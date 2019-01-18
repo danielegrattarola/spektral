@@ -1,0 +1,19 @@
+# Dev related
+.idea/
+*.egg-info
+.pytest_caches/
+dist
+
+# Docs
+docs/site/
+docs/sources/
+
+# Logs
+logs/
+
+# Executables
+*.sh~
+*.pyc
+
+# Virtualenvs
+spektral-venv*

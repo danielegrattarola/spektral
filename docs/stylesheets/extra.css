@@ -1,0 +1,13 @@
+.toctree-l4, .toctree-l5 {
+    display: none !important;
+}
+
+body > div.wy-grid-for-nav > nav > div.wy-side-nav-search > a {
+    color: transparent !important;
+    background-image: url('https://danielegrattarola.github.io/spektral/img/logo.png') !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    line-height: 4;
+    display: flex !important;
+}
