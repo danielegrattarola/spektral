@@ -3,6 +3,7 @@
 *.egg-info
 .pytest_caches/
 dist
+build
 
 # Docs
 docs/site/
