@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Spektral: a Framework for Relational Representation Learning">
+  <meta name="author" content="Daniele Grattarola">
+  <link rel="shortcut icon" href="img/favicon.ico">
+  <title>Home - Spektral</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  <link href="stylesheets/extra.css" rel="stylesheet">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Home";
+    var mkdocs_page_input_path = "index.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="js/jquery-2.1.1.min.js" defer></script>
+  <script src="js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+  <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-125823175-1', 'auto');
+      ga('send', 'pageview');
+  </script>
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="." class="icon icon-home"> Spektral</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href=".">Home</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#welcome-to-spektral">Welcome to Spektral</a></li>
+    
+
+    <li class="toctree-l2"><a href="#relational-representation-learning">Relational Representation Learning</a></li>
+    
+
+    <li class="toctree-l2"><a href="#why-keras">Why Keras?</a></li>
+    
+
+    <li class="toctree-l2"><a href="#installation">Installation</a></li>
+    
+
+    <li class="toctree-l2"><a href="#contributing">Contributing</a></li>
+    
+
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="data/">Data representation</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Layers</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="layers/convolution/">Convolutional Layers</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="layers/base/">Base Layers</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="layers/pooiling/">Pooling Layers</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="layers/matching.md">Matching Layers</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Datasets</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="datasets/aids.md">AIDS</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="datasets/citation/">Citation</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="datasets/delaunay/">Delaunay</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="datasets/kaggle_seizure.md">Kaggle iEEG</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="datasets/qm9/">QM9</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="chem/">Chemistry</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="brain/">Brain</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="geometric/">Geometric</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Utils</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="utils/affinities.md">Affinities</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="utils/io/">Input/Ouput</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="utils/conversion/">Conversion</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="utils/convolution/">Convolution</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="utils/logging/">Logging</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="utils/misc/">Miscellaneous</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="utils/plotting/">Plotting</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href=".">Spektral</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Home</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/danielegrattarola/spektral/edit/master/docs/index.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p><img alt="Spektral logo" src="https://danielegrattarola.github.io/spektral/img/logo_black.png" /></p>
+<table>
+<thead>
+<tr>
+<th align="left">WARNING</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">The documentation for Spektral is still a work in progress and may change substantially before the first release. Most features that are documented now are probably not mature enough to make it in the first round, but worry not! They'll be there eventually! Drop me an email if you want to help out with the release.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="welcome-to-spektral">Welcome to Spektral</h2>
+<p>Spektral is a framework for relational representation learning, built in
+Python and based on the Keras API.
+The main purpose of this project is to provide a simple, fast, and
+scalable environment for fast experimentation.</p>
+<p>Spektral contains a wide set of tools to build graph neural networks, and 
+implements some of the most popular layers for graph deep learning so that you 
+only need to worry about creating your models.</p>
+<p>Read the documentation on <a href="https://danielegrattarola.github.io/spektral">the official website</a>.</p>
+<h2 id="relational-representation-learning">Relational Representation Learning</h2>
+<p>An important trait of human intelligence is the ability to model the world 
+in terms of entities and relations, exploiting the knowledge that entities are 
+connected (called the <strong>relational inductive bias</strong>) in order to make informed 
+decisions.<br />
+This relational representation of the world allows us to model a great deal of
+phenomena using graphs, from social networks to sentences, from the 
+interactions of bodies in a gravitational field to the bonds between atoms in a 
+molecule. </p>
+<p>Given their flexibility for representing knowledge in a structured way, graphs 
+have been historically ubiquitous in computer science, and early efforts in 
+artificial intelligence relied heavily on relational representations 
+(e.g., Monte Carlo methods, Bayesian networks, etc.).<br />
+Modern machine learning approaches, on the other hand, seemed to have diverted 
+from such <strong>hand-engineered</strong> representations in favour of learning from 
+raw data, with deep learning methods leading the way on the quasi-totality of 
+learning tasks.  <br />
+However, by placing artificial intelligence in the framework of relational 
+inductive bias, as proposed by <a href="https://arxiv.org/abs/1806.01261">Battaglia et al.</a>, 
+we see that even the most modern deep learning methods are designed to exploit 
+the relational inductive biases of particular types of data. For instance, 
+convolutional neural networks are based on exploiting the relation of <strong>locality</strong> 
+in grid-structured data, and recurrent neural networks are designed to exploit 
+the <strong>sequentiality</strong> of time series (i.e., chains of time steps).</p>
+<p>Adding to this, in recent years graph neural networks (GNNs) have been proposed, 
+in several formulations, as a general framework for exploiting arbitrary 
+relational inductive biases on arbitrarily defined entities and relations, giving
+rise to the filed of <strong>relational representation learning</strong> (RRL).<br />
+In other words, RRL consists of developing models that are able to deal with 
+graphs natively, taking their topology and attributes into account when making
+a prediction, exactly like we do when we reason about the universe.</p>
+<p>To read more about RRL and recent developments in the literature, an excellent
+starting point is <a href="https://arxiv.org/abs/1806.01261">this paper by DeepMind</a>.</p>
+<h2 id="why-keras">Why Keras?</h2>
+<p>The core GNN modules of Spektral are based on Keras, rather than libraries like 
+TensorFlow or PyTorch.<br />
+Because it's built as a Keras extension, Spektral works with all the different 
+backends offered by Keras, so that you can quickly start experimenting with RRL 
+without having to deal with the distracting low-level details. <br />
+This also means that Spektral inherits all the core design principles of
+Keras, and that it can be seamlessly integrated in your Keras or TensorFlow 
+projects. </p>
+<p>While Keras has a slightly higher computational overhead with respect to
+the "pure" deep learning frameworks, the speed of implementation of
+Keras's models largely makes up for the disadvantage. At the same time,
+Keras offers the same granular control as the other frameworks via
+direct access to the backend (<code>from keras import backend as K</code>), and
+native functions from the backend frameworks can directly be used at any
+point in a Keras model.</p>
+<p>Spektral's accessory modules are built in Numpy/Scipy, so everything should work 
+at almost-C-like speed and without compatibility issues.</p>
+<h2 id="installation">Installation</h2>
+<p>Spektral is developed with Python 3 in mind, although some modules may
+work as expected also in Python 2. However, <a href="https://python3statement.org/">you should consider
+switching to Python 3</a> if you haven't
+already.</p>
+<p>Currently, installation is only available from source (PyPi support will
+be added eventually).</p>
+<p>Install dependencies (on Ubuntu) with:</p>
+<pre><code class="sh">$ sudo apt install python-dev graphviz libgraphviz-dev pkg-config libcgraph
+</code></pre>
+
+<p>Some features of Spektral require the following optional dependencies:</p>
+<ul>
+<li><a href="http://www.rdkit.org/docs/index.html">RDKit</a>, a library for cheminformatics 
+ and molecule manipulation (available through Anaconda);</li>
+<li><a href="https://dyfunconn.readthedocs.io/">dyfunconn</a>, a library to build functional 
+ connectivity networks (available through PyPi);</li>
+<li><a href="https://github.com/dan-zam/cdg">CDG</a>, a library implementing several change 
+ detection algorithms, as well as an engine for Riemannian geometry (available 
+ on Github);</li>
+</ul>
+<p>To install Spektral, run this in a terminal:</p>
+<pre><code class="sh">$ git clone https://github.com/danielegrattarola/spektral.git
+$ cd spektral
+$ python setup.py install  # Or 'pip install .'
+</code></pre>
+
+<p>Note that the <code>setup.py</code> script will not attempt to install a backend for Keras,
+in order to not mess up any previous installation. 
+It will, however, install Keras and its dependencies via PyPi (which may include 
+the CPU version of TensorFlow).  <br />
+If you are already a Keras user, this should not impact you. If you're
+just getting started, then you may want to <a href="https://www.tensorflow.org/install/">install the GPU version of Tensorflow</a> 
+before installing Spektral.</p>
+<p>Also note that some experimental features of Spektral may depend explicitly on 
+TensorFlow, although this dependency will be kept to a minimum.</p>
+<h2 id="contributing">Contributing</h2>
+<p>Spektral is an open source project available <a href="https://github.com/danielegrattarola/spektral">on Github</a>,
+and contributions of all types are welcome. Feel free to open a pull request if 
+you have something interesting that you want to add to the framework.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="data/" class="btn btn-neutral float-right" title="Data representation">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+      
+        <span style="margin-left: 15px"><a href="data/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme.js" defer></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+      <script src="search/main.js" defer></script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 1.0.4
+Build Date UTC : 2019-01-18 11:49:19
+-->

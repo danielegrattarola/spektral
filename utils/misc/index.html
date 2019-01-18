@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="Daniele Grattarola">
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Miscellaneous - Spektral</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  <link href="../../stylesheets/extra.css" rel="stylesheet">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Miscellaneous";
+    var mkdocs_page_input_path = "utils/misc.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+  <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-125823175-1', 'auto');
+      ga('send', 'pageview');
+  </script>
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Spektral</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../data/">Data representation</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Layers</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../../layers/convolution/">Convolutional Layers</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../layers/base/">Base Layers</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../layers/pooiling/">Pooling Layers</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../layers/matching.md">Matching Layers</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Datasets</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../../datasets/aids.md">AIDS</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../datasets/citation/">Citation</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../datasets/delaunay/">Delaunay</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../datasets/kaggle_seizure.md">Kaggle iEEG</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../datasets/qm9/">QM9</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../chem/">Chemistry</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../brain/">Brain</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../geometric/">Geometric</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Utils</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../affinities.md">Affinities</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../io/">Input/Ouput</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../conversion/">Conversion</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../convolution/">Convolution</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../logging/">Logging</a>
+                </li>
+                <li class=" current">
+                    
+    <a class="current" href="./">Miscellaneous</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#batch_iterator">batch_iterator</a></li>
+    
+
+    <li class="toctree-l3"><a href="#set_trainable">set_trainable</a></li>
+    
+
+    <li class="toctree-l3"><a href="#pad_jagged_array">pad_jagged_array</a></li>
+    
+
+    <li class="toctree-l3"><a href="#normalize_adj">normalize_adj</a></li>
+    
+
+    <li class="toctree-l3"><a href="#add_eye">add_eye</a></li>
+    
+
+    <li class="toctree-l3"><a href="#sub_eye">sub_eye</a></li>
+    
+
+    </ul>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../plotting/">Plotting</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Spektral</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Utils &raquo;</li>
+        
+      
+    
+    <li>Miscellaneous</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/danielegrattarola/spektral/edit/master/docs/utils/misc.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h3 id="batch_iterator">batch_iterator</h3>
+<pre><code class="python">spektral.utils.batch_iterator(data, batch_size=32, epochs=1, shuffle=True)
+</code></pre>
+
+<p>Iterates over the data for the given number of epochs, yielding batches of
+size <code>batch_size</code>.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>data</code>: np.array or list of np.arrays with equal first dimension.</p>
+</li>
+<li>
+<p><code>batch_size</code>: number of samples in a batch</p>
+</li>
+<li>
+<p><code>epochs</code>: number of times to iterate over the data</p>
+</li>
+<li>
+<p><code>shuffle</code>: whether to shuffle the data at the beginning of each epoch
+:yield: a batch of samples (or tuple of batches if X had more than one 
+array). </p>
+</li>
+</ul>
+<hr />
+<h3 id="set_trainable">set_trainable</h3>
+<pre><code class="python">spektral.utils.set_trainable(model, toset)
+</code></pre>
+
+<p>Sets the trainable parameters of a Keras model and all its layers to toset.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>model</code>: a Keras Model</p>
+</li>
+<li>
+<p><code>toset</code>: boolean</p>
+</li>
+</ul>
+<p><strong>Return</strong><br />
+ None</p>
+<hr />
+<h3 id="pad_jagged_array">pad_jagged_array</h3>
+<pre><code class="python">spektral.utils.pad_jagged_array(x, target_shape, dtype=&lt;class 'float'&gt;)
+</code></pre>
+
+<p>Given a jagged array of arbitrary dimensions, zero-pads all elements in the
+array to match the provided <code>target_shape</code>.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>x</code>: a np.array of dtype object, containing np.arrays of varying 
+dimensions</p>
+</li>
+<li>
+<p><code>target_shape</code>: a tuple or list s.t. target_shape[i] &gt;= x.shape[i]
+for each x in X.
+If <code>target_shape[i] = -1</code>, it will be automatically converted to X.shape[i], 
+so that passing a target shape of e.g. (-1, n, m) will leave the first 
+dimension of each element untouched (note that the creation of the output
+array may fail if the result is again a jagged array). </p>
+</li>
+<li>
+<p><code>dtype</code>: the dtype of the returned np.array</p>
+</li>
+</ul>
+<p><strong>Return</strong><br />
+ A zero-padded np.array of shape <code>(X.shape[0], ) + target_shape</code></p>
+<hr />
+<h3 id="normalize_adj">normalize_adj</h3>
+<pre><code class="python">spektral.utils.normalize_adj(adj, symmetric_normalization=True)
+</code></pre>
+
+<p>Normalizes an adjacency matrix as <script type="math/tex">D^{-rac{1}{2}}AD^{-rac{1}{2}}</script> if
+<code>symmetric_normalization=True</code> or <script type="math/tex">D^{-1}A</script> otherwise.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>adj</code>: np.array or scipy.sparse matrix of shape <code>(num_nodes, num_nodes)</code></p>
+</li>
+<li>
+<p><code>symmetric_normalization</code>: boolean, whether to normalize symetrically</p>
+</li>
+</ul>
+<p><strong>Return</strong><br />
+ Np.array of shape <code>(num_nodes, num_nodes)</code></p>
+<hr />
+<h3 id="add_eye">add_eye</h3>
+<pre><code class="python">spektral.utils.add_eye(x)
+</code></pre>
+
+<p>Adds the identity matrix to the given matrix.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li><code>x</code>: a rank 2 np.array or scipy.sparse matrix</li>
+</ul>
+<p><strong>Return</strong><br />
+ A rank 2 np.array as described above</p>
+<hr />
+<h3 id="sub_eye">sub_eye</h3>
+<pre><code class="python">spektral.utils.sub_eye(x)
+</code></pre>
+
+<p>Subtracts the identity matrix to the given matrix.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li><code>x</code>: a rank 2 np.array or scipy.sparse matrix</li>
+</ul>
+<p><strong>Return</strong><br />
+ A rank 2 np.array as described above</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../plotting/" class="btn btn-neutral float-right" title="Plotting">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../logging/" class="btn btn-neutral" title="Logging"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../logging/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../plotting/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+      <script src="../../search/main.js" defer></script>
+
+</body>
+</html>

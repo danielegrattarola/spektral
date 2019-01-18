@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="Daniele Grattarola">
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Base Layers - Spektral</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  <link href="../../stylesheets/extra.css" rel="stylesheet">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Base Layers";
+    var mkdocs_page_input_path = "layers/base.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+  <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-125823175-1', 'auto');
+      ga('send', 'pageview');
+  </script>
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Spektral</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../data/">Data representation</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Layers</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../convolution/">Convolutional Layers</a>
+                </li>
+                <li class=" current">
+                    
+    <a class="current" href="./">Base Layers</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#innerproduct">InnerProduct</a></li>
+    
+
+    <li class="toctree-l3"><a href="#minkowskiproduct">MinkowskiProduct</a></li>
+    
+
+    <li class="toctree-l3"><a href="#ccmprojection">CCMProjection</a></li>
+    
+
+    <li class="toctree-l3"><a href="#ccmmembership">CCMMembership</a></li>
+    
+
+    </ul>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../pooiling/">Pooling Layers</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../matching.md">Matching Layers</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Datasets</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../../datasets/aids.md">AIDS</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../datasets/citation/">Citation</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../datasets/delaunay/">Delaunay</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../datasets/kaggle_seizure.md">Kaggle iEEG</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../datasets/qm9/">QM9</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../chem/">Chemistry</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../brain/">Brain</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../geometric/">Geometric</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Utils</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../../utils/affinities.md">Affinities</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../utils/io/">Input/Ouput</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../utils/conversion/">Conversion</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../utils/convolution/">Convolution</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../utils/logging/">Logging</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../utils/misc/">Miscellaneous</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../utils/plotting/">Plotting</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Spektral</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Layers &raquo;</li>
+        
+      
+    
+    <li>Base Layers</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/danielegrattarola/spektral/edit/master/docs/layers/base.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L105">[source]</a></span></p>
+<h3 id="innerproduct">InnerProduct</h3>
+<pre><code class="python">spektral.layers.InnerProduct(trainable_kernel=False, activation=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None)
+</code></pre>
+
+<p>Computes the inner product between elements of a given 2d tensor <script type="math/tex">x</script>: 
+<script type="math/tex; mode=display">
+\langle x, x \rangle = xx^T.
+</script>
+</p>
+<p><strong>Mode</strong>: single.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>rank 2 tensor of shape <code>(input_dim_1, input_dim_2)</code> (e.g. node features
+of shape <code>(num_nodes, num_features)</code>);</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>rank 2 tensor of shape <code>(input_dim_1, input_dim_1)</code></li>
+</ul>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>trainable_kernel</code>: add a trainable square matrix between the inner
+product (i.e., <code>x.dot(w).dot(x.T)</code>);</p>
+</li>
+<li>
+<p><code>activation</code>: activation function to use;</p>
+</li>
+<li>
+<p><code>kernel_initializer</code>: initializer for the kernel matrix;</p>
+</li>
+<li>
+<p><code>kernel_regularizer</code>: regularization applied to the kernel;</p>
+</li>
+<li>
+<p><code>activity_regularizer</code>: regularization applied to the output;</p>
+</li>
+<li>
+<p><code>kernel_constraint</code>: constraint applied to the kernel;</p>
+</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L181">[source]</a></span></p>
+<h3 id="minkowskiproduct">MinkowskiProduct</h3>
+<pre><code class="python">spektral.layers.MinkowskiProduct(input_dim_1=None, activation=None, activity_regularizer=None)
+</code></pre>
+
+<p>Computes the hyperbolic inner product between elements of a given 2d tensor
+<script type="math/tex">x</script>: 
+<script type="math/tex; mode=display">
+\langle x, x \rangle = x \,
+\begin{pmatrix}
+I_{d\times d} & 0 \\ 0 & -1
+\end{pmatrix} \,x^T.
+</script>
+</p>
+<p><strong>Mode</strong>: single.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>rank 2 tensor of shape <code>(input_dim_1, input_dim_2)</code> (e.g. node features
+of shape <code>(num_nodes, num_features)</code>);</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>rank 2 tensor of shape <code>(input_dim_1, input_dim_1)</code></li>
+</ul>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>input_dim_1</code>: first dimension of the input tensor; set this if you
+encounter issues with shapes in your model, in order to provide an explicit
+output shape for your layer.</p>
+</li>
+<li>
+<p><code>activation</code>: activation function to use;</p>
+</li>
+<li>
+<p><code>activity_regularizer</code>: regularization applied to the output;</p>
+</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L254">[source]</a></span></p>
+<h3 id="ccmprojection">CCMProjection</h3>
+<pre><code class="python">spektral.layers.CCMProjection(r=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
+</code></pre>
+
+<p>Projects a tensor to a CCM depending on the value of <code>r</code>. Optionally, 
+<code>r</code> can be learned via backpropagation.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>tensor of shape <code>(batch_size, input_dim)</code>.</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>tensor of shape <code>(batch_size, input_dim)</code>, where each sample along the
+0th axis is projected to the CCM.</li>
+</ul>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>r</code>: radius of the CCM. If r is a number, then use it as fixed
+radius. If <code>r='spherical'</code>, use a trainable weight as radius, with a
+positivity constraint. If <code>r='hyperbolic'</code>, use a trainable weight
+as radius, with a negativity constraint. If <code>r=None</code>, use a trainable
+weight as radius, with no constraints (points will be projected to the
+correct manifold based on the sign of the weight).</p>
+</li>
+<li>
+<p><code>kernel_initializer</code>: initializer for the kernel matrix;</p>
+</li>
+<li>
+<p><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</p>
+</li>
+<li>
+<p><code>kernel_constraint</code>: constraint applied to the kernel matrix.</p>
+</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L347">[source]</a></span></p>
+<h3 id="ccmmembership">CCMMembership</h3>
+<pre><code class="python">spektral.layers.CCMMembership(r=1.0, mode='average', sigma=1.0)
+</code></pre>
+
+<p>Computes the membership of the given points to a constant-curvature
+manifold of radius <code>r</code>, as: 
+<script type="math/tex; mode=display">
+\mu(x) = \mathrm{exp}\left(\cfrac{-\big( \langle \vec x, \vec x \rangle - r^2 \big)^2}{2\sigma^2}\right).
+</script>
+</p>
+<p>If <code>r=0</code>, then <script type="math/tex">\mu(x) = 1</script>.
+If more than one radius is given, inputs are evenly split across the 
+last dimension and membership is computed for each radius-slice pair.
+The output membership is returned according to the <code>mode</code> option.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>tensor of shape <code>(batch_size, input_dim)</code>;</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>tensor of shape <code>(batch_size, output_size)</code>, where <code>output_size</code> is
+computed according to the <code>mode</code> option;.</li>
+</ul>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>r</code>: int ot list, radia of the CCMs.</p>
+</li>
+<li>
+<p><code>mode</code>: 'average' to return the average membership across CCMs, or
+'concat' to return the membership for each CCM concatenated;</p>
+</li>
+<li>
+<p><code>sigma</code>: spread of the membership curve;</p>
+</li>
+</ul>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../pooiling/" class="btn btn-neutral float-right" title="Pooling Layers">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../convolution/" class="btn btn-neutral" title="Convolutional Layers"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../convolution/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../pooiling/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+      <script src="../../search/main.js" defer></script>
+
+</body>
+</html>

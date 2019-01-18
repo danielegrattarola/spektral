@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="Daniele Grattarola">
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Data representation - Spektral</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  <link href="../stylesheets/extra.css" rel="stylesheet">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Data representation";
+    var mkdocs_page_input_path = "data.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+  <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-125823175-1', 'auto');
+      ga('send', 'pageview');
+  </script>
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Spektral</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="./">Data representation</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#representing-graphs">Representing graphs</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#modes">Modes</a></li>
+        
+            <li><a class="toctree-l3" href="#other-formats">Other formats</a></li>
+        
+        </ul>
+    
+
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Layers</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../layers/convolution/">Convolutional Layers</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../layers/base/">Base Layers</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../layers/pooiling/">Pooling Layers</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../layers/matching.md">Matching Layers</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Datasets</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../datasets/aids.md">AIDS</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../datasets/citation/">Citation</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../datasets/delaunay/">Delaunay</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../datasets/kaggle_seizure.md">Kaggle iEEG</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../datasets/qm9/">QM9</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../chem/">Chemistry</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../brain/">Brain</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../geometric/">Geometric</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Utils</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../utils/affinities.md">Affinities</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../utils/io/">Input/Ouput</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../utils/conversion/">Conversion</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../utils/convolution/">Convolution</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../utils/logging/">Logging</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../utils/misc/">Miscellaneous</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../utils/plotting/">Plotting</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Spektral</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Data representation</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/danielegrattarola/spektral/edit/master/docs/data.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="representing-graphs">Representing graphs</h1>
+<p>Spektral uses a matrix-based representation for manipulating graphs and feeding them to neural networks. This approach is one of the most commonly used in the literature on graph neural networks, and it's perfect to perform efficient computations on GPU.</p>
+<p>A graph is generally represented by three matrices:</p>
+<ul>
+<li>
+<script type="math/tex">A \in \{0, 1\}^{N \times N}</script>: a binary adjacency matrix, where <script type="math/tex">A_{ij} = 1</script> if there is a connection between nodes <script type="math/tex">i</script> and <script type="math/tex">j</script>, and <script type="math/tex">A_{ij} = 0</script> otherwise;</li>
+<li>
+<script type="math/tex">X \in \mathbb{R}^{N \times F}</script>: a matrix encoding node attributes (or features), where an <script type="math/tex">F</script>-dimensional attribute vector is associated to each node;</li>
+<li>
+<script type="math/tex">E \in \mathbb{R}^{N \times N \times S}</script>: a matrix encoding edge attributes, where an <script type="math/tex">S</script>-dimensional attribute vector is associated to each edge;</li>
+</ul>
+<p>Some formulations (like the <a href="https://arxiv.org/abs/1806.01261">graph neural networks</a> proposed by Battaglia et al.) include a feature vector describing the global state of the graph, but this is not supported by Spektral for now. </p>
+<h2 id="modes">Modes</h2>
+<p>In Spektral, some layers and functions are implemented to work on a single graph, while others consider sets (i.e., datasets or batches) of graphs. </p>
+<p>To understand the need for different settings, consider the difference between a citation network and a dataset of molecules.
+In the citation network, the elements of interest are the single nodes and the connections between them. Node and edge features are usually specific to each individual network, and there is no point in training a model across networks.<br />
+On the other hand, when working with molecules in a dataset, we are in a much more familiar setting. Each molecule can be seen as a point in some space, and learning tasks are applied to this domain. Here, the atoms and bonds that make up the molecules are repeated across the dataset with high frequency (like pixel colors in images, where information is mostly encoded in the spatial relations between pixels rather than in the colors themselves), and we are interested in finding patterns that describe the properties of the molecules in general. </p>
+<p>We distinguish between three main <em>modes</em> of operation: </p>
+<ul>
+<li><strong>single</strong>, where we consider a single graph, with its topology and attributes;</li>
+<li><strong>batch</strong>, where we consider a collection of graphs, each with its own topology and attributes;</li>
+<li><strong>mixed</strong>, where we consider a graph with fixed topology, but a collection of 
+different attributes; this can be seen as a particular case of the batch mode (i.e., the case where all adjacency matrices are the same) but is treated separately for computational reasons. </li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="center">Mode</th>
+<th align="center">Adjacency</th>
+<th align="center">Node attr.</th>
+<th align="center">Edge attr.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">Single</td>
+<td align="center">(N, N)</td>
+<td align="center">(N, F)</td>
+<td align="center">(N, N, S)</td>
+</tr>
+<tr>
+<td align="center">Batch</td>
+<td align="center">(batch, N, N)</td>
+<td align="center">(batch, N, F)</td>
+<td align="center">(batch, N, N, S)</td>
+</tr>
+<tr>
+<td align="center">Mixed</td>
+<td align="center">(N, N)</td>
+<td align="center">(batch, N, F)</td>
+<td align="center">(batch, N, N, S)</td>
+</tr>
+</tbody>
+</table>
+<p>In practice, Spektral assumes that when operating in "single" mode the data has no <code>batch</code> dimension, and describes a single graph:</p>
+<pre><code class="py">In [1]: from spektral.datasets import citation
+Using TensorFlow backend.
+
+In [2]: adj, node_features, _, _, _, _, _, _ = citation.load_data('cora')
+Loading cora dataset
+
+In [3]: adj.shape
+Out[3]: (2708, 2708)
+
+In [4]: node_features.shape
+Out[4]: (2708, 1433)
+</code></pre>
+
+<p>This means that when training models in single mode, the usual batching of the data along the first dimension cannot be done (unless the graph can be safely "sliced"), and the whole graph must be fed to the model at each step. See <a href="https://github.com/danielegrattarola/spektral/blob/master/examples/semi_sup_classification_gcn.py">the semi-supervised classification example</a> for a better understanding.</p>
+<p>In "batch" mode, the matrices will have the <code>batch</code> dimension first: </p>
+<pre><code class="py">In [1]: from spektral.datasets import qm9
+Using TensorFlow backend.
+
+In [2]: adj, nf, ef, _ = qm9.load_data()
+Loading QM9 dataset.
+Reading SDF
+100%|█████████████████████| 133885/133885 [00:29&lt;00:00, 4579.22it/s]
+
+In [3]: adj.shape
+Out[3]: (133885, 9, 9)
+
+In [4]: nf.shape
+Out[4]: (133885, 9, 6)
+
+In [5]: ef.shape
+Out[5]: (133885, 9, 9, 1)
+</code></pre>
+
+<p>which should not surprise you if you are familiar with machine learning frameworks (try and load MNIST or any other benchmark image dataset to see a similar representation of the data).</p>
+<p>Finally, in "mixed" mode, where we consider a single adjacency matrix (with no <code>batch</code> dimension), and collections of node and edge attributes (with the <code>batch</code> dimension).</p>
+<h2 id="other-formats">Other formats</h2>
+<p>To provide better compatibility with other libraries, Spektral has methods to convert graphs between the matrix representation (<code>'numpy'</code>) and other formats. </p>
+<p>The <code>'networkx'</code> format represents graphs using the Networkx library, which can then be used to <a href="https://networkx.github.io/documentation/networkx-1.10/reference/convert.html">convert the graphs</a> to other formats like <code>.dot</code> and edge lists. 
+Conversion methods between <code>'numpy'</code> and <code>'networkx'</code> are provided in <code>spektral.utils.conversion</code>.</p>
+<h3 id="molecules">Molecules</h3>
+<p>When working with molecules, some specific formats can be used to represent the graphs. </p>
+<p>The <code>'sdf'</code> format is an internal representation format used to store an SDF file to a dictionary. A molecule in <code>'sdf'</code> format will look something like this: </p>
+<pre><code class="py">{'atoms': [{'atomic_num': 7,
+           'charge': 0,
+           'coords': array([-0.0299,  1.2183,  0.2994]),
+           'index': 0,
+           'info': array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+          'iso': 0},
+          ...,
+          {'atomic_num': 1,
+           'charge': 0,
+           'coords': array([ 0.6896, -2.3002, -0.1042]),
+           'index': 14,
+           'info': array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+           'iso': 0}],
+'bonds': [{'end_atom': 13,
+           'info': array([0, 0, 0]),
+           'start_atom': 4,
+           'stereo': 0,
+           'type': 1},
+          ...,
+          {'end_atom': 8,
+           'info': array([0, 0, 0]),
+           'start_atom': 7,
+           'stereo': 0,
+           'type': 3}],
+'comment': '',
+'data': [''],
+'details': '-OEChem-03231823253D',
+'n_atoms': 15,
+'n_bonds': 15,
+'name': 'gdb_54964',
+'properties': []}
+</code></pre>
+
+<p>The <code>'rdkit'</code> format uses the <a href="http://www.rdkit.org/docs/index.html">RDKit</a> library to represent molecules, and offers several methods to manipulate molecules with a chemistry-oriented approach.</p>
+<p>The <code>'smiles'</code> format represents molecules as strings, and can be used as a space-efficient way to store molecules or perform quick checks on a dataset (e.g., counting the unique number of molecules in a dataset is quicker if all molecules are converted to SMILES first).</p>
+<p>The <code>spektral.chem</code> modules offers conversion methods between all of these formats, although some conversions may need more than one step to do (e.g., <code>'sdf'</code> to <code>'networkx'</code> to <code>'numpy'</code> to <code>'smiles'</code>). Support for direct conversion between all formats will eventually be added.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../layers/convolution/" class="btn btn-neutral float-right" title="Convolutional Layers">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href=".." class="btn btn-neutral" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../layers/convolution/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>

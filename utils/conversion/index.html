@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="Daniele Grattarola">
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Conversion - Spektral</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  <link href="../../stylesheets/extra.css" rel="stylesheet">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Conversion";
+    var mkdocs_page_input_path = "utils/conversion.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+  <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-125823175-1', 'auto');
+      ga('send', 'pageview');
+  </script>
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Spektral</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../data/">Data representation</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Layers</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../../layers/convolution/">Convolutional Layers</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../layers/base/">Base Layers</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../layers/pooiling/">Pooling Layers</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../layers/matching.md">Matching Layers</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Datasets</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../../datasets/aids.md">AIDS</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../datasets/citation/">Citation</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../datasets/delaunay/">Delaunay</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../datasets/kaggle_seizure.md">Kaggle iEEG</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../datasets/qm9/">QM9</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../chem/">Chemistry</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../brain/">Brain</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../geometric/">Geometric</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Utils</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../affinities.md">Affinities</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../io/">Input/Ouput</a>
+                </li>
+                <li class=" current">
+                    
+    <a class="current" href="./">Conversion</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#nx_to_adj">nx_to_adj</a></li>
+    
+
+    <li class="toctree-l3"><a href="#nx_to_node_features">nx_to_node_features</a></li>
+    
+
+    <li class="toctree-l3"><a href="#nx_to_edge_features">nx_to_edge_features</a></li>
+    
+
+    <li class="toctree-l3"><a href="#nx_to_numpy">nx_to_numpy</a></li>
+    
+
+    <li class="toctree-l3"><a href="#numpy_to_nx">numpy_to_nx</a></li>
+    
+
+    </ul>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../convolution/">Convolution</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../logging/">Logging</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../misc/">Miscellaneous</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../plotting/">Plotting</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Spektral</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Utils &raquo;</li>
+        
+      
+    
+    <li>Conversion</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/danielegrattarola/spektral/edit/master/docs/utils/conversion.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h3 id="nx_to_adj">nx_to_adj</h3>
+<pre><code class="python">spektral.utils.nx_to_adj(graphs)
+</code></pre>
+
+<p>Converts a list of nx.Graphs to a rank 3 np.array of adjacency matrices
+of shape <code>(num_graphs, num_nodes, num_nodes)</code>.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li><code>graphs</code>: a nx.Graph, or list of nx.Graphs.</li>
+</ul>
+<p><strong>Return</strong><br />
+ A rank 3 np.array of adjacency matrices.</p>
+<hr />
+<h3 id="nx_to_node_features">nx_to_node_features</h3>
+<pre><code class="python">spektral.utils.nx_to_node_features(graphs, keys=None, post_processing=None)
+</code></pre>
+
+<p>Converts a list of nx.Graphs to a rank 3 np.array of node features matrices
+of shape <code>(num_graphs, num_nodes, num_features)</code>. Optionally applies a
+post-processing function to each individual attribute in the nx Graphs.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>graphs</code>: a nx.Graph, or a list of nx.Graphs;</p>
+</li>
+<li>
+<p><code>keys</code>: a list of keys with which to index node attributes in the nx
+Graphs. It's also possible to set this to <code>None</code> and the function will
+attempt to automatically extract the correct keys from the first graph in
+the list.</p>
+</li>
+<li>
+<p><code>post_processing</code>: a list of functions with which to post process each
+attribute associated to a key. <code>None</code> can be passed as post-processing 
+function to leave the attribute unchanged.</p>
+</li>
+</ul>
+<p><strong>Return</strong><br />
+ A rank 3 np.array of feature matrices</p>
+<hr />
+<h3 id="nx_to_edge_features">nx_to_edge_features</h3>
+<pre><code class="python">spektral.utils.nx_to_edge_features(graphs, keys=None, post_processing=None)
+</code></pre>
+
+<p>Converts a list of nx.Graphs to a rank 4 np.array of edge features matrices
+of shape <code>(num_graphs, num_nodes, num_nodes, num_features)</code>.
+Optionally applies a post-processing function to each attribute in the nx
+graphs.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>graphs</code>: a nx.Graph, or a list of nx.Graphs;</p>
+</li>
+<li>
+<p><code>keys</code>: a list of keys with which to index edge attributes. It's also
+possible to set this to <code>None</code> and the function will attempt to 
+automatically extract the correct keys from the first graph in the list.  </p>
+</li>
+<li>
+<p><code>post_processing</code>: a list of functions with which to post process each
+attribute associated to a key. <code>None</code> can be passed as post-processing 
+function to leave the attribute unchanged.</p>
+</li>
+</ul>
+<p><strong>Return</strong><br />
+ A rank 3 np.array of feature matrices</p>
+<hr />
+<h3 id="nx_to_numpy">nx_to_numpy</h3>
+<pre><code class="python">spektral.utils.nx_to_numpy(graphs, auto_pad=True, self_loops=True, nf_keys=None, ef_keys=None, nf_postprocessing=None, ef_postprocessing=None)
+</code></pre>
+
+<p>Comverts a list of nx.Graphs to numpy format (adjacency, node attributes,
+and edge attributes matrices).</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>graphs</code>: a nx.Graph, or list of nx.Graphs;</p>
+</li>
+<li>
+<p><code>auto_pad</code>: whether to zero-pad all matrices to have graphs with the
+same dimension (set this to true if you don't want to deal with manual
+batching for different-size graphs.</p>
+</li>
+<li>
+<p><code>self_loops</code>: whether to add self-loops to the graphs.</p>
+</li>
+<li>
+<p><code>nf_keys</code>: a list of keys with which to index node attributes. It's also
+possible to set this to <code>None</code> and the function will attempt to
+automatically extract the correct keys from the first graph in the list.</p>
+</li>
+<li>
+<p><code>ef_keys</code>: a list of keys with which to index edge attributes. It's also
+possible to set this to <code>None</code> and the function will attempt to
+automatically extract the correct keys from the first graph in the list.</p>
+</li>
+<li>
+<p><code>nf_postprocessing</code>: a list of functions with which to post process each
+node attribute associated to a key. <code>None</code> can be passed as post-processing
+function to leave the attribute unchanged.</p>
+</li>
+<li>
+<p><code>ef_postprocessing</code>: a list of functions with which to post process each
+edge attribute associated to a key. <code>None</code> can be passed as post-processing
+function to leave the attribute unchanged.</p>
+</li>
+</ul>
+<p><strong>Return</strong>  </p>
+<ul>
+<li>adjacency matrices of shape <code>(num_samples, num_nodes, num_nodes)</code></li>
+<li>node attributes matrices of shape <code>(num_samples, num_nodes, node_features_dim)</code></li>
+<li>edge attributes matrices of shape <code>(num_samples, num_nodes, num_nodes, edge_features_dim)</code></li>
+</ul>
+<hr />
+<h3 id="numpy_to_nx">numpy_to_nx</h3>
+<pre><code class="python">spektral.utils.numpy_to_nx(adj, node_features=None, edge_features=None, nf_name=None, ef_name=None)
+</code></pre>
+
+<p>Converts graphs in numpy format to a list of nx.Graphs.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>adj</code>: adjacency matrices of shape <code>(num_samples, num_nodes, num_nodes)</code>.
+If there is only one sample, the first dimension can be dropped.</p>
+</li>
+<li>
+<p><code>node_features</code>: optional node attributes matrices of shape <code>(num_samples, num_nodes, node_features_dim)</code>.
+If there is only one sample, the first dimension can be dropped.</p>
+</li>
+<li>
+<p><code>edge_features</code>: optional edge attributes matrices of shape <code>(num_samples, num_nodes, num_nodes, edge_features_dim)</code>
+If there is only one sample, the first dimension can be dropped.</p>
+</li>
+<li>
+<p><code>nf_name</code>: optional name to assign to node attributes in the nx.Graphs</p>
+</li>
+<li>
+<p><code>ef_name</code>: optional name to assign to edge attributes in the nx.Graphs</p>
+</li>
+</ul>
+<p><strong>Return</strong><br />
+ A list of nx.Graphs (or a single nx.Graph is there is only one sample)</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../convolution/" class="btn btn-neutral float-right" title="Convolution">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../io/" class="btn btn-neutral" title="Input/Ouput"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../io/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../convolution/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+      <script src="../../search/main.js" defer></script>
+
+</body>
+</html>
