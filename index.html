@@ -285,13 +285,13 @@ at almost-C-like speed and without compatibility issues.</p>
 work as expected also in Python 2. However, <a href="https://python3statement.org/">you should consider
 switching to Python 3</a> if you haven't
 already.</p>
-<p>Currently, installation is only available from source (PyPi support will
-be added eventually).</p>
-<p>Install dependencies (on Ubuntu) with:</p>
-<pre><code class="sh">$ sudo apt install python-dev graphviz libgraphviz-dev pkg-config libcgraph
+<p>The framework is tested for Ubuntu 16.04 and 18.04, but is should also work on 
+other Linux distros and MacOS.</p>
+<p>To install the required dependencies on Ubuntu run:</p>
+<pre><code class="bash">$ sudo apt install graphviz libgraphviz-dev libcgraph6
 </code></pre>
 
-<p>Some features of Spektral require the following optional dependencies:</p>
+<p>Some features of Spektral also require the following optional dependencies:</p>
 <ul>
 <li><a href="http://www.rdkit.org/docs/index.html">RDKit</a>, a library for cheminformatics 
  and molecule manipulation (available through Anaconda);</li>
@@ -301,8 +301,12 @@ be added eventually).</p>
  detection algorithms, as well as an engine for Riemannian geometry (available 
  on Github);</li>
 </ul>
-<p>To install Spektral, run this in a terminal:</p>
-<pre><code class="sh">$ git clone https://github.com/danielegrattarola/spektral.git
+<p>The simplest way to install Spektral is with PyPi: </p>
+<pre><code class="bash">$ pip install spektral
+</code></pre>
+
+<p>To install Spektral from source, run this in a terminal:</p>
+<pre><code class="bash">$ git clone https://github.com/danielegrattarola/spektral.git
 $ cd spektral
 $ python setup.py install  # Or 'pip install .'
 </code></pre>
@@ -314,8 +318,8 @@ the CPU version of TensorFlow).  <br />
 If you are already a Keras user, this should not impact you. If you're
 just getting started, then you may want to <a href="https://www.tensorflow.org/install/">install the GPU version of Tensorflow</a> 
 before installing Spektral.</p>
-<p>Also note that some experimental features of Spektral may depend explicitly on 
-TensorFlow, although this dependency will be kept to a minimum.</p>
+<p>Also note that some features of Spektral may depend explicitly on TensorFlow, 
+although this dependency will be kept to a minimum.</p>
 <h2 id="contributing">Contributing</h2>
 <p>Spektral is an open source project available <a href="https://github.com/danielegrattarola/spektral">on Github</a>,
 and contributions of all types are welcome. Feel free to open a pull request if 
@@ -371,5 +375,5 @@ you have something interesting that you want to add to the framework.</p>
 
 <!--
 MkDocs version : 1.0.4
-Build Date UTC : 2019-01-21 06:21:41
+Build Date UTC : 2019-01-21 15:18:27
 -->
