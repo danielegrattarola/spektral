@@ -203,9 +203,8 @@
               
                 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L6">[source]</a></span></p>
 <h3 id="globalattentionpool">GlobalAttentionPool</h3>
-<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">GlobalAttentionPool</span><span class="p">(</span><span class="n">channels</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">kernel_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
-</pre></div>
-
+<pre><code class="python">spektral.layers.GlobalAttentionPool(channels=32, kernel_regularizer=None)
+</code></pre>
 
 <p>A gated attention global pooling layer as presented by
 <a href="https://arxiv.org/abs/1511.05493">Li et al. (2017)</a>.
@@ -227,17 +226,15 @@ the mode;</li>
 <li><code>kernel_regularizer</code>: regularization applied to the gating networks;  </li>
 </ul>
 <p><strong>Usage</strong></p>
-<div class="codehilite"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">num_features</span><span class="p">))</span>
-<span class="n">Z</span> <span class="o">=</span> <span class="n">GlobalAttentionPool</span><span class="p">(</span><span class="n">channels</span><span class="p">)(</span><span class="n">X</span><span class="p">)</span>
-</pre></div>
-
+<pre><code class="py">X = Input(shape=(num_nodes, num_features))
+Z = GlobalAttentionPool(channels)(X)
+</code></pre>
 
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L82">[source]</a></span></p>
 <h3 id="nodeattentionpool">NodeAttentionPool</h3>
-<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">NodeAttentionPool</span><span class="p">(</span><span class="n">attn_kernel_initializer</span><span class="o">=</span><span class="s1">&#39;glorot_uniform&#39;</span><span class="p">,</span> <span class="n">kernel_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">attn_kernel_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">attn_kernel_constraint</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
-</pre></div>
-
+<pre><code class="python">spektral.layers.NodeAttentionPool(attn_kernel_initializer='glorot_uniform', kernel_regularizer=None, attn_kernel_regularizer=None, attn_kernel_constraint=None)
+</code></pre>
 
 <p>A node-attention global pooling layer. Pools a graph by learning attention
 coefficients to sum node features.
@@ -262,9 +259,9 @@ matrix;</li>
 matrix;</li>
 </ul>
 <p><strong>Usage</strong></p>
-<div class="codehilite"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">num_features</span><span class="p">))</span>
-<span class="n">Z</span> <span class="o">=</span> <span class="n">NodeAttentionPool</span><span class="p">()(</span><span class="n">X</span><span class="p">)</span>
-</pre></div>
+<pre><code class="py">X = Input(shape=(num_nodes, num_features))
+Z = NodeAttentionPool()(X)
+</code></pre>
               
             </div>
           </div>

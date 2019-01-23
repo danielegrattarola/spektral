@@ -214,9 +214,8 @@
             <div class="section">
               
                 <h3 id="batch_iterator">batch_iterator</h3>
-<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">batch_iterator</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-</pre></div>
-
+<pre><code class="python">spektral.utils.batch_iterator(data, batch_size=32, epochs=1, shuffle=True)
+</code></pre>
 
 <p>Iterates over the data for the given number of epochs, yielding batches of
 size <code>batch_size</code>.</p>
@@ -239,9 +238,8 @@ array). </p>
 </ul>
 <hr />
 <h3 id="set_trainable">set_trainable</h3>
-<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">set_trainable</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">toset</span><span class="p">)</span>
-</pre></div>
-
+<pre><code class="python">spektral.utils.set_trainable(model, toset)
+</code></pre>
 
 <p>Sets the trainable parameters of a Keras model and all its layers to toset.</p>
 <p><strong>Arguments</strong>  </p>
@@ -257,9 +255,8 @@ array). </p>
  None</p>
 <hr />
 <h3 id="pad_jagged_array">pad_jagged_array</h3>
-<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">pad_jagged_array</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">target_shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=&lt;</span><span class="k">class</span> <span class="err">&#39;</span><span class="nc">float</span><span class="s1">&#39;&gt;)</span>
-</pre></div>
-
+<pre><code class="python">spektral.utils.pad_jagged_array(x, target_shape, dtype=&lt;class 'float'&gt;)
+</code></pre>
 
 <p>Given a jagged array of arbitrary dimensions, zero-pads all elements in the
 array to match the provided <code>target_shape</code>.</p>
@@ -285,9 +282,8 @@ array may fail if the result is again a jagged array). </p>
  A zero-padded np.array of shape <code>(X.shape[0], ) + target_shape</code></p>
 <hr />
 <h3 id="normalize_adj">normalize_adj</h3>
-<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">normalize_adj</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">symmetric_normalization</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-</pre></div>
-
+<pre><code class="python">spektral.utils.normalize_adj(adj, symmetric_normalization=True)
+</code></pre>
 
 <p>Normalizes an adjacency matrix as <script type="math/tex">D^{-rac{1}{2}}AD^{-rac{1}{2}}</script> if
 <code>symmetric_normalization=True</code> or <script type="math/tex">D^{-1}A</script> otherwise.</p>
@@ -304,9 +300,8 @@ array may fail if the result is again a jagged array). </p>
  Np.array of shape <code>(num_nodes, num_nodes)</code></p>
 <hr />
 <h3 id="add_eye">add_eye</h3>
-<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">add_eye</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-</pre></div>
-
+<pre><code class="python">spektral.utils.add_eye(x)
+</code></pre>
 
 <p>Adds the identity matrix to the given matrix.</p>
 <p><strong>Arguments</strong>  </p>
@@ -317,9 +312,8 @@ array may fail if the result is again a jagged array). </p>
  A rank 2 np.array as described above</p>
 <hr />
 <h3 id="sub_eye">sub_eye</h3>
-<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">sub_eye</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-</pre></div>
-
+<pre><code class="python">spektral.utils.sub_eye(x)
+</code></pre>
 
 <p>Subtracts the identity matrix to the given matrix.</p>
 <p><strong>Arguments</strong>  </p>

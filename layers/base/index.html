@@ -209,9 +209,8 @@
               
                 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L105">[source]</a></span></p>
 <h3 id="innerproduct">InnerProduct</h3>
-<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">InnerProduct</span><span class="p">(</span><span class="n">trainable_kernel</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="s1">&#39;glorot_uniform&#39;</span><span class="p">,</span> <span class="n">kernel_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">activity_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">kernel_constraint</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
-</pre></div>
-
+<pre><code class="python">spektral.layers.InnerProduct(trainable_kernel=False, activation=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None)
+</code></pre>
 
 <p>Computes the inner product between elements of a given 2d tensor <script type="math/tex">x</script>: 
 <script type="math/tex; mode=display">
@@ -253,9 +252,8 @@ product (i.e., <code>x.dot(w).dot(x.T)</code>);</p>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L181">[source]</a></span></p>
 <h3 id="minkowskiproduct">MinkowskiProduct</h3>
-<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">MinkowskiProduct</span><span class="p">(</span><span class="n">input_dim_1</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">activity_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
-</pre></div>
-
+<pre><code class="python">spektral.layers.MinkowskiProduct(input_dim_1=None, activation=None, activity_regularizer=None)
+</code></pre>
 
 <p>Computes the hyperbolic inner product between elements of a given 2d tensor
 <script type="math/tex">x</script>: 
@@ -293,9 +291,8 @@ output shape for your layer.</p>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L254">[source]</a></span></p>
 <h3 id="ccmprojection">CCMProjection</h3>
-<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">CCMProjection</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="s1">&#39;glorot_uniform&#39;</span><span class="p">,</span> <span class="n">kernel_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">kernel_constraint</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
-</pre></div>
-
+<pre><code class="python">spektral.layers.CCMProjection(r=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
+</code></pre>
 
 <p>Projects a tensor to a CCM depending on the value of <code>r</code>. Optionally, 
 <code>r</code> can be learned via backpropagation.</p>
@@ -331,9 +328,8 @@ correct manifold based on the sign of the weight).</p>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L347">[source]</a></span></p>
 <h3 id="ccmmembership">CCMMembership</h3>
-<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">CCMMembership</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;average&#39;</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
-</pre></div>
-
+<pre><code class="python">spektral.layers.CCMMembership(r=1.0, mode='average', sigma=1.0)
+</code></pre>
 
 <p>Computes the membership of the given points to a constant-curvature
 manifold of radius <code>r</code>, as: 

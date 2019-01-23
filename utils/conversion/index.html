@@ -211,9 +211,8 @@
             <div class="section">
               
                 <h3 id="nx_to_adj">nx_to_adj</h3>
-<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">nx_to_adj</span><span class="p">(</span><span class="n">graphs</span><span class="p">)</span>
-</pre></div>
-
+<pre><code class="python">spektral.utils.nx_to_adj(graphs)
+</code></pre>
 
 <p>Converts a list of nx.Graphs to a rank 3 np.array of adjacency matrices
 of shape <code>(num_graphs, num_nodes, num_nodes)</code>.</p>
@@ -225,9 +224,8 @@ of shape <code>(num_graphs, num_nodes, num_nodes)</code>.</p>
  A rank 3 np.array of adjacency matrices.</p>
 <hr />
 <h3 id="nx_to_node_features">nx_to_node_features</h3>
-<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">nx_to_node_features</span><span class="p">(</span><span class="n">graphs</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">post_processing</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
-</pre></div>
-
+<pre><code class="python">spektral.utils.nx_to_node_features(graphs, keys=None, post_processing=None)
+</code></pre>
 
 <p>Converts a list of nx.Graphs to a rank 3 np.array of node features matrices
 of shape <code>(num_graphs, num_nodes, num_features)</code>. Optionally applies a
@@ -253,9 +251,8 @@ function to leave the attribute unchanged.</p>
  A rank 3 np.array of feature matrices</p>
 <hr />
 <h3 id="nx_to_edge_features">nx_to_edge_features</h3>
-<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">nx_to_edge_features</span><span class="p">(</span><span class="n">graphs</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">post_processing</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
-</pre></div>
-
+<pre><code class="python">spektral.utils.nx_to_edge_features(graphs, keys=None, post_processing=None)
+</code></pre>
 
 <p>Converts a list of nx.Graphs to a rank 4 np.array of edge features matrices
 of shape <code>(num_graphs, num_nodes, num_nodes, num_features)</code>.
@@ -281,9 +278,8 @@ function to leave the attribute unchanged.</p>
  A rank 3 np.array of feature matrices</p>
 <hr />
 <h3 id="nx_to_numpy">nx_to_numpy</h3>
-<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">nx_to_numpy</span><span class="p">(</span><span class="n">graphs</span><span class="p">,</span> <span class="n">auto_pad</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">self_loops</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">nf_keys</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">ef_keys</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">nf_postprocessing</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">ef_postprocessing</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
-</pre></div>
-
+<pre><code class="python">spektral.utils.nx_to_numpy(graphs, auto_pad=True, self_loops=True, nf_keys=None, ef_keys=None, nf_postprocessing=None, ef_postprocessing=None)
+</code></pre>
 
 <p>Converts a list of nx.Graphs to numpy format (adjacency, node attributes,
 and edge attributes matrices).</p>
@@ -329,9 +325,8 @@ function to leave the attribute unchanged.</p>
 </ul>
 <hr />
 <h3 id="numpy_to_nx">numpy_to_nx</h3>
-<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">numpy_to_nx</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">node_features</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">edge_features</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">nf_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">ef_name</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
-</pre></div>
-
+<pre><code class="python">spektral.utils.numpy_to_nx(adj, node_features=None, edge_features=None, nf_name=None, ef_name=None)
+</code></pre>
 
 <p>Converts graphs in numpy format to a list of nx.Graphs.</p>
 <p><strong>Arguments</strong>  </p>
