@@ -159,3 +159,4 @@ class NodeAttentionPool(Layer):
         config = {}
         base_config = super(NodeAttentionPool, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
+

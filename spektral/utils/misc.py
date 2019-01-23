@@ -5,8 +5,6 @@ import re
 import networkx as nx
 import numpy as np
 from scipy import sparse as sp
-from scipy.stats import mannwhitneyu
-from tqdm import tqdm
 
 
 def pad_jagged_array(x, target_shape, dtype=np.float):
@@ -327,17 +325,17 @@ def batch_iterator(data, batch_size=32, epochs=1, shuffle=True):
     if len(set([len(item) for item in data])) > 1:
         raise ValueError('All arrays must have the same length')
 
-    l = len(data[0])
-    batches_per_epoch = int(l / batch_size)
-    if batches_per_epoch == 0 or l % batch_size == 0:
+    len_data = len(data[0])
+    batches_per_epoch = int(len_data / batch_size)
+    if batches_per_epoch == 0 or len_data % batch_size == 0:
         batches_per_epoch += 1
     for epochs in range(epochs):
         if shuffle:
-            shuffle_idx = np.random.permutation(np.arange(l))
+            shuffle_idx = np.random.permutation(np.arange(len_data))
             data = [np.array(item)[shuffle_idx] for item in data]
         for batch in range(batches_per_epoch):
             start = batch * batch_size
-            stop = min(start + batch_size, l)
+            stop = min(start + batch_size, len_data)
             if len(data) > 1:
                 yield [item[start:stop] for item in data]
             else:

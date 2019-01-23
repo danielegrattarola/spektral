@@ -1,5 +1,9 @@
 import numpy as np
-from cdg.embedding.manifold import SphericalManifold, HyperbolicManifold
+try:
+    from cdg.embedding.manifold import SphericalManifold, HyperbolicManifold
+    CDG_OK = True
+except ImportError:
+    CDG_OK = False
 
 
 # Euclidean manifold ###########################################################
@@ -115,6 +119,8 @@ def exp_map(x, r, tangent_point=None):
     (extrinsic coordinates); if `None`, defaults to `[0., ..., 0., r]`.
     :return: the exp-map of x to the CCM (extrinsic coordinates).
     """
+    if not CDG_OK:
+        raise ImportError('`exp_map` requires CDG.')
     extrinsic_dim = x.shape[-1] + 1
     if tangent_point is None:
         tangent_point = np.zeros((extrinsic_dim,))
@@ -149,6 +155,8 @@ def log_map(x, r, tangent_point=None):
     (extrinsic coordinates); if 'None', defaults to `[0., ..., 0., r]`.
     :return: the log-map of x to the tangent plane (intrinsic coordinates).
     """
+    if not CDG_OK:
+        raise ImportError('`log_map` requires CDG.')
     extrinsic_dim = x.shape[-1]
     if tangent_point is None:
         tangent_point = np.zeros((extrinsic_dim,))

@@ -2,7 +2,7 @@
 
 |WARNING|
 |:------|
-| The documentation for Spektral is still a work in progress and may change substantially before the first release. Most features that are documented now are probably not mature enough to make it in the first round, but worry not! They'll be there eventually! Drop me an email if you want to help out with the release.|
+| The documentation for Spektral is still a work in progress and may change substantially before the first proper release. The API is not mature enough to be considered stable, but we'll try to keep breaking changes to a minimum. Drop me an email if you want to help out with the development.|
 
 ## Welcome to Spektral
 Spektral is a framework for relational representation learning, built in
@@ -14,6 +14,7 @@ Spektral contains a wide set of tools to build graph neural networks, and
 implements some of the most popular layers for graph deep learning so that you 
 only need to worry about creating your models.
 
+Spektral is an open source project available on [Github](https://github.com/danielegrattarola/spektral).  
 Read the documentation on [the official website](https://danielegrattarola.github.io/spektral).
 
 ## Relational Representation Learning
@@ -80,15 +81,16 @@ work as expected also in Python 2. However, [you should consider
 switching to Python 3](https://python3statement.org/) if you haven't
 already.
 
-Currently, installation is only available from source (PyPi support will
-be added eventually).
+The framework is tested for Ubuntu 16.04 and 18.04, but is should also work on 
+other Linux distros and MacOS.
 
-Install dependencies (on Ubuntu) with:
-```sh
-$ sudo apt install python-dev graphviz libgraphviz-dev pkg-config libcgraph
+To install the required dependencies on Ubuntu run:
+
+```bash
+$ sudo apt install graphviz libgraphviz-dev libcgraph6
 ```
 
-Some features of Spektral require the following optional dependencies:
+Some features of Spektral also require the following optional dependencies:
 
  - [RDKit](http://www.rdkit.org/docs/index.html), a library for cheminformatics 
  and molecule manipulation (available through Anaconda);
@@ -98,8 +100,15 @@ Some features of Spektral require the following optional dependencies:
  detection algorithms, as well as an engine for Riemannian geometry (available 
  on Github);
 
-To install Spektral, run this in a terminal:
-```sh
+The simplest way to install Spektral is with PyPi: 
+
+```bash
+$ pip install spektral
+```
+
+To install Spektral from source, run this in a terminal:
+
+```bash
 $ git clone https://github.com/danielegrattarola/spektral.git
 $ cd spektral
 $ python setup.py install  # Or 'pip install .'
@@ -113,8 +122,8 @@ If you are already a Keras user, this should not impact you. If you're
 just getting started, then you may want to [install the GPU version of Tensorflow](https://www.tensorflow.org/install/) 
 before installing Spektral.
 
-Also note that some experimental features of Spektral may depend explicitly on 
-TensorFlow, although this dependency will be kept to a minimum.
+Also note that some features of Spektral may depend explicitly on TensorFlow, 
+although this dependency will be kept to a minimum.
 
 ## Contributing
 Spektral is an open source project available [on Github](https://github.com/danielegrattarola/spektral),

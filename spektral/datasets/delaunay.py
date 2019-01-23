@@ -151,7 +151,7 @@ def generate_data(return_type='networkx', classes=0, n_samples_in_class=1000,
             noise_i = np.random.normal(0, 1, (n_samples_in_class, n_nodes, 2))
             class_i = concept_i + noise_i
             node_features.append(class_i)
-    node_features = np.array(node_features).reshape(-1, n_nodes, 2)
+    node_features = np.array(node_features).reshape((-1, n_nodes, 2))
 
     # Compute adjacency matrices
     adjacency = []

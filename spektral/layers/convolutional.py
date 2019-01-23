@@ -117,7 +117,7 @@ class GraphConv(Layer):
                 output = K.batch_dot(fltr, output)
             else:
                 # Mixed mode
-                output = K.tf.einsum('ij,bjk->bik', fltr, output)  # TODO implement in pure Keras
+                output = mixed_mode_dot(fltr, output)
 
         if self.use_bias:
             output = K.bias_add(output, self.bias)
@@ -261,7 +261,7 @@ class ChebConv(Layer):
                     s = K.batch_dot(fltr, features)
                 else:
                     # Mixed mode
-                    s = K.tf.einsum('ij,bjk->bik', fltr, features)  # TODO implement in pure Keras
+                    s = mixed_mode_dot(fltr, features)
             supports.append(s)
         supports = K.concatenate(supports, axis=-1)
         output = K.dot(supports, self.kernel)
@@ -828,20 +828,20 @@ class GraphConvSkip(Layer):
     def call(self, inputs):
         features = inputs[0]
         features_skip = inputs[1]
-        basis = inputs[2]
+        fltr = inputs[2]
 
         # Convolution
         output = K.dot(features, self.kernel_1)
         if len(K.int_shape(features)) == 2:
             # Single mode
-            output = K.dot(basis, output)
+            output = K.dot(fltr, output)
         else:
-            if len(K.int_shape(basis)) == 3:
+            if len(K.int_shape(fltr)) == 3:
                 # Batch mode
-                output = K.batch_dot(basis, output)
+                output = K.batch_dot(fltr, output)
             else:
                 # Mixed mode
-                output = K.tf.einsum('ij,bjk->bik', basis, output)  # TODO implement in pure Keras
+                output = mixed_mode_dot(fltr, output)
 
         # Skip connection
         skip = K.dot(features_skip, self.kernel_2)
@@ -878,15 +878,22 @@ class GraphConvSkip(Layer):
 class ARMAConv(Layer):
     """
     A graph convolutional layer with ARMA(H, K) filters, as presented by
-    [Bianchi et al. (2019)]().
+    [Bianchi et al. (2019)](https://arxiv.org/abs/1901.01343).
 
     **Mode**: single, mixed, batch.
 
     This layer computes the transformation:
     $$
-        X^{out} = \\dots
+        X^{out} = \\text{avgpool}\\left(\\sum \\limits_{k=1}^K \\bar{X}_k^{(T)} \\right),
     $$
-    where ...
+    where:
+    $$
+        \\bar{X}_k^{(t + 1)} =  \\sigma\\left(\\tilde{L}\\bar{X}^{(t)}W^{(t)} + XV^{(t)}\\right)
+    $$
+    is a graph convolutional skip layer implementing the recursive update to
+    approximate the ARMA filter, \(\\tilde{L}\) is the Laplacian modified to
+    have a spectrum in \([0,,2]\), \(\\bar{X}^{(0)} = X\), and \(W, V\) are
+    trainable kernels.
 
     **Input**
 
@@ -1001,17 +1008,15 @@ class ARMAConv(Layer):
 
     def call(self, inputs):
         features = inputs[0]
-        basis = inputs[1]
+        fltr = inputs[1]
 
         # Convolution
         output = []  # Stores the parallel filters
         for k in range(self.ARMA_K):
             output_k = features
-#            basis_drop = Dropout(self.dropout_rate)(basis)
-            basis_drop = basis
             for d in range(self.ARMA_D):
                 features_drop = Dropout(self.dropout_rate)(features)
-                output_k = self.graph_conv_skip([output_k, features_drop, basis_drop],
+                output_k = self.graph_conv_skip([output_k, features_drop, fltr],
                                                 self.channels,
                                                 'ARMA_skip_{}{}'.format(k, d),
                                                 recurrent_k=k if self.recurrent else None,
@@ -1029,12 +1034,12 @@ class ARMAConv(Layer):
         # Aggregate parallel filters
         output = K.concatenate(output, axis=-1)
                 
-        # Avrage pooling
+        # Average pooling
         output = K.expand_dims(output, axis=-1)
         output_dim = K.int_shape(output)
-        if len(output_dim) == 3: # [nodes, feat, 1] -> [nodes, feat_red, 1]
+        if len(output_dim) == 3:  # [nodes, feat, 1] -> [nodes, feat_red, 1]
             output = AveragePooling1D(pool_size=self.ARMA_K, padding='same')(output)
-        elif len(output_dim) == 4: # [batch, nodes, feat, 1] -> [batch, nodes, feat_red, 1]
+        elif len(output_dim) == 4:  # [batch, nodes, feat, 1] -> [batch, nodes, feat_red, 1]
             output = AveragePooling2D(pool_size=(1, self.ARMA_K), padding='same')(output)
         else:
             raise RuntimeError('GCN_ARMA layer: wrong output dim')
@@ -1175,20 +1180,20 @@ class ARMAConv(Layer):
                 kernel_1, kernel_2, bias = self.kernels_hid[recurrent_k]
         features = x[0]
         features_skip = x[1]
-        basis = x[2]
+        fltr = x[2]
 
         # Convolution
         output = K.dot(features, kernel_1)
         if len(K.int_shape(features)) == 2:
             # Single mode
-            output = K.dot(basis, output)
+            output = K.dot(fltr, output)
         else:
-            if len(K.int_shape(basis)) == 3:
+            if len(K.int_shape(fltr)) == 3:
                 # Batch mode
-                output = K.batch_dot(basis, output)
+                output = K.batch_dot(fltr, output)
             else:
                 # Mixed mode
-                output = K.tf.einsum('ij,bjk->bik', basis, output)  # TODO implement in pure Keras
+                output = mixed_mode_dot(fltr, output)
 
         # Skip connection
         skip = K.dot(features_skip, kernel_2)
@@ -1199,3 +1204,21 @@ class ARMAConv(Layer):
         if activation is not None:
             output = activations.get(activation)(output)
         return output
+
+
+def mixed_mode_dot(fltr, output):
+    """
+    Computes the equivalent of tf.einsum('ij,bjk->bik', fltr, output), but works
+    for both dense and sparse fltr.
+    :param fltr: rank 2 tensor, the filter for convolution
+    :param output: rank 3 tensor, the features of the input signals
+    :return:
+    """
+    _, m_, f_ = K.int_shape(output)
+    output = K.permute_dimensions(output, [1, 2, 0])
+    output = K.reshape(output, (m_, -1))
+    output = K.dot(fltr, output)
+    output = K.reshape(output, (m_, f_, -1))
+    output = K.permute_dimensions(output, [2, 0, 1])
+
+    return output

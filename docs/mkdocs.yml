@@ -11,9 +11,6 @@ google_analytics:
     - UA-125823175-1
     - auto
 
-markdown_extensions:
-  - codehilite
-
 extra_css:
   - 'stylesheets/extra.css'
 
@@ -21,6 +18,7 @@ extra_javascript:
     - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML
 
 markdown_extensions:
+    - codehilite
     - mdx_math
 
 nav:
@@ -30,18 +28,14 @@ nav:
     - Convolutional Layers: layers/convolution.md
     - Base Layers: layers/base.md
     - Pooling Layers: layers/pooiling.md
-    - Matching Layers: layers/matching.md
 - Datasets:
-    - AIDS: datasets/aids.md
     - Citation: datasets/citation.md
     - Delaunay: datasets/delaunay.md
-    - Kaggle iEEG: datasets/kaggle_seizure.md
     - QM9: datasets/qm9.md
 - Chemistry: chem.md
 - Brain: brain.md
 - Geometric: geometric.md
 - Utils:
-    - Affinities: utils/affinities.md
     - Input/Ouput: utils/io.md
     - Conversion: utils/conversion.md
     - Convolution: utils/convolution.md

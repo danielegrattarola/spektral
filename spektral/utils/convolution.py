@@ -35,7 +35,7 @@ def chebyshev_polynomial(X, k):
             the approximation
     """
     T_k = list()
-    T_k.append(sp.eye(X.shape[0]).tocsr())
+    T_k.append(sp.eye(X.shape[0], dtype=X.dtype).tocsr())
     T_k.append(X)
 
     def chebyshev_recurrence(T_k_minus_one, T_k_minus_two, X):
@@ -53,7 +53,7 @@ def chebyshev_filter(adj, k, symmetric_normalization=True):
     Computes the Chebyshev filter from the given adjacency matrix, as described
     in Defferrard et at. (2016).
     :param adj: a np.array or scipy.sparse matrix
-    :param k: integer, the order up to which to cocmpute the Chebyshev polynomials
+    :param k: integer, the order up to which to compute the Chebyshev polynomials
     :param symmetric_normalization: boolean, whether to normalize the matrix as 
     \(D^{-\\frac{1}{2}}AD^{-\\frac{1}{2}}\) or as \(D^{-1}A\). 
     :return: a list of k+1 filter matrices, as np.arrays 

@@ -111,8 +111,8 @@ def get_fc(x, band_freq, sampling_freq, samples_per_graph=None,
         for fcm in ef.reshape((-1, N * N)).T:
             pctl_lo.append(stats.scoreatpercentile(fcm, percentiles[0]))
             pctl_hi.append(stats.scoreatpercentile(fcm, percentiles[1]))
-        pctl_lo = np.array(pctl_lo).reshape(1, N, N, 1)
-        pctl_hi = np.array(pctl_hi).reshape(1, N, N, 1)
+        pctl_lo = np.array(pctl_lo).reshape((1, N, N, 1))
+        pctl_hi = np.array(pctl_hi).reshape((1, N, N, 1))
         adj = np.logical_or(ef < pctl_lo, ef > pctl_hi).astype(np.int)[..., 0]
 
     return adj, nf, ef

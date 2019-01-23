@@ -46,12 +46,12 @@ def nx_to_node_features(graphs, keys=None, post_processing=None):
 
     if keys is None:
         # Attempt to extract node attribute keys from the data itself
-        keys = graphs[0].node[0].keys()
+        keys = graphs[0].nodes[0].keys()
 
     output = []
     for g in graphs:
         node_features = []
-        for v in g.node.values():
+        for v in g.nodes.values():
             f = [v[key] for key in keys]
             if post_processing is not None:
                 f = [op(_) for op, _ in zip(post_processing, f)]
@@ -112,7 +112,7 @@ def nx_to_edge_features(graphs, keys=None, post_processing=None):
 def nx_to_numpy(graphs, auto_pad=True, self_loops=True, nf_keys=None,
                 ef_keys=None, nf_postprocessing=None, ef_postprocessing=None):
     """
-    Comverts a list of nx.Graphs to numpy format (adjacency, node attributes,
+    Converts a list of nx.Graphs to numpy format (adjacency, node attributes,
     and edge attributes matrices).
     :param graphs: a nx.Graph, or list of nx.Graphs;
     :param auto_pad: whether to zero-pad all matrices to have graphs with the

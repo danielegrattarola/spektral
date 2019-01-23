@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='spektral',
-    version='0.0.2',
+    version='0.0.3',
     packages=find_packages(),
     install_requires=['keras', 'networkx', 'pandas', 'joblib', 'matplotlib',
                       'tqdm', 'pygraphviz', 'numpy', 'scipy'],

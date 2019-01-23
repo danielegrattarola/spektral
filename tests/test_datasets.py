@@ -1,5 +1,6 @@
 import pytest
-from spektral.datasets import aids, citation, delaunay, ieeg, kaggle_seizure, qm9
+
+from spektral.datasets import delaunay, qm9
 
 
 def correctly_padded(adj, nf, ef):
@@ -14,20 +15,6 @@ def correctly_padded(adj, nf, ef):
         assert adj.shape[-1] == ef.shape[-3]
 
 
-def test_aids():
-    adj, nf, ef, labels = aids.load_data('numpy')
-    correctly_padded(adj, nf, ef)
-    assert adj.shape[-1] == aids.MAX_K
-    assert adj.shape[0] == labels.shape[0]
-
-    # Test that it doesn't crash
-    aids.load_data('networkx')
-
-
-def test_citation():
-    pass
-
-
 def test_delaunay():
     adj, nf, labels = delaunay.load_data('numpy')
     correctly_padded(adj, nf, None)
@@ -36,20 +23,6 @@ def test_delaunay():
 
     # Test that it doesn't crash
     delaunay.load_data('networkx')
-
-
-def test_ieeg():
-    pass
-
-
-def test_kaggle_seizure():
-    datasets = kaggle_seizure.DATASETS
-    for d in datasets:
-        for p in kaggle_seizure.available_patients(d):
-            adj_train, nf_train, ef_train, y_train, \
-            adj_test, nf_test, ef_test = kaggle_seizure.load_data(p, d)
-            correctly_padded(adj_train, nf_train, ef_train)
-            correctly_padded(adj_test, nf_test, ef_test)
 
 
 def test_qm9():

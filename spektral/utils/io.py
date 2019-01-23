@@ -251,12 +251,12 @@ def _parse_bonds_block(sdf, n_atoms, n_bonds):
     for v in values:
         start_atom = int(v[:3]) - 1
         end_atom = int(v[3:6]) - 1
-        type = int(v[6:9])
+        type_ = int(v[6:9])
         stereo = int(v[9:12])
         info = np.array([int(v[pos:pos + 3]) for pos in range(12, len(v), 3)])
         bonds.append({'start_atom': start_atom,
                       'end_atom': end_atom,
-                      'type': type,
+                      'type': type_,
                       'stereo': stereo,
                       'info': info})
     return bonds

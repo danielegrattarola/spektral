@@ -16,9 +16,12 @@ def n_gpus():
     """
     Returns the number of available GPUs in the system (requires Tensorflow).
     """
-    from tensorflow.python.client import device_lib
-    local_device_protos = device_lib.list_local_devices()
-    return len([x.name for x in local_device_protos if x.device_type == 'GPU'])
+    try:
+        from tensorflow.python.client import device_lib
+        local_device_protos = device_lib.list_local_devices()
+        return len([x.name for x in local_device_protos if x.device_type == 'GPU'])
+    except ImportError:
+        raise ImportError('`n_gpus` requires tensorflow')
 
 
 def init_display():

@@ -415,6 +415,8 @@ class CCMMembership(Layer):
                 output = Average()(output_part)
             elif self.mode == 'concat':
                 output = Concatenate()(output_part)
+            else:
+                raise ValueError()  # Never gets here
         else:
             output = output_part[0]
 
@@ -521,3 +523,4 @@ class Bias(Layer):
         config = {}
         base_config = super(Bias, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
+
