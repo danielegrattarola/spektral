@@ -97,7 +97,7 @@
                 </li>
                 <li class="">
                     
-    <a class="" href="../layers/pooiling/">Pooling Layers</a>
+    <a class="" href="../layers/pooiling.md">Pooling Layers</a>
                 </li>
     </ul>
 	    </li>
@@ -257,38 +257,40 @@ different attributes; this can be seen as a particular case of the batch mode (i
 </tbody>
 </table>
 <p>In practice, Spektral assumes that when operating in "single" mode the data has no <code>batch</code> dimension, and describes a single graph:</p>
-<pre><code class="py">In [1]: from spektral.datasets import citation
-Using TensorFlow backend.
+<div class="codehilite"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">from</span> <span class="nn">spektral.datasets</span> <span class="kn">import</span> <span class="n">citation</span>
+<span class="n">Using</span> <span class="n">TensorFlow</span> <span class="n">backend</span><span class="o">.</span>
 
-In [2]: adj, node_features, _, _, _, _, _, _ = citation.load_data('cora')
-Loading cora dataset
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">adj</span><span class="p">,</span> <span class="n">node_features</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">citation</span><span class="o">.</span><span class="n">load_data</span><span class="p">(</span><span class="s1">&#39;cora&#39;</span><span class="p">)</span>
+<span class="n">Loading</span> <span class="n">cora</span> <span class="n">dataset</span>
 
-In [3]: adj.shape
-Out[3]: (2708, 2708)
+<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="n">adj</span><span class="o">.</span><span class="n">shape</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="p">(</span><span class="mi">2708</span><span class="p">,</span> <span class="mi">2708</span><span class="p">)</span>
 
-In [4]: node_features.shape
-Out[4]: (2708, 1433)
-</code></pre>
+<span class="n">In</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="n">node_features</span><span class="o">.</span><span class="n">shape</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="p">(</span><span class="mi">2708</span><span class="p">,</span> <span class="mi">1433</span><span class="p">)</span>
+</pre></div>
+
 
 <p>This means that when training models in single mode, the usual batching of the data along the first dimension cannot be done (unless the graph can be safely "sliced"), and the whole graph must be fed to the model at each step. See <a href="https://github.com/danielegrattarola/spektral/blob/master/examples/semi_sup_classification_gcn.py">the semi-supervised classification example</a> for a better understanding.</p>
 <p>In "batch" mode, the matrices will have the <code>batch</code> dimension first: </p>
-<pre><code class="py">In [1]: from spektral.datasets import qm9
-Using TensorFlow backend.
+<div class="codehilite"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">from</span> <span class="nn">spektral.datasets</span> <span class="kn">import</span> <span class="n">qm9</span>
+<span class="n">Using</span> <span class="n">TensorFlow</span> <span class="n">backend</span><span class="o">.</span>
 
-In [2]: adj, nf, ef, _ = qm9.load_data()
-Loading QM9 dataset.
-Reading SDF
-100%|█████████████████████| 133885/133885 [00:29&lt;00:00, 4579.22it/s]
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">adj</span><span class="p">,</span> <span class="n">nf</span><span class="p">,</span> <span class="n">ef</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">qm9</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+<span class="n">Loading</span> <span class="n">QM9</span> <span class="n">dataset</span><span class="o">.</span>
+<span class="n">Reading</span> <span class="n">SDF</span>
+<span class="mi">100</span><span class="o">%|</span><span class="err">█████████████████████</span><span class="o">|</span> <span class="mi">133885</span><span class="o">/</span><span class="mi">133885</span> <span class="p">[</span><span class="mo">00</span><span class="p">:</span><span class="mi">29</span><span class="o">&lt;</span><span class="mo">00</span><span class="p">:</span><span class="mo">00</span><span class="p">,</span> <span class="mf">4579.22</span><span class="n">it</span><span class="o">/</span><span class="n">s</span><span class="p">]</span>
 
-In [3]: adj.shape
-Out[3]: (133885, 9, 9)
+<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="n">adj</span><span class="o">.</span><span class="n">shape</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="p">(</span><span class="mi">133885</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
 
-In [4]: nf.shape
-Out[4]: (133885, 9, 6)
+<span class="n">In</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="n">nf</span><span class="o">.</span><span class="n">shape</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="p">(</span><span class="mi">133885</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
 
-In [5]: ef.shape
-Out[5]: (133885, 9, 9, 1)
-</code></pre>
+<span class="n">In</span> <span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="n">ef</span><span class="o">.</span><span class="n">shape</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="p">(</span><span class="mi">133885</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
 
 <p>which should not surprise you if you are familiar with machine learning frameworks (try and load MNIST or any other benchmark image dataset to see a similar representation of the data).</p>
 <p>Finally, in "mixed" mode, where we consider a single adjacency matrix (with no <code>batch</code> dimension), and collections of node and edge attributes (with the <code>batch</code> dimension).</p>
@@ -299,38 +301,39 @@ Conversion methods between <code>'numpy'</code> and <code>'networkx'</code> are 
 <h3 id="molecules">Molecules</h3>
 <p>When working with molecules, some specific formats can be used to represent the graphs. </p>
 <p>The <code>'sdf'</code> format is an internal representation format used to store an SDF file to a dictionary. A molecule in <code>'sdf'</code> format will look something like this: </p>
-<pre><code class="py">{'atoms': [{'atomic_num': 7,
-           'charge': 0,
-           'coords': array([-0.0299,  1.2183,  0.2994]),
-           'index': 0,
-           'info': array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-          'iso': 0},
-          ...,
-          {'atomic_num': 1,
-           'charge': 0,
-           'coords': array([ 0.6896, -2.3002, -0.1042]),
-           'index': 14,
-           'info': array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-           'iso': 0}],
-'bonds': [{'end_atom': 13,
-           'info': array([0, 0, 0]),
-           'start_atom': 4,
-           'stereo': 0,
-           'type': 1},
-          ...,
-          {'end_atom': 8,
-           'info': array([0, 0, 0]),
-           'start_atom': 7,
-           'stereo': 0,
-           'type': 3}],
-'comment': '',
-'data': [''],
-'details': '-OEChem-03231823253D',
-'n_atoms': 15,
-'n_bonds': 15,
-'name': 'gdb_54964',
-'properties': []}
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="p">{</span><span class="s1">&#39;atoms&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;atomic_num&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+           <span class="s1">&#39;charge&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+           <span class="s1">&#39;coords&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">0.0299</span><span class="p">,</span>  <span class="mf">1.2183</span><span class="p">,</span>  <span class="mf">0.2994</span><span class="p">]),</span>
+           <span class="s1">&#39;index&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+           <span class="s1">&#39;info&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
+          <span class="s1">&#39;iso&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+          <span class="o">...</span><span class="p">,</span>
+          <span class="p">{</span><span class="s1">&#39;atomic_num&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+           <span class="s1">&#39;charge&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+           <span class="s1">&#39;coords&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span> <span class="mf">0.6896</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.3002</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1042</span><span class="p">]),</span>
+           <span class="s1">&#39;index&#39;</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span>
+           <span class="s1">&#39;info&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
+           <span class="s1">&#39;iso&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}],</span>
+<span class="s1">&#39;bonds&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;end_atom&#39;</span><span class="p">:</span> <span class="mi">13</span><span class="p">,</span>
+           <span class="s1">&#39;info&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
+           <span class="s1">&#39;start_atom&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+           <span class="s1">&#39;stereo&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+           <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+          <span class="o">...</span><span class="p">,</span>
+          <span class="p">{</span><span class="s1">&#39;end_atom&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+           <span class="s1">&#39;info&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
+           <span class="s1">&#39;start_atom&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+           <span class="s1">&#39;stereo&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+           <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}],</span>
+<span class="s1">&#39;comment&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+<span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">],</span>
+<span class="s1">&#39;details&#39;</span><span class="p">:</span> <span class="s1">&#39;-OEChem-03231823253D&#39;</span><span class="p">,</span>
+<span class="s1">&#39;n_atoms&#39;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
+<span class="s1">&#39;n_bonds&#39;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
+<span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;gdb_54964&#39;</span><span class="p">,</span>
+<span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+</pre></div>
+
 
 <p>The <code>'rdkit'</code> format uses the <a href="http://www.rdkit.org/docs/index.html">RDKit</a> library to represent molecules, and offers several methods to manipulate molecules with a chemistry-oriented approach.</p>
 <p>The <code>'smiles'</code> format represents molecules as strings, and can be used as a space-efficient way to store molecules or perform quick checks on a dataset (e.g., counting the unique number of molecules in a dataset is quicker if all molecules are converted to SMILES first).</p>

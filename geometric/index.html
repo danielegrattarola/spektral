@@ -83,7 +83,7 @@
                 </li>
                 <li class="">
                     
-    <a class="" href="../layers/pooiling/">Pooling Layers</a>
+    <a class="" href="../layers/pooiling.md">Pooling Layers</a>
                 </li>
     </ul>
 	    </li>
@@ -216,8 +216,9 @@
             <div class="section">
               
                 <h3 id="exp_map">exp_map</h3>
-<pre><code class="python">spektral.geometric.manifold.exp_map(x, r, tangent_point=None)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">geometric</span><span class="o">.</span><span class="n">manifold</span><span class="o">.</span><span class="n">exp_map</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">tangent_point</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</pre></div>
+
 
 <p>Let <script type="math/tex">\mathcal{M}</script> be a CCM of radius <code>r</code>, and <script type="math/tex">T_{p}\mathcal{M}</script> the
 tangent plane of the CCM at point <script type="math/tex">p</script> (<code>tangent_point</code>).
@@ -240,8 +241,9 @@ Riemannian exponential map.</p>
  The exp-map of x to the CCM (extrinsic coordinates).</p>
 <hr />
 <h3 id="log_map">log_map</h3>
-<pre><code class="python">spektral.geometric.manifold.log_map(x, r, tangent_point=None)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">geometric</span><span class="o">.</span><span class="n">manifold</span><span class="o">.</span><span class="n">log_map</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">tangent_point</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</pre></div>
+
 
 <p>Let <script type="math/tex">\mathcal{M}</script> be a CCM of radius <code>r</code> and <script type="math/tex">T_{p}\mathcal{M}</script> the
 tangent plane of the CCM at point <script type="math/tex">p</script> (<code>tangent_point</code>).
@@ -264,8 +266,9 @@ Riemannian logarithmic map.</p>
  The log-map of x to the tangent plane (intrinsic coordinates).</p>
 <hr />
 <h3 id="belongs">belongs</h3>
-<pre><code class="python">spektral.geometric.manifold.belongs(x, r)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">geometric</span><span class="o">.</span><span class="n">manifold</span><span class="o">.</span><span class="n">belongs</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+</pre></div>
+
 
 <p>Boolean membership to CCM of radius <code>r</code>.</p>
 <p><strong>Arguments</strong>  </p>
@@ -281,8 +284,9 @@ Riemannian logarithmic map.</p>
  Boolean np.array, True if the points are on the CCM.</p>
 <hr />
 <h3 id="clip">clip</h3>
-<pre><code class="python">spektral.geometric.manifold.clip(x, r, axis=-1)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">geometric</span><span class="o">.</span><span class="n">manifold</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
 
 <p>Clips points in the ambient space to a CCM of radius <code>r</code>.</p>
 <p><strong>Arguments</strong>  </p>
@@ -301,8 +305,9 @@ Riemannian logarithmic map.</p>
  Np.array of same shape as x.</p>
 <hr />
 <h3 id="get_distance">get_distance</h3>
-<pre><code class="python">spektral.geometric.manifold.get_distance(r)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">geometric</span><span class="o">.</span><span class="n">manifold</span><span class="o">.</span><span class="n">get_distance</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</pre></div>
+
 
 <p><strong>Arguments</strong>  </p>
 <ul>
@@ -312,8 +317,9 @@ Riemannian logarithmic map.</p>
  The callable distance function for the CCM of radius <code>r</code>.</p>
 <hr />
 <h3 id="ccm_uniform">ccm_uniform</h3>
-<pre><code class="python">spektral.geometric.stat.ccm_uniform(size, dim=3, r=0.0, low=-1.0, high=1.0, projection='upper')
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">geometric</span><span class="o">.</span><span class="n">stat</span><span class="o">.</span><span class="n">ccm_uniform</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">low</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;upper&#39;</span><span class="p">)</span>
+</pre></div>
+
 
 <p>Samples points from a uniform distribution on a constant-curvature manifold.
 If <code>r=0</code>, then points are sampled from a uniform distribution in the ambient
@@ -349,8 +355,9 @@ on the sign of the last coordinate.</p>
 list, np.array of shape (size, len(r) * dim).</p>
 <hr />
 <h3 id="ccm_normal">ccm_normal</h3>
-<pre><code class="python">spektral.geometric.stat.ccm_normal(size, dim=3, r=0.0, tangent_point=None, loc=0.0, scale=1.0)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">geometric</span><span class="o">.</span><span class="n">stat</span><span class="o">.</span><span class="n">ccm_normal</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">tangent_point</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+</pre></div>
+
 
 <p>Samples points from a Gaussian distribution on a constant-curvature manifold.
 If <code>r=0</code>, then points are sampled from a Gaussian distribution in the
@@ -385,8 +392,9 @@ along the last axis (e.g., see <a href="https://arxiv.org/abs/1805.06299">Gratta
 list, np.array of shape (size, len(r) * dim).</p>
 <hr />
 <h3 id="get_ccm_distribution">get_ccm_distribution</h3>
-<pre><code class="python">spektral.geometric.stat.get_ccm_distribution(name)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">geometric</span><span class="o">.</span><span class="n">stat</span><span class="o">.</span><span class="n">get_ccm_distribution</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</pre></div>
+
 
 <p><strong>Arguments</strong>  </p>
 <ul>

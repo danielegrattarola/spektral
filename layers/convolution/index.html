@@ -104,7 +104,7 @@
                 </li>
                 <li class="">
                     
-    <a class="" href="../pooiling/">Pooling Layers</a>
+    <a class="" href="../pooiling.md">Pooling Layers</a>
                 </li>
     </ul>
 	    </li>
@@ -215,8 +215,9 @@
               
                 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L8">[source]</a></span></p>
 <h3 id="graphconv">GraphConv</h3>
-<pre><code class="python">spektral.layers.GraphConv(channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">GraphConv</span><span class="p">(</span><span class="n">channels</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">use_bias</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="s1">&#39;glorot_uniform&#39;</span><span class="p">,</span> <span class="n">bias_initializer</span><span class="o">=</span><span class="s1">&#39;zeros&#39;</span><span class="p">,</span> <span class="n">kernel_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">bias_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">activity_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">kernel_constraint</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">bias_constraint</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</pre></div>
+
 
 <p>A graph convolutional layer as presented by <a href="https://arxiv.org/abs/1609.02907">Kipf &amp; Welling (2016)</a>.</p>
 <p><strong>Mode</strong>: single, mixed, batch.</p>
@@ -254,20 +255,22 @@ changed to <code>channels</code>.</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <p><strong>Usage</strong>  </p>
-<pre><code class="py">fltr = localpooling_filter(adj)  # Can be any pre-processing
-...
-X = Input(shape=(num_nodes, num_features))
-filter = Input((num_nodes, num_nodes))
-Z = GraphConv(units, activation='relu')([X, filter])
-...
-model.fit([node_features, fltr], y)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">fltr</span> <span class="o">=</span> <span class="n">localpooling_filter</span><span class="p">(</span><span class="n">adj</span><span class="p">)</span>  <span class="c1"># Can be any pre-processing</span>
+<span class="o">...</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">num_features</span><span class="p">))</span>
+<span class="nb">filter</span> <span class="o">=</span> <span class="n">Input</span><span class="p">((</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">num_nodes</span><span class="p">))</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">GraphConv</span><span class="p">(</span><span class="n">units</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;relu&#39;</span><span class="p">)([</span><span class="n">X</span><span class="p">,</span> <span class="nb">filter</span><span class="p">])</span>
+<span class="o">...</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">([</span><span class="n">node_features</span><span class="p">,</span> <span class="n">fltr</span><span class="p">],</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+
 
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L150">[source]</a></span></p>
 <h3 id="chebconv">ChebConv</h3>
-<pre><code class="python">spektral.layers.ChebConv(channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">ChebConv</span><span class="p">(</span><span class="n">channels</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">use_bias</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="s1">&#39;glorot_uniform&#39;</span><span class="p">,</span> <span class="n">bias_initializer</span><span class="o">=</span><span class="s1">&#39;zeros&#39;</span><span class="p">,</span> <span class="n">kernel_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">bias_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">activity_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">kernel_constraint</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">bias_constraint</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</pre></div>
+
 
 <p>A Chebyshev convolutional layer as presented by <a href="https://arxiv.org/abs/1606.09375">Defferrard et al. (2016)</a>.</p>
 <p><strong>Mode</strong>: single, mixed, batch.</p>
@@ -306,29 +309,38 @@ changed to <code>channels</code>.</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <p><strong>Usage</strong></p>
-<pre><code class="py">fltr = chebyshev_filter(adj, K)
-...
-X = Input(shape=(num_nodes, num_features))
-filter = Input((num_nodes, num_nodes))
-Z = GraphConv(units, activation='relu')([X, filter])
-...
-model.fit([node_features, fltr], y)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">fltr</span> <span class="o">=</span> <span class="n">chebyshev_filter</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">K</span><span class="p">)</span>
+<span class="o">...</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">num_features</span><span class="p">))</span>
+<span class="nb">filter</span> <span class="o">=</span> <span class="n">Input</span><span class="p">((</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">num_nodes</span><span class="p">))</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">GraphConv</span><span class="p">(</span><span class="n">units</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;relu&#39;</span><span class="p">)([</span><span class="n">X</span><span class="p">,</span> <span class="nb">filter</span><span class="p">])</span>
+<span class="o">...</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">([</span><span class="n">node_features</span><span class="p">,</span> <span class="n">fltr</span><span class="p">],</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+
 
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L878">[source]</a></span></p>
 <h3 id="armaconv">ARMAConv</h3>
-<pre><code class="python">spektral.layers.ARMAConv(channels, ARMA_D, ARMA_K=None, recurrent=False, activation=None, gcn_activation='relu', dropout_rate=0.0, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">ARMAConv</span><span class="p">(</span><span class="n">channels</span><span class="p">,</span> <span class="n">ARMA_D</span><span class="p">,</span> <span class="n">ARMA_K</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">recurrent</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">gcn_activation</span><span class="o">=</span><span class="s1">&#39;relu&#39;</span><span class="p">,</span> <span class="n">dropout_rate</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">use_bias</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="s1">&#39;glorot_uniform&#39;</span><span class="p">,</span> <span class="n">bias_initializer</span><span class="o">=</span><span class="s1">&#39;zeros&#39;</span><span class="p">,</span> <span class="n">kernel_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">bias_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">activity_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">kernel_constraint</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">bias_constraint</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</pre></div>
+
 
 <p>A graph convolutional layer with ARMA(H, K) filters, as presented by
 <a href="https://arxiv.org/abs/1901.01343">Bianchi et al. (2019)</a>.</p>
 <p><strong>Mode</strong>: single, mixed, batch.</p>
 <p>This layer computes the transformation:
 <script type="math/tex; mode=display">
-X^{out} = \dots
+X^{out} = \text{avgpool}\left(\sum \limits_{k=1}^K \bar{X}_k^{(T)} \right),
 </script>
-where ...</p>
+where:
+<script type="math/tex; mode=display">
+\bar{X}_k^{(t + 1)} =  \sigma\left(\tilde{L}\bar{X}^{(t)}W^{(t)} + XV^{(t)}\right)
+</script>
+is a graph convolutional skip layer implementing the recursive update to
+approximate the ARMA filter, <script type="math/tex">\tilde{L}</script> is the Laplacian modified to
+have a spectrum in <script type="math/tex">[0,,2]</script>, <script type="math/tex">\bar{X}^{(0)} = X</script>, and <script type="math/tex">W, V</script> are
+trainable kernels.</p>
 <p><strong>Input</strong></p>
 <ul>
 <li>node features of shape <code>(batch, num_nodes, num_features)</code>, depending on the
@@ -360,20 +372,22 @@ changed to <code>channels</code>.</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <p><strong>Usage</strong></p>
-<pre><code class="py">fltr = localpooling_filter(adj)
-...
-X = Input(shape=(num_nodes, num_features))
-filter = Input((num_nodes, num_nodes))
-Z = ARMAConv(units, activation='relu')([X, filter])
-...
-model.fit([node_features, fltr], y)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">fltr</span> <span class="o">=</span> <span class="n">localpooling_filter</span><span class="p">(</span><span class="n">adj</span><span class="p">)</span>
+<span class="o">...</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">num_features</span><span class="p">))</span>
+<span class="nb">filter</span> <span class="o">=</span> <span class="n">Input</span><span class="p">((</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">num_nodes</span><span class="p">))</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">ARMAConv</span><span class="p">(</span><span class="n">units</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;relu&#39;</span><span class="p">)([</span><span class="n">X</span><span class="p">,</span> <span class="nb">filter</span><span class="p">])</span>
+<span class="o">...</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">([</span><span class="n">node_features</span><span class="p">,</span> <span class="n">fltr</span><span class="p">],</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+
 
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L297">[source]</a></span></p>
 <h3 id="edgeconditionedconv">EdgeConditionedConv</h3>
-<pre><code class="python">spektral.layers.EdgeConditionedConv(channels, kernel_network=None, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">EdgeConditionedConv</span><span class="p">(</span><span class="n">channels</span><span class="p">,</span> <span class="n">kernel_network</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">use_bias</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="s1">&#39;glorot_uniform&#39;</span><span class="p">,</span> <span class="n">bias_initializer</span><span class="o">=</span><span class="s1">&#39;zeros&#39;</span><span class="p">,</span> <span class="n">kernel_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">bias_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">activity_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">kernel_constraint</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">bias_constraint</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</pre></div>
+
 
 <p>An edge-conditioned convolutional layer as presented by <a href="https://arxiv.org/abs/1704.02901">Simonovsky and
 Komodakis (2017)</a>.</p>
@@ -420,21 +434,23 @@ output);</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <p><strong>Usage</strong></p>
-<pre><code class="py">adj = add_eye_batch(adj)
-...
-nf = Input(shape=(num_nodes, num_node_features))
-a = Input(shape=(num_nodes, num_nodes))
-ef = Input(shape=(num_nodes, num_nodes, num_edge_features))
-Z = EdgeConditionedConv(32, num_nodes, num_edge_features)([nf, a, ef])
-...
-model.fit([node_features, adj, edge_features], y)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">adj</span> <span class="o">=</span> <span class="n">add_eye_batch</span><span class="p">(</span><span class="n">adj</span><span class="p">)</span>
+<span class="o">...</span>
+<span class="n">nf</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">num_node_features</span><span class="p">))</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">num_nodes</span><span class="p">))</span>
+<span class="n">ef</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">num_nodes</span><span class="p">,</span> <span class="n">num_edge_features</span><span class="p">))</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">EdgeConditionedConv</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">num_nodes</span><span class="p">,</span> <span class="n">num_edge_features</span><span class="p">)([</span><span class="n">nf</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">ef</span><span class="p">])</span>
+<span class="o">...</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">([</span><span class="n">node_features</span><span class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span class="n">edge_features</span><span class="p">],</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+
 
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L493">[source]</a></span></p>
 <h3 id="graphattention">GraphAttention</h3>
-<pre><code class="python">spektral.layers.GraphAttention(channels, attn_heads=1, attn_heads_reduction='concat', dropout_rate=0.5, activation='relu', use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', attn_kernel_initializer='glorot_uniform', kernel_regularizer=None, bias_regularizer=None, attn_kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None, attn_kernel_constraint=None)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">GraphAttention</span><span class="p">(</span><span class="n">channels</span><span class="p">,</span> <span class="n">attn_heads</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">attn_heads_reduction</span><span class="o">=</span><span class="s1">&#39;concat&#39;</span><span class="p">,</span> <span class="n">dropout_rate</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;relu&#39;</span><span class="p">,</span> <span class="n">use_bias</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="s1">&#39;glorot_uniform&#39;</span><span class="p">,</span> <span class="n">bias_initializer</span><span class="o">=</span><span class="s1">&#39;zeros&#39;</span><span class="p">,</span> <span class="n">attn_kernel_initializer</span><span class="o">=</span><span class="s1">&#39;glorot_uniform&#39;</span><span class="p">,</span> <span class="n">kernel_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">bias_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">attn_kernel_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">activity_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">kernel_constraint</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">bias_constraint</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">attn_kernel_constraint</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</pre></div>
+
 
 <p>A graph attention layer as presented by
 <a href="https://arxiv.org/abs/1710.10903">Velickovic et al. (2017)</a>.</p>
@@ -475,20 +491,22 @@ matrices;</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <p><strong>Usage</strong></p>
-<pre><code class="py">adj = normalize_sum_to_unity(adj)
-...
-X = Input(shape=(num_nodes, num_features))
-A = Input((num_nodes, num_nodes))
-Z = GraphAttention(channels, activation='relu')([X, A])
-...
-model.fit([node_features, fltr], y)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">adj</span> <span class="o">=</span> <span class="n">normalize_sum_to_unity</span><span class="p">(</span><span class="n">adj</span><span class="p">)</span>
+<span class="o">...</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">num_features</span><span class="p">))</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">Input</span><span class="p">((</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">num_nodes</span><span class="p">))</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">GraphAttention</span><span class="p">(</span><span class="n">channels</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;relu&#39;</span><span class="p">)([</span><span class="n">X</span><span class="p">,</span> <span class="n">A</span><span class="p">])</span>
+<span class="o">...</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">([</span><span class="n">node_features</span><span class="p">,</span> <span class="n">fltr</span><span class="p">],</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+
 
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L722">[source]</a></span></p>
 <h3 id="graphconvskip">GraphConvSkip</h3>
-<pre><code class="python">spektral.layers.GraphConvSkip(channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">GraphConvSkip</span><span class="p">(</span><span class="n">channels</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">use_bias</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="s1">&#39;glorot_uniform&#39;</span><span class="p">,</span> <span class="n">bias_initializer</span><span class="o">=</span><span class="s1">&#39;zeros&#39;</span><span class="p">,</span> <span class="n">kernel_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">bias_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">activity_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">kernel_constraint</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">bias_constraint</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</pre></div>
+
 
 <p>A graph convolutional layer as presented by
 <a href="https://arxiv.org/abs/1609.02907">Kipf &amp; Welling (2016)</a>, with the addition
@@ -531,11 +549,11 @@ changed to <code>channels</code>.</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <p><strong>Usage</strong></p>
-<pre><code class="py">X = Input(shape=(num_nodes, num_features))
-X_0 = Input(shape=(num_nodes, num_features))
-filter = Input((num_nodes, num_nodes))
-Z = GraphConvSkip(units, activation='relu')([X, X_0, filter])
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">num_features</span><span class="p">))</span>
+<span class="n">X_0</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">num_features</span><span class="p">))</span>
+<span class="nb">filter</span> <span class="o">=</span> <span class="n">Input</span><span class="p">((</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">num_nodes</span><span class="p">))</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">GraphConvSkip</span><span class="p">(</span><span class="n">units</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;relu&#39;</span><span class="p">)([</span><span class="n">X</span><span class="p">,</span> <span class="n">X_0</span><span class="p">,</span> <span class="nb">filter</span><span class="p">])</span>
+</pre></div>
               
             </div>
           </div>

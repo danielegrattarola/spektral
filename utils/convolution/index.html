@@ -83,7 +83,7 @@
                 </li>
                 <li class="">
                     
-    <a class="" href="../../layers/pooiling/">Pooling Layers</a>
+    <a class="" href="../../layers/pooiling.md">Pooling Layers</a>
                 </li>
     </ul>
 	    </li>
@@ -202,8 +202,9 @@
             <div class="section">
               
                 <h3 id="localpooling_filter">localpooling_filter</h3>
-<pre><code class="python">spektral.utils.localpooling_filter(adj, symmetric_normalization=True)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">localpooling_filter</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">symmetric_normalization</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+
 
 <p>Computes the local pooling filter from the given adjacency matrix, as 
 described by Kipf &amp; Welling (2017).</p>
@@ -221,8 +222,9 @@ described by Kipf &amp; Welling (2017).</p>
  The filter matrix, as dense np.array</p>
 <hr />
 <h3 id="chebyshev_filter">chebyshev_filter</h3>
-<pre><code class="python">spektral.utils.chebyshev_filter(adj, k, symmetric_normalization=True)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">chebyshev_filter</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">symmetric_normalization</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+
 
 <p>Computes the Chebyshev filter from the given adjacency matrix, as described
 in Defferrard et at. (2016).</p>
@@ -232,7 +234,7 @@ in Defferrard et at. (2016).</p>
 <p><code>adj</code>: a np.array or scipy.sparse matrix</p>
 </li>
 <li>
-<p><code>k</code>: integer, the order up to which to cocmpute the Chebyshev polynomials</p>
+<p><code>k</code>: integer, the order up to which to compute the Chebyshev polynomials</p>
 </li>
 <li>
 <p><code>symmetric_normalization</code>: boolean, whether to normalize the matrix as 

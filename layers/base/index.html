@@ -98,7 +98,7 @@
                 </li>
                 <li class="">
                     
-    <a class="" href="../pooiling/">Pooling Layers</a>
+    <a class="" href="../pooiling.md">Pooling Layers</a>
                 </li>
     </ul>
 	    </li>
@@ -209,8 +209,9 @@
               
                 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L105">[source]</a></span></p>
 <h3 id="innerproduct">InnerProduct</h3>
-<pre><code class="python">spektral.layers.InnerProduct(trainable_kernel=False, activation=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">InnerProduct</span><span class="p">(</span><span class="n">trainable_kernel</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="s1">&#39;glorot_uniform&#39;</span><span class="p">,</span> <span class="n">kernel_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">activity_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">kernel_constraint</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</pre></div>
+
 
 <p>Computes the inner product between elements of a given 2d tensor <script type="math/tex">x</script>: 
 <script type="math/tex; mode=display">
@@ -252,8 +253,9 @@ product (i.e., <code>x.dot(w).dot(x.T)</code>);</p>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L181">[source]</a></span></p>
 <h3 id="minkowskiproduct">MinkowskiProduct</h3>
-<pre><code class="python">spektral.layers.MinkowskiProduct(input_dim_1=None, activation=None, activity_regularizer=None)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">MinkowskiProduct</span><span class="p">(</span><span class="n">input_dim_1</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">activity_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</pre></div>
+
 
 <p>Computes the hyperbolic inner product between elements of a given 2d tensor
 <script type="math/tex">x</script>: 
@@ -291,8 +293,9 @@ output shape for your layer.</p>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L254">[source]</a></span></p>
 <h3 id="ccmprojection">CCMProjection</h3>
-<pre><code class="python">spektral.layers.CCMProjection(r=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">CCMProjection</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="s1">&#39;glorot_uniform&#39;</span><span class="p">,</span> <span class="n">kernel_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">kernel_constraint</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</pre></div>
+
 
 <p>Projects a tensor to a CCM depending on the value of <code>r</code>. Optionally, 
 <code>r</code> can be learned via backpropagation.</p>
@@ -328,8 +331,9 @@ correct manifold based on the sign of the weight).</p>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L347">[source]</a></span></p>
 <h3 id="ccmmembership">CCMMembership</h3>
-<pre><code class="python">spektral.layers.CCMMembership(r=1.0, mode='average', sigma=1.0)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">CCMMembership</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;average&#39;</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+</pre></div>
+
 
 <p>Computes the membership of the given points to a constant-curvature
 manifold of radius <code>r</code>, as: 
@@ -370,7 +374,7 @@ computed according to the <code>mode</code> option;.</li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../pooiling/" class="btn btn-neutral float-right" title="Pooling Layers">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../../datasets/citation/" class="btn btn-neutral float-right" title="Citation">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../convolution/" class="btn btn-neutral" title="Convolutional Layers"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -404,7 +408,7 @@ computed according to the <code>mode</code> option;.</li>
         <span><a href="../convolution/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../pooiling/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../../datasets/citation/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

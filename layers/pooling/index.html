@@ -8,7 +8,7 @@
   
   <meta name="author" content="Daniele Grattarola">
   <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>Pooling Layers - Spektral</title>
+  <title>Pooling - Spektral</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
@@ -18,8 +18,8 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Pooling Layers";
-    var mkdocs_page_input_path = "layers/pooiling.md";
+    var mkdocs_page_name = "Pooling";
+    var mkdocs_page_input_path = "layers/pooling.md";
     var mkdocs_page_url = null;
   </script>
   
@@ -81,18 +81,9 @@
                     
     <a class="" href="../base/">Base Layers</a>
                 </li>
-                <li class=" current">
+                <li class="">
                     
-    <a class="current" href="./">Pooling Layers</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l3"><a href="#globalattentionpool">GlobalAttentionPool</a></li>
-    
-
-    <li class="toctree-l3"><a href="#nodeattentionpool">NodeAttentionPool</a></li>
-    
-
-    </ul>
+    <a class="" href="../pooiling.md">Pooling Layers</a>
                 </li>
     </ul>
 	    </li>
@@ -183,15 +174,11 @@
     <li><a href="../..">Docs</a> &raquo;</li>
     
       
-        
-          <li>Layers &raquo;</li>
-        
-      
     
-    <li>Pooling Layers</li>
+    <li>Pooling</li>
     <li class="wy-breadcrumbs-aside">
       
-        <a href="https://github.com/danielegrattarola/spektral/edit/master/docs/layers/pooiling.md"
+        <a href="https://github.com/danielegrattarola/spektral/edit/master/docs/layers/pooling.md"
           class="icon icon-github"> Edit on GitHub</a>
       
     </li>
@@ -203,8 +190,9 @@
               
                 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L6">[source]</a></span></p>
 <h3 id="globalattentionpool">GlobalAttentionPool</h3>
-<pre><code class="python">spektral.layers.GlobalAttentionPool(channels=32, kernel_regularizer=None)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">GlobalAttentionPool</span><span class="p">(</span><span class="n">channels</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">kernel_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</pre></div>
+
 
 <p>A gated attention global pooling layer as presented by
 <a href="https://arxiv.org/abs/1511.05493">Li et al. (2017)</a>.
@@ -226,15 +214,17 @@ the mode;</li>
 <li><code>kernel_regularizer</code>: regularization applied to the gating networks;  </li>
 </ul>
 <p><strong>Usage</strong></p>
-<pre><code class="py">X = Input(shape=(num_nodes, num_features))
-Z = GlobalAttentionPool(channels)(X)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">num_features</span><span class="p">))</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">GlobalAttentionPool</span><span class="p">(</span><span class="n">channels</span><span class="p">)(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+
 
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L82">[source]</a></span></p>
 <h3 id="nodeattentionpool">NodeAttentionPool</h3>
-<pre><code class="python">spektral.layers.NodeAttentionPool(attn_kernel_initializer='glorot_uniform', kernel_regularizer=None, attn_kernel_regularizer=None, attn_kernel_constraint=None)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">NodeAttentionPool</span><span class="p">(</span><span class="n">attn_kernel_initializer</span><span class="o">=</span><span class="s1">&#39;glorot_uniform&#39;</span><span class="p">,</span> <span class="n">kernel_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">attn_kernel_regularizer</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">attn_kernel_constraint</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</pre></div>
+
 
 <p>A node-attention global pooling layer. Pools a graph by learning attention
 coefficients to sum node features.
@@ -259,22 +249,13 @@ matrix;</li>
 matrix;</li>
 </ul>
 <p><strong>Usage</strong></p>
-<pre><code class="py">X = Input(shape=(num_nodes, num_features))
-Z = NodeAttentionPool()(X)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">num_features</span><span class="p">))</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">NodeAttentionPool</span><span class="p">()(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
               
             </div>
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../../datasets/citation/" class="btn btn-neutral float-right" title="Citation">Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../base/" class="btn btn-neutral" title="Base Layers"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>
@@ -300,10 +281,6 @@ Z = NodeAttentionPool()(X)
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../base/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../../datasets/citation/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

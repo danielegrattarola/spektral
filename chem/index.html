@@ -83,7 +83,7 @@
                 </li>
                 <li class="">
                     
-    <a class="" href="../layers/pooiling/">Pooling Layers</a>
+    <a class="" href="../layers/pooiling.md">Pooling Layers</a>
                 </li>
     </ul>
 	    </li>
@@ -237,8 +237,9 @@
 the <a href="http://www.rdkit.org/docs/index.html">RDKit</a> library to be
 installed on the system.</p>
 <h3 id="numpy_to_rdkit">numpy_to_rdkit</h3>
-<pre><code class="python">spektral.chem.numpy_to_rdkit(adj, nf, ef, sanitize=False)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">chem</span><span class="o">.</span><span class="n">numpy_to_rdkit</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">nf</span><span class="p">,</span> <span class="n">ef</span><span class="p">,</span> <span class="n">sanitize</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+
 
 <p>Converts a molecule from numpy to RDKit format.</p>
 <p><strong>Arguments</strong>  </p>
@@ -260,8 +261,9 @@ installed on the system.</p>
  An RDKit molecule</p>
 <hr />
 <h3 id="numpy_to_smiles">numpy_to_smiles</h3>
-<pre><code class="python">spektral.chem.numpy_to_smiles(adj, nf, ef)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">chem</span><span class="o">.</span><span class="n">numpy_to_smiles</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">nf</span><span class="p">,</span> <span class="n">ef</span><span class="p">)</span>
+</pre></div>
+
 
 <p>Converts a molecule from numpy to SMILES format.</p>
 <p><strong>Arguments</strong>  </p>
@@ -280,8 +282,9 @@ installed on the system.</p>
  The SMILES string of the molecule</p>
 <hr />
 <h3 id="rdkit_to_smiles">rdkit_to_smiles</h3>
-<pre><code class="python">spektral.chem.rdkit_to_smiles(mol)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">chem</span><span class="o">.</span><span class="n">rdkit_to_smiles</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+</pre></div>
+
 
 <p>Returns the SMILES string representing an RDKit molecule.</p>
 <p><strong>Arguments</strong>  </p>
@@ -292,8 +295,9 @@ installed on the system.</p>
  The SMILES string of the molecule </p>
 <hr />
 <h3 id="sdf_to_nx">sdf_to_nx</h3>
-<pre><code class="python">spektral.chem.sdf_to_nx(sdf, keep_hydrogen=False)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">chem</span><span class="o">.</span><span class="n">sdf_to_nx</span><span class="p">(</span><span class="n">sdf</span><span class="p">,</span> <span class="n">keep_hydrogen</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+
 
 <p>Converts molecules in SDF format to networkx Graphs.</p>
 <p><strong>Arguments</strong>  </p>
@@ -309,8 +313,9 @@ installed on the system.</p>
  List of nx.Graphs.</p>
 <hr />
 <h3 id="nx_to_sdf">nx_to_sdf</h3>
-<pre><code class="python">spektral.chem.nx_to_sdf(graphs)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">chem</span><span class="o">.</span><span class="n">nx_to_sdf</span><span class="p">(</span><span class="n">graphs</span><span class="p">)</span>
+</pre></div>
+
 
 <p>Converts a list of nx.Graphs to the internal SDF format.</p>
 <p><strong>Arguments</strong>  </p>
@@ -321,8 +326,9 @@ installed on the system.</p>
  List of molecules in the internal SDF format.</p>
 <hr />
 <h3 id="validate_rdkit">validate_rdkit</h3>
-<pre><code class="python">spektral.chem.validate_rdkit(mol)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">chem</span><span class="o">.</span><span class="n">validate_rdkit</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+</pre></div>
+
 
 <p>Validates RDKit molecules (single or in a list). </p>
 <p><strong>Arguments</strong>  </p>
@@ -334,8 +340,9 @@ installed on the system.</p>
 otherwise</p>
 <hr />
 <h3 id="get_atomic_symbol">get_atomic_symbol</h3>
-<pre><code class="python">spektral.chem.get_atomic_symbol(number)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">chem</span><span class="o">.</span><span class="n">get_atomic_symbol</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+</pre></div>
+
 
 <p>Given an atomic number (e.g., 6), returns its atomic symbol (e.g., 'C')</p>
 <p><strong>Arguments</strong>  </p>
@@ -346,8 +353,9 @@ otherwise</p>
  String, atomic symbol</p>
 <hr />
 <h3 id="get_atomic_num">get_atomic_num</h3>
-<pre><code class="python">spektral.chem.get_atomic_num(symbol)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">chem</span><span class="o">.</span><span class="n">get_atomic_num</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
+</pre></div>
+
 
 <p>Given an atomic symbol (e.g., 'C'), returns its atomic number (e.g., 6)</p>
 <p><strong>Arguments</strong>  </p>
@@ -358,8 +366,9 @@ otherwise</p>
  Int &lt;= 118</p>
 <hr />
 <h3 id="valid_score">valid_score</h3>
-<pre><code class="python">spektral.chem.valid_score(molecules, from_numpy=False)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">chem</span><span class="o">.</span><span class="n">valid_score</span><span class="p">(</span><span class="n">molecules</span><span class="p">,</span> <span class="n">from_numpy</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+
 
 <p>For a given list of molecules (RDKit or numpy format), returns a boolean 
 array representing the validity of each molecule.</p>
@@ -376,8 +385,9 @@ array representing the validity of each molecule.</p>
  Boolean array with the validity for each molecule</p>
 <hr />
 <h3 id="novel_score">novel_score</h3>
-<pre><code class="python">spektral.chem.novel_score(molecules, smiles, from_numpy=False)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">chem</span><span class="o">.</span><span class="n">novel_score</span><span class="p">(</span><span class="n">molecules</span><span class="p">,</span> <span class="n">smiles</span><span class="p">,</span> <span class="n">from_numpy</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+
 
 <p>For a given list of molecules (RDKit or numpy format), returns a boolean 
 array representing valid and novel molecules with respect to the list
@@ -399,8 +409,9 @@ novelty</p>
  Boolean array with the novelty for each valid molecule</p>
 <hr />
 <h3 id="unique_score">unique_score</h3>
-<pre><code class="python">spektral.chem.unique_score(molecules, from_numpy=False)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">chem</span><span class="o">.</span><span class="n">unique_score</span><span class="p">(</span><span class="n">molecules</span><span class="p">,</span> <span class="n">from_numpy</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+
 
 <p>For a given list of molecules (RDKit or numpy format), returns the fraction
 of unique and valid molecules w.r.t. to the number of valid molecules.</p>
@@ -417,15 +428,17 @@ of unique and valid molecules w.r.t. to the number of valid molecules.</p>
  Fraction of unique valid molecules w.r.t. to valid molecules</p>
 <hr />
 <h3 id="enable_rdkit_log">enable_rdkit_log</h3>
-<pre><code class="python">spektral.chem.enable_rdkit_log()
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">chem</span><span class="o">.</span><span class="n">enable_rdkit_log</span><span class="p">()</span>
+</pre></div>
+
 
 <p>Enables RDkit logging.</p>
 <p><strong>Return</strong>  </p>
 <hr />
 <h3 id="plot_rdkit">plot_rdkit</h3>
-<pre><code class="python">spektral.chem.plot_rdkit(mol, filename=None)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">chem</span><span class="o">.</span><span class="n">plot_rdkit</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</pre></div>
+
 
 <p>Plots an RDKit molecule in Matplotlib</p>
 <p><strong>Arguments</strong>  </p>
@@ -440,8 +453,9 @@ of unique and valid molecules w.r.t. to the number of valid molecules.</p>
 <p><strong>Return</strong>  </p>
 <hr />
 <h3 id="plot_rdkit_svg_grid">plot_rdkit_svg_grid</h3>
-<pre><code class="python">spektral.chem.plot_rdkit_svg_grid(mols, mols_per_row=5, filename=None)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">chem</span><span class="o">.</span><span class="n">plot_rdkit_svg_grid</span><span class="p">(</span><span class="n">mols</span><span class="p">,</span> <span class="n">mols_per_row</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</pre></div>
+
 
 <p>Plots a grid of RDKit molecules in SVG.</p>
 <p><strong>Arguments</strong>  </p>

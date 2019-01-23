@@ -83,7 +83,7 @@
                 </li>
                 <li class="">
                     
-    <a class="" href="../layers/pooiling/">Pooling Layers</a>
+    <a class="" href="../layers/pooiling.md">Pooling Layers</a>
                 </li>
     </ul>
 	    </li>
@@ -198,8 +198,9 @@
 networks, and requires the <a href="https://dyfunconn.readthedocs.io/">dyfunconn</a>
 library to be installed on the system.</p>
 <h3 id="get_fc">get_fc</h3>
-<pre><code class="python">spektral.brain.get_fc(x, band_freq, sampling_freq, samples_per_graph=None, fc_measure='corr', link_cutoff=0.0, percentiles=None, band_freq_hi=(20.0, 45.0), nfft=128, n_overlap=64)
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">spektral</span><span class="o">.</span><span class="n">brain</span><span class="o">.</span><span class="n">get_fc</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">band_freq</span><span class="p">,</span> <span class="n">sampling_freq</span><span class="p">,</span> <span class="n">samples_per_graph</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">fc_measure</span><span class="o">=</span><span class="s1">&#39;corr&#39;</span><span class="p">,</span> <span class="n">link_cutoff</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">percentiles</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">band_freq_hi</span><span class="o">=</span><span class="p">(</span><span class="mf">20.0</span><span class="p">,</span> <span class="mf">45.0</span><span class="p">),</span> <span class="n">nfft</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">n_overlap</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span>
+</pre></div>
+
 
 <p>Build functional connectivity networks from the given data stream.</p>
 <p><strong>Arguments</strong>  </p>
