@@ -8,7 +8,7 @@
   
   <meta name="author" content="Daniele Grattarola">
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Brain - Spektral</title>
+  <title>Acknowledgements - Spektral</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   <link rel="stylesheet" href="../css/theme.css" type="text/css" />
@@ -18,8 +18,8 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Brain";
-    var mkdocs_page_input_path = "brain.md";
+    var mkdocs_page_name = "Acknowledgements";
+    var mkdocs_page_input_path = "acknowledgements.md";
     var mkdocs_page_url = null;
   </script>
   
@@ -112,15 +112,9 @@
     <a class="" href="../chem/">Chemistry</a>
 	    </li>
           
-            <li class="toctree-l1 current">
+            <li class="toctree-l1">
 		
-    <a class="current" href="./">Brain</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l2"><a href="#get_fc">get_fc</a></li>
-    
-
-    </ul>
+    <a class="" href="../brain/">Brain</a>
 	    </li>
           
             <li class="toctree-l1">
@@ -163,9 +157,15 @@
 		
     <span class="caption-text">About</span>
     <ul class="subnav">
-                <li class="">
+                <li class=" current">
                     
-    <a class="" href="../acknowledgements/">Acknowledgements</a>
+    <a class="current" href="./">Acknowledgements</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#acknowledgements">Acknowledgements</a></li>
+    
+
+    </ul>
                 </li>
                 <li class="">
                     
@@ -195,11 +195,15 @@
     <li><a href="..">Docs</a> &raquo;</li>
     
       
+        
+          <li>About &raquo;</li>
+        
+      
     
-    <li>Brain</li>
+    <li>Acknowledgements</li>
     <li class="wy-breadcrumbs-aside">
       
-        <a href="https://github.com/danielegrattarola/spektral/edit/master/docs/brain.md"
+        <a href="https://github.com/danielegrattarola/spektral/edit/master/docs/acknowledgements.md"
           class="icon icon-github"> Edit on GitHub</a>
       
     </li>
@@ -209,54 +213,13 @@
           <div role="main">
             <div class="section">
               
-                <p>This module provides some functions to create functional connectivity
-networks, and requires the <a href="https://dyfunconn.readthedocs.io/">dyfunconn</a>
-library to be installed on the system.</p>
-<h3 id="get_fc">get_fc</h3>
-<pre><code class="python">spektral.brain.get_fc(x, band_freq, sampling_freq, samples_per_graph=None, fc_measure='corr', link_cutoff=0.0, percentiles=None, band_freq_hi=(20.0, 45.0), nfft=128, n_overlap=64)
-</code></pre>
-
-<p>Build functional connectivity networks from the given data stream.</p>
-<p><strong>Arguments</strong>  </p>
-<ul>
-<li>
-<p><code>x</code>: numpy array of shape (n_channels, n_samples);</p>
-</li>
-<li>
-<p><code>band_freq</code>: list with two elements, the band in which to estimate FC;</p>
-</li>
-<li>
-<p><code>sampling_freq</code>: float, sampling frequency of the stream;</p>
-</li>
-<li>
-<p><code>samples_per_graph</code>: number of samples to use to generate a graph. By 
-default, the whole stream is used. If provided, 
-1 + (n_samples / samples_per_graph) will be generated;</p>
-</li>
-<li>
-<p><code>fc_measure</code>: functional connectivity measure to use;</p>
-</li>
-<li>
-<p><code>link_cutoff</code>: links with absolute FC measure below this value will be
-removed;</p>
-</li>
-<li>
-<p><code>percentiles</code>: tuple of two numbers &gt;0 and &lt;100; links with FC measure 
-between the two percentiles will be removed (statistics are calculated for
-each edge). Note that this option ignores <code>link_cutoff</code>.</p>
-</li>
-<li>
-<p><code>band_freq_hi</code>: high band used to estimate FC when using 'aec';</p>
-</li>
-<li>
-<p><code>nfft</code>: TODO, affects 'wpli' and 'dwpli';</p>
-</li>
-<li>
-<p><code>n_overlap</code>: TODO, affects 'wpli' and 'dwpli';</p>
-</li>
-</ul>
-<p><strong>Return</strong><br />
- FC graph(s) in numpy format (note that node features are all ones).</p>
+                <h2 id="acknowledgements">Acknowledgements</h2>
+<p>Spektral is released under MIT license, available on the project's <a href="https://github.com/danielegrattarola/spektral">Github</a>.</p>
+<p>The framework is developed and maintained primarily by Daniele Grattarola, from <a href="https://usi.ch">Università della Svizzera Italiana (USI)</a>, as part of the <a href="https://alari.ch">Advanced Learning and Research Institute (ALaRI)</a>, and under the support of the Swiss National Science Foundation grant 200021_172671. </p>
+<p><img src="https://content.usi.ch/sites/default/files/storage/attachments/press/press-logo-statico-usi-orizzontale-web.svg" width="50%"/>
+<br/>
+<br/>
+<img src="http://www.alari.ch/sites/all/themes/alari/img/alari-header.png" width="100%"/></p>
               
             </div>
           </div>
@@ -264,10 +227,10 @@ each edge). Note that this option ignores <code>link_cutoff</code>.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../geometric/" class="btn btn-neutral float-right" title="Geometric">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../papers/" class="btn btn-neutral float-right" title="Featured papers">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../chem/" class="btn btn-neutral" title="Chemistry"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../utils/plotting/" class="btn btn-neutral" title="Plotting"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -295,10 +258,10 @@ each edge). Note that this option ignores <code>link_cutoff</code>.</p>
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../chem/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../utils/plotting/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../geometric/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../papers/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

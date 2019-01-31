@@ -8,7 +8,7 @@
   
   <meta name="author" content="Daniele Grattarola">
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Brain - Spektral</title>
+  <title>Featured papers - Spektral</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   <link rel="stylesheet" href="../css/theme.css" type="text/css" />
@@ -18,8 +18,8 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Brain";
-    var mkdocs_page_input_path = "brain.md";
+    var mkdocs_page_name = "Featured papers";
+    var mkdocs_page_input_path = "papers.md";
     var mkdocs_page_url = null;
   </script>
   
@@ -112,15 +112,9 @@
     <a class="" href="../chem/">Chemistry</a>
 	    </li>
           
-            <li class="toctree-l1 current">
+            <li class="toctree-l1">
 		
-    <a class="current" href="./">Brain</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l2"><a href="#get_fc">get_fc</a></li>
-    
-
-    </ul>
+    <a class="" href="../brain/">Brain</a>
 	    </li>
           
             <li class="toctree-l1">
@@ -167,9 +161,15 @@
                     
     <a class="" href="../acknowledgements/">Acknowledgements</a>
                 </li>
-                <li class="">
+                <li class=" current">
                     
-    <a class="" href="../papers/">Featured papers</a>
+    <a class="current" href="./">Featured papers</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#featured-papers">Featured papers</a></li>
+    
+
+    </ul>
                 </li>
     </ul>
 	    </li>
@@ -195,11 +195,15 @@
     <li><a href="..">Docs</a> &raquo;</li>
     
       
+        
+          <li>About &raquo;</li>
+        
+      
     
-    <li>Brain</li>
+    <li>Featured papers</li>
     <li class="wy-breadcrumbs-aside">
       
-        <a href="https://github.com/danielegrattarola/spektral/edit/master/docs/brain.md"
+        <a href="https://github.com/danielegrattarola/spektral/edit/master/docs/papers.md"
           class="icon icon-github"> Edit on GitHub</a>
       
     </li>
@@ -209,54 +213,43 @@
           <div role="main">
             <div class="section">
               
-                <p>This module provides some functions to create functional connectivity
-networks, and requires the <a href="https://dyfunconn.readthedocs.io/">dyfunconn</a>
-library to be installed on the system.</p>
-<h3 id="get_fc">get_fc</h3>
-<pre><code class="python">spektral.brain.get_fc(x, band_freq, sampling_freq, samples_per_graph=None, fc_measure='corr', link_cutoff=0.0, percentiles=None, band_freq_hi=(20.0, 45.0), nfft=128, n_overlap=64)
+                <h2 id="featured-papers">Featured papers</h2>
+<p>This is a list of papers that use Spektral to run experiments.<br />
+If you want to have your paper listed on this page, feel free to send a Bibtex citation to Daniele Grattarola to have it added to the list. </p>
+<hr />
+<p><strong>Change Detection in Graph Streams by Learning Graph Embeddings on Constant-Curvature Manifolds</strong><br />
+Grattarola et al. </p>
+<pre><code>@article{grattarola2018learning,
+  title={Change Detection in Graph Streams by Learning Graph Embeddings on Constant-Curvature Manifolds},
+  author={Grattarola, Daniele and Zambon, Daniele and Alippi, Cesare and Livi, Lorenzo},
+  journal={arXiv preprint arXiv:1805.06299},
+  year={2018}
+}
 </code></pre>
 
-<p>Build functional connectivity networks from the given data stream.</p>
-<p><strong>Arguments</strong>  </p>
-<ul>
-<li>
-<p><code>x</code>: numpy array of shape (n_channels, n_samples);</p>
-</li>
-<li>
-<p><code>band_freq</code>: list with two elements, the band in which to estimate FC;</p>
-</li>
-<li>
-<p><code>sampling_freq</code>: float, sampling frequency of the stream;</p>
-</li>
-<li>
-<p><code>samples_per_graph</code>: number of samples to use to generate a graph. By 
-default, the whole stream is used. If provided, 
-1 + (n_samples / samples_per_graph) will be generated;</p>
-</li>
-<li>
-<p><code>fc_measure</code>: functional connectivity measure to use;</p>
-</li>
-<li>
-<p><code>link_cutoff</code>: links with absolute FC measure below this value will be
-removed;</p>
-</li>
-<li>
-<p><code>percentiles</code>: tuple of two numbers &gt;0 and &lt;100; links with FC measure 
-between the two percentiles will be removed (statistics are calculated for
-each edge). Note that this option ignores <code>link_cutoff</code>.</p>
-</li>
-<li>
-<p><code>band_freq_hi</code>: high band used to estimate FC when using 'aec';</p>
-</li>
-<li>
-<p><code>nfft</code>: TODO, affects 'wpli' and 'dwpli';</p>
-</li>
-<li>
-<p><code>n_overlap</code>: TODO, affects 'wpli' and 'dwpli';</p>
-</li>
-</ul>
-<p><strong>Return</strong><br />
- FC graph(s) in numpy format (note that node features are all ones).</p>
+<hr />
+<p><strong>Adversarial Autoencoders with Constant Curvature Latent Manifolds</strong><br />
+Grattarola et al.</p>
+<pre><code>@article{grattarola2018adversarial,
+    title={Adversarial Autoencoders with Constant Curvature Latent Manifolds},
+    author={Grattarola, Daniele and Livi, Lorenzo and Alippi, Cesare},
+    journal={arXiv preprint arXiv:1812.04314},   
+    year={2018}
+ }
+</code></pre>
+
+<hr />
+<p><strong>Graph Neural Networks with Convolutional ARMA Filters</strong><br />
+Bianchi et al.</p>
+<pre><code> @article{bianchi2019graph,
+  title={Graph Neural Networks with Convolutional ARMA Filters},
+  author={Bianchi, Filippo Maria and Grattarola, Daniele and Alippi, Cesare and Livi, Lorenzo},
+  journal={arXiv preprint arXiv:1901.01343},
+  year={2019}
+}
+</code></pre>
+
+<hr />
               
             </div>
           </div>
@@ -264,10 +257,8 @@ each edge). Note that this option ignores <code>link_cutoff</code>.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../geometric/" class="btn btn-neutral float-right" title="Geometric">Next <span class="icon icon-circle-arrow-right"></span></a>
       
-      
-        <a href="../chem/" class="btn btn-neutral" title="Chemistry"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../acknowledgements/" class="btn btn-neutral" title="Acknowledgements"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -295,10 +286,8 @@ each edge). Note that this option ignores <code>link_cutoff</code>.</p>
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../chem/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../acknowledgements/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
-      
-        <span style="margin-left: 15px"><a href="../geometric/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
