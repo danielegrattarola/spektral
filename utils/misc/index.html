@@ -156,9 +156,6 @@
     <li class="toctree-l3"><a href="#pad_jagged_array">pad_jagged_array</a></li>
     
 
-    <li class="toctree-l3"><a href="#normalize_adj">normalize_adj</a></li>
-    
-
     <li class="toctree-l3"><a href="#add_eye">add_eye</a></li>
     
 
@@ -295,24 +292,6 @@ array may fail if the result is again a jagged array). </p>
 </ul>
 <p><strong>Return</strong><br />
  A zero-padded np.array of shape <code>(X.shape[0], ) + target_shape</code></p>
-<hr />
-<h3 id="normalize_adj">normalize_adj</h3>
-<pre><code class="python">spektral.utils.normalize_adj(adj, symmetric_normalization=True)
-</code></pre>
-
-<p>Normalizes an adjacency matrix as <script type="math/tex">D^{-rac{1}{2}}AD^{-rac{1}{2}}</script> if
-<code>symmetric_normalization=True</code> or <script type="math/tex">D^{-1}A</script> otherwise.</p>
-<p><strong>Arguments</strong>  </p>
-<ul>
-<li>
-<p><code>adj</code>: np.array or scipy.sparse matrix of shape <code>(num_nodes, num_nodes)</code></p>
-</li>
-<li>
-<p><code>symmetric_normalization</code>: boolean, whether to normalize symetrically</p>
-</li>
-</ul>
-<p><strong>Return</strong><br />
- Np.array of shape <code>(num_nodes, num_nodes)</code></p>
 <hr />
 <h3 id="add_eye">add_eye</h3>
 <pre><code class="python">spektral.utils.add_eye(x)

@@ -139,6 +139,21 @@
     <a class="current" href="./">Convolution</a>
     <ul class="subnav">
             
+    <li class="toctree-l3"><a href="#degree">degree</a></li>
+    
+
+    <li class="toctree-l3"><a href="#degree_power">degree_power</a></li>
+    
+
+    <li class="toctree-l3"><a href="#normalized_adjacency">normalized_adjacency</a></li>
+    
+
+    <li class="toctree-l3"><a href="#laplacian">laplacian</a></li>
+    
+
+    <li class="toctree-l3"><a href="#normalized_laplacian">normalized_laplacian</a></li>
+    
+
     <li class="toctree-l3"><a href="#localpooling_filter">localpooling_filter</a></li>
     
 
@@ -216,8 +231,86 @@
           <div role="main">
             <div class="section">
               
-                <h3 id="localpooling_filter">localpooling_filter</h3>
-<pre><code class="python">spektral.utils.localpooling_filter(adj, symmetric_normalization=True)
+                <h3 id="degree">degree</h3>
+<pre><code class="python">spektral.utils.degree(adj)
+</code></pre>
+
+<p>Computes the degree matrix of the given adjacency matrix.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li><code>adj</code>: rank 2 array or sparse matrix</li>
+</ul>
+<p><strong>Return</strong><br />
+ The degree matrix in sparse DIA format</p>
+<hr />
+<h3 id="degree_power">degree_power</h3>
+<pre><code class="python">spektral.utils.degree_power(adj, pow)
+</code></pre>
+
+<p>Computes <script type="math/tex">D^{p}</script> from the given adjacency matrix. Useful for computing
+normalised Laplacians.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>adj</code>: rank 2 array or sparse matrix</p>
+</li>
+<li>
+<p><code>pow</code>: exponent to which elevate the degree matrix</p>
+</li>
+</ul>
+<p><strong>Return</strong><br />
+ The exponentiated degree matrix in sparse DIA format</p>
+<hr />
+<h3 id="normalized_adjacency">normalized_adjacency</h3>
+<pre><code class="python">spektral.utils.normalized_adjacency(adj, symmetric=False)
+</code></pre>
+
+<p>Normalizes the given adjacency matrix using the degree matrix as either
+<script type="math/tex">D^{-1}A</script> or <script type="math/tex">D^{-1/2}AD^{-1/2}</script> (symmetric normalization).</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>adj</code>: rank 2 array or sparse matrix;</p>
+</li>
+<li>
+<p><code>symmetric</code>: boolean, compute symmetric normalization;</p>
+</li>
+</ul>
+<p><strong>Return</strong><br />
+ The normalized adjacency matrix.</p>
+<hr />
+<h3 id="laplacian">laplacian</h3>
+<pre><code class="python">spektral.utils.laplacian(adj)
+</code></pre>
+
+<p>Computes the Laplacian of the given adjacency matrix as <script type="math/tex">D - A</script>.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li><code>adj</code>: rank 2 array or sparse matrix;</li>
+</ul>
+<p><strong>Return</strong><br />
+ The Laplacian.</p>
+<hr />
+<h3 id="normalized_laplacian">normalized_laplacian</h3>
+<pre><code class="python">spektral.utils.normalized_laplacian(adj, symmetric=False)
+</code></pre>
+
+<p>Computes a  normalized Laplacian of the given adjacency matrix as
+<script type="math/tex">I - D^{-1}A</script> or <script type="math/tex">I - D^{-1/2}AD^{-1/2}</script> (symmetric normalization).</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>adj</code>: rank 2 array or sparse matrix;</p>
+</li>
+<li>
+<p><code>symmetric</code>: boolean, compute symmetric normalization;</p>
+</li>
+</ul>
+<p><strong>Return</strong><br />
+ The normalized Laplacian.</p>
+<hr />
+<h3 id="localpooling_filter">localpooling_filter</h3>
+<pre><code class="python">spektral.utils.localpooling_filter(adj, symmetric=True)
 </code></pre>
 
 <p>Computes the local pooling filter from the given adjacency matrix, as 
@@ -225,18 +318,18 @@ described by Kipf &amp; Welling (2017).</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
 <li>
-<p><code>adj</code>: a np.array or scipy.sparse matrix of rank 2 or 3</p>
+<p><code>adj</code>: a np.array or scipy.sparse matrix of rank 2 or 3;</p>
 </li>
 <li>
-<p><code>symmetric_normalization</code>: boolean, whether to normalize the matrix as 
-<script type="math/tex">D^{-\frac{1}{2}}AD^{-\frac{1}{2}}</script> or as <script type="math/tex">D^{-1}A</script>.</p>
+<p><code>symmetric</code>: boolean, whether to normalize the matrix as
+<script type="math/tex">D^{-\frac{1}{2}}AD^{-\frac{1}{2}}</script> or as <script type="math/tex">D^{-1}A</script>;</p>
 </li>
 </ul>
 <p><strong>Return</strong><br />
- The filter matrix, as dense np.array</p>
+ The filter matrix, as dense np.array.</p>
 <hr />
 <h3 id="chebyshev_filter">chebyshev_filter</h3>
-<pre><code class="python">spektral.utils.chebyshev_filter(adj, k, symmetric_normalization=True)
+<pre><code class="python">spektral.utils.chebyshev_filter(adj, k, symmetric=True)
 </code></pre>
 
 <p>Computes the Chebyshev filter from the given adjacency matrix, as described
@@ -244,18 +337,18 @@ in Defferrard et at. (2016).</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
 <li>
-<p><code>adj</code>: a np.array or scipy.sparse matrix</p>
+<p><code>adj</code>: a np.array or scipy.sparse matrix;</p>
 </li>
 <li>
-<p><code>k</code>: integer, the order up to which to compute the Chebyshev polynomials</p>
+<p><code>k</code>: integer, the order up to which to compute the Chebyshev polynomials;</p>
 </li>
 <li>
-<p><code>symmetric_normalization</code>: boolean, whether to normalize the matrix as 
-<script type="math/tex">D^{-\frac{1}{2}}AD^{-\frac{1}{2}}</script> or as <script type="math/tex">D^{-1}A</script>. </p>
+<p><code>symmetric</code>: boolean, whether to normalize the matrix as
+<script type="math/tex">D^{-\frac{1}{2}}AD^{-\frac{1}{2}}</script> or as <script type="math/tex">D^{-1}A</script>;</p>
 </li>
 </ul>
 <p><strong>Return</strong><br />
- A list of k+1 filter matrices, as np.arrays </p>
+ A list of k+1 filter matrices, as np.arrays.</p>
               
             </div>
           </div>
