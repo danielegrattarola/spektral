@@ -1,4 +1,4 @@
-# Representing graphs
+## Representing graphs
 
 Spektral uses a matrix-based representation for manipulating graphs and feeding them to neural networks. This approach is one of the most commonly used in the literature on graph neural networks, and it's perfect to perform efficient computations on GPU.
 

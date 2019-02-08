@@ -18,7 +18,6 @@ extra_javascript:
     - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML
 
 markdown_extensions:
-    - codehilite
     - mdx_math
 
 nav:
@@ -27,7 +26,7 @@ nav:
 - Layers:
     - Convolutional Layers: layers/convolution.md
     - Base Layers: layers/base.md
-    - Pooling Layers: layers/pooiling.md
+    - Pooling Layers: layers/pooling.md
 - Datasets:
     - Citation: datasets/citation.md
     - Delaunay: datasets/delaunay.md
@@ -42,3 +41,6 @@ nav:
     - Logging: utils/logging.md
     - Miscellaneous: utils/misc.md
     - Plotting: utils/plotting.md
+- About:
+    - Acknowledgements: acknowledgements.md
+    - Featured papers: papers.md

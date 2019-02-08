@@ -1,38 +1,98 @@
 from __future__ import absolute_import
 
+import numpy as np
 from scipy import sparse as sp
 from scipy.sparse.linalg import ArpackNoConvergence
 
-from .misc import add_eye, normalize_adj
+
+def degree(adj):
+    """
+    Computes the degree matrix of the given adjacency matrix.
+    :param adj: rank 2 array or sparse matrix
+    :return: the degree matrix in sparse DIA format
+    """
+    degrees = np.array(adj.sum(1)).flatten()
+    return sp.diags(degrees)
 
 
-def localpooling_filter(adj, symmetric_normalization=True):
+def degree_power(adj, pow):
+    """
+    Computes \(D^{p}\) from the given adjacency matrix. Useful for computing
+    normalised Laplacians.
+    :param adj: rank 2 array or sparse matrix
+    :param pow: exponent to which elevate the degree matrix
+    :return: the exponentiated degree matrix in sparse DIA format
+    """
+    degrees = np.power(np.array(adj.sum(1)), pow).flatten()
+    return sp.diags(degrees, 0)
+
+
+def normalized_adjacency(adj, symmetric=False):
+    """
+    Normalizes the given adjacency matrix using the degree matrix as either
+    \(D^{-1}A\) or \(D^{-1/2}AD^{-1/2}\) (symmetric normalization).
+    :param adj: rank 2 array or sparse matrix;
+    :param symmetric: boolean, compute symmetric normalization;
+    :return: the normalized adjacency matrix.
+    """
+    if symmetric:
+        normalized_D = degree_power(adj, -0.5)
+        return normalized_D.dot(adj).dot(normalized_D)
+    else:
+        normalized_D = degree_power(adj, -1)
+        return normalized_D.dot(adj)
+
+
+def laplacian(adj):
+    """
+    Computes the Laplacian of the given adjacency matrix as \(D - A\).
+    :param adj: rank 2 array or sparse matrix;
+    :return: the Laplacian.
+    """
+    return degree(adj) - adj
+
+
+def normalized_laplacian(adj, symmetric=False):
+    """
+    Computes a  normalized Laplacian of the given adjacency matrix as
+    \(I - D^{-1}A\) or \(I - D^{-1/2}AD^{-1/2}\) (symmetric normalization).
+    :param adj: rank 2 array or sparse matrix;
+    :param symmetric: boolean, compute symmetric normalization;
+    :return: the normalized Laplacian.
+    """
+    I = sp.eye(adj.shape[-1])
+    normalized_adj = normalized_adjacency(adj, symmetric=symmetric)
+    return I - normalized_adj
+
+
+def localpooling_filter(adj, symmetric=True):
     """
     Computes the local pooling filter from the given adjacency matrix, as 
     described by Kipf & Welling (2017).
-    :param adj: a np.array or scipy.sparse matrix of rank 2 or 3
-    :param symmetric_normalization: boolean, whether to normalize the matrix as 
-    \(D^{-\\frac{1}{2}}AD^{-\\frac{1}{2}}\) or as \(D^{-1}A\).
-    :return: the filter matrix, as dense np.array
+    :param adj: a np.array or scipy.sparse matrix of rank 2 or 3;
+    :param symmetric: boolean, whether to normalize the matrix as
+    \(D^{-\\frac{1}{2}}AD^{-\\frac{1}{2}}\) or as \(D^{-1}A\);
+    :return: the filter matrix, as dense np.array.
     """
+    fltr = adj.copy()
+    I = sp.eye(adj.shape[-1])
     if adj.ndim == 3:
         for i in range(adj.shape[0]):
-            adj[i] = add_eye(adj[i])
-            adj[i] = normalize_adj(adj[i], symmetric_normalization)
+            A_tilde = adj[i] + I
+            fltr[i] = normalized_adjacency(A_tilde, symmetric=symmetric)
     else:
-        adj = add_eye(adj)
-        adj = normalize_adj(adj, symmetric_normalization)
-
-    return adj
+        A_tilde = adj + I
+        fltr = normalized_adjacency(A_tilde, symmetric=symmetric)
+    return fltr
 
 
 def chebyshev_polynomial(X, k):
     """
     Calculates Chebyshev polynomials up to order k.
-    :param X: a np.array or scipy.sparse matrix
-    :param k: the order up to which compute the polynomials
+    :param X: a np.array or scipy.sparse matrix;
+    :param k: the order up to which compute the polynomials,
     :return: a list of k + 1 sparse matrices with one element for each degree of 
-            the approximation
+            the approximation.
     """
     T_k = list()
     T_k.append(sp.eye(X.shape[0], dtype=X.dtype).tocsr())
@@ -48,18 +108,18 @@ def chebyshev_polynomial(X, k):
     return T_k
 
 
-def chebyshev_filter(adj, k, symmetric_normalization=True):
+def chebyshev_filter(adj, k, symmetric=True):
     """
     Computes the Chebyshev filter from the given adjacency matrix, as described
     in Defferrard et at. (2016).
-    :param adj: a np.array or scipy.sparse matrix
-    :param k: integer, the order up to which to compute the Chebyshev polynomials
-    :param symmetric_normalization: boolean, whether to normalize the matrix as 
-    \(D^{-\\frac{1}{2}}AD^{-\\frac{1}{2}}\) or as \(D^{-1}A\). 
-    :return: a list of k+1 filter matrices, as np.arrays 
+    :param adj: a np.array or scipy.sparse matrix;
+    :param k: integer, the order up to which to compute the Chebyshev polynomials;
+    :param symmetric: boolean, whether to normalize the matrix as
+    \(D^{-\\frac{1}{2}}AD^{-\\frac{1}{2}}\) or as \(D^{-1}A\);
+    :return: a list of k+1 filter matrices, as np.arrays.
     """
-    adj_normalized = normalize_adj(adj, symmetric_normalization)
-    L = sp.eye(adj.shape[0]) - adj_normalized  # Compute Laplacian
+    normalized_adj = normalized_adjacency(adj, symmetric)
+    L = sp.eye(adj.shape[0]) - normalized_adj  # Compute Laplacian
 
     # Rescale Laplacian
     try:
@@ -72,3 +132,5 @@ def chebyshev_filter(adj, k, symmetric_normalization=True):
     T_k = chebyshev_polynomial(L_scaled, k)
 
     return T_k
+
+

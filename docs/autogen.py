@@ -164,6 +164,11 @@ PAGES = [
     {
         'page': 'utils/convolution.md',
         'functions': [
+            utils.degree,
+            utils.degree_power,
+            utils.normalized_adjacency,
+            utils.laplacian,
+            utils.normalized_laplacian,
             utils.localpooling_filter,
             utils.chebyshev_filter
         ],
@@ -188,7 +193,6 @@ PAGES = [
             utils.batch_iterator,
             utils.set_trainable,
             utils.pad_jagged_array,
-            utils.normalize_adj,
             utils.add_eye,
             utils.sub_eye,
 

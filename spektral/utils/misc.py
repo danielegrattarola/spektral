@@ -2,7 +2,6 @@ from __future__ import division
 
 import re
 
-import networkx as nx
 import numpy as np
 from scipy import sparse as sp
 
@@ -50,33 +49,6 @@ def normalize_sum_to_unity(x):
         return np.nan_to_num(x / x.sum(-1)[..., np.newaxis])
     else:
         return np.nan_to_num(x / x.sum(-1).reshape(-1, 1))
-
-
-def normalize_adj(adj, symmetric_normalization=True):
-    """
-    Normalizes an adjacency matrix as \(D^{-\frac{1}{2}}AD^{-\frac{1}{2}}\) if
-    `symmetric_normalization=True` or \(D^{-1}A\) otherwise.
-    
-    :param adj: np.array or scipy.sparse matrix of shape `(num_nodes, num_nodes)`
-    :param symmetric_normalization: boolean, whether to normalize symetrically
-    :return: np.array of shape `(num_nodes, num_nodes)`
-    """
-    if symmetric_normalization:
-        d = sp.diags(np.power(np.array(adj.sum(1)), -0.5).flatten(), 0)
-        if sp.issparse(adj):
-            adj_norm = adj.dot(d).transpose().dot(d).tocsr()
-        else:
-            d = d.toarray()
-            adj_norm = np.dot(np.dot(d, adj), d)
-    else:
-        d = sp.diags(np.power(np.array(adj.sum(1)), -1).flatten(), 0)
-        if sp.issparse(adj):
-            adj_norm = d.dot(adj).tocsr()
-        else:
-            d = d.toarray()
-            adj_norm = np.dot(d, adj)
-
-    return adj_norm
 
 
 def add_eye(x):
@@ -340,25 +312,6 @@ def batch_iterator(data, batch_size=32, epochs=1, shuffle=True):
                 yield [item[start:stop] for item in data]
             else:
                 yield data[0][start:stop]
-
-
-def delaunay_layout_closure(nf_name):
-    def delaunay_layout(nx_graph):
-        return nx.get_node_attributes(nx_graph, nf_name)
-
-    return delaunay_layout
-
-
-def deserialize_nx_layout(layout, nf_name=None):
-    if isinstance(layout, str):
-        if layout in nx.layout.__all__:
-            return eval('nx.{}'.format(layout))
-        elif layout is 'delaunay':
-            if nf_name is None:
-                nf_name = 'nf'  # Try it anyway
-            return delaunay_layout_closure(nf_name)
-        else:
-            raise ValueError('layout must be in nx.layout.__all__ or \'delaunay\'')
 
 
 def set_trainable(model, toset):
