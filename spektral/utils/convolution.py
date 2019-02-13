@@ -37,7 +37,11 @@ def normalized_adjacency(adj, symmetric=False):
     """
     if symmetric:
         normalized_D = degree_power(adj, -0.5)
-        return normalized_D.dot(adj).dot(normalized_D)
+        if sp.issparse(adj):
+            return normalized_D.dot(adj).dot(normalized_D)
+        else:
+            normalized_D = normalized_D.toarray()
+            return normalized_D.dot(adj).dot(normalized_D)
     else:
         normalized_D = degree_power(adj, -1)
         return normalized_D.dot(adj)
