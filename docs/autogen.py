@@ -16,9 +16,11 @@ from spektral import layers
 from spektral import utils
 from spektral.utils import plotting
 
-if sys.version[0] == '2':
+try:
     reload(sys)
     sys.setdefaultencoding('utf8')
+except NameError:
+    pass
 
 
 EXCLUDE = {}
