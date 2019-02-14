@@ -1,5 +1,6 @@
 import numpy as np
 from scipy import stats
+from joblib import Parallel, delayed
 try:
     from dyfunconn import fc
 except ImportError:
@@ -66,7 +67,7 @@ def _get_fc_graph(x, band_freq, sampling_freq, fc_measure='corr',
 
 def get_fc(x, band_freq, sampling_freq, samples_per_graph=None,
            fc_measure='corr', link_cutoff=0., percentiles=None,
-           band_freq_hi=(20., 45.), nfft=128, n_overlap=64):
+           band_freq_hi=(20., 45.), nfft=128, n_overlap=64, njobs=1):
     """
     Build functional connectivity networks from the given data stream.
     :param x: numpy array of shape (n_channels, n_samples);
@@ -84,6 +85,7 @@ def get_fc(x, band_freq, sampling_freq, samples_per_graph=None,
     :param band_freq_hi: high band used to estimate FC when using 'aec';
     :param nfft: TODO, affects 'wpli' and 'dwpli';
     :param n_overlap: TODO, affects 'wpli' and 'dwpli';
+    :param njobs: number of processes to use (-1 to use all available cores);
     :return: FC graph(s) in numpy format (note that node features are all ones).
     """
     if fc is None:
@@ -93,11 +95,17 @@ def get_fc(x, band_freq, sampling_freq, samples_per_graph=None,
     if samples_per_graph is None:
         samples_per_graph = x.shape[1]
 
-    output = [_get_fc_graph(x[:, i: i + samples_per_graph],
-                            band_freq, sampling_freq, fc_measure=fc_measure,
-                            link_cutoff=link_cutoff, band_freq_hi=band_freq_hi,
-                            nfft=nfft, n_overlap=n_overlap)
-              for i in range(0, x.shape[1], samples_per_graph)]
+    output = Parallel(n_jobs=njobs)(
+        delayed(_get_fc_graph)(x[:, i: i + samples_per_graph],
+                               band_freq,
+                               sampling_freq,
+                               fc_measure=fc_measure,
+                               link_cutoff=link_cutoff,
+                               band_freq_hi=band_freq_hi,
+                               nfft=nfft,
+                               n_overlap=n_overlap)
+        for i in range(0, x.shape[1], samples_per_graph)
+    )
 
     adj, nf, ef = zip(*output)
     adj = np.array(adj)
