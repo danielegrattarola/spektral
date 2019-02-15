@@ -46,7 +46,7 @@ the __sequentiality__ of time series (i.e., chains of time steps).
 Adding to this, in recent years graph neural networks (GNNs) have been proposed, 
 in several formulations, as a general framework for exploiting arbitrary 
 relational inductive biases on arbitrarily defined entities and relations, giving
-rise to the filed of __relational representation learning__ (RRL).  
+rise to the field of __relational representation learning__ (RRL).  
 In other words, RRL consists of developing models that are able to deal with 
 graphs natively, taking their topology and attributes into account when making
 a prediction, exactly like we do when we reason about the universe.
