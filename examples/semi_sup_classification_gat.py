@@ -1,3 +1,10 @@
+"""
+This example implements the experiments on citation networks from the paper:
+
+Graph Attention Networks (https://arxiv.org/abs/1710.10903)
+Petar Veličković, Guillem Cucurull, Arantxa Casanova, Adriana Romero, Pietro Liò, Yoshua Bengio
+"""
+
 from keras.callbacks import EarlyStopping, TensorBoard, ModelCheckpoint
 from keras.layers import Input, Dropout
 from keras.models import Model
