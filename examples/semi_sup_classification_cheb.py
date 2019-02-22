@@ -1,3 +1,11 @@
+"""
+This example implements the experiments on citation networks using tconvolutional
+layers from the paper:
+
+Convolutional Neural Networks on Graphs with Fast Localized Spectral Filtering (https://arxiv.org/abs/1606.09375)
+Michaël Defferrard, Xavier Bresson, Pierre Vandergheynst
+"""
+
 from keras.callbacks import EarlyStopping, TensorBoard, ModelCheckpoint
 from keras.layers import Input, Dropout
 from keras.models import Model
