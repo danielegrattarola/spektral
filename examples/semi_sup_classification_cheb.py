@@ -1,5 +1,5 @@
 """
-This example implements the experiments on citation networks using tconvolutional
+This example implements the experiments on citation networks using convolutional
 layers from the paper:
 
 Convolutional Neural Networks on Graphs with Fast Localized Spectral Filtering (https://arxiv.org/abs/1606.09375)
@@ -22,16 +22,16 @@ dataset = 'cora'
 adj, node_features, y_train, y_val, y_test, train_mask, val_mask, test_mask = citation.load_data(dataset)
 
 # Parameters
+cheb_k = 2                    # Max degree of the Chebyshev approximation
+support = cheb_k + 1          # Total number of filters (k + 1)
 N = node_features.shape[0]    # Number of nodes in the graph
 F = node_features.shape[1]    # Original feature dimensionality
 n_classes = y_train.shape[1]  # Number of classes
-dropout_rate = 0.5            # Dropout rate applied to the input of GCN layers
+dropout_rate = 0.25           # Dropout rate applied to the input of GCN layers
 l2_reg = 5e-4                 # Regularization rate for l2
 learning_rate = 1e-2          # Learning rate for SGD
-epochs = 2000                 # Number of training epochs
-es_patience = 10              # Patience fot early stopping
-cheb_k = 2                    # Max degree of the Chebyshev approximation
-support = cheb_k + 1          # Total number of filters (k + 1)
+epochs = 20000                # Number of training epochs
+es_patience = 200             # Patience fot early stopping
 log_dir = init_logging()      # Create log directory and file
 
 # Preprocessing operations
@@ -44,7 +44,7 @@ X_in = Input(shape=(F, ))
 fltr_in = [Input((N, ), sparse=True) for _ in range(support)]
 
 dropout_1 = Dropout(dropout_rate)(X_in)
-graph_conv_1 = ChebConv(256,
+graph_conv_1 = ChebConv(16,
                         activation='relu',
                         kernel_regularizer=l2(l2_reg),
                         use_bias=False)([dropout_1] + fltr_in)
@@ -63,7 +63,7 @@ model.summary()
 
 # Callbacks
 es_callback = EarlyStopping(monitor='val_weighted_acc', patience=es_patience)
-tb_callback = TensorBoard(log_dir=log_dir, batch_size=N)
+tb_callback = TensorBoard(log_dir=log_dir, batch_size=N, write_graph=True)
 mc_callback = ModelCheckpoint(log_dir + 'best_model.h5', save_best_only=True,
                               save_weights_only=True)
 

@@ -25,10 +25,10 @@ N = node_features.shape[0]    # Number of nodes in the graph
 F = node_features.shape[1]    # Original feature dimensionality
 n_classes = y_train.shape[1]  # Number of classes
 dropout_rate = 0.5            # Dropout rate applied to the input of GCN layers
-l2_reg = 25e-5                # Regularization rate for l2
+l2_reg = 5e-4                 # Regularization rate for l2
 learning_rate = 1e-2          # Learning rate for SGD
-epochs = 2000                 # Number of training epochs
-es_patience = 10              # Patience fot early stopping
+epochs = 200                  # Number of training epochs
+es_patience = 10              # Patience for early stopping
 log_dir = init_logging()      # Create log directory and file
 
 # Preprocessing operations
@@ -43,10 +43,12 @@ dropout_1 = Dropout(dropout_rate)(X_in)
 graph_conv_1 = GraphConv(16,
                          activation='relu',
                          kernel_regularizer=l2(l2_reg),
+                         kernel_initializer='glorot_uniform',
                          use_bias=False)([dropout_1, fltr_in])
 dropout_2 = Dropout(dropout_rate)(graph_conv_1)
 graph_conv_2 = GraphConv(n_classes,
                          activation='softmax',
+                         kernel_initializer='glorot_uniform',
                          use_bias=False)([dropout_2, fltr_in])
 
 # Build model

@@ -24,10 +24,11 @@ def degree_power(adj, pow):
     :return: the exponentiated degree matrix in sparse DIA format
     """
     degrees = np.power(np.array(adj.sum(1)), pow).flatten()
+    degrees[np.isinf(degrees)] = 0.
     return sp.diags(degrees, 0)
 
 
-def normalized_adjacency(adj, symmetric=False):
+def normalized_adjacency(adj, symmetric=True):
     """
     Normalizes the given adjacency matrix using the degree matrix as either
     \(D^{-1}A\) or \(D^{-1/2}AD^{-1/2}\) (symmetric normalization).
@@ -38,13 +39,15 @@ def normalized_adjacency(adj, symmetric=False):
     if symmetric:
         normalized_D = degree_power(adj, -0.5)
         if sp.issparse(adj):
-            return normalized_D.dot(adj).dot(normalized_D)
+            output = normalized_D.dot(adj).dot(normalized_D)
         else:
             normalized_D = normalized_D.toarray()
-            return normalized_D.dot(adj).dot(normalized_D)
+            output = normalized_D.dot(adj).dot(normalized_D)
     else:
-        normalized_D = degree_power(adj, -1)
-        return normalized_D.dot(adj)
+        normalized_D = degree_power(adj, -1.)
+        output = normalized_D.dot(adj)
+
+    return output
 
 
 def laplacian(adj):
@@ -56,7 +59,7 @@ def laplacian(adj):
     return degree(adj) - adj
 
 
-def normalized_laplacian(adj, symmetric=False):
+def normalized_laplacian(adj, symmetric=True):
     """
     Computes a  normalized Laplacian of the given adjacency matrix as
     \(I - D^{-1}A\) or \(I - D^{-1/2}AD^{-1/2}\) (symmetric normalization).
@@ -64,9 +67,22 @@ def normalized_laplacian(adj, symmetric=False):
     :param symmetric: boolean, compute symmetric normalization;
     :return: the normalized Laplacian.
     """
-    I = sp.eye(adj.shape[-1])
+    I = sp.eye(adj.shape[-1], dtype=adj.dtype)
     normalized_adj = normalized_adjacency(adj, symmetric=symmetric)
     return I - normalized_adj
+
+
+def rescale_laplacian(L, lmax=2):
+    """
+    Rescales the Laplacian eigenvalues in [-1,1], using lmax as largest eigenvalue.
+    """
+    if lmax is None:
+        try:
+            lmax = sp.linalg.eigsh(L, 1, which='LM', return_eigenvectors=False)[0]
+        except ArpackNoConvergence:
+            lmax = 2
+    L_scaled = (2. / lmax) * L - sp.eye(L.shape[0], dtype=L.dtype)
+    return L_scaled
 
 
 def localpooling_filter(adj, symmetric=True):
@@ -79,7 +95,7 @@ def localpooling_filter(adj, symmetric=True):
     :return: the filter matrix, as dense np.array.
     """
     fltr = adj.copy()
-    I = sp.eye(adj.shape[-1])
+    I = sp.eye(adj.shape[-1], dtype=adj.dtype)
     if adj.ndim == 3:
         for i in range(adj.shape[0]):
             A_tilde = adj[i] + I
@@ -123,14 +139,10 @@ def chebyshev_filter(adj, k, symmetric=True):
     :return: a list of k+1 filter matrices, as np.arrays.
     """
     normalized_adj = normalized_adjacency(adj, symmetric)
-    L = sp.eye(adj.shape[0]) - normalized_adj  # Compute Laplacian
+    L = sp.eye(adj.shape[0], dtype=adj.dtype) - normalized_adj  # Compute Laplacian
 
     # Rescale Laplacian
-    try:
-        largest_eigval = sp.linalg.eigsh(L, 1, which='LM', return_eigenvectors=False)[0]
-    except ArpackNoConvergence:
-        largest_eigval = 2
-    L_scaled = (2. / largest_eigval) * L - sp.eye(L.shape[0])
+    L_scaled = rescale_laplacian(L)
 
     # Compute Chebyshev polynomial approximation
     T_k = chebyshev_polynomial(L_scaled, k)
