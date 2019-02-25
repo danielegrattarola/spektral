@@ -21,16 +21,16 @@ dataset = 'cora'
 adj, node_features, y_train, y_val, y_test, train_mask, val_mask, test_mask = citation.load_data(dataset)
 
 # Parameters
+gat_channels = 8              # Output size of first GraphAttention layer
+n_attn_heads = 8              # Number of attention heads in first GAT layer
 N = node_features.shape[0]    # Number of nodes in the graph
 F = node_features.shape[1]    # Original feature dimensionality
 n_classes = y_train.shape[1]  # Number of classes
-gat_channels = 8              # Output size of first GraphAttention layer
-n_attn_heads = 8              # Number of attention heads in first GAT layer
-dropout_rate = 0.6            # Dropout rate applied to the input of GAT layers
-l2_reg = 5e-4/2               # Regularization rate for l2
-learning_rate = 5e-3          # Learning rate for SGD
-epochs = 10000                # Number of epochs to train for
-es_patience = 100             # Patience fot early stopping
+dropout_rate = 0.25           # Dropout rate applied to the input of GAT layers
+l2_reg = 5e-4                 # Regularization rate for l2
+learning_rate = 1e-2          # Learning rate for SGD
+epochs = 20000                # Number of training epochs
+es_patience = 200             # Patience fot early stopping
 log_dir = init_logging()      # Create log directory and file
 
 # Preprocessing operations
@@ -68,7 +68,7 @@ model.summary()
 
 # Callbacks
 es_callback = EarlyStopping(monitor='val_weighted_acc', patience=es_patience)
-tb_callback = TensorBoard(log_dir=log_dir, batch_size=N)
+tb_callback = TensorBoard(log_dir=log_dir, batch_size=N, write_graph=True)
 mc_callback = ModelCheckpoint(log_dir + 'best_model.h5',
                               monitor='val_weighted_acc',
                               save_best_only=True,

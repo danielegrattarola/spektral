@@ -36,7 +36,7 @@ from spektral.utils.io import load_binary
 
 DATA_PATH = os.path.expanduser('~/.spektral/datasets/')
 AVAILABLE_DATASETS = {'cora', 'citeseer', 'pubmed'}
-RETURN_TYPES = {'masked', 'split'}
+RETURN_TYPES = {'numpy'}
 
 
 def _parse_index_file(filename):
@@ -52,7 +52,14 @@ def _sample_mask(idx, l):
     return np.array(mask, dtype=np.bool)
 
 
-def load_data(dataset_name='cora', return_type='masked', val_size=500):
+def load_data(dataset_name='cora', return_type='numpy', val_size=500):
+    """
+        Loads the specified citation dataset using the public splits as defined in
+        [Kipf & Welling (2016)](https://arxiv.org/abs/1609.02907).
+        :param dataset_name: name of the dataset to load (cora, citeseer, or pubmed)
+        :param return_type:
+        :return:
+        """
     if dataset_name not in AVAILABLE_DATASETS:
         raise ValueError('Available datasets: {}'.format(AVAILABLE_DATASETS))
     if return_type not in RETURN_TYPES:
@@ -73,47 +80,46 @@ def load_data(dataset_name='cora', return_type='masked', val_size=500):
         filename = "{}/ind.{}.{}".format(data_path, dataset_name, n)
         objects.append(load_binary(filename))
 
-    x, y, tx, ty, allx, ally, adj = tuple(objects)
-    adj = nx.adjacency_matrix(nx.from_dict_of_lists(adj))
+    x, y, tx, ty, allx, ally, graph = tuple(objects)
+    adj = nx.adjacency_matrix(nx.from_dict_of_lists(graph))
+    test_idx_reorder = _parse_index_file("{}/ind.{}.test.index".format(data_path, dataset_name))
+    test_idx_range = np.sort(test_idx_reorder)
 
-    if return_type is 'split':
-        return adj, x, tx, allx, y, ty, ally
-    else:
-        test_idx_reorder = _parse_index_file("{}/ind.{}.test.index".format(data_path, dataset_name))
-        test_idx_range = np.sort(test_idx_reorder)
+    if dataset_name == 'citeseer':
+        test_idx_range_full = range(min(test_idx_reorder),
+                                    max(test_idx_reorder) + 1)
+        tx_extended = sp.lil_matrix((len(test_idx_range_full), x.shape[1]))
+        tx_extended[test_idx_range - min(test_idx_range), :] = tx
+        tx = tx_extended
+        ty_extended = np.zeros((len(test_idx_range_full), y.shape[1]))
+        ty_extended[test_idx_range - min(test_idx_range), :] = ty
+        ty = ty_extended
 
-        if dataset_name == 'citeseer':
-            test_idx_range_full = range(min(test_idx_reorder),
-                                        max(test_idx_reorder) + 1)
-            tx_extended = sp.lil_matrix((len(test_idx_range_full), x.shape[1]))
-            tx_extended[test_idx_range - min(test_idx_range), :] = tx
-            tx = tx_extended
-            ty_extended = np.zeros((len(test_idx_range_full), y.shape[1]))
-            ty_extended[test_idx_range - min(test_idx_range), :] = ty
-            ty = ty_extended
+    features = sp.vstack((allx, tx)).tolil()
+    features[test_idx_reorder, :] = features[test_idx_range, :]
 
-        features = sp.vstack((allx, tx)).tolil()
-        features[test_idx_reorder, :] = features[test_idx_range, :]
+    labels = np.vstack((ally, ty))
+    labels[test_idx_reorder, :] = labels[test_idx_range, :]
 
-        labels = np.vstack((ally, ty))
-        labels[test_idx_reorder, :] = labels[test_idx_range, :]
+    idx_test = test_idx_range.tolist()
+    idx_train = range(len(y))
+    idx_val = range(len(y), len(y) + val_size)
 
-        idx_test = test_idx_range.tolist()
-        idx_train = range(len(y))
-        idx_val = range(len(y), len(y) + val_size)
+    train_mask = _sample_mask(idx_train, labels.shape[0])
+    val_mask = _sample_mask(idx_val, labels.shape[0])
+    test_mask = _sample_mask(idx_test, labels.shape[0])
 
-        train_mask = _sample_mask(idx_train, labels.shape[0])
-        val_mask = _sample_mask(idx_val, labels.shape[0])
-        test_mask = _sample_mask(idx_test, labels.shape[0])
+    # Row-normalize the features
+    # features_norm = utils.sparse_normalize(features)
 
-        y_train = np.zeros(labels.shape)
-        y_val = np.zeros(labels.shape)
-        y_test = np.zeros(labels.shape)
-        y_train[train_mask, :] = labels[train_mask, :]
-        y_val[val_mask, :] = labels[val_mask, :]
-        y_test[test_mask, :] = labels[test_mask, :]
+    y_train = np.zeros(labels.shape)
+    y_val = np.zeros(labels.shape)
+    y_test = np.zeros(labels.shape)
+    y_train[train_mask, :] = labels[train_mask, :]
+    y_val[val_mask, :] = labels[val_mask, :]
+    y_test[test_mask, :] = labels[test_mask, :]
 
-        return adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask
+    return adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask
 
 
 def preprocess_features(features):
