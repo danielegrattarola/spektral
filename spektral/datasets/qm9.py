@@ -51,7 +51,7 @@ def load_data(return_type='numpy', nf_keys=None, ef_keys=None, auto_pad=True,
     data = load_sdf(sdf_file, amount=amount)  # Internal SDF format
 
     # Load labels
-    labels_file = os.path.join(DATA_PATH, 'qm9.csv')
+    labels_file = os.path.join(DATA_PATH, 'qm9.sdf.csv')
     labels = load_csv(labels_file)
     if return_type is 'sdf':
         return data, labels
