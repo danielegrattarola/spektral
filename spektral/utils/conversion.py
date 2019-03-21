@@ -21,32 +21,28 @@ def nx_to_adj(graphs):
     return np.array([np.array(nx.attr_matrix(g)[0]) for g in graphs])
 
 
-def nx_to_node_features(graphs, keys=None, post_processing=None):
+def nx_to_node_features(graphs, keys, post_processing=None):
     """
     Converts a list of nx.Graphs to a rank 3 np.array of node features matrices
     of shape `(num_graphs, num_nodes, num_features)`. Optionally applies a
     post-processing function to each individual attribute in the nx Graphs.
     :param graphs: a nx.Graph, or a list of nx.Graphs;
     :param keys: a list of keys with which to index node attributes in the nx
-    Graphs. It's also possible to set this to `None` and the function will
-    attempt to automatically extract the correct keys from the first graph in
-    the list.
+    Graphs.
     :param post_processing: a list of functions with which to post process each
     attribute associated to a key. `None` can be passed as post-processing 
     function to leave the attribute unchanged.
     :return: a rank 3 np.array of feature matrices
     """
     if post_processing is not None:
+        if len(post_processing) != len(keys):
+            raise ValueError('post_processing must contain an element for each key')
         for i in range(len(post_processing)):
             if post_processing[i] is None:
                 post_processing[i] = lambda x: x
 
     if isinstance(graphs, nx.Graph):
         graphs = [graphs]
-
-    if keys is None:
-        # Attempt to extract node attribute keys from the data itself
-        keys = graphs[0].nodes[0].keys()
 
     output = []
     for g in graphs:
@@ -62,33 +58,28 @@ def nx_to_node_features(graphs, keys=None, post_processing=None):
     return np.array(output)
 
 
-def nx_to_edge_features(graphs, keys=None, post_processing=None):
+def nx_to_edge_features(graphs, keys, post_processing=None):
     """
     Converts a list of nx.Graphs to a rank 4 np.array of edge features matrices
     of shape `(num_graphs, num_nodes, num_nodes, num_features)`.
     Optionally applies a post-processing function to each attribute in the nx
     graphs.
     :param graphs: a nx.Graph, or a list of nx.Graphs;
-    :param keys: a list of keys with which to index edge attributes. It's also
-    possible to set this to `None` and the function will attempt to 
-    automatically extract the correct keys from the first graph in the list.  
+    :param keys: a list of keys with which to index edge attributes.
     :param post_processing: a list of functions with which to post process each
     attribute associated to a key. `None` can be passed as post-processing 
     function to leave the attribute unchanged.
     :return: a rank 3 np.array of feature matrices
     """
     if post_processing is not None:
+        if len(post_processing) != len(keys):
+            raise ValueError('post_processing must contain an element for each key')
         for i in range(len(post_processing)):
             if post_processing[i] is None:
                 post_processing[i] = lambda x: x
 
     if isinstance(graphs, nx.Graph):
         graphs = [graphs]
-
-    if keys is None:
-        # Attempt to extract edge attribute keys from the data itself
-        edge_key = graphs[0].edges(0)[0]
-        keys = graphs[0].get_edge_data(*edge_key).keys()
 
     output = []
     for g in graphs:
@@ -119,12 +110,10 @@ def nx_to_numpy(graphs, auto_pad=True, self_loops=True, nf_keys=None,
     same dimension (set this to true if you don't want to deal with manual
     batching for different-size graphs.
     :param self_loops: whether to add self-loops to the graphs.
-    :param nf_keys: a list of keys with which to index node attributes. It's also
-    possible to set this to `None` and the function will attempt to
-    automatically extract the correct keys from the first graph in the list.
-    :param ef_keys: a list of keys with which to index edge attributes. It's also
-    possible to set this to `None` and the function will attempt to
-    automatically extract the correct keys from the first graph in the list.
+    :param nf_keys: a list of keys with which to index node attributes. If None,
+    returns None as node attributes matrix.
+    :param ef_keys: a list of keys with which to index edge attributes. If None,
+    returns None as edge attributes matrix.
     :param nf_postprocessing: a list of functions with which to post process each
     node attribute associated to a key. `None` can be passed as post-processing
     function to leave the attribute unchanged.
@@ -138,11 +127,11 @@ def nx_to_numpy(graphs, auto_pad=True, self_loops=True, nf_keys=None,
     """
     adj = nx_to_adj(graphs)
     if nf_keys is not None:
-        nf = nx_to_node_features(graphs, keys=nf_keys, post_processing=nf_postprocessing)
+        nf = nx_to_node_features(graphs, nf_keys, post_processing=nf_postprocessing)
     else:
         nf = None
     if ef_keys is not None:
-        ef = nx_to_edge_features(graphs, keys=ef_keys, post_processing=ef_postprocessing)
+        ef = nx_to_edge_features(graphs, ef_keys, post_processing=ef_postprocessing)
     else:
         ef = None
 
