@@ -72,7 +72,7 @@ def normalized_laplacian(adj, symmetric=True):
     return I - normalized_adj
 
 
-def rescale_laplacian(L, lmax=2):
+def rescale_laplacian(L, lmax=None):
     """
     Rescales the Laplacian eigenvalues in [-1,1], using lmax as largest eigenvalue.
     """
