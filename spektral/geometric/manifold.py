@@ -1,6 +1,6 @@
 import numpy as np
 try:
-    from cdg.embedding.manifold import SphericalManifold, HyperbolicManifold
+    from cdg.geometry import SphericalManifold, HyperbolicManifold
     CDG_OK = True
 except ImportError:
     CDG_OK = False
