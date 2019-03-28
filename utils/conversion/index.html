@@ -239,7 +239,7 @@ of shape <code>(num_graphs, num_nodes, num_nodes)</code>.</p>
  A rank 3 np.array of adjacency matrices.</p>
 <hr />
 <h3 id="nx_to_node_features">nx_to_node_features</h3>
-<pre><code class="python">spektral.utils.nx_to_node_features(graphs, keys=None, post_processing=None)
+<pre><code class="python">spektral.utils.nx_to_node_features(graphs, keys, post_processing=None)
 </code></pre>
 
 <p>Converts a list of nx.Graphs to a rank 3 np.array of node features matrices
@@ -252,9 +252,7 @@ post-processing function to each individual attribute in the nx Graphs.</p>
 </li>
 <li>
 <p><code>keys</code>: a list of keys with which to index node attributes in the nx
-Graphs. It's also possible to set this to <code>None</code> and the function will
-attempt to automatically extract the correct keys from the first graph in
-the list.</p>
+Graphs.</p>
 </li>
 <li>
 <p><code>post_processing</code>: a list of functions with which to post process each
@@ -266,7 +264,7 @@ function to leave the attribute unchanged.</p>
  A rank 3 np.array of feature matrices</p>
 <hr />
 <h3 id="nx_to_edge_features">nx_to_edge_features</h3>
-<pre><code class="python">spektral.utils.nx_to_edge_features(graphs, keys=None, post_processing=None)
+<pre><code class="python">spektral.utils.nx_to_edge_features(graphs, keys, post_processing=None)
 </code></pre>
 
 <p>Converts a list of nx.Graphs to a rank 4 np.array of edge features matrices
@@ -279,9 +277,7 @@ graphs.</p>
 <p><code>graphs</code>: a nx.Graph, or a list of nx.Graphs;</p>
 </li>
 <li>
-<p><code>keys</code>: a list of keys with which to index edge attributes. It's also
-possible to set this to <code>None</code> and the function will attempt to 
-automatically extract the correct keys from the first graph in the list.  </p>
+<p><code>keys</code>: a list of keys with which to index edge attributes.</p>
 </li>
 <li>
 <p><code>post_processing</code>: a list of functions with which to post process each
@@ -312,14 +308,12 @@ batching for different-size graphs.</p>
 <p><code>self_loops</code>: whether to add self-loops to the graphs.</p>
 </li>
 <li>
-<p><code>nf_keys</code>: a list of keys with which to index node attributes. It's also
-possible to set this to <code>None</code> and the function will attempt to
-automatically extract the correct keys from the first graph in the list.</p>
+<p><code>nf_keys</code>: a list of keys with which to index node attributes. If None,
+returns None as node attributes matrix.</p>
 </li>
 <li>
-<p><code>ef_keys</code>: a list of keys with which to index edge attributes. It's also
-possible to set this to <code>None</code> and the function will attempt to
-automatically extract the correct keys from the first graph in the list.</p>
+<p><code>ef_keys</code>: a list of keys with which to index edge attributes. If None,
+returns None as edge attributes matrix.</p>
 </li>
 <li>
 <p><code>nf_postprocessing</code>: a list of functions with which to post process each
