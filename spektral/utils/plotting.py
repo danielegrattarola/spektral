@@ -308,20 +308,20 @@ def euclidean_animation(data, window_size=1, stride=1, frames=None,
 
 
 # Utils
-def delaunay_layout_closure(nf_name):
-    def delaunay_layout(nx_graph):
+def coordinates_layout_closure(nf_name):
+    def coordinates_layout(nx_graph):
         return nx.get_node_attributes(nx_graph, nf_name)
 
-    return delaunay_layout
+    return coordinates_layout
 
 
 def deserialize_nx_layout(layout, nf_name=None):
     if isinstance(layout, str):
         if layout in nx.layout.__all__:
             return eval('nx.{}'.format(layout))
-        elif layout is 'delaunay':
+        elif layout is 'coordinates':
             if nf_name is None:
-                nf_name = 'nf'  # Try it anyway
-            return delaunay_layout_closure(nf_name)
+                raise ValueError('nf_name cannot be None')
+            return coordinates_layout_closure(nf_name)
         else:
             raise ValueError('layout must be in nx.layout.__all__ or \'delaunay\'')

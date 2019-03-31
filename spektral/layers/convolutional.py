@@ -108,16 +108,7 @@ class GraphConv(Layer):
 
         # Convolution
         output = K.dot(features, self.kernel)
-        if len(K.int_shape(features)) == 2:
-            # Single mode
-            output = K.dot(fltr, output)
-        else:
-            if len(K.int_shape(fltr)) == 3:
-                # Batch mode
-                output = K.batch_dot(fltr, output)
-            else:
-                # Mixed mode
-                output = mixed_mode_dot(fltr, output)
+        output = filter_dot(fltr, output)
 
         if self.use_bias:
             output = K.bias_add(output, self.bias)
@@ -252,16 +243,7 @@ class ChebConv(Layer):
         # Convolution
         supports = list()
         for fltr in fltr_list:
-            if len(K.int_shape(features)) == 2:
-                # Single mode
-                s = K.dot(fltr, features)
-            else:
-                if len(K.int_shape(fltr)) == 3:
-                    # Batch mode
-                    s = K.batch_dot(fltr, features)
-                else:
-                    # Mixed mode
-                    s = mixed_mode_dot(fltr, features)
+            s = filter_dot(fltr, features)
             supports.append(s)
         supports = K.concatenate(supports, axis=-1)
         output = K.dot(supports, self.kernel)
@@ -429,7 +411,7 @@ class EdgeConditionedConv(Layer):
         target_shape = (-1,) + K.int_shape(kernel_network)[1:-1] + (F_, F)
         kernel = K.reshape(kernel_network, target_shape)
         output = kernel * fltr[..., None, None]
-        output = K.tf.einsum('abicf,aif->abc', output, node_features)  # TODO remove tf dependency
+        output = K.tf.einsum('abicf,aif->abc', output, node_features)
 
         if self.use_bias:
             output = K.bias_add(output, self.bias)
@@ -495,7 +477,7 @@ class GraphAttention(Layer):
     A graph attention layer as presented by
     [Velickovic et al. (2017)](https://arxiv.org/abs/1710.10903).
 
-    **Mode**: single.
+    **Mode**: single, mixed, batch.
     
     This layer computes the a convolution similar to `layers.GraphConv`, but
     uses the attention mechanism to weight the adjacency matrix instead of
@@ -544,7 +526,6 @@ class GraphAttention(Layer):
     model.fit([node_features, fltr], y)
     ```
     """
-    # TODO: mixed, batch
     def __init__(self,
                  channels,
                  attn_heads=1,
@@ -676,11 +657,8 @@ class GraphAttention(Layer):
             dropout_attn = Dropout(self.dropout_rate)(dense)  # (N x N)
             dropout_feat = Dropout(self.dropout_rate)(features)  # (N x F')
 
-            # Linear combination with neighbors' features
-            if len(K.int_shape(features)) == 2:
-                node_features = K.dot(dropout_attn, dropout_feat)
-            else:
-                node_features = K.batch_dot(dropout_attn, dropout_feat)
+            # Convolution
+            node_features = filter_dot(dropout_attn, dropout_feat)
 
             if self.use_bias:
                 node_features = K.bias_add(node_features, self.biases[head])
@@ -832,16 +810,7 @@ class GraphConvSkip(Layer):
 
         # Convolution
         output = K.dot(features, self.kernel_1)
-        if len(K.int_shape(features)) == 2:
-            # Single mode
-            output = K.dot(fltr, output)
-        else:
-            if len(K.int_shape(fltr)) == 3:
-                # Batch mode
-                output = K.batch_dot(fltr, output)
-            else:
-                # Mixed mode
-                output = mixed_mode_dot(fltr, output)
+        output = filter_dot(fltr, output)
 
         # Skip connection
         skip = K.dot(features_skip, self.kernel_2)
@@ -1184,16 +1153,7 @@ class ARMAConv(Layer):
 
         # Convolution
         output = K.dot(features, kernel_1)
-        if len(K.int_shape(features)) == 2:
-            # Single mode
-            output = K.dot(fltr, output)
-        else:
-            if len(K.int_shape(fltr)) == 3:
-                # Batch mode
-                output = K.batch_dot(fltr, output)
-            else:
-                # Mixed mode
-                output = mixed_mode_dot(fltr, output)
+        output = filter_dot(fltr, output)
 
         # Skip connection
         skip = K.dot(features_skip, kernel_2)
@@ -1206,19 +1166,41 @@ class ARMAConv(Layer):
         return output
 
 
-def mixed_mode_dot(fltr, output):
+def mixed_mode_dot(fltr, features):
     """
     Computes the equivalent of tf.einsum('ij,bjk->bik', fltr, output), but works
     for both dense and sparse fltr.
     :param fltr: rank 2 tensor, the filter for convolution
-    :param output: rank 3 tensor, the features of the input signals
+    :param features: rank 3 tensor, the features of the input signals
     :return:
     """
-    _, m_, f_ = K.int_shape(output)
-    output = K.permute_dimensions(output, [1, 2, 0])
-    output = K.reshape(output, (m_, -1))
-    output = K.dot(fltr, output)
-    output = K.reshape(output, (m_, f_, -1))
-    output = K.permute_dimensions(output, [2, 0, 1])
+    _, m_, f_ = K.int_shape(features)
+    features = K.permute_dimensions(features, [1, 2, 0])
+    features = K.reshape(features, (m_, -1))
+    features = K.dot(fltr, features)
+    features = K.reshape(features, (m_, f_, -1))
+    features = K.permute_dimensions(features, [2, 0, 1])
 
-    return output
+    return features
+
+
+def filter_dot(fltr, features):
+    """
+    Performs the multiplication of a graph filter (N x N) with the node features,
+    automatically dealing with single, mixed, and batch modes.
+    :param fltr: the graph filter(s) (N x N in single and mixed mode,
+    batch x N x N in batch mode).
+    :param features: the node features (N x F in single mode, batch x N x F in
+    mixed and batch mode).
+    :return: the filtered features.
+    """
+    if len(K.int_shape(features)) == 2:
+        # Single mode
+        return K.dot(fltr, features)
+    else:
+        if len(K.int_shape(fltr)) == 3:
+            # Batch mode
+            return K.batch_dot(fltr, features)
+        else:
+            # Mixed mode
+            return mixed_mode_dot(fltr, features)
