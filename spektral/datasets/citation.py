@@ -52,18 +52,16 @@ def _sample_mask(idx, l):
     return np.array(mask, dtype=np.bool)
 
 
-def load_data(dataset_name='cora', return_type='numpy', val_size=500):
+def load_data(dataset_name='cora'):
     """
-        Loads the specified citation dataset using the public splits as defined in
-        [Kipf & Welling (2016)](https://arxiv.org/abs/1609.02907).
-        :param dataset_name: name of the dataset to load (cora, citeseer, or pubmed)
-        :param return_type:
-        :return:
-        """
+    Loads the specified citation dataset using the public splits as defined in
+    [Kipf & Welling (2016)](https://arxiv.org/abs/1609.02907).
+    :param dataset_name: name of the dataset to load (cora, citeseer, or pubmed)
+    :return: the citation network in numpy format, with train, test, and
+    validation splits for the targets and masks.
+    """
     if dataset_name not in AVAILABLE_DATASETS:
         raise ValueError('Available datasets: {}'.format(AVAILABLE_DATASETS))
-    if return_type not in RETURN_TYPES:
-        raise ValueError('Possible return_type: {}'.format(RETURN_TYPES))
 
     if not os.path.exists(DATA_PATH + dataset_name):
         # TODO dataset downloader
