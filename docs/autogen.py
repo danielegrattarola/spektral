@@ -89,6 +89,14 @@ PAGES = [
         'methods': [],
         'classes': []
     },
+{
+        'page': 'datasets/mnist.md',
+        'functions': [
+            datasets.mnist.load_data
+        ],
+        'methods': [],
+        'classes': []
+    },
     {
         'page': 'brain.md',
         'functions': [

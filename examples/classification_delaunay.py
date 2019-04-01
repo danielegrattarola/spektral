@@ -6,7 +6,7 @@ from keras.regularizers import l2
 from sklearn.model_selection import train_test_split
 
 from spektral.datasets import delaunay
-from spektral.layers import GraphConv, GlobalAttentionPool
+from spektral.layers import GraphAttention, GlobalAttentionPool
 from spektral.utils import localpooling_filter
 from spektral.utils.logging import init_logging
 
@@ -36,8 +36,8 @@ y_train, y_test = train_test_split(fltr, x, y, test_size=0.1)
 X_in = Input(shape=(N, F))
 filter_in = Input((N, N))
 
-gc1 = GraphConv(32, activation='relu', kernel_regularizer=l2(l2_reg))([X_in, filter_in])
-gc2 = GraphConv(32, activation='relu', kernel_regularizer=l2(l2_reg))([gc1, filter_in])
+gc1 = GraphAttention(32, activation='relu', kernel_regularizer=l2(l2_reg))([X_in, filter_in])
+gc2 = GraphAttention(32, activation='relu', kernel_regularizer=l2(l2_reg))([gc1, filter_in])
 pool = GlobalAttentionPool(128)(gc2)
 
 output = Dense(n_classes, activation='softmax')(pool)

@@ -31,6 +31,7 @@ nav:
     - Citation: datasets/citation.md
     - Delaunay: datasets/delaunay.md
     - QM9: datasets/qm9.md
+    - MNIST: datasets/mnist.md
 - Chemistry: chem.md
 - Brain: brain.md
 - Geometric: geometric.md
