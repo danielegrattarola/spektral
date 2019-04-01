@@ -1,5 +1,4 @@
-![Spektral logo](https://danielegrattarola.github.io/spektral/img/logo_black.png)
-
+<img src="https://danielegrattarola.github.io/spektral/img/logo_dark.svg" width="50%"/>
 |WARNING|
 |:------|
 | Spektral is still a work in progress and may change substantially before the first proper release. The API is not mature enough to be considered stable, but we'll try to keep breaking changes to a minimum. Drop me an email if you want to help out with the development.|
