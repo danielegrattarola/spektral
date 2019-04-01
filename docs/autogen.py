@@ -1,6 +1,7 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import glob
 import inspect
 import os
 import re
@@ -583,7 +584,7 @@ if __name__ == '__main__':
             os.makedirs('sources/custom_theme/img/')
 
         shutil.copy('./stylesheets/extra.css', './sources/stylesheets/extra.css')
-        shutil.copy('./img/logo.png', './sources/img/logo.png')
-        shutil.copy('./img/logo_black.png', './sources/img/logo_black.png')
+        for file in glob.glob(r'./img/*.svg'):
+            shutil.copy(file, './sources/img/')
         shutil.copy('./img/favicon.ico', './sources/custom_theme/img/favicon.ico')
         shutil.copy('./templates/google8a76765aa72fa8c1.html', './sources/google8a76765aa72fa8c1.html')
