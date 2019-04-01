@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   height="658.50793"
+   width="576.15979"
+   version="1.1"
+   id="svg">
+  <metadata
+     id="metadata9">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs7" />
+  <g
+     style="fill:#f9f9f9;fill-opacity:1"
+     transform="translate(37.225698,-0.03066679)"
+     id="svgg">
+    <path
+       style="fill:#f9f9f9;fill-opacity:1;fill-rule:evenodd;stroke:none"
+       d="m 239.27345,0.559 c -101.958,7.553 -178.986,81.327 -187.449,179.534 -1.265,14.677 -1.29,203.325 -0.03,223.082 1.925,30.177 7.493,40.454 21.985,40.586 7.459,0.068 10.02,-1.571 21.846,-13.984 35.629,-37.395 41.273,-39.072 58.428,-17.365 3.584,4.536 9.016,11.395 12.072,15.243 19.543,24.615 36.692,22.515 57.054,-6.986 21.099,-30.569 33.347,-30.436 57.757,0.627 25.859,32.908 40.883,31.464 72.246,-6.944 18.011,-22.057 24.208,-21.449 45.959,4.507 18.736,22.36 22.04,25.031 30.846,24.949 11.214,-0.106 15.663,-4.847 18.663,-19.889 1.954,-9.795 3.089,-220.725 1.305,-242.438 -8.8,-107.088 -103.983,-188.826 -210.682,-180.922 m -12.987,130.394 c 36.641,13.922 46.716,60.421 18.999,87.689 -30.287,29.797 -80.647,14.088 -89.447,-27.901 -8.279,-39.503 32.577,-74.177 70.448,-59.788 m 162.037,0 c 36.641,13.922 46.716,60.421 18.999,87.689 -30.287,29.797 -80.647,14.088 -89.447,-27.901 -8.279,-39.503 32.577,-74.177 70.448,-59.788 m -167.673,26.756 c -24.073,9.08 -19.9,44.958 5.533,47.563 17.322,1.775 31.038,-14.651 26.181,-31.356 -3.795,-13.057 -19.197,-20.928 -31.714,-16.207 m 162.037,0 c -24.073,9.08 -19.9,44.958 5.533,47.563 17.322,1.775 31.038,-14.651 26.181,-31.356 -3.795,-13.057 -19.197,-20.928 -31.714,-16.207"
+       id="path0" />
+  </g>
+  <text
+     id="text821"
+     y="602.61902"
+     x="-9.7246685"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:186.29632568px;line-height:1.25;font-family:'Brandon Grotesque';-inkscape-font-specification:'Brandon Grotesque';letter-spacing:0px;word-spacing:0px;fill:#f9f9f9;fill-opacity:1;stroke:none;stroke-width:4.65740824;"
+     xml:space="preserve"><tspan
+       style="fill:#f9f9f9;fill-opacity:1;stroke-width:4.65740824;"
+       y="602.61902"
+       x="-9.7246685"
+       id="tspan819">Spektral</tspan></text>
+</svg>
