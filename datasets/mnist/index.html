@@ -8,7 +8,7 @@
   
   <meta name="author" content="Daniele Grattarola">
   <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>QM9 - Spektral</title>
+  <title>MNIST - Spektral</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
@@ -18,8 +18,8 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "QM9";
-    var mkdocs_page_input_path = "datasets/qm9.md";
+    var mkdocs_page_name = "MNIST";
+    var mkdocs_page_input_path = "datasets/mnist.md";
     var mkdocs_page_url = null;
   </script>
   
@@ -100,19 +100,19 @@
                     
     <a class="" href="../delaunay/">Delaunay</a>
                 </li>
+                <li class="">
+                    
+    <a class="" href="../qm9/">QM9</a>
+                </li>
                 <li class=" current">
                     
-    <a class="current" href="./">QM9</a>
+    <a class="current" href="./">MNIST</a>
     <ul class="subnav">
             
     <li class="toctree-l3"><a href="#load_data">load_data</a></li>
     
 
     </ul>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../mnist/">MNIST</a>
                 </li>
     </ul>
 	    </li>
@@ -204,10 +204,10 @@
         
       
     
-    <li>QM9</li>
+    <li>MNIST</li>
     <li class="wy-breadcrumbs-aside">
       
-        <a href="https://github.com/danielegrattarola/spektral/edit/master/docs/datasets/qm9.md"
+        <a href="https://github.com/danielegrattarola/spektral/edit/master/docs/datasets/mnist.md"
           class="icon icon-github"> Edit on GitHub</a>
       
     </li>
@@ -218,43 +218,18 @@
             <div class="section">
               
                 <h3 id="load_data">load_data</h3>
-<pre><code class="python">spektral.datasets.qm9.load_data(return_type='numpy', nf_keys=None, ef_keys=None, auto_pad=True, self_loops=False, amount=None)
+<pre><code class="python">spektral.datasets.mnist.load_data()
 </code></pre>
 
-<p>Loads the QM9 molecules dataset.</p>
-<p><strong>Arguments</strong>  </p>
+<p>Loads the MNIST dataset and the associated grid.
+This code is largely taken from <a href="https://github.com/mdeff/cnn_graph/blob/master/nips2016/mnist.ipynb">Michaël Defferrard's Github</a>.</p>
+<p><strong>Return</strong>  </p>
 <ul>
-<li>
-<p><code>return_type</code>: <code>'networkx'</code>, <code>'numpy'</code>, or <code>'sdf'</code>, data format to return;</p>
-</li>
-<li>
-<p><code>nf_keys</code>: list or str, node features to return (see <code>qm9.NODE_FEATURES</code>
-for available features);</p>
-</li>
-<li>
-<p><code>ef_keys</code>: list or str, edge features to return (see <code>qm9.NODE_FEATURES</code>
-for available features);</p>
-</li>
-<li>
-<p><code>auto_pad</code>: if <code>return_type='numpy'</code>, zero pad graph matrices to have 
-the same dimension;</p>
-</li>
-<li>
-<p><code>self_loops</code>: if <code>return_type='numpy'</code>, add self loops to adjacency 
-matrices;
-from the dataset). If <code>amount=None</code>, return 100 molecules by default;</p>
-</li>
-<li>
-<p><code>amount</code>: the amount of molecules to return (works independently of 
-<code>debug</code>).</p>
-</li>
+<li>X_train, y_train: training node features and labels;</li>
+<li>X_val, y_val: validation node features and labels;</li>
+<li>X_test, y_test: test node features and labels;</li>
+<li>A: adjacency matrix of the grid;</li>
 </ul>
-<p><strong>Return</strong><br />
- If <code>return_type='networkx'</code>, a list of graphs in Networkx format, 
-and a dataframe containing labels; if <code>return_type='numpy'</code>, the adjacency 
-matrix, node features, edge features, and a dataframe containing labels;
-if <code>return_type='sdf'</code>, a list of molecules in the internal SDF format and
-a dataframe containing labels.</p>
               
             </div>
           </div>
@@ -262,10 +237,10 @@ a dataframe containing labels.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../mnist/" class="btn btn-neutral float-right" title="MNIST">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../../chem/" class="btn btn-neutral float-right" title="Chemistry">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../delaunay/" class="btn btn-neutral" title="Delaunay"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../qm9/" class="btn btn-neutral" title="QM9"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -293,10 +268,10 @@ a dataframe containing labels.</p>
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../delaunay/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../qm9/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../mnist/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../../chem/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

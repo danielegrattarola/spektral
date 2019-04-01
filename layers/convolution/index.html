@@ -125,6 +125,10 @@
                     
     <a class="" href="../../datasets/qm9/">QM9</a>
                 </li>
+                <li class="">
+                    
+    <a class="" href="../../datasets/mnist/">MNIST</a>
+                </li>
     </ul>
 	    </li>
           
@@ -279,7 +283,7 @@ model.fit([node_features, fltr], y)
 </code></pre>
 
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L150">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L141">[source]</a></span></p>
 <h3 id="chebconv">ChebConv</h3>
 <pre><code class="python">spektral.layers.ChebConv(channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -331,7 +335,7 @@ model.fit([node_features, fltr], y)
 </code></pre>
 
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L878">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L847">[source]</a></span></p>
 <h3 id="armaconv">ARMAConv</h3>
 <pre><code class="python">spektral.layers.ARMAConv(channels, ARMA_D, ARMA_K=None, recurrent=False, activation=None, gcn_activation='relu', dropout_rate=0.0, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -392,7 +396,7 @@ model.fit([node_features, fltr], y)
 </code></pre>
 
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L297">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L279">[source]</a></span></p>
 <h3 id="edgeconditionedconv">EdgeConditionedConv</h3>
 <pre><code class="python">spektral.layers.EdgeConditionedConv(channels, kernel_network=None, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -453,14 +457,14 @@ model.fit([node_features, adj, edge_features], y)
 </code></pre>
 
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L493">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L475">[source]</a></span></p>
 <h3 id="graphattention">GraphAttention</h3>
 <pre><code class="python">spektral.layers.GraphAttention(channels, attn_heads=1, attn_heads_reduction='concat', dropout_rate=0.5, activation='relu', use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', attn_kernel_initializer='glorot_uniform', kernel_regularizer=None, bias_regularizer=None, attn_kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None, attn_kernel_constraint=None)
 </code></pre>
 
 <p>A graph attention layer as presented by
 <a href="https://arxiv.org/abs/1710.10903">Velickovic et al. (2017)</a>.</p>
-<p><strong>Mode</strong>: single.</p>
+<p><strong>Mode</strong>: single, mixed, batch.</p>
 <p>This layer computes the a convolution similar to <code>layers.GraphConv</code>, but
 uses the attention mechanism to weight the adjacency matrix instead of
 using the normalized Laplacian.</p>
@@ -507,7 +511,7 @@ model.fit([node_features, fltr], y)
 </code></pre>
 
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L722">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L700">[source]</a></span></p>
 <h3 id="graphconvskip">GraphConvSkip</h3>
 <pre><code class="python">spektral.layers.GraphConvSkip(channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
