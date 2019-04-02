@@ -226,28 +226,27 @@
             <div class="section">
               
                 <h2 id="representing-graphs">Representing graphs</h2>
-<p>Spektral uses a matrix-based representation for manipulating graphs and feeding them to neural networks. This approach is one of the most commonly used in the literature on graph neural networks, and it's perfect to perform efficient computations on GPU.</p>
+<p>Spektral uses a matrix-based representation for manipulating graphs and feeding them to neural networks. This approach is one of the most commonly used in the literature on graph neural networks, and it's perfect to perform parallel computations on GPU.</p>
 <p>A graph is generally represented by three matrices:</p>
 <ul>
-<li>
-<script type="math/tex">A \in \{0, 1\}^{N \times N}</script>: a binary adjacency matrix, where <script type="math/tex">A_{ij} = 1</script> if there is a connection between nodes <script type="math/tex">i</script> and <script type="math/tex">j</script>, and <script type="math/tex">A_{ij} = 0</script> otherwise;</li>
-<li>
-<script type="math/tex">X \in \mathbb{R}^{N \times F}</script>: a matrix encoding node attributes (or features), where an <script type="math/tex">F</script>-dimensional attribute vector is associated to each node;</li>
-<li>
-<script type="math/tex">E \in \mathbb{R}^{N \times N \times S}</script>: a matrix encoding edge attributes, where an <script type="math/tex">S</script>-dimensional attribute vector is associated to each edge;</li>
+<li>a binary adjacency matrix, <script type="math/tex">A \in \{0, 1\}^{N \times N}</script>, where <script type="math/tex">A_{ij} = 1</script> if there is a connection between nodes <script type="math/tex">i</script> and <script type="math/tex">j</script>, and <script type="math/tex">A_{ij} = 0</script> otherwise;</li>
+<li>a matrix encoding node attributes, <script type="math/tex">X \in \mathbb{R}^{N \times F}</script>, where each row represents the <script type="math/tex">F</script>-dimensional attribute vector of a node;</li>
+<li>a matrix encoding edge attributes, <script type="math/tex">E \in \mathbb{R}^{N \times N \times S}</script>, where each entry represents the <script type="math/tex">S</script>-dimensional attribute vector of an edge;</li>
 </ul>
-<p>Some formulations (like the <a href="https://arxiv.org/abs/1806.01261">graph neural networks</a> proposed by Battaglia et al.) include a feature vector describing the global state of the graph, but this is not supported by Spektral for now. </p>
+<p>Some formulations (like the <a href="https://arxiv.org/abs/1806.01261">graph networks</a> proposed by Battaglia et al.) also include a feature vector describing the global state of the graph, but this is not supported by Spektral for now. </p>
+<p>In code, the three matrices described above are Numpy arrays <code>A</code>, <code>X</code>, and <code>E</code>, where <code>A.shape == (N, N)</code>, <code>X.shape == (N, F)</code>, and <code>E.shape == (N, N, S)</code>.
+Sparse adjacency matrices are also supported by Spektral.</p>
 <h2 id="modes">Modes</h2>
-<p>In Spektral, some layers and functions are implemented to work on a single graph, while others consider sets (i.e., datasets or batches) of graphs. </p>
-<p>To understand the need for different settings, consider the difference between a citation network and a dataset of molecules.
-In the citation network, the elements of interest are the single nodes and the connections between them. Node and edge features are usually specific to each individual network, and there is no point in training a model across networks.<br />
-On the other hand, when working with molecules in a dataset, we are in a much more familiar setting. Each molecule can be seen as a point in some space, and learning tasks are applied to this domain. Here, the atoms and bonds that make up the molecules are repeated across the dataset with high frequency (like pixel colors in images, where information is mostly encoded in the spatial relations between pixels rather than in the colors themselves), and we are interested in finding patterns that describe the properties of the molecules in general. </p>
-<p>We distinguish between three main <em>modes</em> of operation: </p>
+<p>In Spektral, some functionalities are implemented to work on a single graph, while others consider sets (i.e., batches) of graphs. </p>
+<p>To understand the need for different settings, consider the difference between classifying the nodes of a citation network, and classifying the chemical properties of molecules.
+In the citation network, we are interested in the single nodes and the connections between them. Node and edge attributes are specific to each individual network, and there is no point in training a model across networks. 
+On the other hand, when working with molecules in a dataset, we are in a much more familiar setting. Each molecule is a sample of our dataset, and the atoms and bonds that make up the molecules are repeated across the data (like pixels in images). In this case, we are interested in finding patterns that describe the properties of the molecules in general. </p>
+<p>The two settings require us to do things that are conceptually similar, but that need some minor adjustments in how the data is processed by our graph neural networks. This is why Spektral makes these differences explicit.</p>
+<p>In practice, we actually distinguish between three main <em>modes</em> of operation: </p>
 <ul>
-<li><strong>single</strong>, where we consider a single graph, with its topology and attributes;</li>
-<li><strong>batch</strong>, where we consider a collection of graphs, each with its own topology and attributes;</li>
-<li><strong>mixed</strong>, where we consider a graph with fixed topology, but a collection of 
-different attributes; this can be seen as a particular case of the batch mode (i.e., the case where all adjacency matrices are the same) but is treated separately for computational reasons. </li>
+<li><strong>single</strong>, where we have a single graph, with its topology and attributes;</li>
+<li><strong>batch</strong>, where we have a collection of graphs, each with its own topology and attributes;</li>
+<li><strong>mixed</strong>, where we have a graph with fixed topology, but a collection of different attributes (usually called <em>graph signals</em> in the literature); this can be seen as a particular case of the batch mode (where all adjacency matrices are the same) but it is handled separately in Spektral to improve memory efficiency.</li>
 </ul>
 <table>
 <thead>
@@ -279,7 +278,7 @@ different attributes; this can be seen as a particular case of the batch mode (i
 </tr>
 </tbody>
 </table>
-<p>In practice, Spektral assumes that when operating in "single" mode the data has no <code>batch</code> dimension, and describes a single graph:</p>
+<p>In practice, in "single" mode the data has no <code>batch</code> dimension, and describes a single graph:</p>
 <pre><code class="py">In [1]: from spektral.datasets import citation
 Using TensorFlow backend.
 
@@ -293,8 +292,8 @@ In [4]: node_features.shape
 Out[4]: (2708, 1433)
 </code></pre>
 
-<p>This means that when training models in single mode, the usual batching of the data along the first dimension cannot be done (unless the graph can be safely "sliced"), and the whole graph must be fed to the model at each step. See <a href="https://github.com/danielegrattarola/spektral/blob/master/examples/semi_sup_classification_gcn.py">the semi-supervised classification example</a> for a better understanding.</p>
-<p>In "batch" mode, the matrices will have the <code>batch</code> dimension first: </p>
+<p>This means that when training GNNs in single mode, we cannot batch and shuffle the data along the first axis, and the whole graph must be fed to the model at each step (see <a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_classification_gcn.py">the node classification example</a>).</p>
+<p>In "batch" mode, the matrices will have a <code>batch</code> dimension first: </p>
 <pre><code class="py">In [1]: from spektral.datasets import qm9
 Using TensorFlow backend.
 
@@ -313,8 +312,20 @@ In [5]: ef.shape
 Out[5]: (133885, 9, 9, 1)
 </code></pre>
 
-<p>which should not surprise you if you are familiar with machine learning frameworks (try and load MNIST or any other benchmark image dataset to see a similar representation of the data).</p>
-<p>Finally, in "mixed" mode, where we consider a single adjacency matrix (with no <code>batch</code> dimension), and collections of node and edge attributes (with the <code>batch</code> dimension).</p>
+<p>This should not surprise you if you are familiar with classical machine learning tasks (try and load any benchmark image dataset to see a similar representation of the data).</p>
+<p>Finally, in "mixed" mode we consider a single adjacency matrix with no <code>batch</code> dimension, and collections of node and edge attributes with the <code>batch</code> dimension:</p>
+<pre><code class="py">In [1]: from spektral.datasets import mnist
+Using TensorFlow backend.
+
+In [2]: nf, _, _, _, _, _, adj = mnist.load_data()
+
+In [3]: adj.shape
+Out[3]: (784, 784)
+
+In [4]: nf.shape
+Out[4]: (50000, 784)
+</code></pre>
+
 <h2 id="other-formats">Other formats</h2>
 <p>To provide better compatibility with other libraries, Spektral has methods to convert graphs between the matrix representation (<code>'numpy'</code>) and other formats. </p>
 <p>The <code>'networkx'</code> format represents graphs using the Networkx library, which can then be used to <a href="https://networkx.github.io/documentation/networkx-1.10/reference/convert.html">convert the graphs</a> to other formats like <code>.dot</code> and edge lists. 
