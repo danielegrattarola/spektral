@@ -221,11 +221,12 @@
 <pre><code class="python">spektral.datasets.citation.load_data(dataset_name='cora')
 </code></pre>
 
-<p>Loads the specified citation dataset using the public splits as defined in
+<p>Loads a citation dataset using the public splits as defined in
 <a href="https://arxiv.org/abs/1609.02907">Kipf &amp; Welling (2016)</a>.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
-<li><code>dataset_name</code>: name of the dataset to load (cora, citeseer, or pubmed)</li>
+<li><code>dataset_name</code>: name of the dataset to load ('cora', 'citeseer', or
+'pubmed').</li>
 </ul>
 <p><strong>Return</strong><br />
  The citation network in numpy format, with train, test, and

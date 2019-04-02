@@ -218,7 +218,7 @@
             <div class="section">
               
                 <h3 id="generate_data">generate_data</h3>
-<pre><code class="python">spektral.datasets.delaunay.generate_data(return_type='networkx', classes=0, n_samples_in_class=1000, n_nodes=7, support_low=0.0, support_high=10.0, drift_amount=1.0, one_hot_labels=True, support=None, seed=None)
+<pre><code class="python">spektral.datasets.delaunay.generate_data(return_type='numpy', classes=0, n_samples_in_class=1000, n_nodes=7, support_low=0.0, support_high=10.0, drift_amount=1.0, one_hot_labels=True, support=None, seed=None)
 </code></pre>
 
 <p>Generates a dataset of Delaunay triangulations as described by
@@ -227,7 +227,7 @@ Note that this function is basically deprecated and will change soon.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
 <li>
-<p><code>return_type</code>: <code>'networkx'</code> or <code>'numpy'</code>, data format to return;</p>
+<p><code>return_type</code>: 'numpy' or 'networkx', data format to return;</p>
 </li>
 <li>
 <p><code>classes</code>: indices of the classes to load (integer, or list of integers
@@ -262,9 +262,10 @@ classes;</p>
 </li>
 </ul>
 <p><strong>Return</strong><br />
- If <code>return_type='networkx'</code>, a list of graphs in Networkx format, 
-and an array containing labels; if <code>return_type='numpy'</code>, the adjacency 
-matrix, node features, and an array containing labels.</p>
+ If <code>return_type='numpy'</code>, the adjacency matrix, node features, and
+an array containing labels;
+if <code>return_type='networkx'</code>, a list of graphs in Networkx format, and an
+array containing labels;</p>
               
             </div>
           </div>

@@ -225,34 +225,33 @@
 <p><strong>Arguments</strong>  </p>
 <ul>
 <li>
-<p><code>return_type</code>: <code>'networkx'</code>, <code>'numpy'</code>, or <code>'sdf'</code>, data format to return;</p>
+<p><code>return_type</code>: 'networkx', 'numpy', or 'sdf', data format to return;</p>
 </li>
 <li>
 <p><code>nf_keys</code>: list or str, node features to return (see <code>qm9.NODE_FEATURES</code>
 for available features);</p>
 </li>
 <li>
-<p><code>ef_keys</code>: list or str, edge features to return (see <code>qm9.NODE_FEATURES</code>
+<p><code>ef_keys</code>: list or str, edge features to return (see <code>qm9.EDGE_FEATURES</code>
 for available features);</p>
 </li>
 <li>
 <p><code>auto_pad</code>: if <code>return_type='numpy'</code>, zero pad graph matrices to have 
-the same dimension;</p>
+the same number of nodes;</p>
 </li>
 <li>
 <p><code>self_loops</code>: if <code>return_type='numpy'</code>, add self loops to adjacency 
-matrices;
-from the dataset). If <code>amount=None</code>, return 100 molecules by default;</p>
+matrices;</p>
 </li>
 <li>
-<p><code>amount</code>: the amount of molecules to return (works independently of 
-<code>debug</code>).</p>
+<p><code>amount</code>: the amount of molecules to return (in order).</p>
 </li>
 </ul>
 <p><strong>Return</strong><br />
- If <code>return_type='networkx'</code>, a list of graphs in Networkx format, 
-and a dataframe containing labels; if <code>return_type='numpy'</code>, the adjacency 
-matrix, node features, edge features, and a dataframe containing labels;
+ If <code>return_type='numpy'</code>, the adjacency matrix, node features,
+edge features, and a Pandas dataframe containing labels;
+if <code>return_type='networkx'</code>, a list of graphs in Networkx format,
+and a dataframe containing labels; <br />
 if <code>return_type='sdf'</code>, a list of molecules in the internal SDF format and
 a dataframe containing labels.</p>
               
