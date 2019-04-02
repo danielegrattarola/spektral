@@ -101,7 +101,7 @@ def load_data(dataset_name='cora'):
 
     idx_test = test_idx_range.tolist()
     idx_train = range(len(y))
-    idx_val = range(len(y), len(y) + val_size)
+    idx_val = range(len(y), len(y) + 500)
 
     train_mask = _sample_mask(idx_train, labels.shape[0])
     val_mask = _sample_mask(idx_val, labels.shape[0])
