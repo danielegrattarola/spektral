@@ -52,7 +52,7 @@ class GraphConv(Layer):
     ...
     X = Input(shape=(num_nodes, num_features))
     filter = Input((num_nodes, num_nodes))
-    Z = GraphConv(units, activation='relu')([X, filter])
+    Z = GraphConv(channels, activation='relu')([X, filter])
     ...
     model.fit([node_features, fltr], y)
     ```
@@ -123,7 +123,7 @@ class GraphConv(Layer):
 
     def get_config(self):
         config = {
-            'units': self.channels,
+            'channels': self.channels,
             'activation': activations.serialize(self.activation),
             'use_bias': self.use_bias,
             'kernel_initializer': initializers.serialize(self.kernel_initializer),
@@ -185,7 +185,7 @@ class ChebConv(Layer):
     ...
     X = Input(shape=(num_nodes, num_features))
     filter = Input((num_nodes, num_nodes))
-    Z = GraphConv(units, activation='relu')([X, filter])
+    Z = GraphConv(channels, activation='relu')([X, filter])
     ...
     model.fit([node_features, fltr], y)
     ```
@@ -310,8 +310,6 @@ class EdgeConditionedConv(Layer):
     **Arguments**
     
     - `channels`: integer, number of output channels;
-    - `num_nodes`: integer, the number of nodes in the graphs;
-    - `edge_features_dim`: the dimension of the edge features;
     - `kernel_network`: a list of integers describing the hidden structure of
     the kernel-generating network (i.e., the ReLU layers before the linear
     output);
@@ -337,7 +335,7 @@ class EdgeConditionedConv(Layer):
     model.fit([node_features, adj, edge_features], y)
     ```
     """
-    # TODO: mixed, batch
+    # TODO: single, mixed
     def __init__(self,
                  channels,
                  kernel_network=None,
@@ -428,6 +426,7 @@ class EdgeConditionedConv(Layer):
     def get_config(self):
         config = {
             'channels': self.channels,
+            'kernel_network': self.kernel_network,
             'activation': activations.serialize(self.activation),
             'use_bias': self.use_bias,
             'kernel_initializer': initializers.serialize(self.kernel_initializer),
@@ -479,7 +478,7 @@ class GraphAttention(Layer):
 
     **Mode**: single, mixed, batch.
     
-    This layer computes the a convolution similar to `layers.GraphConv`, but
+    This layer computes a convolution similar to `layers.GraphConv`, but
     uses the attention mechanism to weight the adjacency matrix instead of
     using the normalized Laplacian.
 
@@ -747,7 +746,7 @@ class GraphConvSkip(Layer):
     X = Input(shape=(num_nodes, num_features))
     X_0 = Input(shape=(num_nodes, num_features))
     filter = Input((num_nodes, num_nodes))
-    Z = GraphConvSkip(units, activation='relu')([X, X_0, filter])
+    Z = GraphConvSkip(channels, activation='relu')([X, X_0, filter])
     ```
     """
 
@@ -829,7 +828,7 @@ class GraphConvSkip(Layer):
 
     def get_config(self):
         config = {
-            'units': self.channels,
+            'channels': self.channels,
             'activation': activations.serialize(self.activation),
             'use_bias': self.use_bias,
             'kernel_initializer': initializers.serialize(self.kernel_initializer),
@@ -882,9 +881,9 @@ class ARMAConv(Layer):
     - `ARMA_K`: order of the ARMA filter (combination of K ARMA_1 filters);
     - `ARMA_D`: depth of each ARMA_1 filter (number of recursive updates);
     - `recurrent`: whether to share each head's weights like a recurrent net;
-    - `activation`: activation function to use;
     - `gcn_activation`: activation function to use to compute the ARMA filter;
     - `dropout_rate`: dropout rate for laplacian and output layer
+    - `activation`: activation function to use;
     - `use_bias`: whether to add a bias to the linear transformation;
     - `kernel_initializer`: initializer for the kernel matrix;
     - `bias_initializer`: initializer for the bias vector;
@@ -900,7 +899,7 @@ class ARMAConv(Layer):
     ...
     X = Input(shape=(num_nodes, num_features))
     filter = Input((num_nodes, num_nodes))
-    Z = ARMAConv(units, activation='relu')([X, filter])
+    Z = ARMAConv(channels, activation='relu')([X, filter])
     ...
     model.fit([node_features, fltr], y)
     ```
@@ -911,9 +910,9 @@ class ARMAConv(Layer):
                  ARMA_D,
                  ARMA_K=None,
                  recurrent=False,
-                 activation=None,
                  gcn_activation='relu',
                  dropout_rate=0.0,
+                 activation=None,
                  use_bias=True,
                  kernel_initializer='glorot_uniform',
                  bias_initializer='zeros',
@@ -1025,7 +1024,12 @@ class ARMAConv(Layer):
 
     def get_config(self):
         config = {
-            'units': self.channels,
+            'channels': self.channels,
+            'ARMA_D': self.ARMA_D,
+            'ARMA_K': self.ARMA_K,
+            'recurrent': self.recurrent,
+            'gcn_activation': activations.serialize(self.gcn_activation),
+            'dropout_rate': self.dropout_rate,
             'activation': activations.serialize(self.activation),
             'use_bias': self.use_bias,
             'kernel_initializer': initializers.serialize(self.kernel_initializer),
@@ -1164,6 +1168,203 @@ class ARMAConv(Layer):
         if activation is not None:
             output = activations.get(activation)(output)
         return output
+
+
+class APPNP(Layer):
+    """
+    A graph convolutional layer implementing the APPNP operator, as presented by
+    [Klicpera et al. (2019)](https://arxiv.org/abs/1810.05997).
+    Implementation by Filippo Bianchi.
+
+    **Mode**: single, mixed, batch.
+
+    **Input**
+
+    - node features of shape `(batch, num_nodes, num_features)`, depending on the
+    mode;
+    - normalized Laplacians of shape `(batch, num_nodes, num_nodes)`, depending
+    on the mode.
+
+    **Output**
+
+    - node features with the same shape of the input, but the last dimension
+    changed to `channels`.
+
+    **Arguments**
+
+    - `channels`: integer, number of output channels;
+    - `mlp_channels`: integer, number of hidden units for the MLP layers;
+    - `alpha`: teleport probability;
+    - `H`: number of MLP layers;
+    - `K`: number of power iterations;
+    - `mlp_activation`: activation for the MLP layers;
+    - `dropout_rate`: dropout rate for Laplacian and MLP layers;
+    - `activation`: activation function to use;
+    - `use_bias`: whether to add a bias to the linear transformation;
+    - `kernel_initializer`: initializer for the kernel matrix;
+    - `bias_initializer`: initializer for the bias vector;
+    - `kernel_regularizer`: regularization applied to the kernel matrix;
+    - `bias_regularizer`: regularization applied to the bias vector;
+    - `activity_regularizer`: regularization applied to the output;
+    - `kernel_constraint`: constraint applied to the kernel matrix;
+    - `bias_constraint`: constraint applied to the bias vector.
+
+    **Usage**
+    ```py
+    I = sp.identity(adj.shape[0], dtype=adj.dtype)
+    fltr = utils.normalize_adjacency(adj + I)
+    ...
+    X = Input(shape=(num_nodes, num_features))
+    filter = Input((num_nodes, num_nodes))
+    Z = APPNP(channels, mlp_channels)([X, filter])
+    ...
+    model.fit([node_features, fltr], y)
+    ```
+    """
+
+    def __init__(self,
+                 channels,
+                 mlp_channels,
+                 alpha=0.2,
+                 H=1,
+                 K=1,
+                 mlp_activation='relu',
+                 dropout_rate=0.0,
+                 activation='softmax',
+                 use_bias=True,
+                 kernel_initializer='glorot_uniform',
+                 bias_initializer='zeros',
+                 kernel_regularizer=None,
+                 bias_regularizer=None,
+                 activity_regularizer=None,
+                 kernel_constraint=None,
+                 bias_constraint=None,
+                 **kwargs):
+        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
+            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
+        super(APPNP, self).__init__(**kwargs)
+        self.channels = channels
+        self.mlp_channels = mlp_channels
+        self.alpha = alpha
+        self.H = H
+        self.K = K
+        self.mlp_activation = activations.get(mlp_activation)
+        self.activation = activations.get(activation)
+        self.dropout_rate = dropout_rate
+        self.use_bias = use_bias
+        self.kernel_initializer = initializers.get(kernel_initializer)
+        self.bias_initializer = initializers.get(bias_initializer)
+        self.kernel_regularizer = regularizers.get(kernel_regularizer)
+        self.bias_regularizer = regularizers.get(bias_regularizer)
+        self.activity_regularizer = regularizers.get(activity_regularizer)
+        self.kernel_constraint = constraints.get(kernel_constraint)
+        self.bias_constraint = constraints.get(bias_constraint)
+
+    def build(self, input_shape):
+        assert len(input_shape) >= 2
+        input_dim = input_shape[0][-1]
+        self.kernels_mlp = []
+        self.biases_mlp = []
+
+        # Hidden layers
+        for h in range(self.H):
+            if h == 0:
+                self.kernels_mlp.append(
+                    self.add_weight(shape=(input_dim, self.mlp_channels),
+                                    initializer=self.kernel_initializer,
+                                    name='kernel_mlp_{}'.format(h),
+                                    regularizer=self.kernel_regularizer,
+                                    constraint=self.kernel_constraint)
+                )
+            else:
+                self.kernels_mlp.append(
+                    self.add_weight(shape=(self.mlp_channels, self.mlp_channels),
+                                    initializer=self.kernel_initializer,
+                                    name='kernel_mlp_{}'.format(h),
+                                    regularizer=self.kernel_regularizer,
+                                    constraint=self.kernel_constraint)
+                )
+            if self.use_bias:
+                self.biases_mlp.append(
+                    self.add_weight(shape=(self.mlp_channels,),
+                                    initializer=self.bias_initializer,
+                                    name='bias_mlp_{}'.format(h),
+                                    regularizer=self.bias_regularizer,
+                                    constraint=self.bias_constraint)
+                )
+
+        # Output layer
+        self.kernel_out = self.add_weight(shape=(self.mlp_channels, self.channels),
+                                          initializer=self.kernel_initializer,
+                                          name='kernel_mlp_out',
+                                          regularizer=self.kernel_regularizer,
+                                          constraint=self.kernel_constraint)
+        if self.use_bias:
+            self.bias_out = self.add_weight(shape=(self.channels, ),
+                                            initializer=self.bias_initializer,
+                                            name='bias_mlp_out',
+                                            regularizer=self.bias_regularizer,
+                                            constraint=self.bias_constraint)
+
+        self.built = True
+
+    def call(self, inputs):
+        features = inputs[0]
+        fltr = inputs[1]
+
+        # Compute MLP hidden features
+        for i in range(len(self.kernels_mlp)):
+            features = K.dot(features, self.kernels_mlp[i])
+            if self.use_bias:
+                features += self.biases_mlp[i]
+            features = filter_dot(fltr, features)
+            features = Dropout(self.dropout_rate)(features)
+            if self.mlp_activation is not None:
+                features = self.mlp_activation(features)
+
+        # Compute MLP output
+        mlp_out = K.dot(features, self.kernel_out)
+        if self.use_bias:
+            mlp_out += self.bias_out
+
+        # Propagation
+        Z = mlp_out
+        for k in range(self.K):
+            Z = (1 - self.alpha) * filter_dot(fltr, Z) + self.alpha * mlp_out
+
+        # TODO Softmax?
+        if self.activation is not None:
+            output = self.activation(Z)
+        else:
+            output = Z
+        return output
+
+    def compute_output_shape(self, input_shape):
+        features_shape = input_shape[0]
+        output_shape = features_shape[:-1] + (self.channels, )
+        return output_shape
+
+    def get_config(self):
+        config = {
+            'channels': self.channels,
+            'mlp_channels': self.mlp_channels,
+            'alpha': self.alpha,
+            'H': self.H,
+            'K': self.K,
+            'mlp_activation': activations.serialize(self.mlp_activation),
+            'dropout_rate': self.dropout_rate,
+            'activation': activations.serialize(self.activation),
+            'use_bias': self.use_bias,
+            'kernel_initializer': initializers.serialize(self.kernel_initializer),
+            'bias_initializer': initializers.serialize(self.bias_initializer),
+            'kernel_regularizer': regularizers.serialize(self.kernel_regularizer),
+            'bias_regularizer': regularizers.serialize(self.bias_regularizer),
+            'activity_regularizer': regularizers.serialize(self.activity_regularizer),
+            'kernel_constraint': constraints.serialize(self.kernel_constraint),
+            'bias_constraint': constraints.serialize(self.bias_constraint)
+        }
+        base_config = super(APPNP, self).get_config()
+        return dict(list(base_config.items()) + list(config.items()))
 
 
 def mixed_mode_dot(fltr, features):
