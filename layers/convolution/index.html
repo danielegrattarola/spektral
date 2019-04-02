@@ -96,6 +96,9 @@
     <li class="toctree-l3"><a href="#graphconvskip">GraphConvSkip</a></li>
     
 
+    <li class="toctree-l3"><a href="#appnp">APPNP</a></li>
+    
+
     </ul>
                 </li>
                 <li class="">
@@ -559,6 +562,58 @@ changed to <code>channels</code>.</li>
 X_0 = Input(shape=(num_nodes, num_features))
 filter = Input((num_nodes, num_nodes))
 Z = GraphConvSkip(channels, activation='relu')([X, X_0, filter])
+</code></pre>
+
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L1173">[source]</a></span></p>
+<h3 id="appnp">APPNP</h3>
+<pre><code class="python">spektral.layers.APPNP(channels, mlp_channels, alpha=0.2, H=1, K=1, mlp_activation='relu', dropout_rate=0.0, activation='softmax', use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+</code></pre>
+
+<p>A graph convolutional layer implementing the APPNP operator, as presented by
+<a href="https://arxiv.org/abs/1810.05997">Klicpera et al. (2019)</a>.
+Implementation by Filippo Bianchi.</p>
+<p><strong>Mode</strong>: single, mixed, batch.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>node features of shape <code>(batch, num_nodes, num_features)</code>, depending on the
+mode;</li>
+<li>normalized Laplacians of shape <code>(batch, num_nodes, num_nodes)</code>, depending
+on the mode.</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>node features with the same shape of the input, but the last dimension
+changed to <code>channels</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>channels</code>: integer, number of output channels;</li>
+<li><code>mlp_channels</code>: integer, number of hidden units for the MLP layers;</li>
+<li><code>alpha</code>: teleport probability;</li>
+<li><code>H</code>: number of MLP layers;</li>
+<li><code>K</code>: number of power iterations;</li>
+<li><code>mlp_activation</code>: activation for the MLP layers;</li>
+<li><code>dropout_rate</code>: dropout rate for Laplacian and MLP layers;</li>
+<li><code>activation</code>: activation function to use;</li>
+<li><code>use_bias</code>: whether to add a bias to the linear transformation;</li>
+<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
+<li><code>bias_initializer</code>: initializer for the bias vector;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
+<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
+<li><code>activity_regularizer</code>: regularization applied to the output;</li>
+<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
+<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
+</ul>
+<p><strong>Usage</strong></p>
+<pre><code class="py">I = sp.identity(adj.shape[0], dtype=adj.dtype)
+fltr = utils.normalize_adjacency(adj + I)
+...
+X = Input(shape=(num_nodes, num_features))
+filter = Input((num_nodes, num_nodes))
+Z = APPNP(channels, mlp_channels)([X, filter])
+...
+model.fit([node_features, fltr], y)
 </code></pre>
               
             </div>
