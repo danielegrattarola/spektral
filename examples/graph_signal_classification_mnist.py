@@ -1,14 +1,14 @@
 import numpy as np
 import tensorflow as tf
 from keras import Input, Model
-from keras.callbacks import TensorBoard, EarlyStopping, ModelCheckpoint
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.layers import Dense, Flatten
 from keras.optimizers import Adam
 from keras.regularizers import l2
 
 from spektral.datasets import mnist
 from spektral.layers import GraphConv
-from spektral.utils import init_logging, normalized_laplacian
+from spektral.utils import normalized_laplacian
 
 
 def sp_matrix_to_sp_tensor(x):
@@ -23,7 +23,6 @@ learning_rate = 1e-3      # Learning rate for SGD
 batch_size = 32           # Batch size
 epochs = 10               # Number of training epochs
 es_patience = 200         # Patience fot early stopping
-log_dir = init_logging()  # Create log directory and file
 
 # Load data
 X_train, y_train, X_val, y_val, X_test, y_test, adj = mnist.load_data()
@@ -63,8 +62,7 @@ model.summary()
 # Callbacks
 callbacks = [
     EarlyStopping(monitor='val_loss', patience=es_patience),
-    TensorBoard(log_dir=log_dir, batch_size=batch_size),
-    ModelCheckpoint(log_dir + 'best_model.h5', save_best_only=True, save_weights_only=True)
+    ModelCheckpoint('best_model.h5', save_best_only=True, save_weights_only=True)
 ]
 
 # Train model
@@ -77,7 +75,7 @@ model.fit(X_train,
           callbacks=callbacks)
 
 # Load best model
-model.load_weights(log_dir + 'best_model.h5')
+model.load_weights('best_model.h5')
 
 # Evaluate model
 print('Evaluating model.')

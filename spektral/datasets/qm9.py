@@ -22,21 +22,20 @@ def load_data(return_type='numpy', nf_keys=None, ef_keys=None, auto_pad=True,
               self_loops=False, amount=None):
     """
     Loads the QM9 molecules dataset.
-    :param return_type: `'networkx'`, `'numpy'`, or `'sdf'`, data format to return;
+    :param return_type: 'networkx', 'numpy', or 'sdf', data format to return;
     :param nf_keys: list or str, node features to return (see `qm9.NODE_FEATURES`
     for available features);
-    :param ef_keys: list or str, edge features to return (see `qm9.NODE_FEATURES`
+    :param ef_keys: list or str, edge features to return (see `qm9.EDGE_FEATURES`
     for available features);
     :param auto_pad: if `return_type='numpy'`, zero pad graph matrices to have 
-    the same dimension;
+    the same number of nodes;
     :param self_loops: if `return_type='numpy'`, add self loops to adjacency 
     matrices;
-    from the dataset). If `amount=None`, return 100 molecules by default;
-    :param amount: the amount of molecules to return (works independently of 
-    `debug`).
-    :return: if `return_type='networkx'`, a list of graphs in Networkx format, 
-    and a dataframe containing labels; if `return_type='numpy'`, the adjacency 
-    matrix, node features, edge features, and a dataframe containing labels;
+    :param amount: the amount of molecules to return (in order).
+    :return: if `return_type='numpy'`, the adjacency matrix, node features,
+    edge features, and a Pandas dataframe containing labels;
+    if `return_type='networkx'`, a list of graphs in Networkx format,
+    and a dataframe containing labels;   
     if `return_type='sdf'`, a list of molecules in the internal SDF format and
     a dataframe containing labels.
     """

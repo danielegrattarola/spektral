@@ -54,9 +54,10 @@ def _sample_mask(idx, l):
 
 def load_data(dataset_name='cora'):
     """
-    Loads the specified citation dataset using the public splits as defined in
+    Loads a citation dataset using the public splits as defined in
     [Kipf & Welling (2016)](https://arxiv.org/abs/1609.02907).
-    :param dataset_name: name of the dataset to load (cora, citeseer, or pubmed)
+    :param dataset_name: name of the dataset to load ('cora', 'citeseer', or
+    'pubmed').
     :return: the citation network in numpy format, with train, test, and
     validation splits for the targets and masks.
     """

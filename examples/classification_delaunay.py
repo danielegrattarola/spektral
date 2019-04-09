@@ -8,7 +8,6 @@ from sklearn.model_selection import train_test_split
 from spektral.datasets import delaunay
 from spektral.layers import GraphAttention, GlobalAttentionPool
 from spektral.utils import localpooling_filter
-from spektral.utils.logging import init_logging
 
 # Load data
 adj, x, y = delaunay.generate_data(return_type='numpy', classes=[0, 5])
@@ -22,7 +21,6 @@ learning_rate = 1e-3      # Learning rate for Adam
 epochs = 200              # Number of training epochs
 batch_size = 32           # Batch size
 es_patience = 10          # Patience fot early stopping
-log_dir = init_logging()  # Create log directory and file
 
 # Preprocessing
 fltr = localpooling_filter(adj.copy())

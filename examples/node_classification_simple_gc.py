@@ -5,7 +5,7 @@ Simplifying Graph Convolutional Networks (https://arxiv.org/abs/1902.07153)
 Felix Wu, Tianyi Zhang, Amauri Holanda de Souza Jr., Christopher Fifty, Tao Yu, Kilian Q. Weinberger
 """
 
-from keras.callbacks import EarlyStopping, TensorBoard, ModelCheckpoint
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.layers import Input
 from keras.models import Model
 from keras.optimizers import Adam
@@ -14,7 +14,6 @@ from keras.regularizers import l2
 from spektral.datasets import citation
 from spektral.layers import GraphConv
 from spektral.utils.convolution import localpooling_filter
-from spektral.utils.logging import init_logging
 
 # Load data
 dataset = 'cora'
@@ -25,12 +24,10 @@ K = 2                         # Degree of propagation
 N = node_features.shape[0]    # Number of nodes in the graph
 F = node_features.shape[1]    # Original feature dimensionality
 n_classes = y_train.shape[1]  # Number of classes
-dropout_rate = 0.             # Dropout rate applied to the input of GCN layers
 l2_reg = 5e-6                 # Regularization rate for l2
 learning_rate = 0.2           # Learning rate for SGD
 epochs = 200                  # Number of training epochs
 es_patience = 100             # Patience for early stopping
-log_dir = init_logging()      # Create log directory and file
 
 # Preprocessing operations
 node_features = citation.preprocess_features(node_features)
@@ -57,10 +54,11 @@ model.compile(optimizer=optimizer,
 model.summary()
 
 # Callbacks
-es_callback = EarlyStopping(monitor='val_weighted_acc', patience=es_patience)
-tb_callback = TensorBoard(log_dir=log_dir, batch_size=N)
-mc_callback = ModelCheckpoint(log_dir + 'best_model.h5', save_best_only=True,
-                              save_weights_only=True)
+callbacks = [
+    EarlyStopping(monitor='val_weighted_acc', patience=es_patience),
+    ModelCheckpoint('best_model.h5', monitor='val_weighted_acc',
+                    save_best_only=True, save_weights_only=True)
+]
 
 # Train model
 validation_data = ([node_features, fltr], y_val, val_mask)
@@ -71,10 +69,10 @@ model.fit([node_features, fltr],
           batch_size=N,
           validation_data=validation_data,
           shuffle=False,  # Shuffling data means shuffling the whole graph
-          callbacks=[es_callback, tb_callback, mc_callback])
+          callbacks=callbacks)
 
 # Load best model
-model.load_weights(log_dir + 'best_model.h5')
+model.load_weights('best_model.h5')
 
 # Evaluate model
 print('Evaluating model.')
@@ -83,5 +81,5 @@ eval_results = model.evaluate([node_features, fltr],
                               sample_weight=test_mask,
                               batch_size=N)
 print('Done.\n'
-      'Test loss: {:.3f}\n'
-      'Test accuracy: {:.3f}'.format(*eval_results))
+      'Test loss: {}\n'
+      'Test accuracy: {}'.format(*eval_results))
