@@ -8,11 +8,9 @@ import re
 import shutil
 import sys
 
-import spektral
-import spektral.chem
-import spektral.utils.misc
+from spektral import chem
+from spektral import brain
 from spektral import datasets
-from spektral import geometric
 from spektral import layers
 from spektral import utils
 from spektral.utils import plotting
@@ -102,7 +100,7 @@ PAGES = [
     {
         'page': 'brain.md',
         'functions': [
-            spektral.brain.get_fc
+            brain.get_fc
         ],
         'methods': [],
         'classes': []
@@ -110,35 +108,20 @@ PAGES = [
     {
         'page': 'chem.md',
         'functions': [
-            spektral.chem.numpy_to_rdkit,
-            spektral.chem.numpy_to_smiles,
-            spektral.chem.rdkit_to_smiles,
-            spektral.chem.sdf_to_nx,
-            spektral.chem.nx_to_sdf,
-            spektral.chem.validate_rdkit,
-            spektral.chem.get_atomic_symbol,
-            spektral.chem.get_atomic_num,
-            spektral.chem.valid_score,
-            spektral.chem.novel_score,
-            spektral.chem.unique_score,
-            spektral.chem.enable_rdkit_log,
-            spektral.chem.plot_rdkit,
-            spektral.chem.plot_rdkit_svg_grid
-        ],
-        'methods': [],
-        'classes': []
-    },
-    {
-        'page': 'geometric.md',
-        'functions': [
-            geometric.exp_map,
-            geometric.log_map,
-            geometric.belongs,
-            geometric.clip,
-            geometric.get_distance,
-            geometric.ccm_uniform,
-            geometric.ccm_normal,
-            geometric.get_ccm_distribution
+            chem.numpy_to_rdkit,
+            chem.numpy_to_smiles,
+            chem.rdkit_to_smiles,
+            chem.sdf_to_nx,
+            chem.nx_to_sdf,
+            chem.validate_rdkit,
+            chem.get_atomic_symbol,
+            chem.get_atomic_num,
+            chem.valid_score,
+            chem.novel_score,
+            chem.unique_score,
+            chem.enable_rdkit_log,
+            chem.plot_rdkit,
+            chem.plot_rdkit_svg_grid
         ],
         'methods': [],
         'classes': []
@@ -146,17 +129,17 @@ PAGES = [
     {
         'page': 'utils/io.md',
         'functions': [
-            spektral.utils.io.load_binary,
-            spektral.utils.io.dump_binary,
-            spektral.utils.io.load_csv,
-            spektral.utils.io.dump_csv,
-            spektral.utils.io.load_dot,
-            spektral.utils.io.dump_dot,
-            spektral.utils.io.load_npy,
-            spektral.utils.io.dump_npy,
-            spektral.utils.io.load_txt,
-            spektral.utils.io.dump_txt,
-            spektral.utils.io.load_sdf,
+            utils.io.load_binary,
+            utils.io.dump_binary,
+            utils.io.load_csv,
+            utils.io.dump_csv,
+            utils.io.load_dot,
+            utils.io.dump_dot,
+            utils.io.load_npy,
+            utils.io.dump_npy,
+            utils.io.load_txt,
+            utils.io.dump_txt,
+            utils.io.load_sdf,
         ],
         'methods': [],
         'classes': []
@@ -164,11 +147,11 @@ PAGES = [
     {
         'page': 'utils/conversion.md',
         'functions': [
-            utils.nx_to_adj,
-            utils.nx_to_node_features,
-            utils.nx_to_edge_features,
-            utils.nx_to_numpy,
-            utils.numpy_to_nx
+            utils.conversion.nx_to_adj,
+            utils.conversion.nx_to_node_features,
+            utils.conversion.nx_to_edge_features,
+            utils.conversion.nx_to_numpy,
+            utils.conversion.numpy_to_nx
         ],
         'methods': [],
         'classes': []
@@ -176,13 +159,13 @@ PAGES = [
     {
         'page': 'utils/convolution.md',
         'functions': [
-            utils.degree,
-            utils.degree_power,
-            utils.normalized_adjacency,
-            utils.laplacian,
-            utils.normalized_laplacian,
-            utils.localpooling_filter,
-            utils.chebyshev_filter
+            utils.convolution.degree,
+            utils.convolution.degree_power,
+            utils.convolution.normalized_adjacency,
+            utils.convolution.laplacian,
+            utils.convolution.normalized_laplacian,
+            utils.convolution.localpooling_filter,
+            utils.convolution.chebyshev_filter
         ],
         'methods': [],
         'classes': []
@@ -190,11 +173,11 @@ PAGES = [
     {
         'page': 'utils/misc.md',
         'functions': [
-            utils.batch_iterator,
-            utils.set_trainable,
-            utils.pad_jagged_array,
-            utils.add_eye,
-            utils.sub_eye,
+            utils.misc.batch_iterator,
+            utils.misc.set_trainable,
+            utils.misc.pad_jagged_array,
+            utils.misc.add_eye,
+            utils.misc.sub_eye,
 
         ],
         'methods': [],

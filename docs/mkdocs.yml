@@ -10,6 +10,7 @@ theme:
 
 docs_dir: sources
 repo_url: 'https://github.com/danielegrattarola/spektral/'
+edit_uri: 'edit/master/docs/sources'
 site_author: Daniele Grattarola
 site_description: 'Spektral: a Framework for Relational Representation Learning'
 google_analytics:
@@ -39,7 +40,6 @@ nav:
     - MNIST: datasets/mnist.md
 - Chemistry: chem.md
 - Brain: brain.md
-- Geometric: geometric.md
 - Utils:
     - Input/Ouput: utils/io.md
     - Conversion: utils/conversion.md

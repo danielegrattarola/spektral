@@ -52,7 +52,6 @@ Some features of Spektral also require the following optional dependencies:
 
  - [RDKit](http://www.rdkit.org/docs/index.html), a library for cheminformatics and molecule manipulation (available through Anaconda);
  - [dyfunconn](https://dyfunconn.readthedocs.io/), a library to build functional connectivity networks (available through PyPi);
- - [CDG](https://github.com/dan-zam/cdg), a library implementing several change detection algorithms, as well as an engine for Riemannian geometry (available on Github);
 
 The simplest way to install Spektral is with PyPi: 
 
