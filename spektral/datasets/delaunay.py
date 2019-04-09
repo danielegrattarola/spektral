@@ -9,7 +9,7 @@ RETURN_TYPES = {'numpy', 'networkx'}
 MAX_K = 7  # Maximum number of nodes in a graph
 
 
-def generate_data(return_type='networkx', classes=0, n_samples_in_class=1000,
+def generate_data(return_type='numpy', classes=0, n_samples_in_class=1000,
                   n_nodes=7, support_low=0., support_high=10., drift_amount=1.0,
                   one_hot_labels=True, support=None, seed=None):
     """
@@ -17,7 +17,7 @@ def generate_data(return_type='networkx', classes=0, n_samples_in_class=1000,
     [Zambon et al. (2017)](https://arxiv.org/abs/1706.06941).
     Note that this function is basically deprecated and will change soon.
     
-    :param return_type: `'networkx'` or `'numpy'`, data format to return;
+    :param return_type: 'numpy' or 'networkx', data format to return;
     :param classes: indices of the classes to load (integer, or list of integers
     between 0 and 20);
     :param n_samples_in_class: number of generated samples per class;
@@ -31,9 +31,10 @@ def generate_data(return_type='networkx', classes=0, n_samples_in_class=1000,
     :param one_hot_labels: one-hot encode dataset labels;
     :param support: custom support to use instead of generating it randomly; 
     :param seed: random numpy seed;
-    :return: if `return_type='networkx'`, a list of graphs in Networkx format, 
-    and an array containing labels; if `return_type='numpy'`, the adjacency 
-    matrix, node features, and an array containing labels.
+    :return: if `return_type='numpy'`, the adjacency matrix, node features, and
+    an array containing labels;
+    if `return_type='networkx'`, a list of graphs in Networkx format, and an
+    array containing labels;
     """
     if return_type not in RETURN_TYPES:
         raise ValueError('Possible return_type: {}'.format(RETURN_TYPES))

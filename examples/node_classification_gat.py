@@ -5,7 +5,7 @@ Graph Attention Networks (https://arxiv.org/abs/1710.10903)
 Petar Veličković, Guillem Cucurull, Arantxa Casanova, Adriana Romero, Pietro Liò, Yoshua Bengio
 """
 
-from keras.callbacks import EarlyStopping, TensorBoard, ModelCheckpoint
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.layers import Input, Dropout
 from keras.models import Model
 from keras.optimizers import Adam
@@ -13,7 +13,6 @@ from keras.regularizers import l2
 
 from spektral.datasets import citation
 from spektral.layers import GraphAttention
-from spektral.utils.logging import init_logging
 from spektral.utils.misc import add_eye
 
 # Load data
@@ -31,7 +30,6 @@ l2_reg = 5e-4                 # Regularization rate for l2
 learning_rate = 1e-2          # Learning rate for SGD
 epochs = 20000                # Number of training epochs
 es_patience = 200             # Patience fot early stopping
-log_dir = init_logging()      # Create log directory and file
 
 # Preprocessing operations
 node_features = citation.preprocess_features(node_features)
@@ -67,12 +65,11 @@ model.compile(optimizer=optimizer,
 model.summary()
 
 # Callbacks
-es_callback = EarlyStopping(monitor='val_weighted_acc', patience=es_patience)
-tb_callback = TensorBoard(log_dir=log_dir, batch_size=N, write_graph=True)
-mc_callback = ModelCheckpoint(log_dir + 'best_model.h5',
-                              monitor='val_weighted_acc',
-                              save_best_only=True,
-                              save_weights_only=True)
+callbacks = [
+    EarlyStopping(monitor='val_weighted_acc', patience=es_patience),
+    ModelCheckpoint('best_model.h5', monitor='val_weighted_acc',
+                    save_best_only=True, save_weights_only=True)
+]
 
 # Train model
 validation_data = ([node_features, adj], y_val, val_mask)
@@ -83,10 +80,10 @@ model.fit([node_features, adj],
           batch_size=N,
           validation_data=validation_data,
           shuffle=False,  # Shuffling data means shuffling the whole graph
-          callbacks=[es_callback, tb_callback, mc_callback])
+          callbacks=callbacks)
 
 # Load best model
-model.load_weights(log_dir + 'best_model.h5')
+model.load_weights('best_model.h5')
 
 # Evaluate model
 print('Evaluating model.')

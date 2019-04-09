@@ -43,7 +43,8 @@ PAGES = [
             layers.ARMAConv,
             layers.EdgeConditionedConv,
             layers.GraphAttention,
-            layers.GraphConvSkip
+            layers.GraphConvSkip,
+            layers.APPNP
         ]
     },
     {
@@ -182,18 +183,6 @@ PAGES = [
             utils.normalized_laplacian,
             utils.localpooling_filter,
             utils.chebyshev_filter
-        ],
-        'methods': [],
-        'classes': []
-    },
-    {
-        'page': 'utils/logging.md',
-        'functions': [
-            utils.init_logging,
-            utils.log,
-            utils.tic,
-            utils.toc,
-            utils.model_to_str
         ],
         'methods': [],
         'classes': []

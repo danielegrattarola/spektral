@@ -9,7 +9,7 @@ from sklearn.preprocessing import StandardScaler
 
 from spektral.datasets import qm9
 from spektral.layers import EdgeConditionedConv, GlobalAttentionPool
-from spektral.utils import init_logging, label_to_one_hot
+from spektral.utils import label_to_one_hot
 
 # Load data
 adj, nf, ef, y = qm9.load_data(return_type='numpy',
@@ -34,7 +34,6 @@ learning_rate = 1e-3      # Learning rate for SGD
 epochs = 25               # Number of training epochs
 batch_size = 64           # Batch size
 es_patience = 5           # Patience fot early stopping
-log_dir = init_logging()  # Create log directory and file
 
 # Train/test split
 adj_train, adj_test, \
@@ -87,4 +86,4 @@ plt.scatter(preds, y_test, alpha=0.3)
 plt.plot(range(-6, 6), range(-6, 6))
 plt.xlabel('Predicted')
 plt.ylabel('Actual')
-plt.savefig(log_dir + 'pred_v_true.png')
+plt.savefig('pred_v_true.png')
