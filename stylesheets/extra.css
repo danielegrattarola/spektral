@@ -4,10 +4,18 @@
 
 body > div.wy-grid-for-nav > nav > div.wy-side-nav-search > a {
     color: transparent !important;
-    background-image: url('https://danielegrattarola.github.io/spektral/img/logo_light.svg') !important;
+    background-image: url('../img/logo_light.svg') !important;
     background-size: contain !important;
     background-repeat: no-repeat !important;
     background-position: center !important;
     line-height: 4;
     display: flex !important;
 }
+
+/*.wy-side-nav-search {
+    background-color: #e67e22;
+}
+
+.wy-side-nav-search input[type=text] {
+    border-color: #e67e22;
+}*/
