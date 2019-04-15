@@ -33,7 +33,6 @@ epochs = 20000                # Number of training epochs
 es_patience = 200             # Patience for early stopping
 
 # Preprocessing operations
-node_features = citation.preprocess_features(node_features)
 fltr = normalized_laplacian(adj, symmetric=True)
 fltr = rescale_laplacian(fltr, lmax=2)
 

@@ -30,7 +30,6 @@ epochs = 200                  # Number of training epochs
 es_patience = 10              # Patience for early stopping
 
 # Preprocessing operations
-node_features = citation.preprocess_features(node_features)
 fltr = localpooling_filter(adj)
 
 # Model definition

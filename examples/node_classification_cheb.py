@@ -33,7 +33,6 @@ epochs = 20000                # Number of training epochs
 es_patience = 200             # Patience fot early stopping
 
 # Preprocessing operations
-node_features = citation.preprocess_features(node_features)
 fltr = chebyshev_filter(adj, cheb_k)
 
 # Model definition
