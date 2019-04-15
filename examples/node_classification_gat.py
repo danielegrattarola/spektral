@@ -32,7 +32,6 @@ epochs = 20000                # Number of training epochs
 es_patience = 200             # Patience fot early stopping
 
 # Preprocessing operations
-node_features = citation.preprocess_features(node_features)
 adj = add_eye(adj).toarray()  # Add self-loops
 
 # Model definition

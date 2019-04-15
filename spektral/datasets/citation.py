@@ -53,12 +53,13 @@ def _sample_mask(idx, l):
     return np.array(mask, dtype=np.bool)
 
 
-def load_data(dataset_name='cora'):
+def load_data(dataset_name='cora', normalize_features=True):
     """
     Loads a citation dataset using the public splits as defined in
     [Kipf & Welling (2016)](https://arxiv.org/abs/1609.02907).
     :param dataset_name: name of the dataset to load ('cora', 'citeseer', or
-    'pubmed').
+    'pubmed');
+    :param normalize_features: if True, the node features are normalized;
     :return: the citation network in numpy format, with train, test, and
     validation splits for the targets and masks.
     """
@@ -67,10 +68,6 @@ def load_data(dataset_name='cora'):
 
     if not os.path.exists(DATA_PATH + dataset_name):
         download_data(dataset_name)
-        # TODO dataset downloader
-        raise ValueError('Dataset not available. Download the data from '
-                         'https://github.com/tkipf/gcn/tree/master/gcn/data and '
-                         'place it in {}/'.format(DATA_PATH + dataset_name))
 
     print('Loading {} dataset'.format(dataset_name))
 
@@ -111,7 +108,9 @@ def load_data(dataset_name='cora'):
     test_mask = _sample_mask(idx_test, labels.shape[0])
 
     # Row-normalize the features
-    # features_norm = utils.sparse_normalize(features)
+    if normalize_features:
+        print('Pre-processing node features')
+        features = preprocess_features(features)
 
     y_train = np.zeros(labels.shape)
     y_val = np.zeros(labels.shape)
