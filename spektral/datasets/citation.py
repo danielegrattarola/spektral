@@ -30,6 +30,7 @@ import os
 
 import networkx as nx
 import numpy as np
+import requests
 import scipy.sparse as sp
 
 from spektral.utils.io import load_binary
@@ -65,6 +66,7 @@ def load_data(dataset_name='cora'):
         raise ValueError('Available datasets: {}'.format(AVAILABLE_DATASETS))
 
     if not os.path.exists(DATA_PATH + dataset_name):
+        download_data(dataset_name)
         # TODO dataset downloader
         raise ValueError('Dataset not available. Download the data from '
                          'https://github.com/tkipf/gcn/tree/master/gcn/data and '
@@ -128,3 +130,17 @@ def preprocess_features(features):
     r_mat_inv = sp.diags(r_inv)
     features = r_mat_inv.dot(features)
     return features
+
+
+def download_data(dataset_name):
+    names = ['x', 'y', 'tx', 'ty', 'allx', 'ally', 'graph']
+
+    os.makedirs(DATA_PATH + dataset_name + '/')
+    data_url = 'https://github.com/tkipf/gcn/raw/master/gcn/data/'
+
+    print('Downloading ' + dataset_name + 'from ' + data_url)
+    for n in names:
+        f_name = 'ind.' + dataset_name + '.' + n
+        req = requests.get(data_url + f_name)
+        with open(DATA_PATH + dataset_name + '/' + f_name, 'wb') as out_file:
+            out_file.write(req.content)

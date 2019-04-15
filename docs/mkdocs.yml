@@ -3,9 +3,6 @@ theme:
     name: 'readthedocs'
     custom_dir: 'sources/custom_theme/'
     highlightjs: true
-    hljs_languages:
-        - python
-    hljs_style: darcula
 
 
 docs_dir: sources
@@ -21,7 +18,7 @@ extra_css:
   - 'stylesheets/extra.css'
 
 extra_javascript:
-    - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML
+    - 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
 
 markdown_extensions:
     - mdx_math

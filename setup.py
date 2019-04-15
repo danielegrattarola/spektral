@@ -8,7 +8,7 @@ setup(
     version='0.0.7',
     packages=find_packages(),
     install_requires=['keras', 'networkx', 'pandas', 'joblib', 'matplotlib',
-                      'tqdm', 'pygraphviz', 'numpy', 'scipy'],
+                      'tqdm', 'pygraphviz', 'numpy', 'scipy', 'requests'],
     url='https://github.com/danielegrattarola/spektral',
     license='MIT',
     author='Daniele Grattarola',
