@@ -94,6 +94,7 @@ In [4]: nf.shape
 Out[4]: (50000, 784)
 ```
 
+---
 
 ## Other formats
 
