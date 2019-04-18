@@ -299,7 +299,7 @@ def batch_iterator(data, batch_size=32, epochs=1, shuffle=True):
 
     len_data = len(data[0])
     batches_per_epoch = int(len_data / batch_size)
-    if batches_per_epoch == 0 or len_data % batch_size == 0:
+    if len_data % batch_size != 0:
         batches_per_epoch += 1
     for epochs in range(epochs):
         if shuffle:
