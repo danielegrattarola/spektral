@@ -132,7 +132,7 @@ def preprocess_features(features):
 
 
 def download_data(dataset_name):
-    names = ['x', 'y', 'tx', 'ty', 'allx', 'ally', 'graph']
+    names = ['x', 'y', 'tx', 'ty', 'allx', 'ally', 'graph', 'test.index']
 
     os.makedirs(DATA_PATH + dataset_name + '/')
     data_url = 'https://github.com/tkipf/gcn/raw/master/gcn/data/'
