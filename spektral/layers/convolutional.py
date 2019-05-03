@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from keras import activations, initializers, regularizers, constraints
 from keras import backend as K
 from keras.layers import Layer, LeakyReLU, Dropout, AveragePooling2D, AveragePooling1D
+from spektral.layers.ops import filter_dot
 
 
 class GraphConv(Layer):
@@ -1366,43 +1367,3 @@ class APPNP(Layer):
         }
         base_config = super(APPNP, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
-
-
-def mixed_mode_dot(fltr, features):
-    """
-    Computes the equivalent of `tf.einsum('ij,bjk->bik', fltr, output)`, but
-    works for both dense and sparse input filters.
-    :param fltr: rank 2 tensor, the filter for convolution
-    :param features: rank 3 tensor, the features of the input signals
-    :return:
-    """
-    _, m_, f_ = K.int_shape(features)
-    features = K.permute_dimensions(features, [1, 2, 0])
-    features = K.reshape(features, (m_, -1))
-    features = K.dot(fltr, features)
-    features = K.reshape(features, (m_, f_, -1))
-    features = K.permute_dimensions(features, [2, 0, 1])
-
-    return features
-
-
-def filter_dot(fltr, features):
-    """
-    Performs the multiplication of a graph filter (N x N) with the node features,
-    automatically dealing with single, mixed, and batch modes.
-    :param fltr: the graph filter(s) (N x N in single and mixed mode,
-    batch x N x N in batch mode).
-    :param features: the node features (N x F in single mode, batch x N x F in
-    mixed and batch mode).
-    :return: the filtered features.
-    """
-    if len(K.int_shape(features)) == 2:
-        # Single mode
-        return K.dot(fltr, features)
-    else:
-        if len(K.int_shape(fltr)) == 3:
-            # Batch mode
-            return K.batch_dot(fltr, features)
-        else:
-            # Mixed mode
-            return mixed_mode_dot(fltr, features)
