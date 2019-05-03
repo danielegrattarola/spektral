@@ -21,11 +21,11 @@ class GraphConv(Layer):
     
     **Input**
     
-    - node features of shape `(batch, num_nodes, num_features)`, depending on the
-    mode;
-    - Laplacians of shape `(batch, num_nodes, num_nodes)`, depending on the mode.
-    The Laplacians can be computed from the adjacency matrices like in the
-    original paper using `utils.convolution.localpooling_filter`.
+    - node features of shape `(n_nodes, n_features)` (with optional `batch`
+    dimension);
+    - Laplacian of shape `(n_nodes, n_nodes)` (with optional `batch` dimension);
+    The Laplacian approximation can be computed from the adjacency matrix like
+    in the original paper using `spektral.utils.convolution.localpooling_filter`.
     
     **Output**
     
@@ -154,12 +154,12 @@ class ChebConv(Layer):
 
     **Input**
 
-    - node features of shape `(batch, num_nodes, num_features)`, depending on the
-    mode;
-    - a list of Chebyshev filters of shape `(batch, num_nodes, num_nodes)`,
-    depending on the mode.
-    The filters can be generated from the adjacency matrices using
-    `utils.convolution.chebyshev_filter`.
+    - node features of shape `(n_nodes, n_features)` (with optional `batch`
+    dimension);
+    - a list of Chebyshev polynomials of shape `(num_nodes, num_nodes)` (with
+    optional `batch` dimension)
+    The filters can be generated from the adjacency matrix using
+    `spektral.utils.convolution.chebyshev_filter`.
 
     **Output**
 
@@ -295,12 +295,9 @@ class EdgeConditionedConv(Layer):
 
     **Input**
 
-    - node features of shape `(batch, num_nodes, num_node_features)`, depending
-    on the mode;
-    - adjacency matrices of shape `(batch, num_nodes, num_nodes)`, depending on
-    the mode.
-    - edge features of shape `(batch, num_nodes, num_nodes, num_edge_features)`,
-    depending on the mode.
+    - node features of shape `(batch, n_nodes, n_node_features)`;
+    - adjacency matrices of shape `(batch, n_nodes, num_nodes)`;
+    - edge features of shape `(batch, n_nodes, n_nodes, n_edge_features)`;
 
     **Output**
 
@@ -484,8 +481,10 @@ class GraphAttention(Layer):
 
     **Input**
 
-    - node features of shape `(num_nodes, num_features)`;
-    - adjacency matrices of shape `(num_nodes, num_nodes)`;
+    - node features of shape `(n_nodes, n_features)` (with optional `batch`
+    dimension);
+    - adjacency matrices of shape `(n_nodes, n_nodes)` (with optional `batch`
+    dimension);
 
     **Output**
 
@@ -518,8 +517,8 @@ class GraphAttention(Layer):
     ```py
     adj = normalize_sum_to_unity(adj)
     ...
-    X = Input(shape=(num_nodes, num_features))
-    A = Input((num_nodes, num_nodes))
+    X = Input(shape=(n_nodes, n_features))
+    A = Input((n_nodes, n_nodes))
     Z = GraphAttention(channels, activation='relu')([X, A])
     ...
     model.fit([node_features, fltr], y)
@@ -715,13 +714,13 @@ class GraphConvSkip(Layer):
 
     **Input**
 
-    - node features of shape `(batch, num_nodes, num_features)`, depending on the
-    mode;
-    - node features for the skip connection of shape
-    `(batch, num_nodes, num_features)`, depending on the mode;
-    - Laplacians of shape `(batch, num_nodes, num_nodes)`, depending on the mode.
-    The Laplacians can be computed from the adjacency matrices using
-    `utils.convolution.localpooling_filter`.
+    - node features of shape `(n_nodes, n_features)` (with optional `batch`
+    dimension);
+    - node features for the skip connection, of shape `(n_nodes, n_features)`
+    (with optional `batch` dimension);
+    - Laplacian of shape `(n_nodes, n_nodes)` (with optional `batch` dimension);
+    The Laplacian approximation can be computed from the adjacency matrix like
+    in the original paper using `spektral.utils.convolution.localpooling_filter`.
 
     **Output**
 
@@ -743,9 +742,9 @@ class GraphConvSkip(Layer):
 
     **Usage**
     ```py
-    X = Input(shape=(num_nodes, num_features))
-    X_0 = Input(shape=(num_nodes, num_features))
-    filter = Input((num_nodes, num_nodes))
+    X = Input(shape=(n_nodes, n_features))
+    X_0 = Input(shape=(n_nodes, n_features))
+    filter = Input((n_nodes, n_nodes))
     Z = GraphConvSkip(channels, activation='relu')([X, X_0, filter])
     ```
     """
@@ -865,10 +864,11 @@ class ARMAConv(Layer):
 
     **Input**
 
-    - node features of shape `(batch, num_nodes, num_features)`, depending on the
-    mode;
-    - normalized Laplacians of shape `(batch, num_nodes, num_nodes)`, depending
-    on the mode.
+    - node features of shape `(n_nodes, n_features)` (with optional `batch`
+    dimension);
+    - Laplacian of shape `(n_nodes, n_nodes)` (with optional `batch` dimension);
+    The Laplacian approximation can be computed from the adjacency matrix using
+    the methods in `spektral.utils.convolutions` (see examples/node_classification_arma.py).
 
     **Output**
 
@@ -897,8 +897,8 @@ class ARMAConv(Layer):
     ```py
     fltr = localpooling_filter(adj)
     ...
-    X = Input(shape=(num_nodes, num_features))
-    filter = Input((num_nodes, num_nodes))
+    X = Input(shape=(n_nodes, n_features))
+    filter = Input((n_nodes, n_nodes))
     Z = ARMAConv(channels, activation='relu')([X, filter])
     ...
     model.fit([node_features, fltr], y)
@@ -1180,10 +1180,11 @@ class APPNP(Layer):
 
     **Input**
 
-    - node features of shape `(batch, num_nodes, num_features)`, depending on the
-    mode;
-    - normalized Laplacians of shape `(batch, num_nodes, num_nodes)`, depending
-    on the mode.
+    - node features of shape `(n_nodes, n_features)` (with optional `batch`
+    dimension);
+    - Laplacian of shape `(n_nodes, n_nodes)` (with optional `batch` dimension);
+    The Laplacian approximation can be computed from the adjacency matrix using
+    the methods in `spektral.utils.convolutions` (see examples/node_classification_arma.py).
 
     **Output**
 
@@ -1214,8 +1215,8 @@ class APPNP(Layer):
     I = sp.identity(adj.shape[0], dtype=adj.dtype)
     fltr = utils.normalize_adjacency(adj + I)
     ...
-    X = Input(shape=(num_nodes, num_features))
-    filter = Input((num_nodes, num_nodes))
+    X = Input(shape=(n_nodes, n_features))
+    filter = Input((n_nodes, n_nodes))
     Z = APPNP(channels, mlp_channels)([X, filter])
     ...
     model.fit([node_features, fltr], y)
@@ -1369,8 +1370,8 @@ class APPNP(Layer):
 
 def mixed_mode_dot(fltr, features):
     """
-    Computes the equivalent of tf.einsum('ij,bjk->bik', fltr, output), but works
-    for both dense and sparse fltr.
+    Computes the equivalent of `tf.einsum('ij,bjk->bik', fltr, output)`, but
+    works for both dense and sparse input filters.
     :param fltr: rank 2 tensor, the filter for convolution
     :param features: rank 3 tensor, the features of the input signals
     :return:
