@@ -8,7 +8,7 @@ from keras.backend import tf
 from sklearn.datasets.samples_generator import make_blobs
 from sklearn.neighbors import kneighbors_graph
 
-from spektral.layers import TopKPooling
+from spektral.layers import TopKPool
 from spektral.layers.ops import sp_matrix_to_sp_tensor_value
 
 np.random.seed(None)
@@ -32,9 +32,9 @@ A_in = Input(tensor=tf.sparse_placeholder(tf.float32, shape=(None, None)), spars
 S_in = Input(tensor=tf.placeholder(tf.int32, shape=(None,), name='segment_ids_in'))
 target = Input(tensor=tf.placeholder(tf.float32, shape=(None, F), name='target'))
 
-pool1, adj1, seg1 = TopKPooling(k=50)([X_in, A_in, S_in])
-pool2, adj2, seg2 = TopKPooling(k=25)([pool1, adj1, seg1])
-pool3, adj3, seg3 = TopKPooling(k=5)([pool2, adj2, seg2])
+pool1, adj1, seg1 = TopKPool(k=50)([X_in, A_in, S_in])
+pool2, adj2, seg2 = TopKPool(k=25)([pool1, adj1, seg1])
+pool3, adj3, seg3 = TopKPool(k=5)([pool2, adj2, seg2])
 
 model = Model([X_in, A_in, S_in], pool3)
 model.compile('adam', 'mse', target_tensors=[target])

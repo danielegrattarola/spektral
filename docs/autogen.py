@@ -62,7 +62,7 @@ PAGES = [
         'methods': [],
         'classes': [
             layers.GlobalAttentionPool,
-            layers.NodeAttentionPool
+            layers.GlobalAttnSumPool
         ]
     },
     {

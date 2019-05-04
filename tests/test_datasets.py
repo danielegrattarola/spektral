@@ -1,6 +1,4 @@
-import pytest
-
-from spektral.datasets import delaunay, qm9
+from spektral.datasets import delaunay, qm9, citation, mnist
 
 
 def correctly_padded(adj, nf, ef):
@@ -15,26 +13,36 @@ def correctly_padded(adj, nf, ef):
         assert adj.shape[-1] == ef.shape[-3]
 
 
+def test_citation():
+    for dataset_name in ['cora', 'citeseer', 'pubmed']:
+        citation.load_data(dataset_name)
+
+
 def test_delaunay():
-    adj, nf, labels = delaunay.load_data('numpy')
+    adj, nf, labels = delaunay.generate_data('numpy')
     correctly_padded(adj, nf, None)
-    assert adj.shape[-1] == delaunay.MAX_K
     assert adj.shape[0] == labels.shape[0]
 
     # Test that it doesn't crash
-    delaunay.load_data('networkx')
+    delaunay.generate_data('networkx')
+
+
+def test_mnist():
+    mnist.load_data()
 
 
 def test_qm9():
-    adj, nf, ef, labels = qm9.load_data('numpy')
+    adj, nf, ef, labels = qm9.load_data('numpy', amount=1000)
     correctly_padded(adj, nf, ef)
-    assert adj.shape[-1] == qm9.MAX_K
     assert adj.shape[0] == labels.shape[0]
 
     # Test that it doesn't crash
-    qm9.load_data('networkx')
-    qm9.load_data('sdf')
+    qm9.load_data('networkx', amount=1000)
+    qm9.load_data('sdf', amount=1000)
 
 
 if __name__ == '__main__':
-    pytest.main([__file__, '--disable-pytest-warnings'])
+    test_citation()
+    test_delaunay()
+    test_mnist()
+    test_qm9()
