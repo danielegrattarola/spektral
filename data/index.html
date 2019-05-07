@@ -149,6 +149,10 @@
     <ul class="subnav">
                 <li class="">
                     
+    <a class="" href="../utils/data/">Data</a>
+                </li>
+                <li class="">
+                    
     <a class="" href="../utils/io/">Input/Ouput</a>
                 </li>
                 <li class="">
@@ -324,15 +328,75 @@ Out[4]: (50000, 784)
 <hr />
 <h2 id="other-formats">Other formats</h2>
 <h3 id="graph-batch-mode">Graph batch mode</h3>
+<p><img alt="" src="https://danielegrattarola.github.io/spektral/img/graph_batch.svg" /></p>
 <p>When dealing with graphs with a variable number of nodes, representing a group of graphs in batch mode requires padding <code>A</code>, <code>X</code>, and <code>E</code> to a fixed dimension.<br />
-However, this introduces a noticeable computational load, and it forces all graphs to have the same memory cost. To solve this issue, a common approach is to represent a batch of graphs by taking their disjoint union, and then working with this "supergraph" in single mode.</p>
+In order to avoid this issue, a common approach is to represent a batch of graphs by taking their disjoint union, and then working with this "supergraph" in single mode.</p>
 <p>In order to compute the disjoint union of a batch of graphs: </p>
 <ol>
 <li>We take a block diagonal matrix constructed from the adjacency matrices in the batch;</li>
 <li>We stack node features together along the node dimension;</li>
 <li>We take a block diagonal matrix constructed from the edge features matrices in the batch (if S &gt; 1, we compute a block diagonal matrix for each element of the features, and then stack those along the last dimension).</li>
 </ol>
-<p><img alt="" src="https://danielegrattarola.github.io/spektral/img/graph_batch.svg" /></p>
+<p>Additionally, we also keep track of which nodes belong to which graphs by having a vector of integer indices mapping each node to a number between 0 and the batch size.<br />
+Utilities for dealing with this alternative representation of graph batches are provided in <code>spektral.data</code>:</p>
+<pre><code class="py">In [1]: from spektral.utils.data import Batch                                                               
+Using TensorFlow backend.
+
+In [2]: from spektral.data import Batch 
+   ...: A_list = [np.ones((2, 2))] * 3                                                                
+
+In [3]: X_list = [np.random.normal(size=(2, 4))] * 3                                                  
+
+In [4]: b = Batch(A_list, X_list)                                                                     
+
+In [5]: b.A.todense()                                                                                 
+Out[5]: 
+matrix([[1., 1., 0., 0., 0., 0.],
+        [1., 1., 0., 0., 0., 0.],
+        [0., 0., 1., 1., 0., 0.],
+        [0., 0., 1., 1., 0., 0.],
+        [0., 0., 0., 0., 1., 1.],
+        [0., 0., 0., 0., 1., 1.]])
+
+In [6]: b.X                                                                                           
+Out[6]: 
+array([[-0.85196709, -1.66795384, -1.14046868,  0.4735151 ],
+       [ 0.14221143, -0.76473164, -1.05635638,  1.45961459],
+       [-0.85196709, -1.66795384, -1.14046868,  0.4735151 ],
+       [ 0.14221143, -0.76473164, -1.05635638,  1.45961459],
+       [-0.85196709, -1.66795384, -1.14046868,  0.4735151 ],
+       [ 0.14221143, -0.76473164, -1.05635638,  1.45961459]])
+
+In [7]: b.I                                                                                           
+Out[7]: array([0, 0, 1, 1, 2, 2])
+
+In [8]: b.get('AXI')                                                                                  
+Out[8]: 
+(&lt;6x6 sparse matrix of type '&lt;class 'numpy.float64'&gt;'
+  with 12 stored elements in COOrdinate format&gt;,
+ array([[-0.85196709, -1.66795384, -1.14046868,  0.4735151 ],
+        [ 0.14221143, -0.76473164, -1.05635638,  1.45961459],
+        [-0.85196709, -1.66795384, -1.14046868,  0.4735151 ],
+        [ 0.14221143, -0.76473164, -1.05635638,  1.45961459],
+        [-0.85196709, -1.66795384, -1.14046868,  0.4735151 ],
+        [ 0.14221143, -0.76473164, -1.05635638,  1.45961459]]),
+ array([0, 0, 1, 1, 2, 2]))
+</code></pre>
+
+<table>
+<thead>
+<tr>
+<th align="left">WARNING</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">Note that support for edge attributes is not yet implemented in the current version of <code>Batch</code></td>
+</tr>
+</tbody>
+</table>
+<p>Convolutional layers that work in single mode will work for this type of data representation without any modification.<br />
+Pooling layers, on the other hand, require the batch indices vector in order to know which nodes to pool together. Global pooling layers will consume the indices vector and they will not return it as output, while standard pooling layers will also return a reduced version of the vector. </p>
 <h3 id="conversion-methods">Conversion methods</h3>
 <p>To provide better compatibility with other libraries, Spektral has methods to convert graphs between the matrix representation (<code>'numpy'</code>) and other formats. </p>
 <p>The <code>'networkx'</code> format represents graphs using the Networkx library, which can then be used to <a href="https://networkx.github.io/documentation/networkx-1.10/reference/convert.html">convert the graphs</a> to other formats like <code>.dot</code> and edge lists. 

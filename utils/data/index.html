@@ -8,7 +8,7 @@
   
   <meta name="author" content="Daniele Grattarola">
   <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>Input/Ouput - Spektral</title>
+  <title>Data - Spektral</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
@@ -18,8 +18,8 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Input/Ouput";
-    var mkdocs_page_input_path = "utils/io.md";
+    var mkdocs_page_name = "Data";
+    var mkdocs_page_input_path = "utils/data.md";
     var mkdocs_page_url = null;
   </script>
   
@@ -125,49 +125,22 @@
 		
     <span class="caption-text">Utils</span>
     <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../data/">Data</a>
-                </li>
                 <li class=" current">
                     
-    <a class="current" href="./">Input/Ouput</a>
+    <a class="current" href="./">Data</a>
     <ul class="subnav">
             
-    <li class="toctree-l3"><a href="#load_binary">load_binary</a></li>
+    <li class="toctree-l3"><a href="#batch">Batch</a></li>
     
 
-    <li class="toctree-l3"><a href="#dump_binary">dump_binary</a></li>
-    
-
-    <li class="toctree-l3"><a href="#load_csv">load_csv</a></li>
-    
-
-    <li class="toctree-l3"><a href="#dump_csv">dump_csv</a></li>
-    
-
-    <li class="toctree-l3"><a href="#load_dot">load_dot</a></li>
-    
-
-    <li class="toctree-l3"><a href="#dump_dot">dump_dot</a></li>
-    
-
-    <li class="toctree-l3"><a href="#load_npy">load_npy</a></li>
-    
-
-    <li class="toctree-l3"><a href="#dump_npy">dump_npy</a></li>
-    
-
-    <li class="toctree-l3"><a href="#load_txt">load_txt</a></li>
-    
-
-    <li class="toctree-l3"><a href="#dump_txt">dump_txt</a></li>
-    
-
-    <li class="toctree-l3"><a href="#load_sdf">load_sdf</a></li>
+    <li class="toctree-l3"><a href="#get">get</a></li>
     
 
     </ul>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../io/">Input/Ouput</a>
                 </li>
                 <li class="">
                     
@@ -229,10 +202,10 @@
         
       
     
-    <li>Input/Ouput</li>
+    <li>Data</li>
     <li class="wy-breadcrumbs-aside">
       
-        <a href="https://github.com/danielegrattarola/spektral/edit/master/docs/sources/utils/io.md"
+        <a href="https://github.com/danielegrattarola/spektral/edit/master/docs/sources/utils/data.md"
           class="icon icon-github"> Edit on GitHub</a>
       
     </li>
@@ -242,171 +215,38 @@
           <div role="main">
             <div class="section">
               
-                <h3 id="load_binary">load_binary</h3>
-<pre><code class="python">spektral.utils.load_binary(filename)
+                <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/utils/data.py#L5">[source]</a></span></p>
+<h3 id="batch">Batch</h3>
+<pre><code class="python">spektral.utils.Batch(A_list, X_list)
 </code></pre>
 
-<p>Loads a pickled file.</p>
+<p>Converts a batch of graphs stored in lists to the graph batch format
+(see <a href="https://danielegrattarola.github.io/spektral/data/">https://danielegrattarola.github.io/spektral/data/</a>).</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>A_list, list of adjacency matrices of shape <code>(N, N)</code>;</li>
+<li>X_list, list of node attributes matrices of shape <code>(N, F)</code>;</li>
+</ul>
+<p><strong> Properties </strong></p>
+<ul>
+<li>A: returns the block diagonal adjacency matrix;</li>
+<li>X: returns the stacked node attributes;</li>
+<li>I: returns the graph indices mapping each node to a graph (numbering is
+relative to the batch).</li>
+</ul>
+<hr />
+<h3 id="get">get</h3>
+<pre><code class="python">spektral.utils.get(attr)
+</code></pre>
+
+<p>Splits a strings and returns the associated matrices in order, e.g.,
+<code>data = b.get('AXI')</code> is equivalent to <code>data = b.A, b.X, b.I</code>.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
-<li><code>filename</code>: a string or file-like object</li>
+<li><code>attr</code>: a string (possible literals can be seen with <code>b.attr_map.keys()</code>.</li>
 </ul>
 <p><strong>Return</strong><br />
- The loaded object</p>
-<hr />
-<h3 id="dump_binary">dump_binary</h3>
-<pre><code class="python">spektral.utils.dump_binary(obj, filename)
-</code></pre>
-
-<p>Pickles and saves an object to file.</p>
-<p><strong>Arguments</strong>  </p>
-<ul>
-<li>
-<p><code>obj</code>: the object to save</p>
-</li>
-<li>
-<p><code>filename</code>: a string or file-like object</p>
-</li>
-</ul>
-<hr />
-<h3 id="load_csv">load_csv</h3>
-<pre><code class="python">spektral.utils.load_csv(filename)
-</code></pre>
-
-<p>Loads a csv file with pandas.</p>
-<p><strong>Arguments</strong>  </p>
-<ul>
-<li><code>filename</code>: a string or file-like object</li>
-</ul>
-<p><strong>Return</strong><br />
- The loaded csv</p>
-<hr />
-<h3 id="dump_csv">dump_csv</h3>
-<pre><code class="python">spektral.utils.dump_csv(df, filename, convert=False)
-</code></pre>
-
-<p>Dumps a pd.DataFrame to csv.</p>
-<p><strong>Arguments</strong>  </p>
-<ul>
-<li>
-<p><code>df</code>: the pd.DataFrame to save or equivalent object</p>
-</li>
-<li>
-<p><code>filename</code>: a string or file-like object</p>
-</li>
-<li>
-<p><code>convert</code>: whether to attempt to convert the given object to
-pd.DataFrame before saving the csv.</p>
-</li>
-</ul>
-<hr />
-<h3 id="load_dot">load_dot</h3>
-<pre><code class="python">spektral.utils.load_dot(filename, force_graph=True)
-</code></pre>
-
-<p>Loads a graph saved in .dot format.</p>
-<p><strong>Arguments</strong>  </p>
-<ul>
-<li>
-<p><code>filename</code>: a string or file-like object</p>
-</li>
-<li>
-<p><code>force_graph</code>: whether to force a conversion to nx.Graph after loading.
-This may be useful in the case of .dot files being loaded as nx.MultiGraph.</p>
-</li>
-</ul>
-<p><strong>Return</strong><br />
- The loaded graph</p>
-<hr />
-<h3 id="dump_dot">dump_dot</h3>
-<pre><code class="python">spektral.utils.dump_dot(obj, filename)
-</code></pre>
-
-<p>Dumps a nx.Graph to .dot file</p>
-<p><strong>Arguments</strong>  </p>
-<ul>
-<li>
-<p><code>obj</code>: the nx.Graph (or equivalent) to save</p>
-</li>
-<li>
-<p><code>filename</code>: a string or file-like object</p>
-</li>
-</ul>
-<hr />
-<h3 id="load_npy">load_npy</h3>
-<pre><code class="python">spektral.utils.load_npy(filename)
-</code></pre>
-
-<p>Loads a file saved by np.save.</p>
-<p><strong>Arguments</strong>  </p>
-<ul>
-<li><code>filename</code>: a string or file-like object</li>
-</ul>
-<p><strong>Return</strong><br />
- The loaded object</p>
-<hr />
-<h3 id="dump_npy">dump_npy</h3>
-<pre><code class="python">spektral.utils.dump_npy(obj, filename, zipped=False)
-</code></pre>
-
-<p>Saves an object to file using the numpy format.</p>
-<p><strong>Arguments</strong>  </p>
-<ul>
-<li>
-<p><code>obj</code>: the object to save</p>
-</li>
-<li>
-<p><code>filename</code>: a string or file-like object</p>
-</li>
-<li>
-<p><code>zipped</code>: boolean, whether to save the object in the zipped format .npz
-rather than .npy</p>
-</li>
-</ul>
-<hr />
-<h3 id="load_txt">load_txt</h3>
-<pre><code class="python">spektral.utils.load_txt(filename)
-</code></pre>
-
-<p>Loads a txt file using np.genfromtxt.</p>
-<p><strong>Arguments</strong>  </p>
-<ul>
-<li><code>filename</code>: a string or file-like object</li>
-</ul>
-<p><strong>Return</strong><br />
- The loaded object</p>
-<hr />
-<h3 id="dump_txt">dump_txt</h3>
-<pre><code class="python">spektral.utils.dump_txt(obj, filename)
-</code></pre>
-
-<p>Saves an object to text file using np.savetxt.</p>
-<p><strong>Arguments</strong>  </p>
-<ul>
-<li>
-<p><code>obj</code>: the object to save</p>
-</li>
-<li>
-<p><code>filename</code>: a string or file-like object</p>
-</li>
-</ul>
-<hr />
-<h3 id="load_sdf">load_sdf</h3>
-<pre><code class="python">spektral.utils.load_sdf(filename, amount=None)
-</code></pre>
-
-<p>Load an .sdf file and return a list of molecules in the internal SDF format.</p>
-<p><strong>Arguments</strong>  </p>
-<ul>
-<li>
-<p><code>filename</code>: target SDF file</p>
-</li>
-<li>
-<p><code>amount</code>: only load the first <code>amount</code> molecules from the file</p>
-</li>
-</ul>
-<p><strong>Return</strong><br />
- A list of molecules in the internal SDF format (see documentation).</p>
+ A tuple with the requested matrices.</p>
               
             </div>
           </div>
@@ -414,10 +254,10 @@ rather than .npy</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../conversion/" class="btn btn-neutral float-right" title="Conversion">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../io/" class="btn btn-neutral float-right" title="Input/Ouput">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../data/" class="btn btn-neutral" title="Data"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../brain/" class="btn btn-neutral" title="Brain"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -445,10 +285,10 @@ rather than .npy</p>
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../data/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../../brain/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../conversion/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../io/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
