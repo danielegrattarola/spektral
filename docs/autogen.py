@@ -130,6 +130,15 @@ PAGES = [
         'classes': []
     },
     {
+        'page': 'utils/data.md',
+        'classes': [
+            utils.data.Batch
+        ],
+        'methods': [
+            utils.data.Batch.get
+        ]
+    },
+    {
         'page': 'utils/io.md',
         'functions': [
             utils.io.load_binary,
