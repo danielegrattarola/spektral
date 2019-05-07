@@ -1,77 +1,311 @@
 from keras import backend as K
-from keras.engine import Layer
 from keras import regularizers, constraints, initializers
+from keras.backend import tf
+from keras.engine import Layer
+
+from spektral.layers.ops import sparse_bool_mask, matrix_power
+
+
+################################################################################
+# Global pooling layers
+################################################################################
+class GlobalSumPool(Layer):
+    """
+    A global sum pooling layer. Pools a graph by computing the sum of its node
+    features.
+
+    **Mode**: single, mixed, batch, graph batch.
+
+    **Input**
+
+    - node features of shape `(n_nodes, n_features)` (with optional `batch`
+    dimension);
+    - (optional) graph IDs of shape `(n_nodes, )` (graph batch mode);
+
+    **Output**
+
+    - tensor like node features, but without node dimension (except for single
+    mode, where the node dimension is preserved and set to 1).
+
+    **Arguments**
+
+    None.
+
+    """
+    def __init__(self, **kwargs):
+        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
+            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
+        super(GlobalSumPool, self).__init__(**kwargs)
+        self.supports_masking = True
+
+    def build(self, input_shape):
+        if isinstance(input_shape, list) and len(input_shape) == 2:
+            self.data_mode = 'graph'
+        else:
+            if len(input_shape) == 2:
+                self.data_mode = 'single'
+            else:
+                self.data_mode = 'batch'
+        super(GlobalSumPool, self).build(input_shape)
+
+    def call(self, inputs):
+        if self.data_mode == 'graph':
+            X = inputs[0]
+            S = inputs[1]
+        else:
+            X = inputs
+
+        if self.data_mode == 'graph':
+            return tf.segment_sum(X, S)
+        else:
+            return K.sum(X, axis=-2, keepdims=(self.data_mode == 'single'))
+
+    def compute_output_shape(self, input_shape):
+        if self.data_mode == 'single':
+            return (1, ) + input_shape[-1:]
+        elif self.data_mode == 'batch':
+            return input_shape[:-2] + input_shape[-1:]
+        else:
+            return input_shape[0]
+
+    def get_config(self):
+        return super(GlobalSumPool, self).get_config()
+
+
+class GlobalAvgPool(Layer):
+    """
+    An average pooling layer. Pools a graph by computing the average of its node
+    features.
+
+    **Mode**: single, mixed, batch, graph batch.
+
+    **Input**
+
+    - node features of shape `(n_nodes, n_features)` (with optional `batch`
+    dimension);
+    - (optional) graph IDs of shape `(n_nodes, )` (graph batch mode);
+
+    **Output**
+
+    - tensor like node features, but without node dimension (except for single
+    mode, where the node dimension is preserved and set to 1).
+
+    **Arguments**
+
+    None.
+    """
+    def __init__(self, **kwargs):
+        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
+            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
+        super(GlobalAvgPool, self).__init__(**kwargs)
+        self.supports_masking = True
+
+    def build(self, input_shape):
+        if isinstance(input_shape, list) and len(input_shape) == 2:
+            self.data_mode = 'graph'
+        else:
+            if len(input_shape) == 2:
+                self.data_mode = 'single'
+            else:
+                self.data_mode = 'batch'
+        super(GlobalAvgPool, self).build(input_shape)
+
+    def call(self, inputs):
+        if self.data_mode == 'graph':
+            X = inputs[0]
+            S = inputs[1]
+        else:
+            X = inputs
+
+        if self.data_mode == 'graph':
+            return tf.segment_sum(X, S)
+        else:
+            return K.sum(X, axis=-2, keepdims=(self.data_mode == 'single'))
+
+    def compute_output_shape(self, input_shape):
+        if self.data_mode == 'single':
+            return (1, ) + input_shape[-1:]
+        elif self.data_mode == 'batch':
+            return input_shape[:-2] + input_shape[-1:]
+        else:
+            return input_shape[0]
+
+    def get_config(self):
+        return super(GlobalAvgPool, self).get_config()
+
+
+class GlobalMaxPool(Layer):
+    """
+    A max pooling layer. Pools a graph by computing the maximum of its node
+    features.
+
+    **Mode**: single, mixed, batch, graph batch.
+
+    **Input**
+
+    - node features of shape `(n_nodes, n_features)` (with optional `batch`
+    dimension);
+    - (optional) graph IDs of shape `(n_nodes, )` (graph batch mode);
+
+    **Output**
+
+    - tensor like node features, but without node dimension (except for single
+    mode, where the node dimension is preserved and set to 1).
+
+    **Arguments**
+
+    None.
+    """
+    def __init__(self, **kwargs):
+        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
+            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
+        super(GlobalMaxPool, self).__init__(**kwargs)
+        self.supports_masking = True
+
+    def build(self, input_shape):
+        if isinstance(input_shape, list) and len(input_shape) == 2:
+            self.data_mode = 'graph'
+        else:
+            if len(input_shape) == 2:
+                self.data_mode = 'single'
+            else:
+                self.data_mode = 'batch'
+        super(GlobalMaxPool, self).build(input_shape)
+
+    def call(self, inputs):
+        if self.data_mode == 'graph':
+            X = inputs[0]
+            S = inputs[1]
+        else:
+            X = inputs
+
+        if self.data_mode == 'graph':
+            return tf.segment_max(X, S)
+        else:
+            return K.max(X, axis=-2, keepdims=(self.data_mode == 'single'))
+
+    def compute_output_shape(self, input_shape):
+        if self.data_mode == 'single':
+            return (1, ) + input_shape[-1:]
+        elif self.data_mode == 'batch':
+            return input_shape[:-2] + input_shape[-1:]
+        else:
+            return input_shape[0]
+
+    def get_config(self):
+        return super(GlobalMaxPool, self).get_config()
 
 
 class GlobalAttentionPool(Layer):
     """
     A gated attention global pooling layer as presented by
     [Li et al. (2017)](https://arxiv.org/abs/1511.05493).
-    Note that this layer assumes the `'channels_last'` data format, and cannot
-    be used otherwise.
 
-    **Mode**: single, batch.
+    **Mode**: single, mixed, batch, graph batch.
 
     **Input**
 
-    - node features of shape `(batch, num_nodes, num_features)`, depending on
-    the mode;
+    - node features of shape `(n_nodes, n_features)` (with optional `batch`
+    dimension);
+    - (optional) graph IDs of shape `(n_nodes, )` (graph batch mode);
 
     **Output**
 
-    - a pooled feature matrix of shape `(batch, channels)`;
+    - tensor like node features, but without node dimension (except for single
+    mode, where the node dimension is preserved and set to 1), and last
+    dimension changed to `channels`.
 
     **Arguments**
 
     - `channels`: integer, number of output channels;
-    - `kernel_regularizer`: regularization applied to the gating networks;  
-
-    **Usage**
-
-    ```py
-    X = Input(shape=(num_nodes, num_features))
-    Z = GlobalAttentionPool(channels)(X)
-    ```
-        """
-    def __init__(self, channels=32, kernel_regularizer=None, **kwargs):
+    - `bias_initializer`: initializer for the bias vector;
+    - `kernel_regularizer`: regularization applied to the kernel matrix;
+    - `bias_regularizer`: regularization applied to the bias vector;
+    - `activity_regularizer`: regularization applied to the output;
+    - `kernel_constraint`: constraint applied to the kernel matrix;
+    - `bias_constraint`: constraint applied to the bias vector.
+    """
+    def __init__(self, channels=32,
+                 kernel_initializer='glorot_uniform',
+                 bias_initializer='zeros',
+                 kernel_regularizer=None,
+                 bias_regularizer=None,
+                 activity_regularizer=None,
+                 kernel_constraint=None,
+                 bias_constraint=None,
+                 **kwargs):
         if 'input_shape' not in kwargs and 'input_dim' in kwargs:
             kwargs['input_shape'] = (kwargs.pop('input_dim'),)
         super(GlobalAttentionPool, self).__init__(**kwargs)
         self.channels = channels
+        self.kernel_initializer = initializers.get(kernel_initializer)
         self.kernel_regularizer = regularizers.get(kernel_regularizer)
+        self.activity_regularizer = regularizers.get(activity_regularizer)
+        self.kernel_constraint = constraints.get(kernel_constraint)
+        self.kernel_initializer = initializers.get(kernel_initializer)
+        self.bias_initializer = initializers.get(bias_initializer)
+        self.kernel_regularizer = regularizers.get(kernel_regularizer)
+        self.bias_regularizer = regularizers.get(bias_regularizer)
+        self.activity_regularizer = regularizers.get(activity_regularizer)
+        self.kernel_constraint = constraints.get(kernel_constraint)
+        self.bias_constraint = constraints.get(bias_constraint)
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
-        self.lg_kernel = self.add_weight('LG_kernel',
-                                         (input_shape[-1], self.channels),
-                                         initializer='glorot_uniform',
-                                         regularizer=self.kernel_regularizer)
-        self.lg_bias = self.add_weight('LG_bias',
-                                       (self.channels,),
-                                       initializer='zeros')
-        self.attn_kernel = self.add_weight('attn_kernel',
-                                           (input_shape[-1], self.channels),
-                                           initializer='glorot_uniform',
-                                           regularizer=self.kernel_regularizer)
-        self.attn_bias = self.add_weight('attn_bias',
-                                         (self.channels,),
-                                         initializer='zeros')
+        if isinstance(input_shape, list) and len(input_shape) == 2:
+            self.data_mode = 'graph'
+            F = input_shape[0][-1]
+        else:
+            if len(input_shape) == 2:
+                self.data_mode = 'single'
+            else:
+                self.data_mode = 'batch'
+            F = input_shape[-1]
+        self.lg_kernel = self.add_weight(shape=(F, self.channels),
+                                         name='LG_kernel',
+                                         initializer=self.kernel_initializer,
+                                         regularizer=self.kernel_regularizer,
+                                         constraint=self.kernel_constraint)
+        self.lg_bias = self.add_weight(shape=(self.channels, ),
+                                       name='LG_bias',
+                                       initializer=self.bias_initializer,
+                                       regularizer=self.bias_regularizer,
+                                       constraint=self.bias_constraint)
+        self.attn_kernel = self.add_weight(shape=(F, self.channels),
+                                           name='attn_kernel',
+                                           initializer=self.kernel_initializer,
+                                           regularizer=self.kernel_regularizer,
+                                           constraint=self.kernel_constraint)
+        self.attn_bias = self.add_weight(shape=(self.channels,),
+                                         name='attn_bias',
+                                         initializer=self.bias_initializer,
+                                         regularizer=self.bias_regularizer,
+                                         constraint=self.bias_constraint)
         self.built = True
 
     def call(self, inputs):
-        # Note that the layer assumes the 'channels_last' data format.
-        inputs_linear = K.dot(inputs, self.lg_kernel) + self.lg_bias
-        attn_map = K.dot(inputs, self.attn_kernel) + self.attn_bias
+        if self.data_mode == 'graph':
+            X, S = inputs
+        else:
+            X = inputs
+        inputs_linear = K.dot(X, self.lg_kernel) + self.lg_bias
+        attn_map = K.dot(X, self.attn_kernel) + self.attn_bias
         attn_map = K.sigmoid(attn_map)
         masked_inputs = inputs_linear * attn_map
-        output = K.sum(masked_inputs, 1)
+        if self.data_mode in {'single', 'batch'}:
+            output = K.sum(masked_inputs, axis=-2, keepdims=self.data_mode=='single')
+        else:
+            output = tf.segment_sum(masked_inputs, S)
+
         return output
 
     def compute_output_shape(self, input_shape):
-        if len(input_shape) == 2:
-            return input_shape[:-1] + (self.channels,)
+        if self.data_mode == 'single':
+            return (1,) + input_shape[-1:]
+        elif self.data_mode == 'batch':
+            return input_shape[:-2] + input_shape[-1:]
         else:
-            return (input_shape[0], self.channels)
+            return input_shape[0]
 
     def get_config(self):
         config = {}
@@ -79,22 +313,23 @@ class GlobalAttentionPool(Layer):
         return dict(list(base_config.items()) + list(config.items()))
 
 
-class NodeAttentionPool(Layer):
+class GlobalAttnSumPool(Layer):
     """
     A node-attention global pooling layer. Pools a graph by learning attention
     coefficients to sum node features.
-    Note that this layer assumes the `'channels_last'` data format, and cannot
-    be used otherwise.
 
-    **Mode**: single, batch.
+    **Mode**: single, mixed, batch, graph batch.
 
     **Input**
 
-    - node features of shape `(batch, num_nodes, num_features)`;
+    - node features of shape `(n_nodes, n_features)` (with optional `batch`
+    dimension);
+    - (optional) graph IDs of shape `(n_nodes, )` (graph batch mode);
 
     **Output**
 
-    - a pooled feature matrix of shape `(batch, num_features)`;
+    - tensor like node features, but without node dimension (except for single
+    mode, where the node dimension is preserved and set to 1).
 
     **Arguments**
 
@@ -104,12 +339,6 @@ class NodeAttentionPool(Layer):
     matrix;
     - `attn_kernel_constraint`: constraint applied to the attention kernel
     matrix;
-
-    **Usage**
-    ```py
-    X = Input(shape=(num_nodes, num_features))
-    Z = NodeAttentionPool()(X)
-    ```
     """
     def __init__(self,
                  attn_kernel_initializer='glorot_uniform',
@@ -119,7 +348,7 @@ class NodeAttentionPool(Layer):
                  **kwargs):
         if 'input_shape' not in kwargs and 'input_dim' in kwargs:
             kwargs['input_shape'] = (kwargs.pop('input_dim'),)
-        super(NodeAttentionPool, self).__init__(**kwargs)
+        super(GlobalAttnSumPool, self).__init__(**kwargs)
         self.kernel_regularizer = regularizers.get(kernel_regularizer)
         self.attn_kernel_initializer = initializers.get(attn_kernel_initializer)
         self.attn_kernel_regularizer = regularizers.get(attn_kernel_regularizer)
@@ -127,8 +356,17 @@ class NodeAttentionPool(Layer):
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
+        if isinstance(input_shape, list) and len(input_shape) == 2:
+            self.data_mode = 'graph'
+            F = input_shape[0][-1]
+        else:
+            if len(input_shape) == 2:
+                self.data_mode = 'single'
+            else:
+                self.data_mode = 'batch'
+            F = input_shape[-1]
         # Attention kernels
-        self.attn_kernel = self.add_weight(shape=(input_shape[-1], 1),
+        self.attn_kernel = self.add_weight(shape=(F, 1),
                                            initializer=self.attn_kernel_initializer,
                                            regularizer=self.attn_kernel_regularizer,
                                            constraint=self.attn_kernel_constraint,
@@ -137,26 +375,33 @@ class NodeAttentionPool(Layer):
         self.built = True
 
     def call(self, inputs):
-        input_shape = K.int_shape(inputs)
-        # Note that the layer assumes the 'channels_last' data format.
-        features = K.dot(inputs, self.attn_kernel)
-        features = K.squeeze(features, -1)
-        attn_coeff = K.softmax(features)  # TODO: maybe sigmoid?
-        if len(input_shape) == 2:
-            output = K.dot(attn_coeff, inputs)
+        if self.data_mode == 'graph':
+            X, S = inputs
         else:
-            output = K.batch_dot(attn_coeff, inputs)
+            X = inputs
+        attn_coeff = K.dot(X, self.attn_kernel)
+        attn_coeff = K.squeeze(attn_coeff, -1)
+        attn_coeff = K.softmax(attn_coeff)
+        if self.data_mode == 'single':
+            output = K.dot(attn_coeff[None, ...], X)
+        elif self.data_mode == 'batch':
+            output = K.batch_dot(attn_coeff, X)
+        else:
+            output = attn_coeff[:, None] * X
+            output = tf.segment_sum(output, S)
 
         return output
 
     def compute_output_shape(self, input_shape):
-        if len(input_shape) == 2:
-            return input_shape[-1:]
+        if self.data_mode == 'single':
+            return (1,) + input_shape[-1:]
+        elif self.data_mode == 'batch':
+            return input_shape[:-2] + input_shape[-1:]
         else:
-            return (input_shape[0], input_shape[-1])
+            return input_shape[0]
 
     def get_config(self):
         config = {}
-        base_config = super(NodeAttentionPool, self).get_config()
+        base_config = super(GlobalAttnSumPool, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
