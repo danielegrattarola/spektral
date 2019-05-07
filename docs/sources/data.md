@@ -98,6 +98,23 @@ Out[4]: (50000, 784)
 
 ## Other formats
 
+
+### Graph batch mode
+
+When dealing with graphs with a variable number of nodes, representing a group of graphs in batch mode requires padding `A`, `X`, and `E` to a fixed dimension.  
+However, this introduces a noticeable computational load, and it forces all graphs to have the same memory cost. To solve this issue, a common approach is to represent a batch of graphs by taking their disjoint union, and then working with this "supergraph" in single mode.
+
+In order to compute the disjoint union of a batch of graphs: 
+
+1. We take a block diagonal matrix constructed from the adjacency matrices in the batch;
+2. We stack node features together along the node dimension;
+3. We take a block diagonal matrix constructed from the edge features matrices in the batch (if S > 1, we compute a block diagonal matrix for each element of the features, and then stack those along the last dimension).
+
+![](https://danielegrattarola.github.io/spektral/img/graph_batch.svg)
+
+
+### Conversion methods
+
 To provide better compatibility with other libraries, Spektral has methods to convert graphs between the matrix representation (`'numpy'`) and other formats. 
 
 The `'networkx'` format represents graphs using the Networkx library, which can then be used to [convert the graphs](https://networkx.github.io/documentation/networkx-1.10/reference/convert.html) to other formats like `.dot` and edge lists. 

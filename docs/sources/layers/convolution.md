@@ -1,4 +1,4 @@
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L8)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L9)</span>
 ### GraphConv
 
 ```python
@@ -20,11 +20,11 @@ the activation function.
 
 **Input**
 
-- node features of shape `(batch, num_nodes, num_features)`, depending on the
-mode;
-- Laplacians of shape `(batch, num_nodes, num_nodes)`, depending on the mode.
-The Laplacians can be computed from the adjacency matrices like in the
-original paper using `utils.convolution.localpooling_filter`.
+- node features of shape `(n_nodes, n_features)` (with optional `batch`
+dimension);
+- Laplacian of shape `(n_nodes, n_nodes)` (with optional `batch` dimension);
+The Laplacian approximation can be computed from the adjacency matrix like
+in the original paper using `spektral.utils.convolution.localpooling_filter`.
 
 **Output**
 
@@ -58,7 +58,7 @@ model.fit([node_features, fltr], y)
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L141)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L142)</span>
 ### ChebConv
 
 ```python
@@ -80,12 +80,12 @@ where \(X\) is the node features matrix, \(W\) is the convolution kernel,
 
 **Input**
 
-- node features of shape `(batch, num_nodes, num_features)`, depending on the
-mode;
-- a list of Chebyshev filters of shape `(batch, num_nodes, num_nodes)`,
-depending on the mode.
-The filters can be generated from the adjacency matrices using
-`utils.convolution.chebyshev_filter`.
+- node features of shape `(n_nodes, n_features)` (with optional `batch`
+dimension);
+- a list of Chebyshev polynomials of shape `(num_nodes, num_nodes)` (with
+optional `batch` dimension)
+The filters can be generated from the adjacency matrix using
+`spektral.utils.convolution.chebyshev_filter`.
 
 **Output**
 
@@ -146,10 +146,11 @@ trainable kernels.
 
 **Input**
 
-- node features of shape `(batch, num_nodes, num_features)`, depending on the
-mode;
-- normalized Laplacians of shape `(batch, num_nodes, num_nodes)`, depending
-on the mode.
+- node features of shape `(n_nodes, n_features)` (with optional `batch`
+dimension);
+- Laplacian of shape `(n_nodes, n_nodes)` (with optional `batch` dimension);
+The Laplacian approximation can be computed from the adjacency matrix using
+the methods in `spektral.utils.convolutions` (see examples/node_classification_arma.py).
 
 **Output**
 
@@ -178,8 +179,8 @@ changed to `channels`.
 ```py
 fltr = localpooling_filter(adj)
 ...
-X = Input(shape=(num_nodes, num_features))
-filter = Input((num_nodes, num_nodes))
+X = Input(shape=(n_nodes, n_features))
+filter = Input((n_nodes, n_nodes))
 Z = ARMAConv(channels, activation='relu')([X, filter])
 ...
 model.fit([node_features, fltr], y)
@@ -187,7 +188,7 @@ model.fit([node_features, fltr], y)
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L279)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L280)</span>
 ### EdgeConditionedConv
 
 ```python
@@ -212,12 +213,9 @@ is a bias vector.
 
 **Input**
 
-- node features of shape `(batch, num_nodes, num_node_features)`, depending
-on the mode;
-- adjacency matrices of shape `(batch, num_nodes, num_nodes)`, depending on
-the mode.
-- edge features of shape `(batch, num_nodes, num_nodes, num_edge_features)`,
-depending on the mode.
+- node features of shape `(batch, n_nodes, n_node_features)`;
+- adjacency matrices of shape `(batch, n_nodes, num_nodes)`;
+- edge features of shape `(batch, n_nodes, n_nodes, n_edge_features)`;
 
 **Output**
 
@@ -254,7 +252,7 @@ model.fit([node_features, adj, edge_features], y)
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L474)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L472)</span>
 ### GraphAttention
 
 ```python
@@ -273,8 +271,10 @@ using the normalized Laplacian.
 
 **Input**
 
-- node features of shape `(num_nodes, num_features)`;
-- adjacency matrices of shape `(num_nodes, num_nodes)`;
+- node features of shape `(n_nodes, n_features)` (with optional `batch`
+dimension);
+- adjacency matrices of shape `(n_nodes, n_nodes)` (with optional `batch`
+dimension);
 
 **Output**
 
@@ -307,8 +307,8 @@ matrices;
 ```py
 adj = normalize_sum_to_unity(adj)
 ...
-X = Input(shape=(num_nodes, num_features))
-A = Input((num_nodes, num_nodes))
+X = Input(shape=(n_nodes, n_features))
+A = Input((n_nodes, n_nodes))
 Z = GraphAttention(channels, activation='relu')([X, A])
 ...
 model.fit([node_features, fltr], y)
@@ -341,13 +341,13 @@ and \(\sigma\) is the activation function.
 
 **Input**
 
-- node features of shape `(batch, num_nodes, num_features)`, depending on the
-mode;
-- node features for the skip connection of shape
-`(batch, num_nodes, num_features)`, depending on the mode;
-- Laplacians of shape `(batch, num_nodes, num_nodes)`, depending on the mode.
-The Laplacians can be computed from the adjacency matrices using
-`utils.convolution.localpooling_filter`.
+- node features of shape `(n_nodes, n_features)` (with optional `batch`
+dimension);
+- node features for the skip connection, of shape `(n_nodes, n_features)`
+(with optional `batch` dimension);
+- Laplacian of shape `(n_nodes, n_nodes)` (with optional `batch` dimension);
+The Laplacian approximation can be computed from the adjacency matrix like
+in the original paper using `spektral.utils.convolution.localpooling_filter`.
 
 **Output**
 
@@ -369,15 +369,15 @@ changed to `channels`.
 
 **Usage**
 ```py
-X = Input(shape=(num_nodes, num_features))
-X_0 = Input(shape=(num_nodes, num_features))
-filter = Input((num_nodes, num_nodes))
+X = Input(shape=(n_nodes, n_features))
+X_0 = Input(shape=(n_nodes, n_features))
+filter = Input((n_nodes, n_nodes))
 Z = GraphConvSkip(channels, activation='relu')([X, X_0, filter])
 ```
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L1173)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L1174)</span>
 ### APPNP
 
 ```python
@@ -393,10 +393,11 @@ Implementation by Filippo Bianchi.
 
 **Input**
 
-- node features of shape `(batch, num_nodes, num_features)`, depending on the
-mode;
-- normalized Laplacians of shape `(batch, num_nodes, num_nodes)`, depending
-on the mode.
+- node features of shape `(n_nodes, n_features)` (with optional `batch`
+dimension);
+- Laplacian of shape `(n_nodes, n_nodes)` (with optional `batch` dimension);
+The Laplacian approximation can be computed from the adjacency matrix using
+the methods in `spektral.utils.convolutions` (see examples/node_classification_arma.py).
 
 **Output**
 
@@ -427,8 +428,8 @@ changed to `channels`.
 I = sp.identity(adj.shape[0], dtype=adj.dtype)
 fltr = utils.normalize_adjacency(adj + I)
 ...
-X = Input(shape=(num_nodes, num_features))
-filter = Input((num_nodes, num_nodes))
+X = Input(shape=(n_nodes, n_features))
+filter = Input((n_nodes, n_nodes))
 Z = APPNP(channels, mlp_channels)([X, filter])
 ...
 model.fit([node_features, fltr], y)
