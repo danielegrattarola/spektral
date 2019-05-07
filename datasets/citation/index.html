@@ -26,7 +26,6 @@
   <script src="../../js/jquery-2.1.1.min.js" defer></script>
   <script src="../../js/modernizr-2.8.3.min.js" defer></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/python.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
   
   <script>
@@ -210,15 +209,20 @@
             <div class="section">
               
                 <h3 id="load_data">load_data</h3>
-<pre><code class="python">spektral.datasets.citation.load_data(dataset_name='cora')
+<pre><code class="python">spektral.datasets.citation.load_data(dataset_name='cora', normalize_features=True)
 </code></pre>
 
 <p>Loads a citation dataset using the public splits as defined in
 <a href="https://arxiv.org/abs/1609.02907">Kipf &amp; Welling (2016)</a>.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
-<li><code>dataset_name</code>: name of the dataset to load ('cora', 'citeseer', or
-'pubmed').</li>
+<li>
+<p><code>dataset_name</code>: name of the dataset to load ('cora', 'citeseer', or
+'pubmed');</p>
+</li>
+<li>
+<p><code>normalize_features</code>: if True, the node features are normalized;</p>
+</li>
 </ul>
 <p><strong>Return</strong><br />
  The citation network in numpy format, with train, test, and

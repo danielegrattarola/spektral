@@ -26,7 +26,6 @@
   <script src="../js/jquery-2.1.1.min.js" defer></script>
   <script src="../js/modernizr-2.8.3.min.js" defer></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/python.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
   
   <script>
@@ -79,6 +78,10 @@
     <li class="toctree-l2"><a href="#other-formats">Other formats</a></li>
     
         <ul>
+        
+            <li><a class="toctree-l3" href="#graph-batch-mode">Graph batch mode</a></li>
+        
+            <li><a class="toctree-l3" href="#conversion-methods">Conversion methods</a></li>
         
             <li><a class="toctree-l3" href="#molecules">Molecules</a></li>
         
@@ -318,7 +321,19 @@ In [4]: nf.shape
 Out[4]: (50000, 784)
 </code></pre>
 
+<hr />
 <h2 id="other-formats">Other formats</h2>
+<h3 id="graph-batch-mode">Graph batch mode</h3>
+<p>When dealing with graphs with a variable number of nodes, representing a group of graphs in batch mode requires padding <code>A</code>, <code>X</code>, and <code>E</code> to a fixed dimension.<br />
+However, this introduces a noticeable computational load, and it forces all graphs to have the same memory cost. To solve this issue, a common approach is to represent a batch of graphs by taking their disjoint union, and then working with this "supergraph" in single mode.</p>
+<p>In order to compute the disjoint union of a batch of graphs: </p>
+<ol>
+<li>We take a block diagonal matrix constructed from the adjacency matrices in the batch;</li>
+<li>We stack node features together along the node dimension;</li>
+<li>We take a block diagonal matrix constructed from the edge features matrices in the batch (if S &gt; 1, we compute a block diagonal matrix for each element of the features, and then stack those along the last dimension).</li>
+</ol>
+<p><img alt="" src="https://danielegrattarola.github.io/spektral/img/graph_batch.svg" /></p>
+<h3 id="conversion-methods">Conversion methods</h3>
 <p>To provide better compatibility with other libraries, Spektral has methods to convert graphs between the matrix representation (<code>'numpy'</code>) and other formats. </p>
 <p>The <code>'networkx'</code> format represents graphs using the Networkx library, which can then be used to <a href="https://networkx.github.io/documentation/networkx-1.10/reference/convert.html">convert the graphs</a> to other formats like <code>.dot</code> and edge lists. 
 Conversion methods between <code>'numpy'</code> and <code>'networkx'</code> are provided in <code>spektral.utils.conversion</code>.</p>
