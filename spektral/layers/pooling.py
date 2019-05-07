@@ -3,8 +3,6 @@ from keras import regularizers, constraints, initializers
 from keras.backend import tf
 from keras.engine import Layer
 
-from spektral.layers.ops import sparse_bool_mask, matrix_power
-
 
 ################################################################################
 # Global pooling layers
@@ -51,12 +49,12 @@ class GlobalSumPool(Layer):
     def call(self, inputs):
         if self.data_mode == 'graph':
             X = inputs[0]
-            S = inputs[1]
+            I = inputs[1]
         else:
             X = inputs
 
         if self.data_mode == 'graph':
-            return tf.segment_sum(X, S)
+            return tf.segment_sum(X, I)
         else:
             return K.sum(X, axis=-2, keepdims=(self.data_mode == 'single'))
 
@@ -113,12 +111,12 @@ class GlobalAvgPool(Layer):
     def call(self, inputs):
         if self.data_mode == 'graph':
             X = inputs[0]
-            S = inputs[1]
+            I = inputs[1]
         else:
             X = inputs
 
         if self.data_mode == 'graph':
-            return tf.segment_sum(X, S)
+            return tf.segment_sum(X, I)
         else:
             return K.sum(X, axis=-2, keepdims=(self.data_mode == 'single'))
 
@@ -175,12 +173,12 @@ class GlobalMaxPool(Layer):
     def call(self, inputs):
         if self.data_mode == 'graph':
             X = inputs[0]
-            S = inputs[1]
+            I = inputs[1]
         else:
             X = inputs
 
         if self.data_mode == 'graph':
-            return tf.segment_max(X, S)
+            return tf.segment_max(X, I)
         else:
             return K.max(X, axis=-2, keepdims=(self.data_mode == 'single'))
 
@@ -285,7 +283,7 @@ class GlobalAttentionPool(Layer):
 
     def call(self, inputs):
         if self.data_mode == 'graph':
-            X, S = inputs
+            X, I = inputs
         else:
             X = inputs
         inputs_linear = K.dot(X, self.lg_kernel) + self.lg_bias
@@ -295,7 +293,7 @@ class GlobalAttentionPool(Layer):
         if self.data_mode in {'single', 'batch'}:
             output = K.sum(masked_inputs, axis=-2, keepdims=self.data_mode=='single')
         else:
-            output = tf.segment_sum(masked_inputs, S)
+            output = tf.segment_sum(masked_inputs, I)
 
         return output
 
@@ -376,7 +374,7 @@ class GlobalAttnSumPool(Layer):
 
     def call(self, inputs):
         if self.data_mode == 'graph':
-            X, S = inputs
+            X, I = inputs
         else:
             X = inputs
         attn_coeff = K.dot(X, self.attn_kernel)
@@ -388,7 +386,7 @@ class GlobalAttnSumPool(Layer):
             output = K.batch_dot(attn_coeff, X)
         else:
             output = attn_coeff[:, None] * X
-            output = tf.segment_sum(output, S)
+            output = tf.segment_sum(output, I)
 
         return output
 

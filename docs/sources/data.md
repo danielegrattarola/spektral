@@ -101,8 +101,10 @@ Out[4]: (50000, 784)
 
 ### Graph batch mode
 
+![](https://danielegrattarola.github.io/spektral/img/graph_batch.svg)
+
 When dealing with graphs with a variable number of nodes, representing a group of graphs in batch mode requires padding `A`, `X`, and `E` to a fixed dimension.  
-However, this introduces a noticeable computational load, and it forces all graphs to have the same memory cost. To solve this issue, a common approach is to represent a batch of graphs by taking their disjoint union, and then working with this "supergraph" in single mode.
+In order to avoid this issue, a common approach is to represent a batch of graphs by taking their disjoint union, and then working with this "supergraph" in single mode.
 
 In order to compute the disjoint union of a batch of graphs: 
 
@@ -110,7 +112,60 @@ In order to compute the disjoint union of a batch of graphs:
 2. We stack node features together along the node dimension;
 3. We take a block diagonal matrix constructed from the edge features matrices in the batch (if S > 1, we compute a block diagonal matrix for each element of the features, and then stack those along the last dimension).
 
-![](https://danielegrattarola.github.io/spektral/img/graph_batch.svg)
+Additionally, we also keep track of which nodes belong to which graphs by having a vector of integer indices mapping each node to a number between 0 and the batch size.  
+Utilities for dealing with this alternative representation of graph batches are provided in `spektral.data`:
+
+```py
+In [1]: from spektral.data import Batch                                                               
+Using TensorFlow backend.
+
+In [2]: from spektral.data import Batch 
+   ...: A_list = [np.ones((2, 2))] * 3                                                                
+
+In [3]: X_list = [np.random.normal(size=(2, 4))] * 3                                                  
+
+In [4]: b = Batch(A_list, X_list)                                                                     
+
+In [5]: b.A.todense()                                                                                 
+Out[5]: 
+matrix([[1., 1., 0., 0., 0., 0.],
+        [1., 1., 0., 0., 0., 0.],
+        [0., 0., 1., 1., 0., 0.],
+        [0., 0., 1., 1., 0., 0.],
+        [0., 0., 0., 0., 1., 1.],
+        [0., 0., 0., 0., 1., 1.]])
+
+In [6]: b.X                                                                                           
+Out[6]: 
+array([[-0.85196709, -1.66795384, -1.14046868,  0.4735151 ],
+       [ 0.14221143, -0.76473164, -1.05635638,  1.45961459],
+       [-0.85196709, -1.66795384, -1.14046868,  0.4735151 ],
+       [ 0.14221143, -0.76473164, -1.05635638,  1.45961459],
+       [-0.85196709, -1.66795384, -1.14046868,  0.4735151 ],
+       [ 0.14221143, -0.76473164, -1.05635638,  1.45961459]])
+
+In [7]: b.I                                                                                           
+Out[7]: array([0, 0, 1, 1, 2, 2])
+
+In [8]: b.get('AXI')                                                                                  
+Out[8]: 
+(<6x6 sparse matrix of type '<class 'numpy.float64'>'
+  with 12 stored elements in COOrdinate format>,
+ array([[-0.85196709, -1.66795384, -1.14046868,  0.4735151 ],
+        [ 0.14221143, -0.76473164, -1.05635638,  1.45961459],
+        [-0.85196709, -1.66795384, -1.14046868,  0.4735151 ],
+        [ 0.14221143, -0.76473164, -1.05635638,  1.45961459],
+        [-0.85196709, -1.66795384, -1.14046868,  0.4735151 ],
+        [ 0.14221143, -0.76473164, -1.05635638,  1.45961459]]),
+ array([0, 0, 1, 1, 2, 2]))
+```
+
+|WARNING|
+|:------|
+| Note that support for edge attributes is not yet implemented in the current version of `Batch` |
+
+Convolutional layers that work in single mode will work for this type of data representation without any modification.  
+Pooling layers, on the other hand, require the batch indices vector in order to know which nodes to pool together. Global pooling layers will consume the indices vector and they will not return it as output, while standard pooling layers will also return a reduced version of the vector. 
 
 
 ### Conversion methods
