@@ -1,63 +1,154 @@
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L6)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L12)</span>
+### GlobalSumPool
+
+```python
+spektral.layers.GlobalSumPool()
+```
+
+
+A global sum pooling layer. Pools a graph by computing the sum of its node
+features.
+
+**Mode**: single, mixed, batch, graph batch.
+
+**Input**
+
+- node features of shape `(n_nodes, n_features)` (with optional `batch`
+dimension);
+- (optional) graph IDs of shape `(n_nodes, )` (graph batch mode);
+
+**Output**
+
+- tensor like node features, but without node dimension (except for single
+mode, where the node dimension is preserved and set to 1).
+
+**Arguments**
+
+None.
+
+
+----
+
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L75)</span>
+### GlobalAvgPool
+
+```python
+spektral.layers.GlobalAvgPool()
+```
+
+
+An average pooling layer. Pools a graph by computing the average of its node
+features.
+
+**Mode**: single, mixed, batch, graph batch.
+
+**Input**
+
+- node features of shape `(n_nodes, n_features)` (with optional `batch`
+dimension);
+- (optional) graph IDs of shape `(n_nodes, )` (graph batch mode);
+
+**Output**
+
+- tensor like node features, but without node dimension (except for single
+mode, where the node dimension is preserved and set to 1).
+
+**Arguments**
+
+None.
+
+----
+
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L137)</span>
+### GlobalMaxPool
+
+```python
+spektral.layers.GlobalMaxPool()
+```
+
+
+A max pooling layer. Pools a graph by computing the maximum of its node
+features.
+
+**Mode**: single, mixed, batch, graph batch.
+
+**Input**
+
+- node features of shape `(n_nodes, n_features)` (with optional `batch`
+dimension);
+- (optional) graph IDs of shape `(n_nodes, )` (graph batch mode);
+
+**Output**
+
+- tensor like node features, but without node dimension (except for single
+mode, where the node dimension is preserved and set to 1).
+
+**Arguments**
+
+None.
+
+----
+
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L199)</span>
 ### GlobalAttentionPool
 
 ```python
-spektral.layers.GlobalAttentionPool(channels=32, kernel_regularizer=None)
+spektral.layers.GlobalAttentionPool(channels=32, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 ```
 
 
 A gated attention global pooling layer as presented by
 [Li et al. (2017)](https://arxiv.org/abs/1511.05493).
-Note that this layer assumes the `'channels_last'` data format, and cannot
-be used otherwise.
 
-**Mode**: single, batch.
+**Mode**: single, mixed, batch, graph batch.
 
 **Input**
 
-- node features of shape `(batch, num_nodes, num_features)`, depending on
-the mode;
+- node features of shape `(n_nodes, n_features)` (with optional `batch`
+dimension);
+- (optional) graph IDs of shape `(n_nodes, )` (graph batch mode);
 
 **Output**
 
-- a pooled feature matrix of shape `(batch, channels)`;
+- tensor like node features, but without node dimension (except for single
+mode, where the node dimension is preserved and set to 1), and last
+dimension changed to `channels`.
 
 **Arguments**
 
 - `channels`: integer, number of output channels;
-- `kernel_regularizer`: regularization applied to the gating networks;  
-
-**Usage**
-
-```py
-X = Input(shape=(num_nodes, num_features))
-Z = GlobalAttentionPool(channels)(X)
-```
+- `bias_initializer`: initializer for the bias vector;
+- `kernel_regularizer`: regularization applied to the kernel matrix;
+- `bias_regularizer`: regularization applied to the bias vector;
+- `activity_regularizer`: regularization applied to the output;
+- `kernel_constraint`: constraint applied to the kernel matrix;
+- `bias_constraint`: constraint applied to the bias vector.
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L82)</span>
-### NodeAttentionPool
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L316)</span>
+### GlobalAttnSumPool
 
 ```python
-spektral.layers.NodeAttentionPool(attn_kernel_initializer='glorot_uniform', kernel_regularizer=None, attn_kernel_regularizer=None, attn_kernel_constraint=None)
+spektral.layers.GlobalAttnSumPool(attn_kernel_initializer='glorot_uniform', kernel_regularizer=None, attn_kernel_regularizer=None, attn_kernel_constraint=None)
 ```
 
 
 A node-attention global pooling layer. Pools a graph by learning attention
 coefficients to sum node features.
-Note that this layer assumes the `'channels_last'` data format, and cannot
-be used otherwise.
 
-**Mode**: single, batch.
+**Mode**: single, mixed, batch, graph batch.
 
 **Input**
 
-- node features of shape `(batch, num_nodes, num_features)`;
+- node features of shape `(n_nodes, n_features)` (with optional `batch`
+dimension);
+- (optional) graph IDs of shape `(n_nodes, )` (graph batch mode);
 
 **Output**
 
-- a pooled feature matrix of shape `(batch, num_features)`;
+- tensor like node features, but without node dimension (except for single
+mode, where the node dimension is preserved and set to 1).
 
 **Arguments**
 
@@ -67,9 +158,3 @@ be used otherwise.
 matrix;
 - `attn_kernel_constraint`: constraint applied to the attention kernel
 matrix;
-
-**Usage**
-```py
-X = Input(shape=(num_nodes, num_features))
-Z = NodeAttentionPool()(X)
-```

@@ -6,7 +6,7 @@ library to be installed on the system.
 
 
 ```python
-spektral.brain.get_fc(x, band_freq, sampling_freq, samples_per_graph=None, fc_measure='corr', link_cutoff=0.0, percentiles=None, band_freq_hi=(20.0, 45.0), nfft=128, n_overlap=64, njobs=1)
+spektral.brain.get_fc(x, band_freq, sampling_freq, samples_per_graph=None, fc_measure='corr', link_cutoff=0.0, percentiles=None, band_freq_hi=(20.0, 45.0), nfft=128, n_overlap=64, nf_mode='mean', self_loops=True, njobs=1)
 ```
 
 
@@ -25,7 +25,9 @@ Build functional connectivity networks from the given data stream.
 default, the whole stream is used. If provided, 
 1 + (n_samples / samples_per_graph) will be generated;
 
-- ` fc_measure`: functional connectivity measure to use;
+- ` fc_measure`: functional connectivity measure to use. Possible measures
+are: iplv, icoh, corr, aec, wpli, dwpli, dpli (see documentation of
+Dyfunconn);
 
 - ` link_cutoff`: links with absolute FC measure below this value will be
 removed;
@@ -39,6 +41,10 @@ each edge). Note that this option ignores `link_cutoff`.
 - ` nfft`: TODO, affects 'wpli' and 'dwpli';
 
 - ` n_overlap`: TODO, affects 'wpli' and 'dwpli';
+param nf_mode: how to compute node features. Possible modes are: full,
+mean, energy, ones.
+
+- ` self_loops`: add self loops to FC networks;
 
 - ` njobs`: number of processes to use (-1 to use all available cores);
 
