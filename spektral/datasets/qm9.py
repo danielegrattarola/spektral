@@ -13,9 +13,9 @@ DATASET_URL = 'http://deepchem.io.s3-website-us-west-1.amazonaws.com/datasets/gd
 RETURN_TYPES = {'numpy', 'networkx', 'sdf'}
 NODE_FEATURES = ['atomic_num', 'charge', 'coords', 'iso']
 EDGE_FEATURES = ['type', 'stereo']
-NF_PROCESSING = [None] * 6  # [label_to_one_hot_closure([6, 7, 8, 9])]
-EF_PROCESSING = [None]      # [int_to_one_hot_closure(4)]
-MAX_K = 9                   # Maximum number of nodes in a graph
+NF_PROCESSING = [None] * len(NODE_FEATURES)
+EF_PROCESSING = [None] * len(EDGE_FEATURES)
+MAX_K = 9
 
 
 def load_data(return_type='numpy', nf_keys=None, ef_keys=None, auto_pad=True,
@@ -52,6 +52,8 @@ def load_data(return_type='numpy', nf_keys=None, ef_keys=None, auto_pad=True,
     # Load labels
     labels_file = os.path.join(DATA_PATH, 'qm9.sdf.csv')
     labels = load_csv(labels_file)
+    if amount is not None:
+        labels = labels[:amount]
     if return_type is 'sdf':
         return data, labels
     else:
