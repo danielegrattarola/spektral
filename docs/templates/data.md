@@ -113,14 +113,13 @@ In order to compute the disjoint union of a batch of graphs:
 3. We take a block diagonal matrix constructed from the edge features matrices in the batch (if S > 1, we compute a block diagonal matrix for each element of the features, and then stack those along the last dimension).
 
 Additionally, we also keep track of which nodes belong to which graphs by having a vector of integer indices mapping each node to a number between 0 and the batch size.  
-Utilities for dealing with this alternative representation of graph batches are provided in `spektral.data`:
+Utilities for dealing with this alternative representation of graph batches are provided in `spektral.utils.data`:
 
 ```py
 In [1]: from spektral.utils.data import Batch                                                               
 Using TensorFlow backend.
 
-In [2]: from spektral.data import Batch 
-   ...: A_list = [np.ones((2, 2))] * 3                                                                
+In [2]: A_list = [np.ones((2, 2))] * 3                                                                
 
 In [3]: X_list = [np.random.normal(size=(2, 4))] * 3                                                  
 
