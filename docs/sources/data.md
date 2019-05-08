@@ -116,7 +116,7 @@ Additionally, we also keep track of which nodes belong to which graphs by having
 Utilities for dealing with this alternative representation of graph batches are provided in `spektral.data`:
 
 ```py
-In [1]: from spektral.data import Batch                                                               
+In [1]: from spektral.utils.data import Batch                                                               
 Using TensorFlow backend.
 
 In [2]: from spektral.data import Batch 
