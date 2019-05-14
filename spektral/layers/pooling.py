@@ -116,9 +116,9 @@ class GlobalAvgPool(Layer):
             X = inputs
 
         if self.data_mode == 'graph':
-            return tf.segment_sum(X, I)
+            return tf.segment_mean(X, I)
         else:
-            return K.sum(X, axis=-2, keepdims=(self.data_mode == 'single'))
+            return K.mean(X, axis=-2, keepdims=(self.data_mode == 'single'))
 
     def compute_output_shape(self, input_shape):
         if self.data_mode == 'single':
