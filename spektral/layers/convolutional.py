@@ -133,7 +133,8 @@ class GraphConv(Layer):
             'bias_regularizer': regularizers.serialize(self.bias_regularizer),
             'activity_regularizer': regularizers.serialize(self.activity_regularizer),
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
-            'bias_constraint': constraints.serialize(self.bias_constraint)
+            'bias_constraint': constraints.serialize(self.bias_constraint),
+            'supports_masking': self.supports_masking
         }
         base_config = super(GraphConv, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
@@ -271,7 +272,8 @@ class ChebConv(Layer):
             'bias_regularizer': regularizers.serialize(self.bias_regularizer),
             'activity_regularizer': regularizers.serialize(self.activity_regularizer),
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
-            'bias_constraint': constraints.serialize(self.bias_constraint)
+            'bias_constraint': constraints.serialize(self.bias_constraint),
+            'supports_masking': self.supports_masking
         }
         base_config = super(ChebConv, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
@@ -433,7 +435,8 @@ class EdgeConditionedConv(Layer):
             'bias_regularizer': regularizers.serialize(self.bias_regularizer),
             'activity_regularizer': regularizers.serialize(self.activity_regularizer),
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
-            'bias_constraint': constraints.serialize(self.bias_constraint)
+            'bias_constraint': constraints.serialize(self.bias_constraint),
+            'supports_masking': self.supports_masking
         }
         base_config = super(EdgeConditionedConv, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
@@ -552,16 +555,13 @@ class GraphAttention(Layer):
         self.dropout_rate = dropout_rate
         self.activation = activations.get(activation)
         self.use_bias = use_bias
-
         self.kernel_initializer = initializers.get(kernel_initializer)
         self.bias_initializer = initializers.get(bias_initializer)
         self.attn_kernel_initializer = initializers.get(attn_kernel_initializer)
-
         self.kernel_regularizer = regularizers.get(kernel_regularizer)
         self.bias_regularizer = regularizers.get(bias_regularizer)
         self.attn_kernel_regularizer = regularizers.get(attn_kernel_regularizer)
         self.activity_regularizer = regularizers.get(activity_regularizer)
-
         self.kernel_constraint = constraints.get(kernel_constraint)
         self.bias_constraint = constraints.get(bias_constraint)
         self.attn_kernel_constraint = constraints.get(attn_kernel_constraint)
@@ -682,15 +682,21 @@ class GraphAttention(Layer):
         config = {
             'channels': self.channels,
             'attn_heads': self.attn_heads,
+            'attn_heads_reduction': self.attn_heads_reduction,
             'dropout_rate': self.dropout_rate,
             'activation': activations.serialize(self.activation),
+            'use_bias': self.use_bias,
             'kernel_initializer': initializers.serialize(self.kernel_initializer),
-            'att_kernel_initializer': initializers.serialize(self.attn_kernel_initializer),
+            'bias_initializer': initializers.serialize(self.bias_initializer),
+            'attn_kernel_initializer': initializers.serialize(self.attn_kernel_initializer),
             'kernel_regularizer': regularizers.serialize(self.kernel_regularizer),
+            'bias_regularizer': regularizers.serialize(self.bias_regularizer),
             'attn_kernel_regularizer': regularizers.serialize(self.attn_kernel_regularizer),
             'activity_regularizer': regularizers.serialize(self.activity_regularizer),
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
+            'bias_constraint': constraints.serialize(self.bias_constraint),
             'attn_kernel_constraint': constraints.serialize(self.attn_kernel_constraint),
+            'supports_masking': self.supports_masking
         }
         base_config = super(GraphAttention, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
@@ -837,7 +843,8 @@ class GraphConvSkip(Layer):
             'bias_regularizer': regularizers.serialize(self.bias_regularizer),
             'activity_regularizer': regularizers.serialize(self.activity_regularizer),
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
-            'bias_constraint': constraints.serialize(self.bias_constraint)
+            'bias_constraint': constraints.serialize(self.bias_constraint),
+            'supports_masking': self.supports_masking
         }
         base_config = super(GraphConvSkip, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
@@ -1029,9 +1036,9 @@ class ARMAConv(Layer):
             'ARMA_D': self.ARMA_D,
             'ARMA_K': self.ARMA_K,
             'recurrent': self.recurrent,
+            'activation': activations.serialize(self.activation),
             'gcn_activation': activations.serialize(self.gcn_activation),
             'dropout_rate': self.dropout_rate,
-            'activation': activations.serialize(self.activation),
             'use_bias': self.use_bias,
             'kernel_initializer': initializers.serialize(self.kernel_initializer),
             'bias_initializer': initializers.serialize(self.bias_initializer),
@@ -1039,7 +1046,8 @@ class ARMAConv(Layer):
             'bias_regularizer': regularizers.serialize(self.bias_regularizer),
             'activity_regularizer': regularizers.serialize(self.activity_regularizer),
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
-            'bias_constraint': constraints.serialize(self.bias_constraint)
+            'bias_constraint': constraints.serialize(self.bias_constraint),
+            'supports_masking': self.supports_masking
         }
         base_config = super(ARMAConv, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
@@ -1354,8 +1362,8 @@ class APPNP(Layer):
             'H': self.H,
             'K': self.K,
             'mlp_activation': activations.serialize(self.mlp_activation),
-            'dropout_rate': self.dropout_rate,
             'activation': activations.serialize(self.activation),
+            'dropout_rate': self.dropout_rate,
             'use_bias': self.use_bias,
             'kernel_initializer': initializers.serialize(self.kernel_initializer),
             'bias_initializer': initializers.serialize(self.bias_initializer),
@@ -1363,7 +1371,8 @@ class APPNP(Layer):
             'bias_regularizer': regularizers.serialize(self.bias_regularizer),
             'activity_regularizer': regularizers.serialize(self.activity_regularizer),
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
-            'bias_constraint': constraints.serialize(self.bias_constraint)
+            'bias_constraint': constraints.serialize(self.bias_constraint),
+            'supports_masking': self.supports_masking
         }
         base_config = super(APPNP, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
