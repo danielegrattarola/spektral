@@ -25,22 +25,26 @@ def _check_output_and_model_output_shapes(true_shape, model_shape):
 def _test_single_mode(layer, **kwargs):
     X = np.random.normal(size=(N, F))
     X_in = Input(shape=(F,))
-    output = layer(**kwargs)(X_in)
+    layer_instance = layer(**kwargs)
+    output = layer_instance(X_in)
     model = Model(X_in, output)
     sess.run(tf.global_variables_initializer())
     output = sess.run(model.output, feed_dict={X_in: X})
-    assert output.shape == (1, F)
+    assert output.shape == (1, kwargs.get('channels', F))
+    assert output.shape == layer_instance.compute_output_shape(X.shape)
     _check_output_and_model_output_shapes(output.shape, model.output_shape)
 
 
 def _test_batch_mode(layer, **kwargs):
     X = np.random.normal(size=(batch_size, N, F))
     X_in = Input(shape=(N, F))
-    output = layer(**kwargs)(X_in)
+    layer_instance = layer(**kwargs)
+    output = layer_instance(X_in)
     model = Model(X_in, output)
     sess.run(tf.global_variables_initializer())
     output = sess.run(model.output, feed_dict={X_in: X})
-    assert output.shape == (batch_size, F)
+    assert output.shape == (batch_size, kwargs.get('channels', F))
+    assert output.shape == layer_instance.compute_output_shape(X.shape)
     _check_output_and_model_output_shapes(output.shape, model.output_shape)
 
 
@@ -49,11 +53,14 @@ def _test_graph_mode(layer, **kwargs):
     S = np.repeat(np.arange(batch_size), N).astype(np.int)
     X_in = Input(shape=(F,))
     S_in = Input(shape=(), dtype=S.dtype)
-    output = layer(**kwargs)([X_in, S_in])
+    layer_instance = layer(**kwargs)
+    output = layer_instance([X_in, S_in])
     model = Model([X_in, S_in], output)
     sess.run(tf.global_variables_initializer())
     output = sess.run(model.output, feed_dict={X_in: X, S_in: S})
-    assert output.shape == (batch_size, F)
+    assert output.shape == (batch_size, kwargs.get('channels', F))
+    # When creating actual graph, the bacth dimension is None
+    assert output.shape[1:] == layer_instance.compute_output_shape([X.shape, S.shape])[1:]
     _check_output_and_model_output_shapes(output.shape, model.output_shape)
 
 
@@ -82,9 +89,11 @@ def test_global_node_attention_pool():
 
 
 def test_global_attention_pool():
-    _test_single_mode(GlobalAttentionPool, channels=F)
-    _test_batch_mode(GlobalAttentionPool, channels=F)
-    _test_graph_mode(GlobalAttentionPool, channels=F)
+    F_ = 10
+    assert F_ != F
+    _test_single_mode(GlobalAttentionPool, channels=F_)
+    _test_batch_mode(GlobalAttentionPool, channels=F_)
+    _test_graph_mode(GlobalAttentionPool, channels=F_)
 
 
 if __name__ == '__main__':

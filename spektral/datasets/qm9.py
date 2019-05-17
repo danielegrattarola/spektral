@@ -13,8 +13,6 @@ DATASET_URL = 'http://deepchem.io.s3-website-us-west-1.amazonaws.com/datasets/gd
 RETURN_TYPES = {'numpy', 'networkx', 'sdf'}
 NODE_FEATURES = ['atomic_num', 'charge', 'coords', 'iso']
 EDGE_FEATURES = ['type', 'stereo']
-NF_PROCESSING = [None] * len(NODE_FEATURES)
-EF_PROCESSING = [None] * len(EDGE_FEATURES)
 MAX_K = 9
 
 
@@ -74,9 +72,7 @@ def load_data(return_type='numpy', nf_keys=None, ef_keys=None, auto_pad=True,
 
         adj, nf, ef = nx_to_numpy(data,
                                   auto_pad=auto_pad, self_loops=self_loops,
-                                  nf_keys=nf_keys, ef_keys=ef_keys,
-                                  nf_postprocessing=NF_PROCESSING,
-                                  ef_postprocessing=EF_PROCESSING)
+                                  nf_keys=nf_keys, ef_keys=ef_keys)
         return adj, nf, ef, labels
     elif return_type is 'networkx':
         return data, labels
