@@ -64,7 +64,7 @@ class GlobalSumPool(Layer):
         elif self.data_mode == 'batch':
             return input_shape[:-2] + input_shape[-1:]
         else:
-            return input_shape[0]
+            return input_shape[0]  # Input shape is a list of shapes for X and I
 
     def get_config(self):
         return super(GlobalSumPool, self).get_config()
@@ -299,11 +299,14 @@ class GlobalAttentionPool(Layer):
 
     def compute_output_shape(self, input_shape):
         if self.data_mode == 'single':
-            return (1,) + input_shape[-1:]
+            return (1,) + (self.channels, )
         elif self.data_mode == 'batch':
-            return input_shape[:-2] + input_shape[-1:]
+            return input_shape[:-2] + (self.channels, )
         else:
-            return input_shape[0]
+            # Input shape is a list of shapes for X and I
+            output_shape = input_shape[0]
+            output_shape = output_shape[:-1] + (self.channels, )
+            return output_shape
 
     def get_config(self):
         config = {}
