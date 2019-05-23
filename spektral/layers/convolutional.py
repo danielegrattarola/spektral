@@ -133,8 +133,7 @@ class GraphConv(Layer):
             'bias_regularizer': regularizers.serialize(self.bias_regularizer),
             'activity_regularizer': regularizers.serialize(self.activity_regularizer),
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
-            'bias_constraint': constraints.serialize(self.bias_constraint),
-            'supports_masking': self.supports_masking
+            'bias_constraint': constraints.serialize(self.bias_constraint)
         }
         base_config = super(GraphConv, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
@@ -273,7 +272,6 @@ class ChebConv(Layer):
             'activity_regularizer': regularizers.serialize(self.activity_regularizer),
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
             'bias_constraint': constraints.serialize(self.bias_constraint),
-            'supports_masking': self.supports_masking
         }
         base_config = super(ChebConv, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
@@ -436,7 +434,6 @@ class EdgeConditionedConv(Layer):
             'activity_regularizer': regularizers.serialize(self.activity_regularizer),
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
             'bias_constraint': constraints.serialize(self.bias_constraint),
-            'supports_masking': self.supports_masking
         }
         base_config = super(EdgeConditionedConv, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
@@ -696,7 +693,6 @@ class GraphAttention(Layer):
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
             'bias_constraint': constraints.serialize(self.bias_constraint),
             'attn_kernel_constraint': constraints.serialize(self.attn_kernel_constraint),
-            'supports_masking': self.supports_masking
         }
         base_config = super(GraphAttention, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
@@ -844,7 +840,6 @@ class GraphConvSkip(Layer):
             'activity_regularizer': regularizers.serialize(self.activity_regularizer),
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
             'bias_constraint': constraints.serialize(self.bias_constraint),
-            'supports_masking': self.supports_masking
         }
         base_config = super(GraphConvSkip, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
@@ -1047,7 +1042,6 @@ class ARMAConv(Layer):
             'activity_regularizer': regularizers.serialize(self.activity_regularizer),
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
             'bias_constraint': constraints.serialize(self.bias_constraint),
-            'supports_masking': self.supports_masking
         }
         base_config = super(ARMAConv, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
@@ -1372,7 +1366,6 @@ class APPNP(Layer):
             'activity_regularizer': regularizers.serialize(self.activity_regularizer),
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
             'bias_constraint': constraints.serialize(self.bias_constraint),
-            'supports_masking': self.supports_masking
         }
         base_config = super(APPNP, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
