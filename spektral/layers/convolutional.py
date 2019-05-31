@@ -24,9 +24,8 @@ class GraphConv(Layer):
     
     - node features of shape `(n_nodes, n_features)` (with optional `batch`
     dimension);
-    - Laplacian of shape `(n_nodes, n_nodes)` (with optional `batch` dimension);
-    The Laplacian approximation can be computed from the adjacency matrix like
-    in the original paper using `spektral.utils.convolution.localpooling_filter`.
+    - Normalized Laplacian of shape `(n_nodes, n_nodes)` (with optional `batch`
+    dimension); see `spektral.utils.convolution.localpooling_filter`.
     
     **Output**
     
@@ -158,9 +157,7 @@ class ChebConv(Layer):
     - node features of shape `(n_nodes, n_features)` (with optional `batch`
     dimension);
     - a list of Chebyshev polynomials of shape `(num_nodes, num_nodes)` (with
-    optional `batch` dimension)
-    The filters can be generated from the adjacency matrix using
-    `spektral.utils.convolution.chebyshev_filter`.
+    optional `batch` dimension); see `spektral.utils.convolution.chebyshev_filter`.
 
     **Output**
 
@@ -702,16 +699,15 @@ class GraphConvSkip(Layer):
     """
     A graph convolutional layer as presented by
     [Kipf & Welling (2016)](https://arxiv.org/abs/1609.02907), with the addition
-    of skip connections.
+    of a skip connection.
 
     **Mode**: single, mixed, batch.
 
     This layer computes the transformation:
     $$
-        Z = \\sigma(A X W_1 + X_0 W_2 + b)
+        Z = \\sigma(A X W_1 + X W_2 + b)
     $$
-    where \(X\) is the node features matrix, \(X_0\) is the node features matrix
-    for the skip connection, \(A\) is the normalized laplacian,
+    where \(X\) is the node features matrix, \(A\) is the normalized laplacian,
     \(W_1\) and \(W_2\) are the convolution kernels, \(b\) is a bias vector,
     and \(\\sigma\) is the activation function.
 
@@ -719,11 +715,8 @@ class GraphConvSkip(Layer):
 
     - node features of shape `(n_nodes, n_features)` (with optional `batch`
     dimension);
-    - node features for the skip connection, of shape `(n_nodes, n_features)`
-    (with optional `batch` dimension);
-    - Laplacian of shape `(n_nodes, n_nodes)` (with optional `batch` dimension);
-    The Laplacian approximation can be computed from the adjacency matrix like
-    in the original paper using `spektral.utils.convolution.localpooling_filter`.
+    - Normalized adjacency matrix of shape `(n_nodes, n_nodes)` (with optional
+    `batch` dimension); see `spektral.utils.convolution.normalized_adjacency`.
 
     **Output**
 
@@ -746,9 +739,8 @@ class GraphConvSkip(Layer):
     **Usage**
     ```py
     X = Input(shape=(n_nodes, n_features))
-    X_0 = Input(shape=(n_nodes, n_features))
     filter = Input((n_nodes, n_nodes))
-    Z = GraphConvSkip(channels, activation='relu')([X, X_0, filter])
+    Z = GraphConvSkip(channels, activation='relu')([X, filter])
     ```
     """
 
@@ -782,14 +774,13 @@ class GraphConvSkip(Layer):
     def build(self, input_shape):
         assert len(input_shape) >= 2
         input_dim = input_shape[0][-1]
-        input_dim_skip = input_shape[1][-1]
 
         self.kernel_1 = self.add_weight(shape=(input_dim, self.channels),
                                         initializer=self.kernel_initializer,
                                         name='kernel_1',
                                         regularizer=self.kernel_regularizer,
                                         constraint=self.kernel_constraint)
-        self.kernel_2 = self.add_weight(shape=(input_dim_skip, self.channels),
+        self.kernel_2 = self.add_weight(shape=(input_dim, self.channels),
                                         initializer=self.kernel_initializer,
                                         name='kernel_2',
                                         regularizer=self.kernel_regularizer,
@@ -806,15 +797,14 @@ class GraphConvSkip(Layer):
 
     def call(self, inputs):
         features = inputs[0]
-        features_skip = inputs[1]
-        fltr = inputs[2]
+        fltr = inputs[1]
 
         # Convolution
         output = K.dot(features, self.kernel_1)
         output = filter_dot(fltr, output)
 
         # Skip connection
-        skip = K.dot(features_skip, self.kernel_2)
+        skip = K.dot(features, self.kernel_2)
         output += skip
 
         if self.use_bias:
@@ -847,7 +837,7 @@ class GraphConvSkip(Layer):
 
 class ARMAConv(Layer):
     """
-    A graph convolutional layer with ARMA(H, K) filters, as presented by
+    A graph convolutional layer with ARMA(K, K) filters, as presented by
     [Bianchi et al. (2019)](https://arxiv.org/abs/1901.01343).
 
     **Mode**: single, mixed, batch.
@@ -869,9 +859,8 @@ class ARMAConv(Layer):
 
     - node features of shape `(n_nodes, n_features)` (with optional `batch`
     dimension);
-    - Laplacian of shape `(n_nodes, n_nodes)` (with optional `batch` dimension);
-    The Laplacian approximation can be computed from the adjacency matrix using
-    the methods in `spektral.utils.convolutions` (see examples/node_classification_arma.py).
+    - Normalized Laplacian  of shape `(n_nodes, n_nodes)` (with optional `batch`
+    dimension); see examples/node_classification_arma.py.
 
     **Output**
 
@@ -881,8 +870,8 @@ class ARMAConv(Layer):
     **Arguments**
 
     - `channels`: integer, number of output channels;
-    - `ARMA_K`: order of the ARMA filter (combination of K ARMA_1 filters);
-    - `ARMA_D`: depth of each ARMA_1 filter (number of recursive updates);
+    - `T`: depth of each ARMA_1 filter (number of recursive updates);
+    - `K`: order of the ARMA filter (combination of K ARMA_1 filters);
     - `recurrent`: whether to share each head's weights like a recurrent net;
     - `gcn_activation`: activation function to use to compute the ARMA filter;
     - `dropout_rate`: dropout rate for laplacian and output layer
@@ -910,8 +899,8 @@ class ARMAConv(Layer):
 
     def __init__(self,
                  channels,
-                 ARMA_D,
-                 ARMA_K=None,
+                 T=1,
+                 K=1,
                  recurrent=False,
                  gcn_activation='relu',
                  dropout_rate=0.0,
@@ -929,8 +918,8 @@ class ARMAConv(Layer):
             kwargs['input_shape'] = (kwargs.pop('input_dim'),)
         super(ARMAConv, self).__init__(**kwargs)
         self.channels = channels
-        self.ARMA_D = ARMA_D
-        self.ARMA_K = ARMA_D if ARMA_K is None else ARMA_K
+        self.T = T
+        self.K = K
         self.recurrent = recurrent
         self.activation = activations.get(activation)
         self.gcn_activation = activations.get(gcn_activation)
@@ -951,7 +940,7 @@ class ARMAConv(Layer):
         if self.recurrent:
             self.kernels_in = []  # Weights from input space to output space
             self.kernels_hid = []  # Weights from output space to output space
-            for k in range(self.ARMA_K):
+            for k in range(self.K):
                 self.kernels_in.append(self.get_gcn_weights(input_shape[0][-1],
                                                             input_shape[0][-1],
                                                             self.channels,
@@ -963,7 +952,7 @@ class ARMAConv(Layer):
                                                             bias_regularizer=self.bias_regularizer,
                                                             kernel_constraint=self.kernel_constraint,
                                                             bias_constraint=self.bias_constraint))
-                if self.ARMA_D > 1:
+                if self.T > 1:
                     self.kernels_hid.append(self.get_gcn_weights(self.channels,
                                                                  input_shape[0][-1],
                                                                  self.channels,
@@ -983,9 +972,9 @@ class ARMAConv(Layer):
 
         # Convolution
         output = []  # Stores the parallel filters
-        for k in range(self.ARMA_K):
+        for k in range(self.K):
             output_k = features
-            for d in range(self.ARMA_D):
+            for d in range(self.T):
                 features_drop = Dropout(self.dropout_rate)(features)
                 output_k = self.graph_conv_skip([output_k, features_drop, fltr],
                                                 self.channels,
@@ -1009,9 +998,9 @@ class ARMAConv(Layer):
         output = K.expand_dims(output, axis=-1)
         output_dim = K.int_shape(output)
         if len(output_dim) == 3:  # [nodes, feat, 1] -> [nodes, feat_red, 1]
-            output = AveragePooling1D(pool_size=self.ARMA_K, padding='same')(output)
+            output = AveragePooling1D(pool_size=self.K, padding='same')(output)
         elif len(output_dim) == 4:  # [batch, nodes, feat, 1] -> [batch, nodes, feat_red, 1]
-            output = AveragePooling2D(pool_size=(1, self.ARMA_K), padding='same')(output)
+            output = AveragePooling2D(pool_size=(1, self.K), padding='same')(output)
         else:
             raise RuntimeError('GCN_ARMA layer: wrong output dim')
         output = K.squeeze(output, axis=-1)
@@ -1028,8 +1017,8 @@ class ARMAConv(Layer):
     def get_config(self):
         config = {
             'channels': self.channels,
-            'ARMA_D': self.ARMA_D,
-            'ARMA_K': self.ARMA_K,
+            'T': self.T,
+            'K': self.K,
             'recurrent': self.recurrent,
             'activation': activations.serialize(self.activation),
             'gcn_activation': activations.serialize(self.gcn_activation),
@@ -1185,9 +1174,8 @@ class APPNP(Layer):
 
     - node features of shape `(n_nodes, n_features)` (with optional `batch`
     dimension);
-    - Laplacian of shape `(n_nodes, n_nodes)` (with optional `batch` dimension);
-    The Laplacian approximation can be computed from the adjacency matrix using
-    the methods in `spektral.utils.convolutions` (see examples/node_classification_arma.py).
+    - Normalized adjacency matrix of shape `(n_nodes, n_nodes)` (with optional
+    `batch` dimension); see `spektral.utils.convolution.normalized_adjacency`.
 
     **Output**
 

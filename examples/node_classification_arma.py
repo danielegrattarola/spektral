@@ -20,8 +20,8 @@ dataset = 'cora'
 adj, node_features, y_train, y_val, y_test, train_mask, val_mask, test_mask = citation.load_data(dataset)
 
 # Parameters
+ARMA_T = 1                    # Depth of each ARMA_1 filter
 ARMA_K = 2                    # Number of parallel ARMA_1 filters
-ARMA_D = 1                    # Depth of each ARMA_1 filter
 recurrent = True              # Share weights like a recurrent net in each head
 N = node_features.shape[0]    # Number of nodes in the graph
 F = node_features.shape[1]    # Original feature dimensionality
@@ -42,8 +42,8 @@ fltr_in = Input((N, ), sparse=True)
 
 dropout_1 = Dropout(dropout_rate)(X_in)
 graph_conv_1 = ARMAConv(16,
-                        ARMA_K=ARMA_K,
-                        ARMA_D=ARMA_D,
+                        T=ARMA_T,
+                        K=ARMA_K,
                         recurrent=recurrent,
                         dropout_rate=dropout_rate,
                         activation='elu',
@@ -51,8 +51,8 @@ graph_conv_1 = ARMAConv(16,
                         kernel_regularizer=l2(l2_reg))([dropout_1, fltr_in])
 dropout_2 = Dropout(dropout_rate)(graph_conv_1)
 graph_conv_2 = ARMAConv(n_classes,
-                        ARMA_K=1,
-                        ARMA_D=1,
+                        T=1,
+                        K=1,
                         recurrent=recurrent,
                         dropout_rate=dropout_rate,
                         activation='softmax',
