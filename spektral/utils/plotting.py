@@ -26,7 +26,7 @@ def plot_nx(nx_graph, nf_name=None, ef_name=None, layout='spring_layout',
     :param node_size: size of the plotted nodes
     :return: None
     """
-    layout = deserialize_nx_layout(layout)
+    layout = deserialize_nx_layout(layout, nf_name=nf_name)
     pos = layout(nx_graph)
     nx.draw(nx_graph, pos, node_color=node_color, node_size=node_size, **kwds)
     if nf_name is not None:
@@ -324,4 +324,4 @@ def deserialize_nx_layout(layout, nf_name=None):
                 raise ValueError('nf_name cannot be None')
             return coordinates_layout_closure(nf_name)
         else:
-            raise ValueError('layout must be in nx.layout.__all__ or \'delaunay\'')
+            raise ValueError('layout must be in nx.layout.__all__ or \'coordinates\'')
