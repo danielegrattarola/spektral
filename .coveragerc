@@ -1,0 +1,16 @@
+[run]
+source=spektral
+omit=
+    spektral/layers/base.py
+    spektral/layers/convolutional.py
+    spektral/layers/base.py
+    spektral/layers/ops.py
+    spektral/utils*
+    spektral/brain.py
+    spektral/chem.py
+[report]
+exclude_lines =
+    pragma: no cover
+    raise
+    except
+
