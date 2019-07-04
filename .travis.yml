@@ -4,6 +4,9 @@ python:
   - "3.6"
 script:
   - pip install -U pip
+  - pip install pytest-cov
+  - pip install coverage
+  - pip install codecov
   - pip install scikit-learn
   - pip install matplotlib==3.0.3
   - pip install tensorflow
