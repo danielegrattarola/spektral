@@ -4,8 +4,8 @@ python:
   - "3.4"
   - "3.5"
   - "3.5-dev"  # 3.5 development branch
-install:
-  - pip install -r requirements.txt
 script:
   - python setup.py install
   - pytest
+notifications:
+  email: false
