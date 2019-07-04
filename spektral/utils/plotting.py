@@ -319,7 +319,7 @@ def deserialize_nx_layout(layout, nf_name=None):
     if isinstance(layout, str):
         if layout in nx.layout.__all__:
             return eval('nx.{}'.format(layout))
-        elif layout is 'coordinates':
+        elif layout == 'coordinates':
             if nf_name is None:
                 raise ValueError('nf_name cannot be None')
             return coordinates_layout_closure(nf_name)

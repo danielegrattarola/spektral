@@ -5,6 +5,165 @@ from keras.engine import Layer
 
 
 ################################################################################
+# Pooling layers
+################################################################################
+from spektral.layers.ops import top_k
+
+
+class TopKPool(Layer):
+    """
+    A gPool/Top-K layer as presented by
+    [Gao & Ji (2017)](http://proceedings.mlr.press/v97/gao19a/gao19a.pdf) and
+    [Cangea et al.](https://arxiv.org/abs/1811.01287).
+
+    This layer computes the following operations:
+
+    $$
+    y = \\cfrac{Xp}{\\| p \\|}; \\;\\;\\;\\;
+    \\textrm{idx} = \\textrm{rank}(y, k); \\;\\;\\;\\;
+    \\bar X = (X \\odot \\textrm{tanh}(y))_{\\textrm{idx}}; \\;\\;\\;\\;
+    \\bar A = A^2_{\\textrm{idx}, \\textrm{idx}}
+    $$
+
+    where \( \\textrm{rank}(y, k) \) returns the indices of the top k values of
+    \( y \), and \( p \) is a learnable parameter vector of size \(F\).
+    Note that the the gating operation \( \\textrm{tanh}(y) \) (Cangea et al.)
+    can be replaced with a sigmoid (Gao & Ji). The original paper by Gao & Ji
+    used a tanh as well, but was later updated to use a sigmoid activation.
+
+    Due to the lack of sparse-sparse matrix multiplication support, this layer
+    temporarily makes the adjacency matrix dense in order to compute \(A^2\)
+    (needed to preserve connectivity after pooling).
+    **If memory is not an issue, considerable speedups can be achieved by using
+    dense graphs directly.
+    Converting a graph from dense to sparse and viceversa is a costly operation.**
+
+    **Mode**: single, graph batch.
+
+    **Input**
+
+    - node features of shape `(n_nodes, n_features)`;
+    - adjacency matrix of shape `(n_nodes, n_nodes)`;
+    - (optional) graph IDs of shape `(n_nodes, )` (graph batch mode);
+
+    **Output**
+
+    - reduced node features of shape `(n_graphs * k, n_features)`;
+    - reduced adjacency matrix of shape `(n_graphs * k, n_graphs * k)`;
+    - reduced graph IDs with shape `(n_graphs * k, )` (graph batch mode);
+
+    **Arguments**
+
+    - `ratio`: float between 0 and 1, ratio of nodes to keep in each graph;
+    - `return_mask`: boolean, whether to return the binary mask used for pooling;
+    - `sigmoid_gating`: boolean, use a sigmoid gating activation instead of a
+        tanh;
+    - `kernel_initializer`: initializer for the kernel matrix;
+    - `kernel_regularizer`: regularization applied to the kernel matrix;
+    - `activity_regularizer`: regularization applied to the output;
+    - `kernel_constraint`: constraint applied to the kernel matrix;
+    """
+
+    def __init__(self, ratio,
+                 return_mask=False,
+                 sigmoid_gating=False,
+                 kernel_initializer='glorot_uniform',
+                 kernel_regularizer=None,
+                 activity_regularizer=None,
+                 kernel_constraint=None,
+                 **kwargs):
+        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
+            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
+        super(TopKPool, self).__init__(**kwargs)
+        self.ratio = ratio  # Ratio of nodes to keep in each graph
+        self.return_mask = return_mask
+        self.sigmoid_gating = sigmoid_gating
+        self.gating_op = K.sigmoid if self.sigmoid_gating else K.tanh
+        self.kernel_initializer = initializers.get(kernel_initializer)
+        self.kernel_regularizer = regularizers.get(kernel_regularizer)
+        self.activity_regularizer = regularizers.get(activity_regularizer)
+        self.kernel_constraint = constraints.get(kernel_constraint)
+
+    def build(self, input_shape):
+        self.F = input_shape[0][-1]
+        self.N = input_shape[0][0]
+        self.kernel = self.add_weight(shape=(self.F, 1),
+                                      name='kernel',
+                                      initializer=self.kernel_initializer,
+                                      regularizer=self.kernel_regularizer,
+                                      constraint=self.kernel_constraint)
+        self.top_k_var = tf.Variable(0.0, validate_shape=False)
+        super(TopKPool, self).build(input_shape)
+
+    def call(self, inputs):
+        if len(inputs) == 3:
+            X, A, I = inputs
+            self.data_mode = 'graph'
+        else:
+            X, A = inputs
+            I = tf.zeros(tf.shape(X)[:1], dtype=tf.int32)
+            self.data_mode = 'single'
+
+        A_is_sparse = K.is_sparse(A)
+
+        # Get mask
+        y = K.dot(X, K.l2_normalize(self.kernel))
+        N = K.shape(X)[-2]
+        indices = top_k(y[:, 0], I, self.ratio, self.top_k_var)
+        mask = tf.scatter_nd(tf.expand_dims(indices, 1), tf.ones_like(indices), (N,))
+
+        # Multiply X and y to make layer differentiable
+        features = X * self.gating_op(y)
+
+        axis = 0 if len(K.int_shape(A)) == 2 else 1  # Cannot use negative axis in tf.boolean_mask
+        # Reduce X
+        X_pooled = tf.boolean_mask(features, mask, axis=axis)
+
+        # Compute A^2
+        if A_is_sparse:
+            A_dense = tf.sparse.to_dense(A)
+        else:
+            A_dense = A
+        A_squared = K.dot(A, A_dense)
+
+        # Reduce A
+        A_pooled = tf.boolean_mask(A_squared, mask, axis=axis)
+        A_pooled = tf.boolean_mask(A_pooled, mask, axis=axis + 1)
+        if A_is_sparse:
+            A_pooled = tf.contrib.layers.dense_to_sparse(A_pooled)
+
+        output = [X_pooled, A_pooled]
+
+        # Reduce I
+        if self.data_mode == 'graph':
+            I_pooled = tf.boolean_mask(I[:, None], mask)[:, 0]
+            output.append(I_pooled)
+
+        if self.return_mask:
+            output.append(mask)
+
+        return output
+
+    def compute_output_shape(self, input_shape):
+        output_shape = input_shape
+        if self.return_mask:
+            output_shape += [(input_shape[0][:-1])]
+        return output_shape
+
+    def get_config(self):
+        config = {
+            'ratio': self.ratio,
+            'return_mask': self.return_mask,
+            'kernel_initializer': initializers.serialize(self.kernel_initializer),
+            'kernel_regularizer': regularizers.serialize(self.kernel_regularizer),
+            'activity_regularizer': regularizers.serialize(self.activity_regularizer),
+            'kernel_constraint': constraints.serialize(self.kernel_constraint),
+        }
+        base_config = super(TopKPool, self).get_config()
+        return dict(list(base_config.items()) + list(config.items()))
+
+
+################################################################################
 # Global pooling layers
 ################################################################################
 class GlobalSumPool(Layer):
