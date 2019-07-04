@@ -74,18 +74,17 @@
 
     <li class="toctree-l2"><a href="#modes">Modes</a></li>
     
-
-    <li class="toctree-l2"><a href="#other-formats">Other formats</a></li>
-    
         <ul>
         
             <li><a class="toctree-l3" href="#graph-batch-mode">Graph batch mode</a></li>
         
-            <li><a class="toctree-l3" href="#conversion-methods">Conversion methods</a></li>
-        
-            <li><a class="toctree-l3" href="#molecules">Molecules</a></li>
-        
         </ul>
+    
+
+    <li class="toctree-l2"><a href="#conversion-methods">Conversion methods</a></li>
+    
+
+    <li class="toctree-l2"><a href="#molecules">Molecules</a></li>
     
 
     </ul>
@@ -101,11 +100,11 @@
                 </li>
                 <li class="">
                     
-    <a class="" href="../layers/base/">Base Layers</a>
+    <a class="" href="../layers/pooling/">Pooling Layers</a>
                 </li>
                 <li class="">
                     
-    <a class="" href="../layers/pooling/">Pooling Layers</a>
+    <a class="" href="../layers/base/">Base Layers</a>
                 </li>
     </ul>
 	    </li>
@@ -325,10 +324,20 @@ In [4]: nf.shape
 Out[4]: (50000, 784)
 </code></pre>
 
-<hr />
-<h2 id="other-formats">Other formats</h2>
 <h3 id="graph-batch-mode">Graph batch mode</h3>
 <p><img alt="" src="https://danielegrattarola.github.io/spektral/img/graph_batch.svg" /></p>
+<table>
+<thead>
+<tr>
+<th align="left">WARNING</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">Note that support for edge attributes is not yet implemented in Spektral</td>
+</tr>
+</tbody>
+</table>
 <p>When dealing with graphs with a variable number of nodes, representing a group of graphs in batch mode requires padding <code>A</code>, <code>X</code>, and <code>E</code> to a fixed dimension.<br />
 In order to avoid this issue, a common approach is to represent a batch of graphs by taking their disjoint union, and then working with this "supergraph" in single mode.</p>
 <p>In order to compute the disjoint union of a batch of graphs: </p>
@@ -382,25 +391,17 @@ Out[8]:
  array([0, 0, 1, 1, 2, 2]))
 </code></pre>
 
-<table>
-<thead>
-<tr>
-<th align="left">WARNING</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left">Note that support for edge attributes is not yet implemented in the current version of <code>Batch</code></td>
-</tr>
-</tbody>
-</table>
 <p>Convolutional layers that work in single mode will work for this type of data representation without any modification.<br />
-Pooling layers, on the other hand, require the batch indices vector in order to know which nodes to pool together. Global pooling layers will consume the indices vector and they will not return it as output, while standard pooling layers will also return a reduced version of the vector. </p>
-<h3 id="conversion-methods">Conversion methods</h3>
+Pooling layers, on the other hand, require the batch indices vector in order to know which nodes to pool together. 
+Global pooling layers do not need the indices vector, and they simply operate on X. 
+Standard pooling layers, on the other hand, will also return a reduced version of the vector.</p>
+<hr />
+<h2 id="conversion-methods">Conversion methods</h2>
 <p>To provide better compatibility with other libraries, Spektral has methods to convert graphs between the matrix representation (<code>'numpy'</code>) and other formats. </p>
 <p>The <code>'networkx'</code> format represents graphs using the Networkx library, which can then be used to <a href="https://networkx.github.io/documentation/networkx-1.10/reference/convert.html">convert the graphs</a> to other formats like <code>.dot</code> and edge lists. 
 Conversion methods between <code>'numpy'</code> and <code>'networkx'</code> are provided in <code>spektral.utils.conversion</code>.</p>
-<h3 id="molecules">Molecules</h3>
+<hr />
+<h2 id="molecules">Molecules</h2>
 <p>When working with molecules, some specific formats can be used to represent the graphs. </p>
 <p>The <code>'sdf'</code> format is an internal representation format used to store an SDF file to a dictionary. A molecule in <code>'sdf'</code> format will look something like this: </p>
 <pre><code class="py">{'atoms': [{'atomic_num': 7,

@@ -77,15 +77,14 @@
                     
     <a class="" href="../convolution/">Convolutional Layers</a>
                 </li>
-                <li class="">
-                    
-    <a class="" href="../base/">Base Layers</a>
-                </li>
                 <li class=" current">
                     
     <a class="current" href="./">Pooling Layers</a>
     <ul class="subnav">
             
+    <li class="toctree-l3"><a href="#topkpool">TopKPool</a></li>
+    
+
     <li class="toctree-l3"><a href="#globalsumpool">GlobalSumPool</a></li>
     
 
@@ -102,6 +101,10 @@
     
 
     </ul>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../base/">Base Layers</a>
                 </li>
     </ul>
 	    </li>
@@ -224,7 +227,60 @@
           <div role="main">
             <div class="section">
               
-                <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L10">[source]</a></span></p>
+                <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L13">[source]</a></span></p>
+<h3 id="topkpool">TopKPool</h3>
+<pre><code class="python">spektral.layers.TopKPool(ratio, return_mask=False, sigmoid_gating=False, kernel_initializer='glorot_uniform', kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None)
+</code></pre>
+
+<p>A gPool/Top-K layer as presented by
+<a href="http://proceedings.mlr.press/v97/gao19a/gao19a.pdf">Gao &amp; Ji (2017)</a> and
+<a href="https://arxiv.org/abs/1811.01287">Cangea et al.</a>.</p>
+<p>This layer computes the following operations:</p>
+<p>
+<script type="math/tex; mode=display">
+y = \cfrac{Xp}{\| p \|}; \;\;\;\;
+\textrm{idx} = \textrm{rank}(y, k); \;\;\;\;
+\bar X = (X \odot \textrm{tanh}(y))_{\textrm{idx}}; \;\;\;\;
+\bar A = A^2_{\textrm{idx}, \textrm{idx}}
+</script>
+</p>
+<p>where <script type="math/tex"> \textrm{rank}(y, k) </script> returns the indices of the top k values of
+<script type="math/tex"> y </script>, and <script type="math/tex"> p </script> is a learnable parameter vector of size <script type="math/tex">F</script>.
+Note that the the gating operation <script type="math/tex"> \textrm{tanh}(y) </script> (Cangea et al.)
+can be replaced with a sigmoid (Gao &amp; Ji). The original paper by Gao &amp; Ji
+used a tanh as well, but was later updated to use a sigmoid activation.</p>
+<p>Due to the lack of sparse-sparse matrix multiplication support, this layer
+temporarily makes the adjacency matrix dense in order to compute <script type="math/tex">A^2</script>
+(needed to preserve connectivity after pooling).
+<strong>If memory is not an issue, considerable speedups can be achieved by using
+dense graphs directly.
+Converting a graph from dense to sparse and viceversa is a costly operation.</strong></p>
+<p><strong>Mode</strong>: single, graph batch.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>node features of shape <code>(n_nodes, n_features)</code>;</li>
+<li>adjacency matrix of shape <code>(n_nodes, n_nodes)</code>;</li>
+<li>(optional) graph IDs of shape <code>(n_nodes, )</code> (graph batch mode);</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>reduced node features of shape <code>(n_graphs * k, n_features)</code>;</li>
+<li>reduced adjacency matrix of shape <code>(n_graphs * k, n_graphs * k)</code>;</li>
+<li>reduced graph IDs with shape <code>(n_graphs * k, )</code> (graph batch mode);</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>ratio</code>: float between 0 and 1, ratio of nodes to keep in each graph;</li>
+<li><code>return_mask</code>: boolean, whether to return the binary mask used for pooling;</li>
+<li><code>sigmoid_gating</code>: boolean, use a sigmoid gating activation instead of a
+tanh;</li>
+<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
+<li><code>activity_regularizer</code>: regularization applied to the output;</li>
+<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L169">[source]</a></span></p>
 <h3 id="globalsumpool">GlobalSumPool</h3>
 <pre><code class="python">spektral.layers.GlobalSumPool()
 </code></pre>
@@ -246,7 +302,7 @@ mode, where the node dimension is preserved and set to 1).</li>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L73">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L232">[source]</a></span></p>
 <h3 id="globalavgpool">GlobalAvgPool</h3>
 <pre><code class="python">spektral.layers.GlobalAvgPool()
 </code></pre>
@@ -268,7 +324,7 @@ mode, where the node dimension is preserved and set to 1).</li>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L135">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L294">[source]</a></span></p>
 <h3 id="globalmaxpool">GlobalMaxPool</h3>
 <pre><code class="python">spektral.layers.GlobalMaxPool()
 </code></pre>
@@ -290,7 +346,7 @@ mode, where the node dimension is preserved and set to 1).</li>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L197">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L356">[source]</a></span></p>
 <h3 id="globalattentionpool">GlobalAttentionPool</h3>
 <pre><code class="python">spektral.layers.GlobalAttentionPool(channels=32, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -321,7 +377,7 @@ dimension changed to <code>channels</code>.</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L317">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L476">[source]</a></span></p>
 <h3 id="globalattnsumpool">GlobalAttnSumPool</h3>
 <pre><code class="python">spektral.layers.GlobalAttnSumPool(attn_kernel_initializer='glorot_uniform', kernel_regularizer=None, attn_kernel_regularizer=None, attn_kernel_constraint=None)
 </code></pre>
@@ -356,10 +412,10 @@ matrix;</li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../../datasets/citation/" class="btn btn-neutral float-right" title="Citation">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../base/" class="btn btn-neutral float-right" title="Base Layers">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../base/" class="btn btn-neutral" title="Base Layers"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../convolution/" class="btn btn-neutral" title="Convolutional Layers"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -387,10 +443,10 @@ matrix;</li>
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../base/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../convolution/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../../datasets/citation/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../base/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
