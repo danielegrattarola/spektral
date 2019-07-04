@@ -10,6 +10,6 @@ script:
   - python setup.py install
   - pytest
 after_success:
-  - codecov
+  - bash < (curl -s https://codecov.io/bash)
 notifications:
   email: false
