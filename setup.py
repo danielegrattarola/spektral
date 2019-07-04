@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='spektral',
-    version='0.0.10',
+    version='0.0.11',
     packages=find_packages(),
     install_requires=['keras', 'networkx', 'pandas', 'joblib', 'matplotlib',
                       'tqdm', 'pygraphviz', 'numpy', 'scipy', 'requests'],
@@ -16,4 +16,7 @@ setup(
     description='A Python framework for relational representation learning',
     long_description=long_description,
     long_description_content_type="text/markdown",
+    classifiers=[
+        "Programming Language :: Python :: 3.5",
+    ],
 )

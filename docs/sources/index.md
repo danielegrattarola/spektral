@@ -1,9 +1,16 @@
 [pypi-image]: https://badge.fury.io/py/spektral.svg
-[pypi-url]: 
+[pypi-url]: https://pypi.org/project/spektral/
+[coverage-image]: https://codecov.io/gh/danielegrattarola/spektral/branch/develop/graph/badge.svg
+[coverage-url]: https://codecov.io/github/danielegrattarola/spektral?branch=develop
+[contributing-image]: https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat
+[contributing-url]: https://github.com/rusty1s/pytorch_geometric/blob/master/CONTRIBUTING.md
+
 
 <img src="https://danielegrattarola.github.io/spektral/img/logo_dark.svg" width="50%"/>
 
 [![PyPI Version][pypi-image]][pypi-url]
+[![Code Coverage][coverage-image]][coverage-url]
+[![Contributing][contributing-image]][contributing-url]
 
 
 |WARNING|
