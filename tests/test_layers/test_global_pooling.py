@@ -94,11 +94,3 @@ def test_global_attention_pool():
     _test_single_mode(GlobalAttentionPool, channels=F_)
     _test_batch_mode(GlobalAttentionPool, channels=F_)
     _test_graph_mode(GlobalAttentionPool, channels=F_)
-
-
-if __name__ == '__main__':
-    test_global_sum_pool()
-    test_global_avg_pool()
-    test_global_max_pool()
-    test_global_attention_pool()
-    test_global_node_attention_pool()
