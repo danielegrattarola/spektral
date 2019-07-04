@@ -4,6 +4,7 @@ python:
   - "3.6"
 script:
   - pip install -U pip
+  - pip install scikit-learn
   - pip install matplotlib==3.0.3
   - pip install tensorflow
   - python setup.py install
