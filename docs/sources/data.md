@@ -94,14 +94,13 @@ In [4]: nf.shape
 Out[4]: (50000, 784)
 ```
 
----
-
-## Other formats
-
-
 ### Graph batch mode
 
 ![](https://danielegrattarola.github.io/spektral/img/graph_batch.svg)
+
+|WARNING|
+|:------|
+| Note that support for edge attributes is not yet implemented in Spektral |
 
 When dealing with graphs with a variable number of nodes, representing a group of graphs in batch mode requires padding `A`, `X`, and `E` to a fixed dimension.  
 In order to avoid this issue, a common approach is to represent a batch of graphs by taking their disjoint union, and then working with this "supergraph" in single mode.
@@ -159,23 +158,23 @@ Out[8]:
  array([0, 0, 1, 1, 2, 2]))
 ```
 
-|WARNING|
-|:------|
-| Note that support for edge attributes is not yet implemented in the current version of `Batch` |
-
 Convolutional layers that work in single mode will work for this type of data representation without any modification.  
-Pooling layers, on the other hand, require the batch indices vector in order to know which nodes to pool together. Global pooling layers will consume the indices vector and they will not return it as output, while standard pooling layers will also return a reduced version of the vector. 
+Pooling layers, on the other hand, require the batch indices vector in order to know which nodes to pool together. 
+Global pooling layers do not need the indices vector, and they simply operate on X. 
+Standard pooling layers, on the other hand, will also return a reduced version of the vector.
 
+---
 
-### Conversion methods
+## Conversion methods
 
 To provide better compatibility with other libraries, Spektral has methods to convert graphs between the matrix representation (`'numpy'`) and other formats. 
 
 The `'networkx'` format represents graphs using the Networkx library, which can then be used to [convert the graphs](https://networkx.github.io/documentation/networkx-1.10/reference/convert.html) to other formats like `.dot` and edge lists. 
 Conversion methods between `'numpy'` and `'networkx'` are provided in `spektral.utils.conversion`.
 
+---
 
-### Molecules
+## Molecules
 
 When working with molecules, some specific formats can be used to represent the graphs. 
 

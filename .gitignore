@@ -4,6 +4,8 @@
 .pytest_caches/
 dist
 build
+.coverage
+.coverage.*
 
 # Docs
 docs/site/

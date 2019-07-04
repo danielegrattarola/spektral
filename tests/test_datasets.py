@@ -39,10 +39,3 @@ def test_qm9():
     # Test that it doesn't crash
     qm9.load_data('networkx', amount=1000)
     qm9.load_data('sdf', amount=1000)
-
-
-if __name__ == '__main__':
-    test_citation()
-    test_delaunay()
-    test_mnist()
-    test_qm9()

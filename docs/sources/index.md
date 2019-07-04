@@ -1,4 +1,10 @@
+[pypi-image]: https://badge.fury.io/py/spektral.svg
+[pypi-url]: 
+
 <img src="https://danielegrattarola.github.io/spektral/img/logo_dark.svg" width="50%"/>
+
+[![PyPI Version][pypi-image]][pypi-url]
+
 
 |WARNING|
 |:------|

@@ -28,8 +28,8 @@ nav:
 - Data representation: data.md
 - Layers:
     - Convolutional Layers: layers/convolution.md
-    - Base Layers: layers/base.md
     - Pooling Layers: layers/pooling.md
+    - Base Layers: layers/base.md
 - Datasets:
     - Citation: datasets/citation.md
     - Delaunay: datasets/delaunay.md

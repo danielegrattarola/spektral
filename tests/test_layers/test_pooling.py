@@ -22,9 +22,7 @@ def _check_output_and_model_output_shapes(true_shape, model_shape):
 
 
 def _check_number_of_nodes(N_pool_expected, N_pool_true):
-    if N_pool_expected is None:
-        pass
-    else:
+    if N_pool_expected is not None:
         assert N_pool_expected == N_pool_true or N_pool_true is None
 
 
@@ -90,5 +88,3 @@ def test_top_k_pool():
     _test_graph_mode(TopKPool, ratio=0.5, return_mask=True)
 
 
-if __name__ == '__main__':
-    test_top_k_pool()
