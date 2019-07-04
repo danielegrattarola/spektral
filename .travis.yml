@@ -9,5 +9,7 @@ script:
   - pip install tensorflow
   - python setup.py install
   - pytest
+after_success:
+  - codecov
 notifications:
   email: false
