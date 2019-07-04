@@ -8,7 +8,7 @@ script:
   - pip install matplotlib==3.0.3
   - pip install tensorflow
   - python setup.py install
-  - pytest
+  - pytest --cov
 after_success:
   - bash < (curl -s https://codecov.io/bash)
 notifications:
