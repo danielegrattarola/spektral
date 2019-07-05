@@ -19,7 +19,7 @@ def test_citation():
 
 
 def test_delaunay():
-    adj, nf, labels = delaunay.generate_data('numpy')
+    adj, nf, labels = delaunay.generate_data('numpy', classes=[0, 1, 2])
     correctly_padded(adj, nf, None)
     assert adj.shape[0] == labels.shape[0]
 

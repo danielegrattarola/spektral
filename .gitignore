@@ -6,6 +6,7 @@ dist
 build
 .coverage
 .coverage.*
+htmlcov/
 
 # Docs
 docs/site/
