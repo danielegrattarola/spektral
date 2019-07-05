@@ -38,6 +38,7 @@ PAGES = [
         'classes': [
             layers.GraphConv,
             layers.ChebConv,
+            layers.GraphSageConv,
             layers.ARMAConv,
             layers.EdgeConditionedConv,
             layers.GraphAttention,
@@ -213,10 +214,19 @@ ROOT = 'https://danielegrattarola.github.io/spektral/'
 def get_function_signature(function, method=True):
     wrapped = getattr(function, '_original_function', None)
     if wrapped is None:
-        signature = inspect.getargspec(function)
+        try:
+            signature = inspect.getargspec(function)
+        except ValueError:
+            signature = inspect.getfullargspec(function)
     else:
         signature = inspect.getargspec(wrapped)
+    if signature.defaults is None:
+        signature = signature._replace(defaults=[])
     defaults = signature.defaults
+    if hasattr(signature, 'kwonlydefaults'):
+        signature.args.extend(signature.kwonlyargs)
+        for kwa in signature.kwonlyargs:
+            defaults.append(signature.kwonlydefaults[kwa])
     if method:
         args = signature.args[1:]  # Remove self
     else:
