@@ -12,6 +12,10 @@ body > div.wy-grid-for-nav > nav > div.wy-side-nav-search > a {
     display: flex !important;
 }
 
+.auto-width {
+    width: auto !important;
+}
+
 /*.wy-side-nav-search {
     background-color: #e67e22;
 }

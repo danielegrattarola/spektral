@@ -1,22 +1,20 @@
-[pypi-image]: https://badge.fury.io/py/spektral.svg
-[pypi-url]: https://pypi.org/project/spektral/
-[pyv-image]: https://img.shields.io/pypi/pyversions/spektral.svg
-[pyv-url]: https://pypi.python.org/pypi/spektral/
-[build-image]: https://travis-ci.org/danielegrattarola/spektral.svg?branch=master
-[build-url]: https://travis-ci.org/danielegrattarola/spektral
-[coverage-image]: https://codecov.io/gh/danielegrattarola/spektral/branch/develop/graph/badge.svg
-[coverage-url]: https://codecov.io/github/danielegrattarola/spektral?branch=develop
-[contributing-image]: https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat
-[contributing-url]: https://github.com/rusty1s/pytorch_geometric/blob/master/CONTRIBUTING.md
-
-
 <img src="https://danielegrattarola.github.io/spektral/img/logo_dark.svg" width="50%"/>
-
-[![Python Version][pyv-image]][pyv-url]
-[![PyPI Version][pypi-image]][pypi-url]
-[![Code Coverage][coverage-image]][coverage-url]
-[![Contributing][contributing-image]][contributing-url]
-
+<br><br>
+<a href="https://pypi.python.org/pypi/spektral/">
+    <img src="https://img.shields.io/pypi/pyversions/spektral.svg" style="width: auto !important" />
+</a>
+<a href="https://pypi.org/project/spektral/">
+    <img src="https://badge.fury.io/py/spektral.svg" style="width: auto !important" />
+</a>
+<a href="https://travis-ci.org/danielegrattarola/spektral">
+    <img src="https://travis-ci.org/danielegrattarola/spektral.svg?branch=master" style="width: auto !important" />
+</a>
+<a href="https://codecov.io/github/danielegrattarola/spektral?branch=develop">
+    <img src="https://codecov.io/gh/danielegrattarola/spektral/branch/develop/graph/badge.svg" style="width: auto !important" />
+</a>
+<a href="https://github.com/danielegrattarola/spektral">
+    <img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat" style="width: auto !important" />
+</a>
 
 |WARNING|
 |:------|

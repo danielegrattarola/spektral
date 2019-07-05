@@ -107,8 +107,8 @@ changed to `channels`.
 fltr = chebyshev_filter(adj, K)
 ...
 X = Input(shape=(num_nodes, num_features))
-filter = Input((num_nodes, num_nodes))
-Z = GraphConv(channels, activation='relu')([X, filter])
+filter = [Input((num_nodes, num_nodes)) for _ in range(k + 1)]
+Z = ChebConv(channels, activation='relu')([X] + filter)
 ...
 model.fit([node_features, fltr], y)
 ```
