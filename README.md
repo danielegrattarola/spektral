@@ -1,5 +1,9 @@
 [pypi-image]: https://badge.fury.io/py/spektral.svg
 [pypi-url]: https://pypi.org/project/spektral/
+[pyv-image]: https://img.shields.io/pypi/pyversions/spektral.svg
+[pyv-url]: https://pypi.python.org/pypi/spektral/
+[build-image]: https://travis-ci.org/danielegrattarola/spektral.svg?branch=master
+[build-url]: https://travis-ci.org/danielegrattarola/spektral
 [coverage-image]: https://codecov.io/gh/danielegrattarola/spektral/branch/develop/graph/badge.svg
 [coverage-url]: https://codecov.io/github/danielegrattarola/spektral?branch=develop
 [contributing-image]: https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat
@@ -8,6 +12,7 @@
 
 <img src="https://danielegrattarola.github.io/spektral/img/logo_dark.svg" width="50%"/>
 
+[![Python Version][pyv-image]][pyv-url]
 [![PyPI Version][pypi-image]][pypi-url]
 [![Code Coverage][coverage-image]][coverage-url]
 [![Contributing][contributing-image]][contributing-url]
