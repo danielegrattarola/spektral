@@ -1,8 +1,6 @@
 [run]
 omit=
     spektral/layers/base.py
-    spektral/layers/convolutional.py
-    spektral/layers/base.py
     spektral/layers/ops.py
     spektral/utils*
     spektral/brain.py
