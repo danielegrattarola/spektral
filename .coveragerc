@@ -1,4 +1,5 @@
 [run]
+source=spektral
 omit=
     spektral/layers/base.py
     spektral/layers/ops.py
