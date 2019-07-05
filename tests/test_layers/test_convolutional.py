@@ -1,4 +1,5 @@
-from spektral.layers import GraphConv, ChebConv, EdgeConditionedConv, GraphAttention, GraphConvSkip, ARMAConv, APPNP
+from spektral.layers import GraphConv, ChebConv, EdgeConditionedConv, GraphAttention, GraphConvSkip, ARMAConv, APPNP, \
+    GraphSageConv
 from keras import backend as K, Model, Input
 import numpy as np
 import tensorflow as tf
@@ -14,6 +15,11 @@ TESTS = [
     {
         LAYER_K_: ChebConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
+        KWARGS_K_: {'channels': 8}
+    },
+    {
+        LAYER_K_: GraphSageConv,
+        MODES_K_: [SINGLE],
         KWARGS_K_: {'channels': 8}
     },
     {

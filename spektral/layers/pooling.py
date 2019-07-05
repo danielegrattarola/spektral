@@ -3,13 +3,12 @@ from keras import regularizers, constraints, initializers
 from keras.backend import tf
 from keras.engine import Layer
 
+from spektral.layers.ops import top_k
+
 
 ################################################################################
 # Pooling layers
 ################################################################################
-from spektral.layers.ops import top_k
-
-
 class TopKPool(Layer):
     """
     A gPool/Top-K layer as presented by

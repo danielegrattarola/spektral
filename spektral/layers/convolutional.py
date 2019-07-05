@@ -2,7 +2,9 @@ from __future__ import absolute_import
 
 from keras import activations, initializers, regularizers, constraints
 from keras import backend as K
+from keras.backend import tf
 from keras.layers import Layer, LeakyReLU, Dropout, AveragePooling2D, AveragePooling1D
+
 from spektral.layers.ops import filter_dot
 
 
@@ -272,6 +274,141 @@ class ChebConv(Layer):
         }
         base_config = super(ChebConv, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
+
+
+class GraphSageConv(GraphConv):
+    """
+    A GraphSage layer as presented by [Hamilton et al. (2017)](https://arxiv.org/abs/1706.02216).
+
+    **Mode**: single.
+
+    This layer computes the transformation:
+    $$
+        Z = \\sigma \\big( \\big[ \\textrm{AGGREGATE}(X) \\| X \\big] W + b \\big)
+    $$
+    where \(X\) is the node features matrix, \(W\) is a trainable kernel,
+    \(b\) is a bias vector, and \(\\sigma\) is the activation function.
+    \(\\textrm{AGGREGATE}\) is an aggregation function as described in the
+    original paper, that works by aggregating each node's neighbourhood
+    according to some rule. The available aggregation methods are: sum, mean,
+    max, min, and product.
+
+    **Input**
+
+    - node features of shape `(n_nodes, n_features)`;
+    - Binary adjacency matrix of shape `(n_nodes, n_nodes)`.
+
+    **Output**
+
+    - node features with the same shape of the input, but the last dimension
+    changed to `channels`.
+
+    **Arguments**
+
+    - `channels`: integer, number of output channels;
+    - `aggregate_method`: str, aggregation method to use (`'sum'`, `'mean'`,
+    `'max'`, `'min'`, `'prod'`);
+    - `activation`: activation function to use;
+    - `use_bias`: whether to add a bias to the linear transformation;
+    - `kernel_initializer`: initializer for the kernel matrix;
+    - `bias_initializer`: initializer for the bias vector;
+    - `kernel_regularizer`: regularization applied to the kernel matrix;
+    - `bias_regularizer`: regularization applied to the bias vector;
+    - `activity_regularizer`: regularization applied to the output;
+    - `kernel_constraint`: constraint applied to the kernel matrix;
+    - `bias_constraint`: constraint applied to the bias vector.
+
+    **Usage**
+
+    ```py
+    fltr = localpooling_filter(adj)  # Can be any pre-processing
+    ...
+    X = Input(shape=(num_nodes, num_features))
+    filter = Input((num_nodes, num_nodes))
+    Z = GraphConv(channels, activation='relu')([X, filter])
+    ...
+    model.fit([node_features, fltr], y)
+    ```
+    """
+
+    def __init__(self,
+                 channels,
+                 aggregate_method='mean',
+                 activation=None,
+                 use_bias=True,
+                 kernel_initializer='glorot_uniform',
+                 bias_initializer='zeros',
+                 kernel_regularizer=None,
+                 bias_regularizer=None,
+                 activity_regularizer=None,
+                 kernel_constraint=None,
+                 bias_constraint=None,
+                 **kwargs):
+        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
+            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
+        super(GraphConv, self).__init__(**kwargs)
+        self.channels = channels
+        self.activation = activations.get(activation)
+        self.use_bias = use_bias
+        self.kernel_initializer = initializers.get(kernel_initializer)
+        self.bias_initializer = initializers.get(bias_initializer)
+        self.kernel_regularizer = regularizers.get(kernel_regularizer)
+        self.bias_regularizer = regularizers.get(bias_regularizer)
+        self.activity_regularizer = regularizers.get(activity_regularizer)
+        self.kernel_constraint = constraints.get(kernel_constraint)
+        self.bias_constraint = constraints.get(bias_constraint)
+        self.supports_masking = False
+        if aggregate_method == 'sum':
+            self.aggregate_op = tf.segment_sum
+        elif aggregate_method == 'mean':
+            self.aggregate_op = tf.segment_mean
+        elif aggregate_method == 'max':
+            self.aggregate_op = tf.segment_max
+        elif aggregate_method == 'min':
+            self.aggregate_op = tf.segment_sum
+        elif aggregate_method == 'prod':
+            self.aggregate_op = tf.segment_prod
+        else:
+            raise ValueError('Possbile aggragation methods: sum, mean, max, min, '
+                             'prod')
+
+    def build(self, input_shape):
+        assert len(input_shape) >= 2
+        input_dim = input_shape[0][-1]
+        self.kernel = self.add_weight(shape=(2 * input_dim, self.channels),
+                                      initializer=self.kernel_initializer,
+                                      name='kernel',
+                                      regularizer=self.kernel_regularizer,
+                                      constraint=self.kernel_constraint)
+        if self.use_bias:
+            self.bias = self.add_weight(shape=(self.channels,),
+                                        initializer=self.bias_initializer,
+                                        name='bias',
+                                        regularizer=self.bias_regularizer,
+                                        constraint=self.bias_constraint)
+        else:
+            self.bias = None
+        self.built = True
+
+    def call(self, inputs):
+        features = inputs[0]
+        fltr = inputs[1]
+
+        if not K.is_sparse(fltr):
+            fltr = K.tf.contrib.layers.dense_to_sparse(fltr)  # TODO: move this to tf
+
+        features_neigh = self.aggregate_op(
+            tf.gather(features, fltr.indices[:, -1]), fltr.indices[:, -2]
+        )
+        output = K.concatenate([features, features_neigh])
+        output = K.dot(output, self.kernel)
+
+        if self.use_bias:
+            output = K.bias_add(output, self.bias)
+        if self.activation is not None:
+            output = self.activation(output)
+        output = K.l2_normalize(output, axis=-1)
+        return output
 
 
 class EdgeConditionedConv(Layer):
