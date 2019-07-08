@@ -10,28 +10,29 @@ from spektral.layers.ops import filter_dot
 
 class GraphConv(Layer):
     """
-    A graph convolutional layer as presented by [Kipf & Welling (2016)](https://arxiv.org/abs/1609.02907).
+    A graph convolutional layer as presented by
+    [Kipf & Welling (2016)](https://arxiv.org/abs/1609.02907).
 
     **Mode**: single, mixed, batch.
     
     This layer computes the transformation:
     $$  
-        Z = \\sigma(AXW + b)
+        Z = \\sigma( \tilde{A} XW + b)
     $$
-    where \(X\) is the node features matrix, \(A\) is the normalized Laplacian,
-    \(W\) is the convolution kernel, \(b\) is a bias vector, and \(\\sigma\) is 
-    the activation function.
+    where \(X\) is the node features matrix, \(\tilde{A}\) is the normalized
+    Laplacian, \(W\) is the convolution kernel, \(b\) is a bias vector, and
+    \(\\sigma\) is the activation function.
     
     **Input**
     
-    - node features of shape `(n_nodes, n_features)` (with optional `batch`
+    - Node features of shape `(n_nodes, n_features)` (with optional `batch`
     dimension);
     - Normalized Laplacian of shape `(n_nodes, n_nodes)` (with optional `batch`
     dimension); see `spektral.utils.convolution.localpooling_filter`.
     
     **Output**
     
-    - node features with the same shape of the input, but the last dimension
+    - Node features with the same shape of the input, but the last dimension
     changed to `channels`.
         
     **Arguments**
@@ -50,13 +51,16 @@ class GraphConv(Layer):
     **Usage**  
     
     ```py
-    fltr = localpooling_filter(adj)  # Can be any pre-processing
-    ...
-    X = Input(shape=(num_nodes, num_features))
-    filter = Input((num_nodes, num_nodes))
-    Z = GraphConv(channels, activation='relu')([X, filter])
-    ...
-    model.fit([node_features, fltr], y)
+    # Load data
+    A, X, _, _, _, _, _, _ = citation.load_data('cora')
+
+    # Preprocessing operations
+    fltr = utils.localpooling_filter(A)
+
+    # Model definition
+    X_in = Input(shape=(F, ))
+    fltr_in = Input((N, ), sparse=True)
+    output = GraphConv(channels)([X_in, fltr_in])
     ```
     """
     def __init__(self,
@@ -142,7 +146,8 @@ class GraphConv(Layer):
 
 class ChebConv(Layer):
     """
-    A Chebyshev convolutional layer as presented by [Defferrard et al. (2016)](https://arxiv.org/abs/1606.09375).
+    A Chebyshev convolutional layer as presented by
+    [Defferrard et al. (2016)](https://arxiv.org/abs/1606.09375).
 
     **Mode**: single, mixed, batch.
     
@@ -156,14 +161,14 @@ class ChebConv(Layer):
 
     **Input**
 
-    - node features of shape `(n_nodes, n_features)` (with optional `batch`
+    - Node features of shape `(n_nodes, n_features)` (with optional `batch`
     dimension);
-    - a list of Chebyshev polynomials of shape `(num_nodes, num_nodes)` (with
+    - A list of Chebyshev polynomials of shape `(num_nodes, num_nodes)` (with
     optional `batch` dimension); see `spektral.utils.convolution.chebyshev_filter`.
 
     **Output**
 
-    - node features with the same shape of the input, but the last dimension
+    - Node features with the same shape of the input, but the last dimension
     changed to `channels`.
     
     **Arguments**
@@ -181,13 +186,16 @@ class ChebConv(Layer):
     
     **Usage**
     ```py
-    fltr = chebyshev_filter(adj, K)
-    ...
-    X = Input(shape=(num_nodes, num_features))
-    filter = [Input((num_nodes, num_nodes)) for _ in range(k + 1)]
-    Z = ChebConv(channels, activation='relu')([X] + filter)
-    ...
-    model.fit([node_features, fltr], y)
+    # Load data
+    A, X, _, _, _, _, _, _ = citation.load_data('cora')
+
+    # Preprocessing operations
+    fltr = utils.chebyshev_filter(A, K)
+
+    # Model definition
+    X_in = Input(shape=(F, ))
+    fltr_in = [Input((N, ), sparse=True) for _ in range(K + 1)]
+    output = ChebConv(channels)([X_in] + fltr_in)
     ```
     """
     def __init__(self,
@@ -290,17 +298,17 @@ class GraphSageConv(GraphConv):
     \(b\) is a bias vector, and \(\\sigma\) is the activation function.
     \(\\textrm{AGGREGATE}\) is an aggregation function as described in the
     original paper, that works by aggregating each node's neighbourhood
-    according to some rule. The available aggregation methods are: sum, mean,
+    according to some rule. The supported aggregation methods are: sum, mean,
     max, min, and product.
 
     **Input**
 
-    - node features of shape `(n_nodes, n_features)`;
+    - Node features of shape `(n_nodes, n_features)`;
     - Binary adjacency matrix of shape `(n_nodes, n_nodes)`.
 
     **Output**
 
-    - node features with the same shape of the input, but the last dimension
+    - Node features with the same shape of the input, but the last dimension
     changed to `channels`.
 
     **Arguments**
@@ -321,13 +329,9 @@ class GraphSageConv(GraphConv):
     **Usage**
 
     ```py
-    fltr = localpooling_filter(adj)  # Can be any pre-processing
-    ...
-    X = Input(shape=(num_nodes, num_features))
-    filter = Input((num_nodes, num_nodes))
-    Z = GraphConv(channels, activation='relu')([X, filter])
-    ...
-    model.fit([node_features, fltr], y)
+    X_in = Input(shape=(F, ))
+    A_in = Input((N, ), sparse=True)
+    output = GraphSage(channels)([X_in, A_in])
     ```
     """
 
@@ -457,14 +461,10 @@ class EdgeConditionedConv(Layer):
     
     **Usage**
     ```py
-    adj = add_eye_batch(adj)
-    ...
-    nf = Input(shape=(num_nodes, num_node_features))
-    a = Input(shape=(num_nodes, num_nodes))
-    ef = Input(shape=(num_nodes, num_nodes, num_edge_features))
-    Z = EdgeConditionedConv(32, num_nodes, num_edge_features)([nf, a, ef])
-    ...
-    model.fit([node_features, adj, edge_features], y)
+    X_in = Input(shape=(N, F))
+    A_in = Input(shape=(N, N))
+    E_in = Input(shape=(N, N, S))
+    output = EdgeConditionedConv(channels)([X_in, A_in, E_in])
     ```
     """
     # TODO: single, mixed
@@ -649,14 +649,18 @@ class GraphAttention(Layer):
     - `bias_constraint`: constraint applied to the bias vector.
     
     **Usage**
+
     ```py
-    adj = normalize_sum_to_unity(adj)
-    ...
-    X = Input(shape=(n_nodes, n_features))
-    A = Input((n_nodes, n_nodes))
-    Z = GraphAttention(channels, activation='relu')([X, A])
-    ...
-    model.fit([node_features, fltr], y)
+    # Load data
+    A, X, _, _, _, _, _, _ = citation.load_data('cora')
+
+    # Preprocessing operations
+    A = utils.add_eye(A).toarray()  # Add self-loops
+
+    # Model definition
+    X_in = Input(shape=(F, ))
+    A_in = Input((N, ))
+    output = GraphAttention(channels)([X_in, A_in])
     ```
     """
     def __init__(self,
@@ -875,9 +879,16 @@ class GraphConvSkip(Layer):
 
     **Usage**
     ```py
-    X = Input(shape=(n_nodes, n_features))
-    filter = Input((n_nodes, n_nodes))
-    Z = GraphConvSkip(channels, activation='relu')([X, filter])
+    # Load data
+    A, X, _, _, _, _, _, _ = citation.load_data('cora')
+
+    # Preprocessing operations
+    fltr = utils.normalized_adjacency(A)
+
+    # Model definition
+    X_in = Input(shape=(F, ))
+    fltr_in = Input((N, ), sparse=True)
+    output = GraphConvSkip(channels)([X_in, fltr_in])
     ```
     """
 
@@ -1024,13 +1035,16 @@ class ARMAConv(Layer):
 
     **Usage**
     ```py
-    fltr = localpooling_filter(adj)
-    ...
-    X = Input(shape=(n_nodes, n_features))
-    filter = Input((n_nodes, n_nodes))
-    Z = ARMAConv(channels, activation='relu')([X, filter])
-    ...
-    model.fit([node_features, fltr], y)
+    # Load data
+    A, X, _, _, _, _, _, _ = citation.load_data('cora')
+
+    # Preprocessing operations
+    fltr = utils.normalized_adjacency(A)
+
+    # Model definition
+    X_in= Input(shape=(F, ), sparse=True)
+    fltr_in = Input((N, ))
+    output = ARMAConv(channels)([X_in, fltr_in])
     ```
     """
 
@@ -1340,14 +1354,17 @@ class APPNP(Layer):
 
     **Usage**
     ```py
-    I = sp.identity(adj.shape[0], dtype=adj.dtype)
-    fltr = utils.normalize_adjacency(adj + I)
-    ...
-    X = Input(shape=(n_nodes, n_features))
-    filter = Input((n_nodes, n_nodes))
-    Z = APPNP(channels, mlp_channels)([X, filter])
-    ...
-    model.fit([node_features, fltr], y)
+    # Load data
+    A, X, _, _, _, _, _, _ = citation.load_data('cora')
+
+    # Preprocessing operations
+    I = sp.identity(A.shape[0], dtype=A.dtype)
+    fltr = utils.normalize_adjacency(A + I)
+
+    # Model definition
+    X_in = Input(shape=(F, ))
+    fltr_in = Input((N, ))
+    output = APPNP(channels, mlp_channels)([X_in, fltr_in])
     ```
     """
 
