@@ -64,6 +64,11 @@
     <a class="" href="..">Home</a>
 	    </li>
           
+            <li class="toctree-l1">
+		
+    <a class="" href="../getting-started/">Getting started</a>
+	    </li>
+          
             <li class="toctree-l1 current">
 		
     <a class="current" href="./">Data representation</a>
@@ -73,9 +78,6 @@
     
 
     <li class="toctree-l2"><a href="#modes">Modes</a></li>
-    
-
-    <li class="toctree-l2"><a href="#examples">Examples</a></li>
     
         <ul>
         
@@ -246,10 +248,12 @@
 <script type="math/tex">E \in \mathbb{R}^{N \times N \times S}</script>, a matrix encoding edge attributes, where each entry represents the <script type="math/tex">S</script>-dimensional attribute vector of an edge;</li>
 </ul>
 <p>Some frameworks (like the <a href="https://arxiv.org/abs/1806.01261">graph networks</a> proposed by Battaglia et al.) also include a feature vector describing the global state of the graph, but this is not supported by Spektral for now. </p>
-<p>In code, and in this documentation, we use the following convention to refer to the formulation above:
-- <code>A</code> is the adjacency matrix, <code>N</code> is the number of nodes;
-- <code>X</code> is the node attributes matrix, <code>F</code> is the size of the edge attributes;
-- <code>E</code> is the edge attributes matrix, <code>S</code> is the size of the edge attributes;</p>
+<p>In code, and in this documentation, we use the following convention to refer to the formulation above:</p>
+<ul>
+<li><code>A</code> is the adjacency matrix, <code>N</code> is the number of nodes;</li>
+<li><code>X</code> is the node attributes matrix, <code>F</code> is the size of the edge attributes;</li>
+<li><code>E</code> is the edge attributes matrix, <code>S</code> is the size of the edge attributes;</li>
+</ul>
 <p>See the table below for how these matrices are represented in Numpy. </p>
 <h2 id="modes">Modes</h2>
 <p>In Spektral, some functionalities are implemented to work on a single graph, while others consider batches of graphs. </p>
@@ -263,14 +267,15 @@ On the other hand, when working with molecules in a dataset, we are in a much mo
 <li><strong>batch</strong>, where we have a set of different graphs, each with its own topology and attributes;</li>
 <li><strong>mixed</strong>, where we have a graph with fixed topology, but a set of different attributes (usually called <em>graph signals</em>); this can be seen as a particular case of the batch mode, but it is handled separately in Spektral to improve memory efficiency.</li>
 </ul>
-<p>The difference between the three modes can be summarized as:</p>
+<p>We also have the <strong>graph batch</strong> mode, which is a simple trick to represent a batch of graphs in single mode. This requires an additional data structure to keep track of the graphs, and is explained in detail at the end of this section.</p>
+<p>The difference between the three main modes can be easily seen in how <code>A</code>, <code>X</code>, and <code>E</code> have different shapes in each case:</p>
 <table>
 <thead>
 <tr>
 <th align="center">Mode</th>
-<th align="center"><code>A</code></th>
-<th align="center"><code>X</code></th>
-<th align="center"><code>E</code></th>
+<th align="center"><code>A.shape</code></th>
+<th align="center"><code>X.shape</code></th>
+<th align="center"><code>E.shape</code></th>
 </tr>
 </thead>
 <tbody>
@@ -294,7 +299,6 @@ On the other hand, when working with molecules in a dataset, we are in a much mo
 </tr>
 </tbody>
 </table>
-<h2 id="examples">Examples</h2>
 <h3 id="single-mode">Single mode</h3>
 <p>In <strong>single mode</strong> the data describes a single graph. Three very popular datasets in this setting are the citation networks, Cora, Citeseer, and Pubmed. To load a citation network, you can use the built-in loader:</p>
 <pre><code class="py">In [1]: from spektral.datasets import citation
@@ -335,7 +339,7 @@ Out[5]: (133885, 9, 9, 1)
 <p>Note that the graphs in QM9 have variable order (i.e., different <code>N</code> for each graph), and that by default <code>load_data()</code> pads them with zeros in order to store the data in Numpy arrays.<br />
 See the <a href="https://danielegrattarola.github.io/spektral/data/#graph-batch-mode">graph batch mode</a> section for an alternative to zero-padding. </p>
 <h3 id="mixed-mode">Mixed mode</h3>
-<p>In <strong>mixed mode</strong> we consider a single adjacency matrix, and different node and edge attributes matrices. An example of a mixed mode dataset is the MNIST random grid classification proposed by <a href="https://arxiv.org/abs/1606.09375">Defferrard et al.</a>:</p>
+<p>In <strong>mixed mode</strong> we consider a single adjacency matrix, and different node and edge attributes matrices. An example of a mixed mode dataset is the MNIST random grid proposed by <a href="https://arxiv.org/abs/1606.09375">Defferrard et al.</a>:</p>
 <pre><code class="py">In [1]: from spektral.datasets import mnist
 Using TensorFlow backend.
 
@@ -358,7 +362,7 @@ In order to avoid this issue, a common approach is to represent a batch of graph
 <li><code>X</code> is obtained by stacking the node attributes of the batch;</li>
 <li><code>E</code> is a block diagonal tensor of rank 3, obtained from the edge attributes;</li>
 </ol>
-<p>In order to keep track of different graphs in the disjoint union, we use an additional array of integers <code>I</code>, that maps each node to a graph.</p>
+<p>In order to keep track of different graphs in the disjoint union, we use an additional array of integers <code>I</code>, that maps each node to a graph with a progressive, zero-based indexing.</p>
 <p>Utilities for creating the disjoint union of a list of graphs are provided in <code>spektral.utils.data</code>:</p>
 <pre><code class="py">In [1]: from spektral.utils.data import Batch                                                               
 Using TensorFlow backend.
@@ -405,7 +409,7 @@ Out[8]:
 
 <p>Convolutional layers that work in single mode will work for this type of data representation, without any modification.<br />
 Pooling layers, on the other hand, require the batch indices vector in order to know which nodes to pool together. </p>
-<p>Global pooling layers will consume <code>I</code> and return a single vectors instead of graphs. Standard pooling layers will return a reduced version of <code>I</code> along with the reduced graphs. </p>
+<p>Global pooling layers will consume <code>I</code> and reduce the graphs to single vectors. Standard pooling layers will return a reduced version of <code>I</code> along with the reduced graphs. </p>
 <hr />
 <h2 id="conversion-methods">Conversion methods</h2>
 <p>To provide better compatibility with other libraries, Spektral has methods to convert graphs between the matrix representation (<code>'numpy'</code>) and other formats. </p>
@@ -473,7 +477,7 @@ Conversion utils between <code>'numpy'</code> and <code>'networkx'</code> are pr
         <a href="../layers/convolution/" class="btn btn-neutral float-right" title="Convolutional Layers">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href=".." class="btn btn-neutral" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../getting-started/" class="btn btn-neutral" title="Getting started"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -501,7 +505,7 @@ Conversion utils between <code>'numpy'</code> and <code>'networkx'</code> are pr
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../getting-started/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
         <span style="margin-left: 15px"><a href="../layers/convolution/" style="color: #fcfcfc">Next &raquo;</a></span>
