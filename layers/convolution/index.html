@@ -400,7 +400,7 @@ output = GraphSage(channels)([X_in, A_in])
 <p><strong>Mode</strong>: single, mixed, batch.</p>
 <p>This layer computes the transformation:
 <script type="math/tex; mode=display">
-X^{out} = \text{avgpool}\left(\sum \limits_{k=1}^K \bar{X}_k^{(T)} \right),
+X^{out} = \frac{1}{K}\left(\sum \limits_{k=1}^K \bar{X}_k^{(T)} \right),
 </script>
 where:
 <script type="math/tex; mode=display">
