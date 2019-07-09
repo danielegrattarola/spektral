@@ -395,27 +395,27 @@ output = GraphSage(channels)([X_in, A_in])
 <pre><code class="python">spektral.layers.ARMAConv(channels, T=1, K=1, recurrent=False, gcn_activation='relu', dropout_rate=0.0, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
-<p>A graph convolutional layer with ARMA(K, K) filters, as presented by
+<p>A graph convolutional layer with ARMA(K, K-1) filters, as presented by
 <a href="https://arxiv.org/abs/1901.01343">Bianchi et al. (2019)</a>.</p>
 <p><strong>Mode</strong>: single, mixed, batch.</p>
-<p>This layer computes the transformation:
+<p>This layer computes:
 <script type="math/tex; mode=display">
-X^{out} = \frac{1}{K}\sum \limits_{k=1}^K \bar{X}_k^{(T)},
+Z = \frac{1}{K}\sum \limits_{k=1}^K \bar{X}_k^{(T)},
 </script>
-where:
+where $K$ is the order of the ARMA(K, K-1) filter, and where:
 <script type="math/tex; mode=display">
 \bar{X}_k^{(t + 1)} =  \sigma\left(\tilde{L}\bar{X}^{(t)}W^{(t)} + XV^{(t)}\right)
 </script>
-is a graph convolutional skip layer implementing the recursive update to
-approximate the ARMA filter, <script type="math/tex">\tilde{L}</script> is the Laplacian modified to
-have a spectrum in <script type="math/tex">[0,,2]</script>, <script type="math/tex">\bar{X}^{(0)} = X</script>, and <script type="math/tex">W, V</script> are
-trainable kernels.</p>
+is a graph convolutional skip layer implementing a recursive approximation
+of an ARMA(1, 0) filter, <script type="math/tex">\tilde{L}</script> is  normalized graph Laplacian with
+a rescaled spectrum, <script type="math/tex">\bar{X}^{(0)} = X</script>, and <script type="math/tex">W, V</script> are trainable
+kernels.</p>
 <p><strong>Input</strong></p>
 <ul>
 <li>node features of shape <code>(n_nodes, n_features)</code> (with optional <code>batch</code>
 dimension);</li>
-<li>Normalized Laplacian  of shape <code>(n_nodes, n_nodes)</code> (with optional <code>batch</code>
-dimension); see examples/node_classification_arma.py.</li>
+<li>Normalized Laplacian of shape <code>(n_nodes, n_nodes)</code> (with optional <code>batch</code>
+dimension); see the <a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_classification_arma.py">ARMA node classification example</a></li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
@@ -425,11 +425,12 @@ changed to <code>channels</code>.</li>
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>channels</code>: integer, number of output channels;</li>
-<li><code>T</code>: depth of each ARMA_1 filter (number of recursive updates);</li>
-<li><code>K</code>: order of the ARMA filter (combination of K ARMA_1 filters);</li>
+<li><code>T</code>: depth of each ARMA(1, 0) approximation (number of recursive updates);</li>
+<li><code>K</code>: order of the full ARMA(K, K-1) filter (combination of K ARMA(1, 0)
+filters);</li>
 <li><code>recurrent</code>: whether to share each head's weights like a recurrent net;</li>
 <li><code>gcn_activation</code>: activation function to use to compute the ARMA filter;</li>
-<li><code>dropout_rate</code>: dropout rate for laplacian and output layer</li>
+<li><code>dropout_rate</code>: dropout rate for Laplacian and output layer;</li>
 <li><code>activation</code>: activation function to use;</li>
 <li><code>use_bias</code>: whether to add a bias to the linear transformation;</li>
 <li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
@@ -620,7 +621,7 @@ output = GraphConvSkip(channels)([X_in, fltr_in])
 </code></pre>
 
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L1316">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L1317">[source]</a></span></p>
 <h3 id="appnp">APPNP</h3>
 <pre><code class="python">spektral.layers.APPNP(channels, mlp_channels, alpha=0.2, H=1, K=1, mlp_activation='relu', dropout_rate=0.0, activation='softmax', use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
