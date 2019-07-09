@@ -300,7 +300,7 @@ If left to its own devices, Keras will automatically try to split our graph into
 This would not be necessary if we were working in <strong>batch mode</strong> instead, with many different graphs in our dataset. </p>
 <p>Finally, we used <code>train_mask</code> and <code>val_mask</code> as <code>sample_weight</code>. <br />
 This results in the training nodes being assigned a weight of 1 during training, and the nodes outside the training set being assigned a weight of 0. The same holds for the validation and test sets.  <br />
-This is all that we need to do to differentiate between training and test data. See how the model takes as input the full <code>X</code> and <code>A</code> for both phases? The only thing that changes is the mask and targets. This is also why we used the <code>weihgted_metrics</code> flag when compiling the model. </p>
+This is all that we need to do to differentiate between training and test data. See how the model takes as input the full <code>X</code> and <code>A</code> for both phases? The only thing that changes is the mask and targets. This is also why we used the <code>weighted_metrics</code> flag when compiling the model. </p>
 <h2 id="evaluating-the-model">Evaluating the model</h2>
 <p>Again, this is done in vanilla Keras. We just have to keep in mind the same considerations about batching that we did for training (<code>shuffle</code> is <code>False</code> by default in <code>evaluate()</code>): </p>
 <pre><code class="python"># Evaluate model
