@@ -181,17 +181,7 @@
           
             <li class="toctree-l1">
 		
-    <span class="caption-text">About</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../../acknowledgements/">Acknowledgements</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../papers/">Featured papers</a>
-                </li>
-    </ul>
+    <a class="" href="../../about/">About</a>
 	    </li>
           
         </ul>
@@ -241,7 +231,7 @@
 <p>A graph convolutional layer as presented by
 <a href="https://arxiv.org/abs/1609.02907">Kipf &amp; Welling (2016)</a>.</p>
 <p><strong>Mode</strong>: single, mixed, batch.</p>
-<p>This layer computes the transformation:
+<p>This layer computes:
 <script type="math/tex; mode=display">  
 Z = \sigma( \tilde{A} XW + b)
 </script>
@@ -296,7 +286,7 @@ output = GraphConv(channels)([X_in, fltr_in])
 <a href="https://arxiv.org/abs/1606.09375">Defferrard et al. (2016)</a>.</p>
 <p><strong>Mode</strong>: single, mixed, batch.</p>
 <p>Given a list of Chebyshev polynomials <script type="math/tex">T = [T_{1}, ..., T_{K}]</script>, 
-this layer computes the transformation:
+this layer computes:
 <script type="math/tex; mode=display">
 Z = \sigma( \sum \limits_{k=1}^{K} T_{k} X W  + b)
 </script>
@@ -348,7 +338,7 @@ output = ChebConv(channels)([X_in] + fltr_in)
 
 <p>A GraphSage layer as presented by <a href="https://arxiv.org/abs/1706.02216">Hamilton et al. (2017)</a>.</p>
 <p><strong>Mode</strong>: single.</p>
-<p>This layer computes the transformation:
+<p>This layer computes:
 <script type="math/tex; mode=display">
 Z = \sigma \big( \big[ \textrm{AGGREGATE}(X) \| X \big] W + b \big)
 </script>
@@ -390,7 +380,7 @@ output = GraphSage(channels)([X_in, A_in])
 </code></pre>
 
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L986">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L985">[source]</a></span></p>
 <h3 id="armaconv">ARMAConv</h3>
 <pre><code class="python">spektral.layers.ARMAConv(channels, T=1, K=1, recurrent=False, gcn_activation='relu', dropout_rate=0.0, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -463,10 +453,9 @@ output = ARMAConv(channels)([X_in, fltr_in])
 <p>An edge-conditioned convolutional layer as presented by <a href="https://arxiv.org/abs/1704.02901">Simonovsky and
 Komodakis (2017)</a>.</p>
 <p><strong>Mode</strong>: batch.</p>
-<p>This layer computes a transformation of the input <script type="math/tex">X</script>, s.t. for each node
-<script type="math/tex">i</script> we have:
+<p>For each node <script type="math/tex">i</script>, this layer computes:
 <script type="math/tex; mode=display">
-X^{out}_i =  \frac{1}{\mathcal{N}(i)} \sum\limits_{j \in \mathcal{N}(i)} F(E_{ji}) X_{j} + b
+Z_i =  \frac{1}{\mathcal{N}(i)} \sum\limits_{j \in \mathcal{N}(i)} F(E_{ji}) X_{j} + b
 </script>
 where <script type="math/tex">\mathcal{N}(i)</script> represents the one-step neighbourhood of node <script type="math/tex">i</script>,
 <script type="math/tex">F</script> is a neural network that outputs the convolution kernel as a
@@ -507,7 +496,7 @@ output = EdgeConditionedConv(channels)([X_in, A_in, E_in])
 </code></pre>
 
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L606">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L605">[source]</a></span></p>
 <h3 id="graphattention">GraphAttention</h3>
 <pre><code class="python">spektral.layers.GraphAttention(channels, attn_heads=1, attn_heads_reduction='concat', dropout_rate=0.5, activation='relu', use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', attn_kernel_initializer='glorot_uniform', kernel_regularizer=None, bias_regularizer=None, attn_kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None, attn_kernel_constraint=None)
 </code></pre>
@@ -566,7 +555,7 @@ output = GraphAttention(channels)([X_in, A_in])
 </code></pre>
 
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L839">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L838">[source]</a></span></p>
 <h3 id="graphconvskip">GraphConvSkip</h3>
 <pre><code class="python">spektral.layers.GraphConvSkip(channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -575,7 +564,7 @@ output = GraphAttention(channels)([X_in, A_in])
 <a href="https://arxiv.org/abs/1609.02907">Kipf &amp; Welling (2016)</a>, with the addition
 of a skip connection.</p>
 <p><strong>Mode</strong>: single, mixed, batch.</p>
-<p>This layer computes the transformation:
+<p>This layer computes:
 <script type="math/tex; mode=display">
 Z = \sigma(A X W_1 + X W_2 + b)
 </script>
@@ -621,14 +610,13 @@ output = GraphConvSkip(channels)([X_in, fltr_in])
 </code></pre>
 
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L1317">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L1316">[source]</a></span></p>
 <h3 id="appnp">APPNP</h3>
 <pre><code class="python">spektral.layers.APPNP(channels, mlp_channels, alpha=0.2, H=1, K=1, mlp_activation='relu', dropout_rate=0.0, activation='softmax', use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
 <p>A graph convolutional layer implementing the APPNP operator, as presented by
-<a href="https://arxiv.org/abs/1810.05997">Klicpera et al. (2019)</a>.
-Implementation by Filippo Bianchi.</p>
+<a href="https://arxiv.org/abs/1810.05997">Klicpera et al. (2019)</a>.</p>
 <p><strong>Mode</strong>: single, mixed, batch.</p>
 <p><strong>Input</strong></p>
 <ul>
