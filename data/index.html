@@ -246,7 +246,7 @@
 <p>A graph is generally represented by three matrices:</p>
 <ul>
 <li>
-<script type="math/tex">A \in \{0, 1\}^{N \times N}</script>, a binary adjacency matrix where <script type="math/tex">A_{ij} = 1</script> if there is a connection between nodes <script type="math/tex">i</script> and <script type="math/tex">j</script>, and <script type="math/tex">A_{ij} = 0</script> otherwise;</li>
+<script type="math/tex">A \in \mathbb{R}^{N \times N}</script>, a square adjacency matrix where <script type="math/tex">A_{ij} > 0</script> if there is a connection between nodes <script type="math/tex">i</script> and <script type="math/tex">j</script>, and <script type="math/tex">A_{ij} = 0</script> otherwise;</li>
 <li>
 <script type="math/tex">X \in \mathbb{R}^{N \times F}</script>, a matrix encoding node attributes, where each row represents the <script type="math/tex">F</script>-dimensional attribute vector of a node;</li>
 <li>
@@ -264,7 +264,7 @@
 <p>In Spektral, some functionalities are implemented to work on a single graph, while others consider batches of graphs. </p>
 <p>To understand the difference between the two settings, consider the difference between classifying the nodes of a citation network, and classifying the chemical properties of molecules.<br />
 For the citation network, we are interested in the individual nodes and the connections between them. Node and edge attributes are specific to each individual network, and we are usually not interested in training models that work on different networks. The nodes of themselves are our data.<br />
-On the other hand, when working with molecules in a dataset, we are in a much more familiar setting. Each molecule is a sample of our dataset, and the atoms and bonds that make up the molecules are the constituent part of each data sample (like pixels in images). In this case, we are interested in finding patterns that describe the properties of the molecules in general. </p>
+On the other hand, when working with molecules in a dataset, we are in a much more familiar setting. Each molecule is a sample of our dataset, and the atoms and bonds that make up the molecules are the constituent part of each data point (like pixels in images). In this case, we are interested in finding patterns that describe the properties of the molecules in general. </p>
 <p>The two settings require us to do things that are conceptually similar, but that need some minor adjustments in how the data is processed by our graph neural networks. This is why Spektral makes these differences explicit.</p>
 <p>In practice, we actually distinguish between three main <strong>modes</strong> of operation: </p>
 <ul>
