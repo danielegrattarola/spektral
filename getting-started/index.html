@@ -73,7 +73,7 @@
     
         <ul>
         
-            <li><a class="toctree-l3" href="#citation-networks">Citation networks</a></li>
+            <li><a class="toctree-l3" href="#node-classification-on-citation-networks">Node classification on citation networks</a></li>
         
             <li><a class="toctree-l3" href="#creating-a-gnn">Creating a GNN</a></li>
         
@@ -92,6 +92,11 @@
             <li class="toctree-l1">
 		
     <a class="" href="../data/">Data representation</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../examples/">Examples</a>
 	    </li>
           
             <li class="toctree-l1">
@@ -222,7 +227,7 @@
 <p>The most important features of Spektral are the <code>layers.convolutional</code> and <code>layers.pooling</code> modules, which offer a number of popular layers to start building graph neural networks (GNNs) right away.   <br />
 Because Spektral is designed as an extension of Keras, you can plug any Spektral layer into an existing Keras <code>Model</code> without modifications. </p>
 <p>A good starting point is the collection of examples which can be found <a href="https://github.com/danielegrattarola/spektral/tree/master/examples">on Github</a>, and it is also a good idea to read the section on <a href="https://danielegrattarola.github.io/spektral/data/">how to represent graphs</a> before starting this tutorial. </p>
-<h2 id="citation-networks">Citation networks</h2>
+<h2 id="node-classification-on-citation-networks">Node classification on citation networks</h2>
 <p>In this example, we will build a simple <a href="https://arxiv.org/abs/1609.02907">Graph Convolutional Network for semi-supervised node classification</a>.</p>
 <p>This is a simple but challenging task that has caused GNN's recent rise to popularity, and consists in classifying documents in a <strong>citation network</strong>. <br />
 In this network, each node represents a document, and node attributes are bag-of-words binary features. 
@@ -263,7 +268,7 @@ model = Model(inputs=[X_in, A_in], outputs=graph_conv_2)
 
 <p>And that's it. We just built our first GNN in Spektral and Keras. </p>
 <p>Note how we used the same familiar API of Keras for creating the GCN layers, as well as the standard <code>Dropout</code> layer to regularize our model. If we wanted, we could choose our own regularizers and initializers for the weights of <code>GraphConv</code> as well.</p>
-<p>An important thing to keep in mind is that in this <strong>single mode</strong> (see the <a href="https://danielegrattarola.github.io/spektral/data/">data representation section</a>), there is no batch dimension. The "elements" of our dataset are, in a sense, the node themselves. This is why we omitted the first dimension of <code>X</code> and <code>A</code> in the <code>Input</code> layers. </p>
+<p>An important thing to keep in mind is that in this <strong>single mode</strong> (see the <a href="https://danielegrattarola.github.io/spektral/data/">data representation section</a>), there is no batch dimension. The "elements" of our dataset are, in a sense, the node themselves. This is why we omitted the first dimension of <code>X</code> and <code>A</code> in the <code>Input</code> layers (<code>shape=(F, )</code> instead of <code>(N, F)</code>, and <code>shape=(N, )</code> instead of <code>(N, N)</code>). </p>
 <p>This will become clearer later. </p>
 <h2 id="training-the-gnn">Training the GNN</h2>
 <p>Before training the model, we have to do a simple pre-processing of the adjacency matrix, in order to scale the weight (i.e., the importance) of a node's connections according to the node's degree. In other words, the more a node is connected, the less relative importance those connections have (plus some other minor considerations that you can find in the <a href="https://arxiv.org/abs/1609.02907">original GCN paper</a>).  </p>
@@ -290,7 +295,7 @@ model.fit([X, A],
           epochs=100,
           batch_size=N,
           validation_data=validation_data,
-          shuffle=False  # Shuffling data means shuffling the whole graph)
+          shuffle=False)  # Shuffling data means shuffling the whole graph
 </code></pre>
 
 <p>There are a couple of things to note here.</p>
@@ -315,8 +320,9 @@ print('Done.\n'
 
 <p>Done! Our model has been defined, trained, and evaluated.</p>
 <h2 id="go-create">Go create!</h2>
-<p>If you made it to this point, you are ready to use basically all the functionalities of Spektral. </p>
+<p>If you made it to this point, you are ready to use Spektral to create your own models. </p>
 <p>If you want to build a GNN for a specific task, chances are that the things you need to define the model and pre-process the data are already part of Spektral. Check the <a href="https://github.com/danielegrattarola/spektral/tree/master/examples">examples</a> for some ideas and practical tips.</p>
+<p>Remember to read the <a href="https://danielegrattarola.github.io/spektral/data/">data representation section</a> to learn about how GNNs can be used to solve different problems. </p>
 <p>Make sure to check the documentation, and leave a comment <a href="https://github.com/danielegrattarola/spektral">on Github</a> if you have a feature that you want to see implemented. </p>
               
             </div>

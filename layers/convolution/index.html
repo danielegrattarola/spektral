@@ -76,6 +76,11 @@
           
             <li class="toctree-l1">
 		
+    <a class="" href="../../examples/">Examples</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
     <span class="caption-text">Layers</span>
     <ul class="subnav">
                 <li class=" current">
@@ -381,7 +386,7 @@ changed to <code>channels</code>.</li>
 <p><strong>Usage</strong></p>
 <pre><code class="py">X_in = Input(shape=(F, ))
 A_in = Input((N, ), sparse=True)
-output = GraphSage(channels)([X_in, A_in])
+output = GraphSageConv(channels)([X_in, A_in])
 </code></pre>
 
 <hr />
@@ -677,7 +682,7 @@ output = APPNP(channels, mlp_channels)([X_in, fltr_in])
         <a href="../pooling/" class="btn btn-neutral float-right" title="Pooling Layers">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../../data/" class="btn btn-neutral" title="Data representation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../examples/" class="btn btn-neutral" title="Examples"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -705,7 +710,7 @@ output = APPNP(channels, mlp_channels)([X_in, fltr_in])
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../../data/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../../examples/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
         <span style="margin-left: 15px"><a href="../pooling/" style="color: #fcfcfc">Next &raquo;</a></span>
