@@ -1,5 +1,5 @@
 from spektral.layers import GraphConv, ChebConv, EdgeConditionedConv, GraphAttention, GraphConvSkip, ARMAConv, APPNP, \
-    GraphSageConv
+    GraphSageConv, GINConv
 from keras import backend as K, Model, Input
 import numpy as np
 import tensorflow as tf
@@ -10,42 +10,47 @@ TESTS = [
     {
         LAYER_K_: GraphConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
-        KWARGS_K_: {'channels': 8}
+        KWARGS_K_: {'channels': 8, 'activation': 'relu'}
     },
     {
         LAYER_K_: ChebConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
-        KWARGS_K_: {'channels': 8}
+        KWARGS_K_: {'channels': 8, 'activation': 'relu'}
     },
     {
         LAYER_K_: GraphSageConv,
         MODES_K_: [SINGLE],
-        KWARGS_K_: {'channels': 8}
+        KWARGS_K_: {'channels': 8, 'activation': 'relu'}
     },
     {
         LAYER_K_: EdgeConditionedConv,
         MODES_K_: [BATCH],
-        KWARGS_K_: {'channels': 8, 'edges': True}
+        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'edges': True}
     },
     {
         LAYER_K_: GraphAttention,
         MODES_K_: [SINGLE, BATCH, MIXED],
-        KWARGS_K_: {'channels': 8}
+        KWARGS_K_: {'channels': 8, 'activation': 'relu'}
     },
     {
         LAYER_K_: GraphConvSkip,
         MODES_K_: [SINGLE, BATCH, MIXED],
-        KWARGS_K_: {'channels': 8}
+        KWARGS_K_: {'channels': 8, 'activation': 'relu'}
     },
     {
         LAYER_K_: ARMAConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
-        KWARGS_K_: {'channels': 8, 'T': 2, 'K': 2, 'recurrent': True}
+        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'T': 2, 'K': 2, 'recurrent': True}
     },
     {
         LAYER_K_: APPNP,
         MODES_K_: [SINGLE, BATCH, MIXED],
-        KWARGS_K_: {'channels': 8, 'mlp_channels': 16, 'H': 2}
+        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'mlp_channels': 16, 'H': 2}
+    },
+    {
+        LAYER_K_: GINConv,
+        MODES_K_: [SINGLE],
+        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'n_hidden_layers': 1}
     }
 ]
 

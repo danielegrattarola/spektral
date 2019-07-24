@@ -1510,3 +1510,188 @@ class APPNP(Layer):
         }
         base_config = super(APPNP, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
+
+
+class GINConv(GraphConv):
+    """
+    A Graph Isomorphism Network (GIN) as presented by
+    [Xu et al. (2018)](https://arxiv.org/abs/1810.00826).
+
+    **Mode**: single.
+
+    This layer computes for each node \(i\):
+    $$
+        Z_i = \\textrm{MLP} ( (1 + \\epsilon) \\cdot X_i + \\sum\\limits_{j in \\mathcal{N}(i)} X_j)
+    $$
+    where \(X\) is the node features matrix and \(\\textrm{MLP}\) is a
+    multi-layer perceptron.
+
+    **Input**
+
+    - Node features of shape `(n_nodes, n_features)` (with optional `batch`
+    dimension);
+    - Normalized and rescaled Laplacian of shape `(n_nodes, n_nodes)` (with
+    optional `batch` dimension);
+
+    **Output**
+
+    - Node features with the same shape of the input, but the last dimension
+    changed to `channels`.
+
+    **Arguments**
+
+    - `channels`: integer, number of output channels;
+    - `mlp_channels`: integer, number of channels in the inner MLP;
+    - `n_hidden_layers`: integer, number of hidden layers in the MLP (default 0)
+    - `epsilon`: unnamed parameter, see [Xu et al. (2018)](https://arxiv.org/abs/1810.00826).
+    In practice, it is safe to leave it to 0.
+    - `mlp_activation`: activation function for the MLP,
+    - `activation`: activation function to use;
+    - `use_bias`: whether to add a bias to the linear transformation;
+    - `kernel_initializer`: initializer for the kernel matrix;
+    - `bias_initializer`: initializer for the bias vector;
+    - `kernel_regularizer`: regularization applied to the kernel matrix;
+    - `bias_regularizer`: regularization applied to the bias vector;
+    - `activity_regularizer`: regularization applied to the output;
+    - `kernel_constraint`: constraint applied to the kernel matrix;
+    - `bias_constraint`: constraint applied to the bias vector.
+
+    **Usage**
+
+    ```py
+    # Load data
+    A, X, _, _, _, _, _, _ = citation.load_data('cora')
+
+    # Preprocessing operations
+    fltr = utils.normalized_laplacian(A)
+    fltr = utils.rescale_laplacian(X, lmax=2)
+
+    # Model definition
+    X_in = Input(shape=(F, ))
+    fltr_in = Input((N, ), sparse=True)
+    output = GINConv(channels)([X_in, fltr_in])
+    ```
+    """
+
+    def __init__(self,
+                 channels,
+                 mlp_channels=16,
+                 n_hidden_layers=0,
+                 epsilon=None,
+                 mlp_activation='relu',
+                 activation=None,
+                 use_bias=True,
+                 kernel_initializer='glorot_uniform',
+                 bias_initializer='zeros',
+                 kernel_regularizer=None,
+                 bias_regularizer=None,
+                 activity_regularizer=None,
+                 kernel_constraint=None,
+                 bias_constraint=None,
+                 **kwargs):
+        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
+            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
+        super(GINConv, self).__init__(channels, **kwargs)
+        self.channels = channels
+        self.channels_hid = mlp_channels
+        self.extra_hidden_layers = n_hidden_layers
+        self.epsilon = epsilon
+        self.hidden_activation = activations.get(mlp_activation)
+        self.activation = activations.get(activation)
+        self.use_bias = use_bias
+        self.kernel_initializer = initializers.get(kernel_initializer)
+        self.bias_initializer = initializers.get(bias_initializer)
+        self.kernel_regularizer = regularizers.get(kernel_regularizer)
+        self.bias_regularizer = regularizers.get(bias_regularizer)
+        self.activity_regularizer = regularizers.get(activity_regularizer)
+        self.kernel_constraint = constraints.get(kernel_constraint)
+        self.bias_constraint = constraints.get(bias_constraint)
+        self.supports_masking = False
+
+    def build(self, input_shape):
+        assert len(input_shape) >= 2
+        input_dim = input_shape[0][-1]
+
+        self.kernel_in = self.add_weight(shape=(input_dim, self.channels_hid),
+                                         initializer=self.kernel_initializer,
+                                         name='kernel_in',
+                                         regularizer=self.kernel_regularizer,
+                                         constraint=self.kernel_constraint)
+
+        self.kernel_out = self.add_weight(shape=(self.channels_hid, self.channels),
+                                          initializer=self.kernel_initializer,
+                                          name='kernel_out',
+                                          regularizer=self.kernel_regularizer,
+                                          constraint=self.kernel_constraint)
+
+        if self.use_bias:
+            self.bias_in = self.add_weight(shape=(self.channels_hid,),
+                                           initializer=self.bias_initializer,
+                                           name='bias_in',
+                                           regularizer=self.bias_regularizer,
+                                           constraint=self.bias_constraint)
+
+            self.bias_out = self.add_weight(shape=(self.channels,),
+                                            initializer=self.bias_initializer,
+                                            name='bias_out',
+                                            regularizer=self.bias_regularizer,
+                                            constraint=self.bias_constraint)
+
+        if self.epsilon == None:
+            self.eps = self.add_weight(shape=(1,),
+                                       initializer=self.bias_initializer,
+                                       name='eps')
+        else:
+            self.eps = K.constant(self.epsilon)
+
+        # Additional hidden layers
+        if self.extra_hidden_layers > 0:
+            self.kernels_hid = []
+            self.biases_hid = []
+            for k in range(self.extra_hidden_layers):
+                self.kernels_hid.append(self.add_weight(shape=(self.channels_hid, self.channels_hid),
+                                                        initializer=self.kernel_initializer,
+                                                        name='kernel_hid_{}'.format(k),
+                                                        regularizer=self.kernel_regularizer,
+                                                        constraint=self.kernel_constraint))
+                if self.use_bias:
+                    self.biases_hid.append(self.add_weight(shape=(self.channels_hid,),
+                                                           initializer=self.bias_initializer,
+                                                           name='bias_hid_{}'.format(k),
+                                                           regularizer=self.bias_regularizer,
+                                                           constraint=self.bias_constraint))
+
+        self.built = True
+
+    def call(self, inputs):
+        features = inputs[0]
+        fltr = inputs[1]
+
+        if not K.is_sparse(fltr):
+            fltr = K.tf.contrib.layers.dense_to_sparse(fltr)  # TODO: move this to tf
+
+        # Input layer
+        features_neigh = tf.segment_sum(tf.gather(features, fltr.indices[:, -1]), fltr.indices[:, -2])
+        hidden = (1.0 + self.eps) * features + features_neigh
+        hidden = K.dot(hidden, self.kernel_in)
+        if self.use_bias:
+            hidden = K.bias_add(hidden, self.bias_in)
+        if self.hidden_activation is not None:
+            hidden = self.hidden_activation(hidden)
+
+        # More hidden layers (optional)
+        for k in range(self.extra_hidden_layers):
+            hidden = K.dot(hidden, self.kernels_hid[k])
+            if self.use_bias:
+                hidden = K.bias_add(hidden, self.biases_hid[k])
+            if self.hidden_activation is not None:
+                hidden = self.hidden_activation(hidden)
+
+        # Output layer
+        output = K.dot(hidden, self.kernel_out)
+        if self.use_bias:
+            output = K.bias_add(output, self.bias_out)
+        if self.activation is not None:
+            output = self.activation(output)
+
+        return output
