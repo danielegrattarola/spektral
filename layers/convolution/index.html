@@ -708,8 +708,11 @@ changed to <code>channels</code>.</li>
 <li><code>channels</code>: integer, number of output channels;</li>
 <li><code>mlp_channels</code>: integer, number of channels in the inner MLP;</li>
 <li><code>n_hidden_layers</code>: integer, number of hidden layers in the MLP (default 0)</li>
-<li><code>epsilon</code>: unnamed parameter, see <a href="https://arxiv.org/abs/1810.00826">Xu et al. (2018)</a>.
-In practice, it is safe to leave it to 0.</li>
+<li><code>epsilon</code>: unnamed parameter, see
+<a href="https://arxiv.org/abs/1810.00826">Xu et al. (2018)</a>, and the equation above.
+This parameter can be learned by setting <code>epsilon=None</code>, or it can be set
+to a constant value, which is what happens by default (0). In practice, it
+is safe to leave it to 0.</li>
 <li><code>mlp_activation</code>: activation function for the MLP,</li>
 <li><code>activation</code>: activation function to use;</li>
 <li><code>use_bias</code>: whether to add a bias to the linear transformation;</li>
