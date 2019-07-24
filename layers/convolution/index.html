@@ -112,6 +112,9 @@
     <li class="toctree-l3"><a href="#appnp">APPNP</a></li>
     
 
+    <li class="toctree-l3"><a href="#ginconv">GINConv</a></li>
+    
+
     </ul>
                 </li>
                 <li class="">
@@ -671,6 +674,65 @@ fltr = utils.normalize_adjacency(A + I)
 X_in = Input(shape=(F, ))
 fltr_in = Input((N, ))
 output = APPNP(channels, mlp_channels)([X_in, fltr_in])
+</code></pre>
+
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L1515">[source]</a></span></p>
+<h3 id="ginconv">GINConv</h3>
+<pre><code class="python">spektral.layers.GINConv(channels, mlp_channels=16, n_hidden_layers=0, epsilon=None, mlp_activation='relu', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+</code></pre>
+
+<p>A Graph Isomorphism Network (GIN) as presented by
+<a href="https://arxiv.org/abs/1810.00826">Xu et al. (2018)</a>.</p>
+<p><strong>Mode</strong>: single.</p>
+<p>This layer computes for each node <script type="math/tex">i</script>:
+<script type="math/tex; mode=display">
+Z_i = \textrm{MLP} ( (1 + \epsilon) \cdot X_i + \sum\limits_{j in \mathcal{N}(i)} X_j)
+</script>
+where <script type="math/tex">X</script> is the node features matrix and <script type="math/tex">\textrm{MLP}</script> is a
+multi-layer perceptron.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>(n_nodes, n_features)</code> (with optional <code>batch</code>
+dimension);</li>
+<li>Normalized and rescaled Laplacian of shape <code>(n_nodes, n_nodes)</code> (with
+optional <code>batch</code> dimension);</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Node features with the same shape of the input, but the last dimension
+changed to <code>channels</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>channels</code>: integer, number of output channels;</li>
+<li><code>mlp_channels</code>: integer, number of channels in the inner MLP;</li>
+<li><code>n_hidden_layers</code>: integer, number of hidden layers in the MLP (default 0)</li>
+<li><code>epsilon</code>: unnamed parameter, see <a href="https://arxiv.org/abs/1810.00826">Xu et al. (2018)</a>.
+In practice, it is safe to leave it to 0.</li>
+<li><code>mlp_activation</code>: activation function for the MLP,</li>
+<li><code>activation</code>: activation function to use;</li>
+<li><code>use_bias</code>: whether to add a bias to the linear transformation;</li>
+<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
+<li><code>bias_initializer</code>: initializer for the bias vector;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
+<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
+<li><code>activity_regularizer</code>: regularization applied to the output;</li>
+<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
+<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
+</ul>
+<p><strong>Usage</strong></p>
+<pre><code class="py"># Load data
+A, X, _, _, _, _, _, _ = citation.load_data('cora')
+
+# Preprocessing operations
+fltr = utils.normalized_laplacian(A)
+fltr = utils.rescale_laplacian(X, lmax=2)
+
+# Model definition
+X_in = Input(shape=(F, ))
+fltr_in = Input((N, ), sparse=True)
+output = GINConv(channels)([X_in, fltr_in])
 </code></pre>
               
             </div>
