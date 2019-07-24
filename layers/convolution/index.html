@@ -687,7 +687,7 @@ output = APPNP(channels, mlp_channels)([X_in, fltr_in])
 <p><strong>Mode</strong>: single.</p>
 <p>This layer computes for each node <script type="math/tex">i</script>:
 <script type="math/tex; mode=display">
-Z_i = \textrm{MLP} ( (1 + \epsilon) \cdot X_i + \sum\limits_{j in \mathcal{N}(i)} X_j)
+Z_i = \textrm{MLP} ( (1 + \epsilon) \cdot X_i + \sum\limits_{j \in \mathcal{N}(i)} X_j)
 </script>
 where <script type="math/tex">X</script> is the node features matrix and <script type="math/tex">\textrm{MLP}</script> is a
 multi-layer perceptron.</p>
