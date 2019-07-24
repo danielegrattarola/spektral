@@ -231,24 +231,25 @@
 <a href="https://github.com/danielegrattarola/spektral">
     <img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat" style="width: auto !important" />
 </a></p>
-<table>
-<thead>
-<tr>
-<th align="left">WARNING</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left">Spektral is still a work in progress and may change significantly before the first release. The API is not mature enough to be considered stable, but we'll try to keep breaking changes to a minimum.</td>
-</tr>
-</tbody>
-</table>
 <h2 id="welcome-to-spektral">Welcome to Spektral</h2>
-<p>Spektral is a Python library for relational representation learning, based on the Keras API.
-The main goal of this project is to provide a simple but flexible framework for creating graph neural networks.</p>
-<p>Spektral implements some of the most popular layers for graph deep learning, so that you only need to worry about creating your models.</p>
-<p>The source of the project is available on <a href="https://github.com/danielegrattarola/spektral">Github</a>.<br />
-Read the documentation on <a href="https://danielegrattarola.github.io/spektral">the official website</a>.</p>
+<p>Spektral is a Python library for graph deep learning, based on the Keras API.
+The main goal of this project is to provide a simple but flexible framework for creating graph neural networks (GNNs).</p>
+<p>You can use Spektral for classifying the nodes of a network, predicting molecular properties, generating new graphs with GANs, clustering nodes, predicting links, and any other task where data is described by graphs. </p>
+<p>Spektral implements some of the most popular layers for graph deep learning, including: </p>
+<ul>
+<li><a href="https://arxiv.org/abs/1609.02907">Graph convolutional networks (GCN)</a></li>
+<li><a href="https://arxiv.org/abs/1606.09375">Chebyshev networks (ChebNets)</a></li>
+<li><a href="https://arxiv.org/abs/1706.02216">GraphSage</a></li>
+<li><a href="https://arxiv.org/abs/1704.02901">Edge-conditioned convolutions (ECC)</a></li>
+<li><a href="https://arxiv.org/abs/1710.10903">Graph attention networks (GAT)</a></li>
+<li><a href="https://arxiv.org/abs/1901.01343">ARMA convolutions</a></li>
+<li><a href="https://arxiv.org/abs/1810.0599">Approximated personalized propagation of neural predictions (APPNP)</a></li>
+<li><a href="https://arxiv.org/abs/1810.00826">Graph isomorphism networks (GIN)</a></li>
+</ul>
+<p>You can also find <a href="https://danielegrattarola.github.io/spektral/layers/pooling/">pooling layers</a> (including global readouts and graph coarsening layers), and lots of utilities to apply graph deep learning in your projects.  </p>
+<p>See how to <a href="https://danielegrattarola.github.io/spektral/getting-started/">get started with Spektral</a> and have a look at the <a href="https://danielegrattarola.github.io/spektral/examples/">examples</a> for some project templates.</p>
+<p>The source code of the project is available on <a href="https://github.com/danielegrattarola/spektral">Github</a>.<br />
+Read the documentation <a href="https://danielegrattarola.github.io/spektral">here</a>.</p>
 <h2 id="installation">Installation</h2>
 <p>Spektral is compatible with Python 3.5+, and is tested on Ubuntu 16.04 and 18.04. 
 Other Linux distros and MacOS should work as well, but Windows is not supported for now. </p>
@@ -276,6 +277,18 @@ It will, however, install Keras and its dependencies via PyPi (which may include
 If you are already a Keras user, this should not impact you. If you're just getting started, then you may want to <a href="https://www.tensorflow.org/install/">install the GPU version of Tensorflow</a> before installing Spektral.</p>
 <p>Also note that some features of Spektral may depend explicitly on TensorFlow, although this dependency will be kept to a minimum.</p>
 <h2 id="contributing">Contributing</h2>
+<table>
+<thead>
+<tr>
+<th align="left">WARNING</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">Spektral is still a work in progress and may change significantly before the first release. The API is not mature enough to be considered stable, but we'll try to keep breaking changes to a minimum.</td>
+</tr>
+</tbody>
+</table>
 <p>Spektral is an open source project available <a href="https://github.com/danielegrattarola/spektral">on Github</a>, and contributions of all types are welcome. Feel free to open a pull request if you have something interesting that you want to add to the framework.</p>
               
             </div>
@@ -328,5 +341,5 @@ If you are already a Keras user, this should not impact you. If you're just gett
 
 <!--
 MkDocs version : 1.0.4
-Build Date UTC : 2019-07-24 09:34:29
+Build Date UTC : 2019-07-24 09:56:16
 -->
