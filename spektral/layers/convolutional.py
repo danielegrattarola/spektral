@@ -15,11 +15,11 @@ class GraphConv(Layer):
 
     **Mode**: single, mixed, batch.
     
-    This layer computes the transformation:
+    This layer computes:
     $$  
-        Z = \\sigma( \tilde{A} XW + b)
+        Z = \\sigma( \\tilde{A} XW + b)
     $$
-    where \(X\) is the node features matrix, \(\tilde{A}\) is the normalized
+    where \(X\) is the node features matrix, \(\\tilde{A}\) is the normalized
     Laplacian, \(W\) is the convolution kernel, \(b\) is a bias vector, and
     \(\\sigma\) is the activation function.
     
@@ -152,7 +152,7 @@ class ChebConv(Layer):
     **Mode**: single, mixed, batch.
     
     Given a list of Chebyshev polynomials \(T = [T_{1}, ..., T_{K}]\), 
-    this layer computes the transformation:
+    this layer computes:
     $$
         Z = \\sigma( \\sum \\limits_{k=1}^{K} T_{k} X W  + b)
     $$
@@ -290,7 +290,7 @@ class GraphSageConv(GraphConv):
 
     **Mode**: single.
 
-    This layer computes the transformation:
+    This layer computes:
     $$
         Z = \\sigma \\big( \\big[ \\textrm{AGGREGATE}(X) \\| X \\big] W + b \\big)
     $$
@@ -331,7 +331,7 @@ class GraphSageConv(GraphConv):
     ```py
     X_in = Input(shape=(F, ))
     A_in = Input((N, ), sparse=True)
-    output = GraphSage(channels)([X_in, A_in])
+    output = GraphSageConv(channels)([X_in, A_in])
     ```
     """
 
@@ -422,10 +422,9 @@ class EdgeConditionedConv(Layer):
 
     **Mode**: batch.
     
-    This layer computes a transformation of the input \(X\), s.t. for each node
-    \(i\) we have:
+    For each node \(i\), this layer computes:
     $$
-        X^{out}_i =  \\frac{1}{\\mathcal{N}(i)} \\sum\\limits_{j \\in \\mathcal{N}(i)} F(E_{ji}) X_{j} + b
+        Z_i =  \\frac{1}{\\mathcal{N}(i)} \\sum\\limits_{j \\in \\mathcal{N}(i)} F(E_{ji}) X_{j} + b
     $$
     where \(\\mathcal{N}(i)\) represents the one-step neighbourhood of node \(i\),
      \(F\) is a neural network that outputs the convolution kernel as a
@@ -844,7 +843,7 @@ class GraphConvSkip(Layer):
 
     **Mode**: single, mixed, batch.
 
-    This layer computes the transformation:
+    This layer computes:
     $$
         Z = \\sigma(A X W_1 + X W_2 + b)
     $$
@@ -985,30 +984,30 @@ class GraphConvSkip(Layer):
 
 class ARMAConv(Layer):
     """
-    A graph convolutional layer with ARMA(K, K) filters, as presented by
+    A graph convolutional layer with ARMA(K, K-1) filters, as presented by
     [Bianchi et al. (2019)](https://arxiv.org/abs/1901.01343).
 
     **Mode**: single, mixed, batch.
 
-    This layer computes the transformation:
+    This layer computes:
     $$
-        X^{out} = \\text{avgpool}\\left(\\sum \\limits_{k=1}^K \\bar{X}_k^{(T)} \\right),
+        Z = \\frac{1}{K}\\sum \\limits_{k=1}^K \\bar{X}_k^{(T)},
     $$
-    where:
+    where \(K\) is the order of the ARMA(K, K-1) filter, and where:
     $$
         \\bar{X}_k^{(t + 1)} =  \\sigma\\left(\\tilde{L}\\bar{X}^{(t)}W^{(t)} + XV^{(t)}\\right)
     $$
-    is a graph convolutional skip layer implementing the recursive update to
-    approximate the ARMA filter, \(\\tilde{L}\) is the Laplacian modified to
-    have a spectrum in \([0,,2]\), \(\\bar{X}^{(0)} = X\), and \(W, V\) are
-    trainable kernels.
+    is a graph convolutional skip layer implementing a recursive approximation
+    of an ARMA(1, 0) filter, \(\\tilde{L}\) is  normalized graph Laplacian with
+    a rescaled spectrum, \(\\bar{X}^{(0)} = X\), and \(W, V\) are trainable
+    kernels.
 
     **Input**
 
     - node features of shape `(n_nodes, n_features)` (with optional `batch`
     dimension);
-    - Normalized Laplacian  of shape `(n_nodes, n_nodes)` (with optional `batch`
-    dimension); see examples/node_classification_arma.py.
+    - Normalized Laplacian of shape `(n_nodes, n_nodes)` (with optional `batch`
+    dimension); see the [ARMA node classification example](https://github.com/danielegrattarola/spektral/blob/master/examples/node_classification_arma.py)
 
     **Output**
 
@@ -1018,11 +1017,12 @@ class ARMAConv(Layer):
     **Arguments**
 
     - `channels`: integer, number of output channels;
-    - `T`: depth of each ARMA_1 filter (number of recursive updates);
-    - `K`: order of the ARMA filter (combination of K ARMA_1 filters);
+    - `T`: depth of each ARMA(1, 0) approximation (number of recursive updates);
+    - `K`: order of the full ARMA(K, K-1) filter (combination of K ARMA(1, 0)
+    filters);
     - `recurrent`: whether to share each head's weights like a recurrent net;
     - `gcn_activation`: activation function to use to compute the ARMA filter;
-    - `dropout_rate`: dropout rate for laplacian and output layer
+    - `dropout_rate`: dropout rate for Laplacian and output layer;
     - `activation`: activation function to use;
     - `use_bias`: whether to add a bias to the linear transformation;
     - `kernel_initializer`: initializer for the kernel matrix;
@@ -1317,7 +1317,6 @@ class APPNP(Layer):
     """
     A graph convolutional layer implementing the APPNP operator, as presented by
     [Klicpera et al. (2019)](https://arxiv.org/abs/1810.05997).
-    Implementation by Filippo Bianchi.
 
     **Mode**: single, mixed, batch.
 

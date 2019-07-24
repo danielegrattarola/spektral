@@ -1,4 +1,4 @@
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L13)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L12)</span>
 ### TopKPool
 
 ```python
@@ -59,7 +59,7 @@ tanh;
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L169)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L168)</span>
 ### GlobalSumPool
 
 ```python
@@ -90,7 +90,7 @@ None.
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L232)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L231)</span>
 ### GlobalAvgPool
 
 ```python
@@ -120,7 +120,7 @@ None.
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L294)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L293)</span>
 ### GlobalMaxPool
 
 ```python
@@ -150,7 +150,7 @@ None.
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L356)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L355)</span>
 ### GlobalAttentionPool
 
 ```python
@@ -187,7 +187,7 @@ dimension changed to `channels`.
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L476)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L475)</span>
 ### GlobalAttnSumPool
 
 ```python
