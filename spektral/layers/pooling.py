@@ -270,6 +270,8 @@ class GlobalAvgPool(Layer):
         if self.data_mode == 'graph':
             X = inputs[0]
             I = inputs[1]
+            if K.ndim(I) == 2: 
+                I = I[:, 0]
         else:
             X = inputs
 

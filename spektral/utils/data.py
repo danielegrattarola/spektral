@@ -4,19 +4,19 @@ import scipy.sparse as sp
 
 class Batch(object):
     """
-    Converts a batch of graphs stored in lists to the graph batch format
-    (see [https://danielegrattarola.github.io/spektral/data/](https://danielegrattarola.github.io/spektral/data/)).
+    Converts a batch of graphs stored in lists to the
+    [graph batch format](https://danielegrattarola.github.io/spektral/data/).
 
     **Input**
 
-    - A_list, list of adjacency matrices of shape `(N, N)`;
-    - X_list, list of node attributes matrices of shape `(N, F)`;
+    - `A_list`, list of adjacency matrices of shape `(N, N)`;
+    - `X_list`, list of node attributes matrices of shape `(N, F)`;
 
     ** Properties **
 
-    - A: returns the block diagonal adjacency matrix;
-    - X: returns the stacked node attributes;
-    - I: returns the graph indices mapping each node to a graph (numbering is
+    - `A`: returns the block diagonal adjacency matrix;
+    - `X`: returns the stacked node attributes;
+    - `I`: returns the graph indices mapping each node to a graph (numbering is
     relative to the batch).
 
     ** Usage **
