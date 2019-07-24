@@ -220,18 +220,18 @@
 <pre><code class="python">spektral.utils.Batch(A_list, X_list)
 </code></pre>
 
-<p>Converts a batch of graphs stored in lists to the graph batch format
-(see <a href="https://danielegrattarola.github.io/spektral/data/">https://danielegrattarola.github.io/spektral/data/</a>).</p>
+<p>Converts a batch of graphs stored in lists to the
+<a href="https://danielegrattarola.github.io/spektral/data/">graph batch format</a>.</p>
 <p><strong>Input</strong></p>
 <ul>
-<li>A_list, list of adjacency matrices of shape <code>(N, N)</code>;</li>
-<li>X_list, list of node attributes matrices of shape <code>(N, F)</code>;</li>
+<li><code>A_list</code>, list of adjacency matrices of shape <code>(N, N)</code>;</li>
+<li><code>X_list</code>, list of node attributes matrices of shape <code>(N, F)</code>;</li>
 </ul>
 <p><strong> Properties </strong></p>
 <ul>
-<li>A: returns the block diagonal adjacency matrix;</li>
-<li>X: returns the stacked node attributes;</li>
-<li>I: returns the graph indices mapping each node to a graph (numbering is
+<li><code>A</code>: returns the block diagonal adjacency matrix;</li>
+<li><code>X</code>: returns the stacked node attributes;</li>
+<li><code>I</code>: returns the graph indices mapping each node to a graph (numbering is
 relative to the batch).</li>
 </ul>
 <p><strong> Usage </strong></p>
