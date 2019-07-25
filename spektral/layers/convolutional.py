@@ -1521,7 +1521,7 @@ class GINConv(GraphConv):
 
     This layer computes for each node \(i\):
     $$
-        Z_i = \\textrm{MLP} ( (1 + \\epsilon) \\cdot X_i + \\sum\\limits_{j in \\mathcal{N}(i)} X_j)
+        Z_i = \\textrm{MLP} ( (1 + \\epsilon) \\cdot X_i + \\sum\\limits_{j \\in \\mathcal{N}(i)} X_j)
     $$
     where \(X\) is the node features matrix and \(\\textrm{MLP}\) is a
     multi-layer perceptron.
@@ -1543,8 +1543,11 @@ class GINConv(GraphConv):
     - `channels`: integer, number of output channels;
     - `mlp_channels`: integer, number of channels in the inner MLP;
     - `n_hidden_layers`: integer, number of hidden layers in the MLP (default 0)
-    - `epsilon`: unnamed parameter, see [Xu et al. (2018)](https://arxiv.org/abs/1810.00826).
-    In practice, it is safe to leave it to 0.
+    - `epsilon`: unnamed parameter, see
+    [Xu et al. (2018)](https://arxiv.org/abs/1810.00826), and the equation above.
+    This parameter can be learned by setting `epsilon=None`, or it can be set
+    to a constant value, which is what happens by default (0). In practice, it
+    is safe to leave it to 0.
     - `mlp_activation`: activation function for the MLP,
     - `activation`: activation function to use;
     - `use_bias`: whether to add a bias to the linear transformation;

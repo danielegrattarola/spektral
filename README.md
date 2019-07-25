@@ -16,18 +16,29 @@
     <img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat" style="width: auto !important" />
 </a>
 
-|WARNING|
-|:------|
-| Spektral is still a work in progress and may change significantly before the first release. The API is not mature enough to be considered stable, but we'll try to keep breaking changes to a minimum.|
-
 ## Welcome to Spektral
-Spektral is a Python library for relational representation learning, based on the Keras API.
-The main goal of this project is to provide a simple but flexible framework for creating graph neural networks.
+Spektral is a Python library for graph deep learning, based on the Keras API.
+The main goal of this project is to provide a simple but flexible framework for creating graph neural networks (GNNs).
 
-Spektral implements some of the most popular layers for graph deep learning, so that you only need to worry about creating your models.
+You can use Spektral for classifying the nodes of a network, predicting molecular properties, generating new graphs with GANs, clustering nodes, predicting links, and any other task where data is described by graphs. 
 
-The source of the project is available on [Github](https://github.com/danielegrattarola/spektral).  
-Read the documentation on [the official website](https://danielegrattarola.github.io/spektral).
+Spektral implements some of the most popular layers for graph deep learning, including: 
+
+- [Graph convolutional networks (GCN)](https://arxiv.org/abs/1609.02907)
+- [Chebyshev networks (ChebNets)](https://arxiv.org/abs/1606.09375)
+- [GraphSage](https://arxiv.org/abs/1706.02216)
+- [Edge-conditioned convolutions (ECC)](https://arxiv.org/abs/1704.02901)
+- [Graph attention networks (GAT)](https://arxiv.org/abs/1710.10903)
+- [ARMA convolutions](https://arxiv.org/abs/1901.01343)
+- [Approximated personalized propagation of neural predictions (APPNP)](https://arxiv.org/abs/1810.0599)
+- [Graph isomorphism networks (GIN)](https://arxiv.org/abs/1810.00826)
+
+You can also find [pooling layers](https://danielegrattarola.github.io/spektral/layers/pooling/) (including global readouts and graph coarsening layers), and lots of utilities to apply graph deep learning in your projects.  
+
+See how to [get started with Spektral](https://danielegrattarola.github.io/spektral/getting-started/) and have a look at the [examples](https://danielegrattarola.github.io/spektral/examples/) for some project templates.
+
+The source code of the project is available on [Github](https://github.com/danielegrattarola/spektral).  
+Read the documentation [here](https://danielegrattarola.github.io/spektral).
 
 ## Installation
 Spektral is compatible with Python 3.5+, and is tested on Ubuntu 16.04 and 18.04. 
@@ -65,4 +76,8 @@ If you are already a Keras user, this should not impact you. If you're just gett
 Also note that some features of Spektral may depend explicitly on TensorFlow, although this dependency will be kept to a minimum.
 
 ## Contributing
+|WARNING|
+|:------|
+| Spektral is still a work in progress and may change significantly before the first release. The API is not mature enough to be considered stable, but we'll try to keep breaking changes to a minimum.|
+
 Spektral is an open source project available [on Github](https://github.com/danielegrattarola/spektral), and contributions of all types are welcome. Feel free to open a pull request if you have something interesting that you want to add to the framework.

@@ -43,7 +43,8 @@ PAGES = [
             layers.EdgeConditionedConv,
             layers.GraphAttention,
             layers.GraphConvSkip,
-            layers.APPNP
+            layers.APPNP,
+            layers.GINConv
         ]
     },
     {

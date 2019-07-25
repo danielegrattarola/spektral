@@ -502,3 +502,74 @@ X_in = Input(shape=(F, ))
 fltr_in = Input((N, ))
 output = APPNP(channels, mlp_channels)([X_in, fltr_in])
 ```
+
+----
+
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L1515)</span>
+### GINConv
+
+```python
+spektral.layers.GINConv(channels, mlp_channels=16, n_hidden_layers=0, epsilon=None, mlp_activation='relu', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+```
+
+
+A Graph Isomorphism Network (GIN) as presented by
+[Xu et al. (2018)](https://arxiv.org/abs/1810.00826).
+
+**Mode**: single.
+
+This layer computes for each node \(i\):
+$$
+Z_i = \textrm{MLP} ( (1 + \epsilon) \cdot X_i + \sum\limits_{j \in \mathcal{N}(i)} X_j)
+$$
+where \(X\) is the node features matrix and \(\textrm{MLP}\) is a
+multi-layer perceptron.
+
+**Input**
+
+- Node features of shape `(n_nodes, n_features)` (with optional `batch`
+dimension);
+- Normalized and rescaled Laplacian of shape `(n_nodes, n_nodes)` (with
+optional `batch` dimension);
+
+**Output**
+
+- Node features with the same shape of the input, but the last dimension
+changed to `channels`.
+
+**Arguments**
+
+- `channels`: integer, number of output channels;
+- `mlp_channels`: integer, number of channels in the inner MLP;
+- `n_hidden_layers`: integer, number of hidden layers in the MLP (default 0)
+- `epsilon`: unnamed parameter, see
+[Xu et al. (2018)](https://arxiv.org/abs/1810.00826), and the equation above.
+This parameter can be learned by setting `epsilon=None`, or it can be set
+to a constant value, which is what happens by default (0). In practice, it
+is safe to leave it to 0.
+- `mlp_activation`: activation function for the MLP,
+- `activation`: activation function to use;
+- `use_bias`: whether to add a bias to the linear transformation;
+- `kernel_initializer`: initializer for the kernel matrix;
+- `bias_initializer`: initializer for the bias vector;
+- `kernel_regularizer`: regularization applied to the kernel matrix;
+- `bias_regularizer`: regularization applied to the bias vector;
+- `activity_regularizer`: regularization applied to the output;
+- `kernel_constraint`: constraint applied to the kernel matrix;
+- `bias_constraint`: constraint applied to the bias vector.
+
+**Usage**
+
+```py
+# Load data
+A, X, _, _, _, _, _, _ = citation.load_data('cora')
+
+# Preprocessing operations
+fltr = utils.normalized_laplacian(A)
+fltr = utils.rescale_laplacian(X, lmax=2)
+
+# Model definition
+X_in = Input(shape=(F, ))
+fltr_in = Input((N, ), sparse=True)
+output = GINConv(channels)([X_in, fltr_in])
+```
