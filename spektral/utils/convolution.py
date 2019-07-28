@@ -12,7 +12,11 @@ def degree(adj):
     :return: the degree matrix in sparse DIA format
     """
     degrees = np.array(adj.sum(1)).flatten()
-    return sp.diags(degrees)
+    if sp.issparse(adj):
+        D = sp.diags(degrees)
+    else:
+        D = np.diag(degrees)
+    return D
 
 
 def degree_power(adj, pow):
@@ -25,7 +29,11 @@ def degree_power(adj, pow):
     """
     degrees = np.power(np.array(adj.sum(1)), pow).flatten()
     degrees[np.isinf(degrees)] = 0.
-    return sp.diags(degrees, 0)
+    if sp.issparse(adj):
+        D = sp.diags(degrees)
+    else:
+        D = np.diag(degrees)
+    return D
 
 
 def normalized_adjacency(adj, symmetric=True):
@@ -38,15 +46,10 @@ def normalized_adjacency(adj, symmetric=True):
     """
     if symmetric:
         normalized_D = degree_power(adj, -0.5)
-        if sp.issparse(adj):
-            output = normalized_D.dot(adj).dot(normalized_D)
-        else:
-            normalized_D = normalized_D.toarray()
-            output = normalized_D.dot(adj).dot(normalized_D)
+        output = normalized_D.dot(adj).dot(normalized_D)
     else:
         normalized_D = degree_power(adj, -1.)
         output = normalized_D.dot(adj)
-
     return output
 
 
@@ -67,7 +70,10 @@ def normalized_laplacian(adj, symmetric=True):
     :param symmetric: boolean, compute symmetric normalization;
     :return: the normalized Laplacian.
     """
-    I = sp.eye(adj.shape[-1], dtype=adj.dtype)
+    if sp.issparse(adj):
+        I = sp.eye(adj.shape[-1], dtype=adj.dtype)
+    else:
+        I = np.eye(adj.shape[-1], dtype=adj.dtype)
     normalized_adj = normalized_adjacency(adj, symmetric=symmetric)
     return I - normalized_adj
 
@@ -81,7 +87,11 @@ def rescale_laplacian(L, lmax=None):
             lmax = sp.linalg.eigsh(L, 1, which='LM', return_eigenvectors=False)[0]
         except ArpackNoConvergence:
             lmax = 2
-    L_scaled = (2. / lmax) * L - sp.eye(L.shape[0], dtype=L.dtype)
+    if sp.issparse(L):
+        I = sp.eye(L.shape[-1], dtype=L.dtype)
+    else:
+        I = np.eye(L.shape[-1], dtype=L.dtype)
+    L_scaled = (2. / lmax) * L - I
     return L_scaled
 
 
@@ -95,7 +105,10 @@ def localpooling_filter(adj, symmetric=True):
     :return: the filter matrix, as dense np.array.
     """
     fltr = adj.copy()
-    I = sp.eye(adj.shape[-1], dtype=adj.dtype)
+    if sp.issparse(adj):
+        I = sp.eye(adj.shape[-1], dtype=adj.dtype)
+    else:
+        I = np.eye(adj.shape[-1], dtype=adj.dtype)
     if adj.ndim == 3:
         for i in range(adj.shape[0]):
             A_tilde = adj[i] + I
@@ -115,11 +128,17 @@ def chebyshev_polynomial(X, k):
             the approximation.
     """
     T_k = list()
-    T_k.append(sp.eye(X.shape[0], dtype=X.dtype).tocsr())
+    if sp.issparse(X):
+        T_k.append(sp.eye(X.shape[0], dtype=X.dtype).tocsr())
+    else:
+        T_k.append(np.eye(X.shape[0], dtype=X.dtype))
     T_k.append(X)
 
     def chebyshev_recurrence(T_k_minus_one, T_k_minus_two, X):
-        X_ = sp.csr_matrix(X, copy=True)
+        if sp.issparse(X):
+            X_ = sp.csr_matrix(X, copy=True)
+        else:
+            X_ = np.copy(X)
         return 2 * X_.dot(T_k_minus_one) - T_k_minus_two
 
     for i in range(2, k + 1):
@@ -139,7 +158,11 @@ def chebyshev_filter(adj, k, symmetric=True):
     :return: a list of k+1 filter matrices, as np.arrays.
     """
     normalized_adj = normalized_adjacency(adj, symmetric)
-    L = sp.eye(adj.shape[0], dtype=adj.dtype) - normalized_adj  # Compute Laplacian
+    if sp.issparse(adj):
+        I = sp.eye(adj.shape[0], dtype=adj.dtype)
+    else:
+        I = np.eye(adj.shape[0], dtype=adj.dtype)
+    L = I - normalized_adj  # Compute Laplacian
 
     # Rescale Laplacian
     L_scaled = rescale_laplacian(L)
