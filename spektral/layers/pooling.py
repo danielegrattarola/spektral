@@ -102,6 +102,8 @@ class TopKPool(Layer):
             X, A = inputs
             I = tf.zeros(tf.shape(X)[:1], dtype=tf.int32)
             self.data_mode = 'single'
+        if K.ndim(I) == 2:
+            I = I[:, 0]
 
         A_is_sparse = K.is_sparse(A)
 
@@ -208,6 +210,8 @@ class GlobalSumPool(Layer):
         if self.data_mode == 'graph':
             X = inputs[0]
             I = inputs[1]
+            if K.ndim(I) == 2:
+                I = I[:, 0]
         else:
             X = inputs
 
@@ -334,6 +338,8 @@ class GlobalMaxPool(Layer):
         if self.data_mode == 'graph':
             X = inputs[0]
             I = inputs[1]
+            if K.ndim(I) == 2:
+                I = I[:, 0]
         else:
             X = inputs
 
@@ -444,6 +450,8 @@ class GlobalAttentionPool(Layer):
     def call(self, inputs):
         if self.data_mode == 'graph':
             X, I = inputs
+            if K.ndim(I) == 2:
+                I = I[:, 0]
         else:
             X = inputs
         inputs_linear = K.dot(X, self.lg_kernel) + self.lg_bias
@@ -538,6 +546,8 @@ class GlobalAttnSumPool(Layer):
     def call(self, inputs):
         if self.data_mode == 'graph':
             X, I = inputs
+            if K.ndim(I) == 2:
+                I = I[:, 0]
         else:
             X = inputs
         attn_coeff = K.dot(X, self.attn_kernel)
