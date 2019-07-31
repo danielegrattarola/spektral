@@ -97,6 +97,6 @@ for b in batches_test:
     batch = Batch(b[0], b[1])
     y_ = b[2]
     sess.run(target_iter.initializer, feed_dict={target_ph: y_})
-    loss += model.train_on_batch(list(batch.get('XAI')), None)
+    loss += model.test_on_batch(list(batch.get('XAI')), None)
 print('---------------------------------------------')
 print('Test loss: {}'.format(loss / batches_in_epoch))
