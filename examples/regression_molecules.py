@@ -12,23 +12,24 @@ from spektral.layers import EdgeConditionedConv, GlobalAttentionPool
 from spektral.utils import label_to_one_hot
 
 # Load data
-adj, nf, ef, y = qm9.load_data(return_type='numpy',
-                               nf_keys='atomic_num',
-                               ef_keys='type',
-                               self_loops=True)
+A, X, E, y = qm9.load_data(return_type='numpy',
+                           nf_keys='atomic_num',
+                           ef_keys='type',
+                           self_loops=True,
+                           amount=1000)
 y = y[['cv']].values  # Heat capacity at 298.15K
 
 # Preprocessing
-uniq_nf = np.unique(nf)
-nf = label_to_one_hot(nf, uniq_nf)
-uniq_ef = np.unique(ef)
-ef = label_to_one_hot(ef, uniq_ef)
+uniq_X = np.unique(X)
+X = label_to_one_hot(X, uniq_X)
+uniq_E = np.unique(E)
+ef = label_to_one_hot(E, uniq_E)
 y = StandardScaler().fit_transform(y).reshape(-1, y.shape[-1])
 
 # Parameters
-N = nf.shape[-2]          # Number of nodes in the graphs
-F = nf.shape[-1]          # Node features dimensionality
-S = ef.shape[-1]          # Edge features dimensionality
+N = X.shape[-2]           # Number of nodes in the graphs
+F = X.shape[-1]           # Node features dimensionality
+S = E.shape[-1]           # Edge features dimensionality
 n_out = y.shape[-1]       # Dimensionality of the target
 learning_rate = 1e-3      # Learning rate for SGD
 epochs = 25               # Number of training epochs
@@ -36,25 +37,25 @@ batch_size = 64           # Batch size
 es_patience = 5           # Patience fot early stopping
 
 # Train/test split
-adj_train, adj_test, \
-nf_train, nf_test,   \
-ef_train, ef_test,   \
-y_train, y_test = train_test_split(adj, nf, ef, y, test_size=0.1)
+A_train, A_test, \
+X_train, X_test, \
+E_train, E_test, \
+y_train, y_test = train_test_split(A, X, E, y, test_size=0.1)
 
 # Model definition
-nf_in = Input(shape=(N, F))
-adj_in = Input(shape=(N, N))
-ef_in = Input(shape=(N, N, S))
+X_in = Input(shape=(N, F))
+A_in = Input(shape=(N, N))
+E_in = Input(shape=(N, N, S))
 
-gc1 = EdgeConditionedConv(32, activation='relu')([nf_in, adj_in, ef_in])
-gc2 = EdgeConditionedConv(64, activation='relu')([gc1, adj_in, ef_in])
+gc1 = EdgeConditionedConv(32, activation='relu')([X_in, A_in, E_in])
+gc2 = EdgeConditionedConv(64, activation='relu')([gc1, A_in, E_in])
 pool = GlobalAttentionPool(128)(gc2)
 dense1 = Dense(128, activation='relu')(pool)
 
 output = Dense(n_out)(dense1)
 
 # Build model
-model = Model(inputs=[nf_in, adj_in, ef_in], outputs=output)
+model = Model(inputs=[X_in, A_in, E_in], outputs=output)
 optimizer = Adam(lr=learning_rate)
 model.compile(optimizer=optimizer, loss='mse')
 model.summary()
@@ -63,7 +64,7 @@ model.summary()
 es_callback = EarlyStopping(monitor='val_loss', patience=es_patience)
 
 # Train model
-model.fit([nf_train, adj_train, ef_train],
+model.fit([X_train, A_train, E_train],
           y_train,
           batch_size=batch_size,
           validation_split=0.1,
@@ -72,14 +73,14 @@ model.fit([nf_train, adj_train, ef_train],
 
 # Evaluate model
 print('Evaluating model.')
-eval_results = model.evaluate([nf_test, adj_test, ef_test],
+eval_results = model.evaluate([X_test, A_test, E_test],
                               y_test,
                               batch_size=batch_size)
 print('Done.\n'
       'Test loss: {}'.format(eval_results))
 
 # Plot predictions
-preds = model.predict([nf_test, adj_test, ef_test])
+preds = model.predict([X_test, A_test, E_test])
 
 plt.figure()
 plt.scatter(preds, y_test, alpha=0.3)
