@@ -1,9 +1,9 @@
-from keras import backend as K
+from keras import backend as K, activations
 from keras import regularizers, constraints, initializers
 from keras.backend import tf
 from keras.engine import Layer
 
-from spektral.layers.ops import top_k
+from spektral.layers import ops
 
 
 ################################################################################
@@ -50,6 +50,8 @@ class TopKPool(Layer):
     - reduced node features of shape `(n_graphs * k, n_features)`;
     - reduced adjacency matrix of shape `(n_graphs * k, n_graphs * k)`;
     - reduced graph IDs with shape `(n_graphs * k, )` (graph batch mode);
+    - If `return_mask=True`, the binary mask used for pooling, with shape
+    `(n_graphs * k, )`.
 
     **Arguments**
 
@@ -110,7 +112,7 @@ class TopKPool(Layer):
         # Get mask
         y = K.dot(X, K.l2_normalize(self.kernel))
         N = K.shape(X)[-2]
-        indices = top_k(y[:, 0], I, self.ratio, self.top_k_var)
+        indices = ops.top_k(y[:, 0], I, self.ratio, self.top_k_var)
         mask = tf.scatter_nd(tf.expand_dims(indices, 1), tf.ones_like(indices), (N,))
 
         # Multiply X and y to make layer differentiable
@@ -161,6 +163,220 @@ class TopKPool(Layer):
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
         }
         base_config = super(TopKPool, self).get_config()
+        return dict(list(base_config.items()) + list(config.items()))
+
+
+class MinCutPool(Layer):
+    """
+    A minCUT pooling layer as presented by [Bianchi et al.](https://arxiv.org/abs/1907.00481).
+
+    **Mode**: single, batch.
+
+    This layer computes a soft clustering \(S\) of the input graphs using a MLP,
+    and reduces graphs as follows:
+
+    $$
+        A^{pool} = S^T A S; X^{pool} = S^T X;
+    $$
+
+    Besides training the MLP, two additional unsupervised loss terms to ensure
+    that the cluster assignment solves the minCUT optimization problem.
+    The layer can be used without a supervised loss, to compute node clustering
+    simply by minimizing the unsupervised loss.
+
+    **Input**
+
+    - node features of shape `(n_nodes, n_features)` (with optional `batch`
+    dimension);
+    - adjacency matrix of shape `(n_nodes, n_nodes)` (with optional `batch`
+    dimension);
+
+    **Output**
+
+    - reduced node features of shape `(k, n_features)`;
+    - reduced adjacency matrix of shape `(k, k)`;
+    - reduced graph IDs with shape `(k, )` (graph batch mode);
+    - If `return_mask=True`, the soft assignment matrix used for pooling, with
+    shape `(n_nodes, k)`.
+
+    **Arguments**
+
+    - `k`: number of nodes to keep;
+    - `h`: number of units in the hidden layer;
+    - `return_mask`: boolean, whether to return the cluster assignment matrix,
+    - `kernel_initializer`: initializer for the kernel matrix;
+    - `bias_initializer`: initializer for the bias vector;
+    - `kernel_regularizer`: regularization applied to the kernel matrix;
+    - `bias_regularizer`: regularization applied to the bias vector;
+    - `activity_regularizer`: regularization applied to the output;
+    - `kernel_constraint`: constraint applied to the kernel matrix;
+    - `bias_constraint`: constraint applied to the bias vector.
+    """
+    def __init__(self,
+                 k,
+                 h=None,
+                 return_mask=True,
+                 activation=None,
+                 use_bias=True,
+                 kernel_initializer='glorot_uniform',
+                 bias_initializer='zeros',
+                 kernel_regularizer=None,
+                 bias_regularizer=None,
+                 activity_regularizer=None,
+                 kernel_constraint=None,
+                 bias_constraint=None,
+                 **kwargs):
+        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
+            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
+        super(MinCutPool, self).__init__(**kwargs)
+        self.k = k
+        self.h = h
+        self.return_mask = return_mask
+        self.activation = activations.get(activation)
+        self.use_bias = use_bias
+        self.kernel_initializer = initializers.get(kernel_initializer)
+        self.bias_initializer = initializers.get(bias_initializer)
+        self.kernel_regularizer = regularizers.get(kernel_regularizer)
+        self.bias_regularizer = regularizers.get(bias_regularizer)
+        self.activity_regularizer = regularizers.get(activity_regularizer)
+        self.kernel_constraint = constraints.get(kernel_constraint)
+        self.bias_constraint = constraints.get(bias_constraint)
+
+    def build(self, input_shape):
+        assert isinstance(input_shape, list)
+        F = input_shape[0][-1]
+
+        # Optional hidden layer
+        if self.h is None:
+            H_ = F
+        else:
+            H_ = self.h
+            self.kernel_in = self.add_weight(shape=(F, H_),
+                                             name='kernel_in',
+                                             initializer=self.kernel_initializer,
+                                             regularizer=self.kernel_regularizer,
+                                             constraint=self.kernel_constraint)
+
+            if self.use_bias:
+                self.bias_in = self.add_weight(shape=(H_,),
+                                               name='bias_in',
+                                               initializer=self.bias_initializer,
+                                               regularizer=self.bias_regularizer,
+                                               constraint=self.bias_constraint)
+
+        # Output layer
+        self.kernel_out = self.add_weight(shape=(H_, self.k),
+                                          name='kernel_out',
+                                          initializer=self.kernel_initializer,
+                                          regularizer=self.kernel_regularizer,
+                                          constraint=self.kernel_constraint)
+        if self.use_bias:
+            self.bias_out = self.add_weight(shape=(self.k,),
+                                            name='bias_out',
+                                            initializer=self.bias_initializer,
+                                            regularizer=self.bias_regularizer,
+                                            constraint=self.bias_constraint)
+
+        super(MinCutPool, self).build(input_shape)
+
+    def call(self, inputs):
+        # Note that I is useless, because thee layer cannot be used in graph
+        # batch mode.
+        if len(inputs) == 3:
+            X, A, I = inputs
+        else:
+            X, A = inputs
+            I = None
+
+        # Check if the layer is operating in batch mode (X and A have rank 3)
+        batch_mode = K.ndim(A) == 3
+
+        # Optionally compute hidden layer
+        if self.h is None:
+            Hid = X
+        else:
+            Hid = K.dot(X, self.kernel_in)
+            if self.use_bias:
+                Hid = K.bias_add(Hid, self.bias_in)
+            if self.activation is not None:
+                Hid = self.activation(Hid)
+
+        # Compute cluster assignment matrix
+        S = K.dot(Hid, self.kernel_out)
+        if self.use_bias:
+            S = K.bias_add(S, self.bias_out)
+        S = activations.softmax(S, axis=-1)  # Apply softmax to get cluster assignments
+
+        # MinCut regularization
+        A_pooled = ops.matmul_AT_B_A(S, A)
+        num = tf.trace(A_pooled)
+
+        D = ops.degree_matrix(A)
+        den = tf.trace(ops.matmul_AT_B_A(S, D))
+        cut_loss = -(num / den)
+        if batch_mode:
+            cut_loss = K.mean(cut_loss)
+        self.add_loss(cut_loss)
+
+        # Orthogonality regularization
+        SS = ops.matmul_AT_B(S, S)
+        I_S = tf.eye(self.k)
+        ortho_loss = tf.norm(
+            SS / tf.norm(SS, axis=(-1, -2)) - I_S / tf.norm(I_S), axis=(-1, -2)
+        )
+        if batch_mode:
+            ortho_loss = K.mean(cut_loss)
+        self.add_loss(ortho_loss)
+
+        # Pooling
+        X_pooled = ops.matmul_AT_B(S, X)
+        A_pooled = tf.linalg.set_diag(A_pooled, tf.zeros(K.shape(A_pooled)[:-1]))  # Remove diagonal
+        A_pooled = ops.normalize_A(A_pooled)
+
+        output = [X_pooled, A_pooled]
+
+        if I is not None:
+            I_mean = tf.segment_mean(I, I)
+            I_pooled = ops.tf_repeat_1d(I_mean, tf.ones_like(I_mean) * self.k)
+            output.append(I_pooled)
+
+        if self.return_mask:
+            output.append(S)
+
+        return output
+
+    def compute_output_shape(self, input_shape):
+        X_shape = input_shape[0]
+        A_shape = input_shape[1]
+        X_shape_out = X_shape[:-2] + (self.k,) + X_shape[-1:]
+        A_shape_out = A_shape[:-2] + (self.k, self.k)
+
+        output_shape = [X_shape_out, A_shape_out]
+
+        if len(input_shape) == 3:
+            I_shape_out = A_shape[:-2] + (self.k, )
+            output_shape.append(I_shape_out)
+
+        if self.return_mask:
+            S_shape_out = A_shape[:-1] + (self.k, )
+            output_shape.append(S_shape_out)
+
+        return output_shape
+
+    def get_config(self):
+        config = {
+            'k': self.k,
+            'h': self.h,
+            'return_mask': self.return_mask,
+            'kernel_initializer': initializers.serialize(self.kernel_initializer),
+            'bias_initializer': initializers.serialize(self.bias_initializer),
+            'kernel_regularizer': regularizers.serialize(self.kernel_regularizer),
+            'bias_regularizer': regularizers.serialize(self.bias_regularizer),
+            'activity_regularizer': regularizers.serialize(self.activity_regularizer),
+            'kernel_constraint': constraints.serialize(self.kernel_constraint),
+            'bias_constraint': constraints.serialize(self.bias_constraint)
+        }
+        base_config = super(MinCutPool, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
 
