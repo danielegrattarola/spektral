@@ -95,6 +95,9 @@
     <li class="toctree-l3"><a href="#topkpool">TopKPool</a></li>
     
 
+    <li class="toctree-l3"><a href="#mincutpool">MinCutPool</a></li>
+    
+
     <li class="toctree-l3"><a href="#globalsumpool">GlobalSumPool</a></li>
     
 
@@ -280,6 +283,53 @@ tanh;</li>
 <li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
 <li><code>activity_regularizer</code>: regularization applied to the output;</li>
 <li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L169">[source]</a></span></p>
+<h3 id="mincutpool">MinCutPool</h3>
+<pre><code class="python">spektral.layers.MinCutPool(k, h=None, return_mask=True, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+</code></pre>
+
+<p>A minCUT pooling layer as presented by <a href="https://arxiv.org/abs/1907.00481">Bianchi et al.</a>.</p>
+<p><strong>Mode</strong>: single, batch.</p>
+<p>This layer computes a soft clustering <script type="math/tex">S</script> of the input graphs using a MLP,
+and reduces graphs as follows:</p>
+<p>
+<script type="math/tex; mode=display">
+A^{pool} = S^T A S; X^{pool} = S^T X;
+</script>
+</p>
+<p>Besides training the MLP, two additional unsupervised loss terms to ensure
+that the cluster assignment solves the minCUT optimization problem.
+The layer can be used without a supervised loss, to compute node clustering
+simply by minimizing the unsupervised loss.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>node features of shape <code>(n_nodes, n_features)</code> (with optional <code>batch</code>
+dimension);</li>
+<li>adjacency matrix of shape <code>(n_nodes, n_nodes)</code> (with optional <code>batch</code>
+dimension);</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>reduced node features of shape <code>(k, n_features)</code>;</li>
+<li>reduced adjacency matrix of shape <code>(k, k)</code>;</li>
+<li>reduced graph IDs with shape <code>(k, )</code> (graph batch mode);</li>
+<li>If <code>return_mask=True</code>, the soft assignment matrix used for pooling, with
+shape <code>(n_nodes, k)</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>k</code>: number of nodes to keep;</li>
+<li><code>h</code>: number of units in the hidden layer;</li>
+<li><code>return_mask</code>: boolean, whether to return the cluster assignment matrix,</li>
+<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
+<li><code>bias_initializer</code>: initializer for the bias vector;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
+<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
+<li><code>activity_regularizer</code>: regularization applied to the output;</li>
+<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
+<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L386">[source]</a></span></p>
