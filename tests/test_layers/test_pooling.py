@@ -3,7 +3,7 @@ import tensorflow as tf
 from keras import Input, Model
 from keras import backend as K
 
-from spektral.layers import TopKPool
+from spektral.layers import TopKPool, MinCutPool
 import scipy.sparse as sp
 
 sess = K.get_session()
@@ -40,8 +40,14 @@ def _test_single_mode(layer, **kwargs):
     output = sess.run(model.output, feed_dict={X_in: X, A_in: A})
     X_pool, A_pool, mask = output
 
-    N_pool_expected = np.ceil(kwargs['ratio'] * N)
-    N_pool_true = A_pool.shape[0]
+    if 'ratio' in kwargs.keys():
+        N_exp = kwargs['ratio'] * N
+    elif 'k' in kwargs.keys():
+        N_exp = kwargs['k']
+    else:
+        raise ValueError('Need k or ratio.')
+    N_pool_expected = np.ceil(N_exp)
+    N_pool_true = A_pool.shape[-1]
 
     _check_number_of_nodes(N_pool_expected, N_pool_true)
 
@@ -86,5 +92,8 @@ def _test_graph_mode(layer, **kwargs):
 def test_top_k_pool():
     _test_single_mode(TopKPool, ratio=0.5, return_mask=True)
     _test_graph_mode(TopKPool, ratio=0.5, return_mask=True)
+
+def test_mincut_pool():
+    _test_single_mode(MinCutPool, k=5, return_mask=True)
 
 

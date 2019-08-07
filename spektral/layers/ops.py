@@ -195,3 +195,134 @@ def top_k(scores, I, ratio, top_k_var):
     perm = tf.boolean_mask(perm, mask)
 
     return perm
+
+
+def matmul_AT_B_A(A, B):
+    """
+    Computes A.T * B * A, dealing with sparse A/B and batch mode automatically.
+    TODO: batch mode does not work for sparse tensors.
+    :param A: Tensor with rank k = {2, 3} or SparseTensor with rank k = 2
+    :param B: Tensor or SparseTensor with rank k.
+    :return:
+    """
+    if K.ndim(A) == 3:
+        return K.batch_dot(
+            transpose(K.batch_dot(B, A), (0, 2, 1)), A
+        )
+    else:
+        return K.dot(transpose(K.dot(B, A)), A)
+
+
+def matmul_AT_B(A, B):
+    """
+    Computes A.T * B, dealing with sparse A/B and batch mode automatically.
+    TODO: batch mode does not work for sparse tensors.
+    :param A: Tensor with rank k = {2, 3} or SparseTensor with rank k = 2.
+    :param B: Tensor or SparseTensor with rank k.
+    :return:
+    """
+    if K.ndim(A) == 3:
+        return K.batch_dot(transpose(A, (0, 2, 1)), B)
+    else:
+        return K.dot(transpose(A), B)
+
+
+def matmul_A_BT(A, B):
+    """
+    Computes A * B.T, dealing with sparse A/B and batch mode automatically.
+    TODO: batch mode does not work for sparse tensors.
+    :param A: Tensor with rank k = {2, 3} or SparseTensor with rank k = 2.
+    :param B: Tensor or SparseTensor with rank k.
+    :return: SparseTensor of rank k.
+    """
+    if K.ndim(A) == 3:
+        return K.batch_dot(
+            A, transpose(B, (0, 2, 1))
+        )
+    else:
+        return K.dot(A, transpose(B))
+
+
+def normalize_A(A):
+    """
+    Computes symmetric normalization of A, dealing with sparse A and batch mode
+    automatically.
+    :param A: Tensor or SparseTensor with rank k = {2, 3}.
+    :return: SparseTensor of rank k.
+    """
+    D = degrees(A)
+    D = tf.sqrt(D)[:, None] + K.epsilon()
+    if K.ndim(A) == 3:
+        # Batch mode
+        output = (A / D) / transpose(D, perm=(0, 2, 1))
+    else:
+        # Single mode
+        output = (A / D) / transpose(D)
+
+    return output
+
+
+def degrees(A):
+    """
+    Computes the degrees of each node in A, dealing with sparse A and batch mode
+    automatically.
+    :param A: Tensor or SparseTensor with rank k = {2, 3}.
+    :return: Tensor or SparseTensor of rank k - 1.
+    """
+    if K.is_sparse(A):
+        D = tf.sparse.reduce_sum(A, axis=-1)
+    else:
+        D = tf.reduce_sum(A, axis=-1)
+
+    return D
+
+
+def degree_matrix(A, return_sparse_batch=False):
+    """
+    Computes the degree matrix of A, deals with sparse A and batch mode
+    automatically.
+    :param A: Tensor or SparseTensor with rank k = {2, 3}.
+    :param return_sparse_batch: if operating in batch mode, return a
+    SparseTensor. Note that the sparse degree tensor returned by this function
+    cannot be used for sparse matrix multiplication afterwards.
+    :return: SparseTensor of rank k.
+    """
+    D = degrees(A)
+
+    batch_mode = K.ndim(D) == 2
+    N = tf.shape(D)[-1]
+    batch_size = tf.shape(D)[0] if batch_mode else 1
+
+    inner_index = tf.tile(tf.stack([tf.range(N)] * 2, axis=1), (batch_size, 1))
+    if batch_mode:
+        if return_sparse_batch:
+            outer_index = tf_repeat_1d(
+                tf.range(batch_size), tf.ones(batch_size) * tf.cast(N, tf.float32)
+            )
+            indices = tf.concat([outer_index[:, None], inner_index], 1)
+            dense_shape = (batch_size, N, N)
+        else:
+            return tf.linalg.diag(D)
+    else:
+        indices = inner_index
+        dense_shape = (N, N)
+
+    indices = tf.cast(indices, tf.int64)
+    values = tf.reshape(D, (-1, ))
+    return tf.SparseTensor(indices, values, dense_shape)
+
+
+def transpose(A, perm=None, name=None):
+    """
+    Transposes A according to perm, dealing with sparse A automatically.
+    :param A: Tensor or SparseTensor with rank k.
+    :param perm: permutation indices of size k.
+    :param name: name for the operation.
+    :return: Tensor or SparseTensor with rank k.
+    """
+    if K.is_sparse(A):
+        transpose_op = tf.sparse_transpose
+    else:
+        transpose_op = tf.transpose
+
+    return transpose_op(A, perm=perm, name=name)
