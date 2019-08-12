@@ -65,6 +65,7 @@ PAGES = [
         'classes': [
             layers.TopKPool,
             layers.MinCutPool,
+            layers.DiffPool,
             layers.GlobalSumPool,
             layers.GlobalAvgPool,
             layers.GlobalMaxPool,
