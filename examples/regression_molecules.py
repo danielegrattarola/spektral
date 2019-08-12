@@ -1,3 +1,9 @@
+"""
+This example shows how to perform regression of molecular properties with the
+QM9 database, using a GNN based on edge-conditioned convolutions in batch mode.
+"""
+
+
 import matplotlib.pyplot as plt
 import numpy as np
 from keras.callbacks import EarlyStopping
@@ -16,7 +22,7 @@ A, X, E, y = qm9.load_data(return_type='numpy',
                            nf_keys='atomic_num',
                            ef_keys='type',
                            self_loops=True,
-                           amount=1000)
+                           amount=1000)  # Set to None to train on whole dataset
 y = y[['cv']].values  # Heat capacity at 298.15K
 
 # Preprocessing

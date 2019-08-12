@@ -17,23 +17,23 @@ from spektral.utils import normalized_laplacian, rescale_laplacian
 
 # Load data
 dataset = 'cora'
-adj, node_features, y_train, y_val, y_test, train_mask, val_mask, test_mask = citation.load_data(dataset)
+A, X, y, train_mask, val_mask, test_mask = citation.load_data(dataset)
 
 # Parameters
-ARMA_T = 1                    # Depth of each ARMA_1 filter
-ARMA_K = 2                    # Number of parallel ARMA_1 filters
-recurrent = True              # Share weights like a recurrent net in each head
-N = node_features.shape[0]    # Number of nodes in the graph
-F = node_features.shape[1]    # Original feature dimensionality
-n_classes = y_train.shape[1]  # Number of classes
-dropout_rate = 0.75           # Dropout rate applied to the input of GCN layers
-l2_reg = 5e-4                 # Regularization rate for l2
-learning_rate = 1e-2          # Learning rate for SGD
-epochs = 20000                # Number of training epochs
-es_patience = 200             # Patience for early stopping
+ARMA_T = 1              # Depth of each ARMA_1 filter
+ARMA_K = 2              # Number of parallel ARMA_1 filters
+recurrent = True        # Share weights like a recurrent net in each head
+N = X.shape[0]          # Number of nodes in the graph
+F = X.shape[1]          # Original feature dimensionality
+n_classes = y.shape[1]  # Number of classes
+dropout_rate = 0.75     # Dropout rate applied to the input of GCN layers
+l2_reg = 5e-4           # Regularization rate for l2
+learning_rate = 1e-2    # Learning rate for SGD
+epochs = 20000          # Number of training epochs
+es_patience = 200       # Patience for early stopping
 
 # Preprocessing operations
-fltr = normalized_laplacian(adj, symmetric=True)
+fltr = normalized_laplacian(A, symmetric=True)
 fltr = rescale_laplacian(fltr, lmax=2)
 
 # Model definition
@@ -75,9 +75,9 @@ callbacks = [
 ]
 
 # Train model
-validation_data = ([node_features, fltr], y_val, val_mask)
-model.fit([node_features, fltr],
-          y_train,
+validation_data = ([X, fltr], y, val_mask)
+model.fit([X, fltr],
+          y,
           sample_weight=train_mask,
           epochs=epochs,
           batch_size=N,
@@ -90,8 +90,8 @@ model.load_weights('best_model.h5')
 
 # Evaluate model
 print('Evaluating model.')
-eval_results = model.evaluate([node_features, fltr],
-                              y_test,
+eval_results = model.evaluate([X, fltr],
+                              y,
                               sample_weight=test_mask,
                               batch_size=N)
 print('Done.\n'

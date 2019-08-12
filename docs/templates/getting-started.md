@@ -24,11 +24,11 @@ The `datasets.citation` module of Spektral allows you to download and load three
 ```python
 from spektral.datasets import citation
 data = citation.load_data('cora')
-A, X, y_train, y_val, y_test, train_mask, val_mask, test_mask = data
+A, X, y, train_mask, val_mask, test_mask = data
 
 N = A.shape[0]
 F = X.shape[-1]
-n_classes = y_train.shape[-1]
+n_classes = y.shape[-1]
 ```
 
 This will load the network's adjacency matrix (`A`) in a Scipy sparse format, the node features (`X`), and the pre-split training, validation, and test labels (`y_train, y_val, y_test`). The loader will also return some boolean masks to know which nodes belong to which set (`train_mask, val_mask, test_mask`).
@@ -97,9 +97,9 @@ We are now ready to train the model:
 
 ```python
 # Train model
-validation_data = ([X, A], y_val, val_mask)
+validation_data = ([X, A], y, val_mask)
 model.fit([X, A],
-          y_train,
+          y,
           sample_weight=train_mask,
           epochs=100,
           batch_size=N,
@@ -117,7 +117,7 @@ This would not be necessary if we were working in **batch mode** instead, with m
 
 Finally, we used `train_mask` and `val_mask` as `sample_weight`.   
 This results in the training nodes being assigned a weight of 1 during training, and the nodes outside the training set being assigned a weight of 0. The same holds for the validation and test sets.    
-This is all that we need to do to differentiate between training and test data. See how the model takes as input the full `X` and `A` for both phases? The only thing that changes is the mask and targets. This is also why we used the `weighted_metrics` flag when compiling the model. 
+This is all that we need to do to differentiate between training and test data. See how the model takes as input the full `X`, `A`, and `y` for both phases? The only thing that changes are the masks. This is also why we used the `weighted_metrics` flag when compiling the model. 
 
 ## Evaluating the model
 

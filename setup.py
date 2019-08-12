@@ -5,10 +5,11 @@ with open("README.md", "r") as fh:
 
 setup(
     name='spektral',
-    version='0.0.11',
+    version='0.0.12',
     packages=find_packages(),
     install_requires=['keras', 'networkx', 'pandas', 'joblib', 'matplotlib',
-                      'tqdm', 'pygraphviz', 'numpy', 'scipy', 'requests'],
+                      'tqdm', 'pygraphviz', 'numpy', 'scipy', 'requests',
+                      'scikit-learn'],
     url='https://github.com/danielegrattarola/spektral',
     license='MIT',
     author='Daniele Grattarola',

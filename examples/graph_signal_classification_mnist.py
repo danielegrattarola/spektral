@@ -1,5 +1,3 @@
-import numpy as np
-import tensorflow as tf
 from keras import Input, Model
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.layers import Dense, Flatten
@@ -8,21 +6,15 @@ from keras.regularizers import l2
 
 from spektral.datasets import mnist
 from spektral.layers import GraphConv
+from spektral.layers.ops import sp_matrix_to_sp_tensor
 from spektral.utils import normalized_laplacian
 
-
-def sp_matrix_to_sp_tensor(x):
-    x = x.tocoo()
-    return tf.SparseTensor(indices=np.array([x.row, x.col]).T,
-                           values=x.data, dense_shape=x.shape)
-
-
 # Parameters
-l2_reg = 5e-4             # Regularization rate for l2
-learning_rate = 1e-3      # Learning rate for SGD
-batch_size = 32           # Batch size
-epochs = 10               # Number of training epochs
-es_patience = 200         # Patience fot early stopping
+l2_reg = 5e-4         # Regularization rate for l2
+learning_rate = 1e-3  # Learning rate for SGD
+batch_size = 32       # Batch size
+epochs = 20000        # Number of training epochs
+es_patience = 200     # Patience fot early stopping
 
 # Load data
 X_train, y_train, X_val, y_val, X_test, y_test, adj = mnist.load_data()
@@ -35,24 +27,24 @@ fltr = normalized_laplacian(adj)
 
 # Model definition
 X_in = Input(shape=(N, F))
-# Pass filter as a fixed tensor, otherwise Keras will complain about inputs of
+# Pass A as a fixed tensor, otherwise Keras will complain about inputs of
 # different rank.
-G_in = Input(tensor=sp_matrix_to_sp_tensor(fltr))
+A_in = Input(tensor=sp_matrix_to_sp_tensor(fltr))
 
 graph_conv = GraphConv(32,
                        activation='elu',
                        kernel_regularizer=l2(l2_reg),
-                       use_bias=True)([X_in, G_in])
+                       use_bias=True)([X_in, A_in])
 graph_conv = GraphConv(32,
                        activation='elu',
                        kernel_regularizer=l2(l2_reg),
-                       use_bias=True)([graph_conv, G_in])
+                       use_bias=True)([graph_conv, A_in])
 flatten = Flatten()(graph_conv)
 fc = Dense(512, activation='relu')(flatten)
 output = Dense(n_out, activation='softmax')(fc)
 
 # Build model
-model = Model(inputs=[X_in, G_in], outputs=output)
+model = Model(inputs=[X_in, A_in], outputs=output)
 optimizer = Adam(lr=learning_rate)
 model.compile(optimizer=optimizer,
               loss='sparse_categorical_crossentropy',

@@ -17,20 +17,20 @@ from spektral.utils.convolution import localpooling_filter
 
 # Load data
 dataset = 'cora'
-adj, node_features, y_train, y_val, y_test, train_mask, val_mask, test_mask = citation.load_data(dataset)
+A, X, y, train_mask, val_mask, test_mask = citation.load_data(dataset)
 
 # Parameters
-N = node_features.shape[0]    # Number of nodes in the graph
-F = node_features.shape[1]    # Original feature dimensionality
-n_classes = y_train.shape[1]  # Number of classes
-dropout_rate = 0.5            # Dropout rate applied to the input of GCN layers
-l2_reg = 5e-4                 # Regularization rate for l2
-learning_rate = 1e-2          # Learning rate for SGD
-epochs = 200                  # Number of training epochs
-es_patience = 10              # Patience for early stopping
+N = X.shape[0]          # Number of nodes in the graph
+F = X.shape[1]          # Original feature dimensionality
+n_classes = y.shape[1]  # Number of classes
+dropout_rate = 0.5      # Dropout rate applied to the input of GCN layers
+l2_reg = 5e-4           # Regularization rate for l2
+learning_rate = 1e-2    # Learning rate for SGD
+epochs = 20000          # Number of training epochs
+es_patience = 200       # Patience for early stopping
 
 # Preprocessing operations
-fltr = localpooling_filter(adj)
+fltr = localpooling_filter(A)
 
 # Model definition
 X_in = Input(shape=(F, ))
@@ -64,9 +64,9 @@ callbacks = [
 ]
 
 # Train model
-validation_data = ([node_features, fltr], y_val, val_mask)
-model.fit([node_features, fltr],
-          y_train,
+validation_data = ([X, fltr], y, val_mask)
+model.fit([X, fltr],
+          y,
           sample_weight=train_mask,
           epochs=epochs,
           batch_size=N,
@@ -79,8 +79,8 @@ model.load_weights('best_model.h5')
 
 # Evaluate model
 print('Evaluating model.')
-eval_results = model.evaluate([node_features, fltr],
-                              y_test,
+eval_results = model.evaluate([X, fltr],
+                              y,
                               sample_weight=test_mask,
                               batch_size=N)
 print('Done.\n'

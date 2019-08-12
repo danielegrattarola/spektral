@@ -45,6 +45,8 @@ Converting a graph from dense to sparse and viceversa is a costly operation.**
 - reduced node features of shape `(n_graphs * k, n_features)`;
 - reduced adjacency matrix of shape `(n_graphs * k, n_graphs * k)`;
 - reduced graph IDs with shape `(n_graphs * k, )` (graph batch mode);
+- If `return_mask=True`, the binary mask used for pooling, with shape
+`(n_graphs * k, )`.
 
 **Arguments**
 
@@ -59,7 +61,61 @@ tanh;
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L168)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L169)</span>
+### MinCutPool
+
+```python
+spektral.layers.MinCutPool(k, h=None, return_mask=True, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+```
+
+
+A minCUT pooling layer as presented by [Bianchi et al.](https://arxiv.org/abs/1907.00481).
+
+**Mode**: single, batch.
+
+This layer computes a soft clustering \(S\) of the input graphs using a MLP,
+and reduces graphs as follows:
+
+$$
+A^{pool} = S^T A S; X^{pool} = S^T X;
+$$
+
+Besides training the MLP, two additional unsupervised loss terms to ensure
+that the cluster assignment solves the minCUT optimization problem.
+The layer can be used without a supervised loss, to compute node clustering
+simply by minimizing the unsupervised loss.
+
+**Input**
+
+- node features of shape `(n_nodes, n_features)` (with optional `batch`
+dimension);
+- adjacency matrix of shape `(n_nodes, n_nodes)` (with optional `batch`
+dimension);
+
+**Output**
+
+- reduced node features of shape `(k, n_features)`;
+- reduced adjacency matrix of shape `(k, k)`;
+- reduced graph IDs with shape `(k, )` (graph batch mode);
+- If `return_mask=True`, the soft assignment matrix used for pooling, with
+shape `(n_nodes, k)`.
+
+**Arguments**
+
+- `k`: number of nodes to keep;
+- `h`: number of units in the hidden layer;
+- `return_mask`: boolean, whether to return the cluster assignment matrix,
+- `kernel_initializer`: initializer for the kernel matrix;
+- `bias_initializer`: initializer for the bias vector;
+- `kernel_regularizer`: regularization applied to the kernel matrix;
+- `bias_regularizer`: regularization applied to the bias vector;
+- `activity_regularizer`: regularization applied to the output;
+- `kernel_constraint`: constraint applied to the kernel matrix;
+- `bias_constraint`: constraint applied to the bias vector.
+
+----
+
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L386)</span>
 ### GlobalSumPool
 
 ```python
@@ -90,7 +146,7 @@ None.
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L231)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L451)</span>
 ### GlobalAvgPool
 
 ```python
@@ -120,7 +176,7 @@ None.
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L295)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L515)</span>
 ### GlobalMaxPool
 
 ```python
@@ -150,7 +206,7 @@ None.
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L357)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L579)</span>
 ### GlobalAttentionPool
 
 ```python
@@ -187,7 +243,7 @@ dimension changed to `channels`.
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L477)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L701)</span>
 ### GlobalAttnSumPool
 
 ```python
