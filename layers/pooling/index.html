@@ -98,6 +98,9 @@
     <li class="toctree-l3"><a href="#mincutpool">MinCutPool</a></li>
     
 
+    <li class="toctree-l3"><a href="#diffpool">DiffPool</a></li>
+    
+
     <li class="toctree-l3"><a href="#globalsumpool">GlobalSumPool</a></li>
     
 
@@ -331,6 +334,53 @@ shape <code>(n_nodes, k)</code>.</li>
 <li><code>activity_regularizer</code>: regularization applied to the output;</li>
 <li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L384">[source]</a></span></p>
+<h3 id="diffpool">DiffPool</h3>
+<pre><code class="python">spektral.layers.DiffPool(k, channels=None, return_mask=True, activation=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None)
+</code></pre>
+
+<p>A DiffPool layer as presented by <a href="https://arxiv.org/abs/1806.08804">Ying et al.</a>.</p>
+<p><strong>Mode</strong>: single, batch.</p>
+<p>This layer computes a soft clustering <script type="math/tex">S</script> of the input graphs using a GNN,
+and reduces graphs as follows:</p>
+<p>
+<script type="math/tex; mode=display">
+A^{pool} = S^T A S; X^{pool} = S^T X;
+</script>
+</p>
+<p>Besides training the GNN, two additional unsupervised loss terms are
+minimized. The layer also applies a GNN to the input features, and returns
+the updated graph signal (the number of output channels is controlled by
+the <code>channels</code> parameter).
+The layer can be used without a supervised loss, to compute node clustering
+simply by minimizing the unsupervised loss.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>node features of shape <code>(n_nodes, n_features)</code> (with optional <code>batch</code>
+dimension);</li>
+<li>adjacency matrix of shape <code>(n_nodes, n_nodes)</code> (with optional <code>batch</code>
+dimension);</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>reduced node features of shape <code>(k, channels)</code>;</li>
+<li>reduced adjacency matrix of shape <code>(k, k)</code>;</li>
+<li>reduced graph IDs with shape <code>(k, )</code> (graph batch mode);</li>
+<li>If <code>return_mask=True</code>, the soft assignment matrix used for pooling, with
+shape <code>(n_nodes, k)</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>k</code>: number of nodes to keep;</li>
+<li><code>channels</code>: number of output channels (if None, the number of output
+channels is assumed to be the same as the input);</li>
+<li><code>return_mask</code>: boolean, whether to return the cluster assignment matrix,</li>
+<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
+<li><code>activity_regularizer</code>: regularization applied to the output;</li>
+<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
 </ul>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L574">[source]</a></span></p>
