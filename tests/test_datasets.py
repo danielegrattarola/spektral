@@ -16,6 +16,7 @@ def correctly_padded(adj, nf, ef):
 def test_citation():
     for dataset_name in ['cora', 'citeseer', 'pubmed']:
         citation.load_data(dataset_name)
+        citation.load_data(dataset_name, random_split=True)
 
 
 def test_delaunay():

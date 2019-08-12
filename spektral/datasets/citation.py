@@ -32,6 +32,7 @@ import networkx as nx
 import numpy as np
 import requests
 import scipy.sparse as sp
+from sklearn.model_selection import train_test_split
 
 from spektral.utils.io import load_binary
 
@@ -53,15 +54,17 @@ def _sample_mask(idx, l):
     return np.array(mask, dtype=np.bool)
 
 
-def load_data(dataset_name='cora', normalize_features=True):
+def load_data(dataset_name='cora', normalize_features=True, random_split=False):
     """
     Loads a citation dataset using the public splits as defined in
     [Kipf & Welling (2016)](https://arxiv.org/abs/1609.02907).
     :param dataset_name: name of the dataset to load ('cora', 'citeseer', or
     'pubmed');
     :param normalize_features: if True, the node features are normalized;
-    :return: the citation network in numpy format, with train, test, and
-    validation splits for the targets and masks.
+    :param random_split: if True, return a randomized split (20/40/40); otherwise,
+    return the popular Planetoid split.
+    :return: the citation network in numpy format, the labels, and the binary
+    masks for train, test, and validation splits.
     """
     if dataset_name not in AVAILABLE_DATASETS:
         raise ValueError('Available datasets: {}'.format(AVAILABLE_DATASETS))
@@ -96,30 +99,29 @@ def load_data(dataset_name='cora', normalize_features=True):
     features = sp.vstack((allx, tx)).tolil()
     features[test_idx_reorder, :] = features[test_idx_range, :]
 
-    labels = np.vstack((ally, ty))
-    labels[test_idx_reorder, :] = labels[test_idx_range, :]
-
-    idx_test = test_idx_range.tolist()
-    idx_train = range(len(y))
-    idx_val = range(len(y), len(y) + 500)
-
-    train_mask = _sample_mask(idx_train, labels.shape[0])
-    val_mask = _sample_mask(idx_val, labels.shape[0])
-    test_mask = _sample_mask(idx_test, labels.shape[0])
-
     # Row-normalize the features
     if normalize_features:
         print('Pre-processing node features')
         features = preprocess_features(features)
 
-    y_train = np.zeros(labels.shape)
-    y_val = np.zeros(labels.shape)
-    y_test = np.zeros(labels.shape)
-    y_train[train_mask, :] = labels[train_mask, :]
-    y_val[val_mask, :] = labels[val_mask, :]
-    y_test[test_mask, :] = labels[test_mask, :]
+    labels = np.vstack((ally, ty))
+    labels[test_idx_reorder, :] = labels[test_idx_range, :]
 
-    return adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask
+    # Data splits
+    if random_split:
+        indices = np.arange(labels.shape[0])
+        idx_train, idx_test, y_train, y_test = train_test_split(indices, labels, test_size=0.8, stratify=labels)
+        idx_test, idx_val, y_test, y_val = train_test_split(idx_test, y_test, test_size=0.5, stratify=y_test)
+    else:
+        idx_test = test_idx_range.tolist()
+        idx_train = range(len(y))
+        idx_val = range(len(y), len(y) + 500)
+
+    train_mask = _sample_mask(idx_train, labels.shape[0])
+    val_mask = _sample_mask(idx_val, labels.shape[0])
+    test_mask = _sample_mask(idx_test, labels.shape[0])
+
+    return adj, features, labels, train_mask, val_mask, test_mask
 
 
 def preprocess_features(features):
