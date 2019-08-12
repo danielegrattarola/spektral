@@ -237,11 +237,11 @@ Finally, each node has a class label.</p>
 <p>The <code>datasets.citation</code> module of Spektral allows you to download and load three popular citation datasets (Cora, Citeseer and Pubmed) in one line of code. For instance, loading the Cora dataset is as simple as: </p>
 <pre><code class="python">from spektral.datasets import citation
 data = citation.load_data('cora')
-A, X, y_train, y_val, y_test, train_mask, val_mask, test_mask = data
+A, X, y, train_mask, val_mask, test_mask = data
 
 N = A.shape[0]
 F = X.shape[-1]
-n_classes = y_train.shape[-1]
+n_classes = y.shape[-1]
 </code></pre>
 
 <p>This will load the network's adjacency matrix (<code>A</code>) in a Scipy sparse format, the node features (<code>X</code>), and the pre-split training, validation, and test labels (<code>y_train, y_val, y_test</code>). The loader will also return some boolean masks to know which nodes belong to which set (<code>train_mask, val_mask, test_mask</code>).</p>
@@ -288,9 +288,9 @@ model.summary()
 <p>Note that we used the <code>weighted_metrics</code> argument instead of the usual <code>metrics</code>. This is due to the particular semi-supervised problem that we are dealing with, and has to do with the boolean masks that we loaded earlier (more on that later).</p>
 <p>We are now ready to train the model:</p>
 <pre><code class="python"># Train model
-validation_data = ([X, A], y_val, val_mask)
+validation_data = ([X, A], y, val_mask)
 model.fit([X, A],
-          y_train,
+          y,
           sample_weight=train_mask,
           epochs=100,
           batch_size=N,
@@ -305,7 +305,7 @@ If left to its own devices, Keras will automatically try to split our graph into
 This would not be necessary if we were working in <strong>batch mode</strong> instead, with many different graphs in our dataset. </p>
 <p>Finally, we used <code>train_mask</code> and <code>val_mask</code> as <code>sample_weight</code>. <br />
 This results in the training nodes being assigned a weight of 1 during training, and the nodes outside the training set being assigned a weight of 0. The same holds for the validation and test sets.  <br />
-This is all that we need to do to differentiate between training and test data. See how the model takes as input the full <code>X</code> and <code>A</code> for both phases? The only thing that changes is the mask and targets. This is also why we used the <code>weighted_metrics</code> flag when compiling the model. </p>
+This is all that we need to do to differentiate between training and test data. See how the model takes as input the full <code>X</code>, <code>A</code>, and <code>y</code> for both phases? The only thing that changes are the masks. This is also why we used the <code>weighted_metrics</code> flag when compiling the model. </p>
 <h2 id="evaluating-the-model">Evaluating the model</h2>
 <p>Again, this is done in vanilla Keras. We just have to keep in mind the same considerations about batching that we did for training (<code>shuffle</code> is <code>False</code> by default in <code>evaluate()</code>): </p>
 <pre><code class="python"># Evaluate model

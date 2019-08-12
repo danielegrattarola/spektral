@@ -213,7 +213,7 @@
             <div class="section">
               
                 <h3 id="load_data">load_data</h3>
-<pre><code class="python">spektral.datasets.citation.load_data(dataset_name='cora', normalize_features=True)
+<pre><code class="python">spektral.datasets.citation.load_data(dataset_name='cora', normalize_features=True, random_split=False)
 </code></pre>
 
 <p>Loads a citation dataset using the public splits as defined in
@@ -227,10 +227,14 @@
 <li>
 <p><code>normalize_features</code>: if True, the node features are normalized;</p>
 </li>
+<li>
+<p><code>random_split</code>: if True, return a randomized split (20/40/40); otherwise,
+return the popular Planetoid split.</p>
+</li>
 </ul>
 <p><strong>Return</strong><br />
- The citation network in numpy format, with train, test, and
-validation splits for the targets and masks.</p>
+ The citation network in numpy format, the labels, and the binary
+masks for train, test, and validation splits.</p>
               
             </div>
           </div>
