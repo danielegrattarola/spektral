@@ -60,7 +60,6 @@ epochs = 500               # Number of training epochs
 es_patience = 50           # Patience for early stopping
 learning_rate = 1e-3       # Learning rate
 batch_size = 1             # Batch size. NOTE: it MUST be 1 when using MinCutPool and DiffPool
-data_path = './data/'      # Data folder
 dataset_name = 'easy.npz'  # Dataset ('easy.npz' or 'hard.npz')
 
 ################################################################################
@@ -68,14 +67,14 @@ dataset_name = 'easy.npz'  # Dataset ('easy.npz' or 'hard.npz')
 ################################################################################
 
 # Download graph classification data
-if not os.path.exists(data_path + dataset_name):
+if not os.path.exists(dataset_name):
     data_url = 'https://github.com/FilippoMB/Benchmark_dataset_for_graph_classification/raw/master/datasets/' + dataset_name
     print('Downloading ' + dataset_name + ' from ' + data_url)
     req = requests.get(data_url)
-    with open(data_path + dataset_name, 'wb') as out_file:
+    with open(dataset_name, 'wb') as out_file:
         out_file.write(req.content)
 
-loaded = np.load(data_path + dataset_name, allow_pickle=True)
+loaded = np.load(dataset_name, allow_pickle=True)
 X_train, A_train, y_train = loaded['tr_feat'], list(loaded['tr_adj']), loaded['tr_class']
 X_test, A_test, y_test = loaded['te_feat'], list(loaded['te_adj']), loaded['te_class']
 X_val, A_val, y_val = loaded['val_feat'], list(loaded['val_adj']), loaded['val_class']
