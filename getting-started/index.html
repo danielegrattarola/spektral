@@ -244,7 +244,7 @@ F = X.shape[-1]
 n_classes = y.shape[-1]
 </code></pre>
 
-<p>This will load the network's adjacency matrix (<code>A</code>) in a Scipy sparse format, the node features (<code>X</code>), and the pre-split training, validation, and test labels (<code>y_train, y_val, y_test</code>). The loader will also return some boolean masks to know which nodes belong to which set (<code>train_mask, val_mask, test_mask</code>).</p>
+<p>This will load the network's adjacency matrix (<code>A</code>) in a Scipy sparse format, the node features (<code>X</code>), and the labels (<code>y</code>). The loader will also return some boolean masks to know which nodes belong to the training, validation and test sets (<code>train_mask, val_mask, test_mask</code>).</p>
 <p>We also saved a couple of values that will be useful later: the number of nodes in the graph (<code>N</code>), the size of the node attributes (<code>F</code>), and the number of classes in the labels (<code>n_classes</code>).</p>
 <h2 id="creating-a-gnn">Creating a GNN</h2>
 <p>To create a GCN similar to the one in the paper, we will use the <code>GraphConv</code> layer and the functional API of Keras:</p>
@@ -310,7 +310,7 @@ This is all that we need to do to differentiate between training and test data. 
 <p>Again, this is done in vanilla Keras. We just have to keep in mind the same considerations about batching that we did for training (<code>shuffle</code> is <code>False</code> by default in <code>evaluate()</code>): </p>
 <pre><code class="python"># Evaluate model
 eval_results = model.evaluate([X, A],
-                              y_test,
+                              y,
                               sample_weight=test_mask,
                               batch_size=N)
 print('Done.\n'
