@@ -10,8 +10,8 @@ def pad_jagged_array(x, target_shape, dtype=np.float):
     """
     Given a jagged array of arbitrary dimensions, zero-pads all elements in the
     array to match the provided `target_shape`.
-    :param x: a np.array of dtype object, containing np.arrays of varying 
-    dimensions
+    :param x: a list or np.array of dtype object, containing np.arrays of
+    varying dimensions
     :param target_shape: a tuple or list s.t. target_shape[i] >= x.shape[i]
     for each x in X.
     If `target_shape[i] = -1`, it will be automatically converted to X.shape[i], 
@@ -21,6 +21,8 @@ def pad_jagged_array(x, target_shape, dtype=np.float):
     :param dtype: the dtype of the returned np.array
     :return: a zero-padded np.array of shape `(X.shape[0], ) + target_shape`
     """
+    if isinstance(x, list):
+        x = np.array(x)
     for i in range(len(x)):
         shapes = []
         for j in range(len(target_shape)):

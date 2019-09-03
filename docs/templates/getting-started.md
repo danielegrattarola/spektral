@@ -31,7 +31,7 @@ F = X.shape[-1]
 n_classes = y.shape[-1]
 ```
 
-This will load the network's adjacency matrix (`A`) in a Scipy sparse format, the node features (`X`), and the pre-split training, validation, and test labels (`y_train, y_val, y_test`). The loader will also return some boolean masks to know which nodes belong to which set (`train_mask, val_mask, test_mask`).
+This will load the network's adjacency matrix (`A`) in a Scipy sparse format, the node features (`X`), and the labels (`y`). The loader will also return some boolean masks to know which nodes belong to the training, validation and test sets (`train_mask, val_mask, test_mask`).
 
 We also saved a couple of values that will be useful later: the number of nodes in the graph (`N`), the size of the node attributes (`F`), and the number of classes in the labels (`n_classes`).
 
@@ -126,7 +126,7 @@ Again, this is done in vanilla Keras. We just have to keep in mind the same cons
 ```python
 # Evaluate model
 eval_results = model.evaluate([X, A],
-                              y_test,
+                              y,
                               sample_weight=test_mask,
                               batch_size=N)
 print('Done.\n'
