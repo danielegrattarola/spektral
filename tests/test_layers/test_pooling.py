@@ -1,10 +1,10 @@
 import numpy as np
+import scipy.sparse as sp
 import tensorflow as tf
 from keras import Input, Model
 from keras import backend as K
 
 from spektral.layers import TopKPool, MinCutPool, DiffPool
-import scipy.sparse as sp
 
 SINGLE, BATCH, GRAPH_BATCH = 1, 2, 3  # Single, batch, graph batch
 LAYER_K_, MODES_K_, KWARGS_K_ = 'layer', 'modes', 'kwargs'

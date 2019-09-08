@@ -1,7 +1,7 @@
-from keras import backend as K
-from keras.backend import tf
-import scipy.sparse as sp
 import numpy as np
+import scipy.sparse as sp
+import tensorflow as tf
+from keras import backend as K
 
 
 def sparse_bool_mask(x, mask, axis=0):
@@ -85,7 +85,7 @@ def sp_matrix_to_sp_tensor_value(x):
             raise TypeError('x must be convertible to scipy.coo_matrix')
     else:
         x = x.tocoo()
-    return K.tf.SparseTensorValue(
+    return tf.SparseTensorValue(
         indices=np.array([x.row, x.col]).T,
         values=x.data,
         dense_shape=x.shape
@@ -105,7 +105,7 @@ def sp_matrix_to_sp_tensor(x):
             raise TypeError('x must be convertible to scipy.coo_matrix')
     else:
         x = x.tocoo()
-    return K.tf.SparseTensor(
+    return tf.SparseTensor(
         indices=np.array([x.row, x.col]).T,
         values=x.data,
         dense_shape=x.shape
