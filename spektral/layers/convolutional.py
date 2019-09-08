@@ -1,8 +1,8 @@
 from __future__ import absolute_import
 
+import tensorflow as tf
 from keras import activations, initializers, regularizers, constraints
 from keras import backend as K
-from keras.backend import tf
 from keras.layers import Layer, LeakyReLU, Dropout, AveragePooling2D, AveragePooling1D
 
 from spektral.layers.ops import filter_dot
@@ -399,7 +399,7 @@ class GraphSageConv(GraphConv):
         fltr = inputs[1]
 
         if not K.is_sparse(fltr):
-            fltr = K.tf.contrib.layers.dense_to_sparse(fltr)  # TODO: move this to tf
+            fltr = tf.contrib.layers.dense_to_sparse(fltr)
 
         features_neigh = self.aggregate_op(
             tf.gather(features, fltr.indices[:, -1]), fltr.indices[:, -2]
@@ -540,7 +540,7 @@ class EdgeConditionedConv(Layer):
         target_shape = (-1,) + K.int_shape(kernel_network)[1:-1] + (F_, F)
         kernel = K.reshape(kernel_network, target_shape)
         output = kernel * fltr[..., None, None]
-        output = K.tf.einsum('abicf,aif->abc', output, node_features)
+        output = tf.einsum('abicf,aif->abc', output, node_features)
 
         if self.use_bias:
             output = K.bias_add(output, self.bias)
@@ -1671,7 +1671,7 @@ class GINConv(GraphConv):
         fltr = inputs[1]
 
         if not K.is_sparse(fltr):
-            fltr = K.tf.contrib.layers.dense_to_sparse(fltr)  # TODO: move this to tf
+            fltr = tf.contrib.layers.dense_to_sparse(fltr)
 
         # Input layer
         features_neigh = tf.segment_sum(tf.gather(features, fltr.indices[:, -1]), fltr.indices[:, -2])

@@ -1,8 +1,9 @@
-from spektral.layers import GraphConv, ChebConv, EdgeConditionedConv, GraphAttention, GraphConvSkip, ARMAConv, APPNP, \
-    GraphSageConv, GINConv
-from keras import backend as K, Model, Input
 import numpy as np
 import tensorflow as tf
+from keras import backend as K, Model, Input
+
+from spektral.layers import GraphConv, ChebConv, EdgeConditionedConv, GraphAttention, GraphConvSkip, ARMAConv, APPNP, \
+    GraphSageConv, GINConv
 
 SINGLE, BATCH, MIXED = 1, 2, 3  # Single, batch, mixed
 LAYER_K_, MODES_K_, KWARGS_K_ = 'layer', 'modes', 'kwargs'
