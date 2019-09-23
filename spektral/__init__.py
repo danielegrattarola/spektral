@@ -5,4 +5,4 @@ from . import datasets
 from . import layers
 from . import utils
 
-__version__ = '0.0.6'
+__version__ = '0.0.13'
