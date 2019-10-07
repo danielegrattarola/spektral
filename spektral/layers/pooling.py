@@ -112,7 +112,7 @@ class TopKPool(Layer):
         # Get mask
         y = K.dot(X, K.l2_normalize(self.kernel))
         N = K.shape(X)[-2]
-        indices = ops.top_k(y[:, 0], I, self.ratio, self.top_k_var)
+        indices = ops.segment_top_k(y[:, 0], I, self.ratio, self.top_k_var)
         mask = tf.scatter_nd(tf.expand_dims(indices, 1), tf.ones_like(indices), (N,))
 
         # Multiply X and y to make layer differentiable
@@ -338,7 +338,7 @@ class MinCutPool(Layer):
 
         if I is not None:
             I_mean = tf.segment_mean(I, I)
-            I_pooled = ops.tf_repeat_1d(I_mean, tf.ones_like(I_mean) * self.k)
+            I_pooled = ops.repeat(I_mean, tf.ones_like(I_mean) * self.k)
             output.append(I_pooled)
 
         if self.return_mask:
@@ -529,7 +529,7 @@ class DiffPool(Layer):
 
         if I is not None:
             I_mean = tf.segment_mean(I, I)
-            I_pooled = ops.tf_repeat_1d(I_mean, tf.ones_like(I_mean) * self.k)
+            I_pooled = ops.repeat(I_mean, tf.ones_like(I_mean) * self.k)
             output.append(I_pooled)
 
         if self.return_mask:
