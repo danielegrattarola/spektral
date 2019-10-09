@@ -6,7 +6,7 @@ from keras import backend as K
 _modes = {
     'S': 1,    # Single (rank(A)=2, rank(B)=2)
     'M': 2,    # Mixed (rank(A)=2, rank(B)=3)
-    'iM': 3,   # Inverted mixed (rank(A)=2, rank(B)=2)
+    'iM': 3,   # Inverted mixed (rank(A)=3, rank(B)=2)
     'B': 4,    # Batch (rank(A)=3, rank(B)=3)
     'UNK': -1  # Unknown
 }
