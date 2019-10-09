@@ -25,5 +25,6 @@ body > div.wy-grid-for-nav > nav > div.wy-side-nav-search > a {
 }*/
 
 .MathJax_Display {
-    overflow-x: scroll;
+    overflow-x: auto;
+    overflow-y: hidden;
 }

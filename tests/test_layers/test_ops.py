@@ -100,27 +100,19 @@ def test_matmul_ops_mixed_mode():
     convert_to_sparse = [[True, False], [False, True]]
 
     # A * B
-    expected_output = np.zeros((batch_size, N, N))
-    for i in range(batch_size):
-        expected_output[i, ...] = A.dot(B[i])
+    expected_output = np.array([A.dot(B[i]) for i in range(batch_size)])
     _check_op(matmul_A_B, [A, B], expected_output, convert_to_sparse)
 
     # A.T * B * A
-    expected_output = np.zeros((batch_size, N, N))
-    for i in range(batch_size):
-        expected_output[i, ...] = A.T.dot(B[i]).dot(A)
+    expected_output = np.array([A.T.dot(B[i]).dot(A) for i in range(batch_size)])
     _check_op(matmul_AT_B_A, [A, B], expected_output, convert_to_sparse)
 
     # A.T * B
-    expected_output = np.zeros((batch_size, N, N))
-    for i in range(batch_size):
-        expected_output[i, ...] = A.T.dot(B[i])
+    expected_output = np.array([A.T.dot(B[i]) for i in range(batch_size)])
     _check_op(matmul_AT_B, [A, B], expected_output, convert_to_sparse)
 
     # A * B.T
-    expected_output = np.zeros((batch_size, N, N))
-    for i in range(batch_size):
-        expected_output[i, ...] = A.dot(B[i].T)
+    expected_output = np.array([A.dot(B[i].T) for i in range(batch_size)])
     _check_op(matmul_A_BT, [A, B], expected_output, convert_to_sparse)
 
 
@@ -129,27 +121,19 @@ def test_matmul_ops_inv_mixed_mode():
     B = np.random.randn(N, N)
 
     # A * B
-    expected_output = np.zeros((batch_size, N, N))
-    for i in range(batch_size):
-        expected_output[i, ...] = A[i].dot(B)
+    expected_output = np.array([A[i].dot(B) for i in range(batch_size)])
     _check_op(matmul_A_B, [A, B], expected_output)
 
     # A.T * B * A
-    expected_output = np.zeros((batch_size, N, N))
-    for i in range(batch_size):
-        expected_output[i, ...] = A[i].T.dot(B).dot(A[i])
+    expected_output = np.array([A[i].T.dot(B).dot(A[i]) for i in range(batch_size)])
     _check_op(matmul_AT_B_A, [A, B], expected_output)
 
     # A.T * B
-    expected_output = np.zeros((batch_size, N, N))
-    for i in range(batch_size):
-        expected_output[i, ...] = A[i].T.dot(B)
+    expected_output = np.array([A[i].T.dot(B) for i in range(batch_size)])
     _check_op(matmul_AT_B, [A, B], expected_output)
 
-    # A* B.T
-    expected_output = np.zeros((batch_size, N, N))
-    for i in range(batch_size):
-        expected_output[i, ...] = A[i].dot(B.T)
+    # A * B.T
+    expected_output = np.array([A[i].dot(B.T) for i in range(batch_size)])
     _check_op(matmul_A_BT, [A, B], expected_output)
 
 
@@ -158,25 +142,17 @@ def test_matmul_ops_batch_mode():
     B = np.random.randn(batch_size, N, N)
 
     # A * B
-    expected_output = np.zeros((batch_size, N, N))
-    for i in range(batch_size):
-        expected_output[i, ...] = A[i].dot(B[i])
+    expected_output = np.array([A[i].dot(B[i]) for i in range(batch_size)])
     _check_op(matmul_A_B, [A, B], expected_output)
 
     # A.T * B * A
-    expected_output = np.zeros((batch_size, N, N))
-    for i in range(batch_size):
-        expected_output[i, ...] = A[i].T.dot(B[i]).dot(A[i])
+    expected_output = np.array([A[i].T.dot(B[i]).dot(A[i]) for i in range(batch_size)])
     _check_op(matmul_AT_B_A, [A, B], expected_output)
 
     # A.T * B
-    expected_output = np.zeros((batch_size, N, N))
-    for i in range(batch_size):
-        expected_output[i, ...] = A[i].T.dot(B[i])
+    expected_output = np.array([A[i].T.dot(B[i]) for i in range(batch_size)])
     _check_op(matmul_AT_B, [A, B], expected_output)
 
     # A * B.T
-    expected_output = np.zeros((batch_size, N, N))
-    for i in range(batch_size):
-        expected_output[i, ...] = A[i].dot(B[i].T)
+    expected_output = np.array([A[i].dot(B[i].T) for i in range(batch_size)])
     _check_op(matmul_A_BT, [A, B], expected_output)

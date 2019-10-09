@@ -29,7 +29,7 @@ def test_delaunay():
 
 
 def test_mnist():
-    mnist.load_data()
+    mnist.load_data(k=8, noise_level=0.1)
 
 
 def test_qm9():
