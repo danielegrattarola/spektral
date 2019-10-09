@@ -9,7 +9,8 @@ script:
   - pip install codecov
   - pip install scikit-learn
   - pip install matplotlib==3.0.3
-  - pip install tensorflow
+  - pip install tensorflow<=2.0.0
+  - pip install keras<2.3
   - python setup.py install
   - pytest --cov=spektral
 after_success:

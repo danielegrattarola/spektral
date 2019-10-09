@@ -449,6 +449,7 @@ class DiffPool(Layer):
         self.kernel_regularizer = regularizers.get(kernel_regularizer)
         self.activity_regularizer = regularizers.get(activity_regularizer)
         self.kernel_constraint = constraints.get(kernel_constraint)
+        self.mixed_mode = False
 
     def build(self, input_shape):
         assert isinstance(input_shape, list)
@@ -481,7 +482,8 @@ class DiffPool(Layer):
 
         N = K.shape(A)[-1]
         # Check if the layer is operating in batch mode (X and A have rank 3)
-        batch_mode = K.ndim(A) == 3
+        mode = ops.autodetect_mode(A, X)
+        self.reduce_loss = mode in (ops._modes['M'], ops._modes['B'])
 
         # Get normalized adjacency
         if K.is_sparse(A):
@@ -510,20 +512,23 @@ class DiffPool(Layer):
         else:
             LP_loss = A - S_gram
         LP_loss = tf.norm(LP_loss, axis=(-1, -2))
-        if batch_mode:
+        if self.reduce_loss:
             LP_loss = K.mean(LP_loss)
         self.add_loss(LP_loss)
 
         # Entropy loss
         entr = tf.negative(tf.reduce_sum(tf.multiply(S, K.log(S + K.epsilon())), axis=-1))
         entr_loss = K.mean(entr, axis=-1)
-        if batch_mode:
+        if self.reduce_loss:
             entr_loss = K.mean(entr_loss)
         self.add_loss(entr_loss)
 
         # Pooling
         X_pooled = ops.matmul_AT_B(S, Z)
         A_pooled = ops.matmul_AT_B_A(S, A)
+
+        if K.ndim(A_pooled) == 3:
+            self.mixed_mode = True
 
         output = [X_pooled, A_pooled]
 
@@ -541,7 +546,10 @@ class DiffPool(Layer):
         X_shape = input_shape[0]
         A_shape = input_shape[1]
         X_shape_out = X_shape[:-2] + (self.k, self.channels)
-        A_shape_out = A_shape[:-2] + (self.k, self.k)
+        if self.reduce_loss:
+            A_shape_out = X_shape[:-2] + (self.k, self.k)
+        else:
+            A_shape_out = A_shape[:-2] + (self.k, self.k)
 
         output_shape = [X_shape_out, A_shape_out]
 
