@@ -1,5 +1,3 @@
-from __future__ import division, print_function
-
 from . import brain
 from . import datasets
 from . import layers
