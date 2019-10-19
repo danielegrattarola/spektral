@@ -12,8 +12,8 @@ def load_data(k=8, noise_level=0.0):
     Loads the MNIST dataset and a K-NN grid.
     This code is largely taken from [Michaël Defferrard's Github](https://github.com/mdeff/cnn_graph/blob/master/nips2016/mnist.ipynb).
 
-    :param k:
-    :param noise_level:
+    :param k: int, number of neighbours for each node;
+    :param noise_level: fraction of edges to flip (from 0 to 1 and vice versa);
 
     :return:
         - X_train, y_train: training node features and labels;
@@ -66,9 +66,8 @@ def get_adj_from_data(X, k, **kwargs):
 
 def mnist_grid_graph(k):
     """
-    C
-    :param k:
-    :param corners:
+    Get the adjacency matrix for the KNN graph.
+    :param k: int, number of neighbours for each node;
     :return:
     """
     X = grid_coordinates(MNIST_SIZE)
