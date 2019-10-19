@@ -102,12 +102,6 @@
     <li class="toctree-l3"><a href="#minkowskiproduct">MinkowskiProduct</a></li>
     
 
-    <li class="toctree-l3"><a href="#ccmprojection">CCMProjection</a></li>
-    
-
-    <li class="toctree-l3"><a href="#ccmmembership">CCMMembership</a></li>
-    
-
     </ul>
                 </li>
     </ul>
@@ -221,7 +215,7 @@
           <div role="main">
             <div class="section">
               
-                <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L105">[source]</a></span></p>
+                <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L7">[source]</a></span></p>
 <h3 id="innerproduct">InnerProduct</h3>
 <pre><code class="python">spektral.layers.InnerProduct(trainable_kernel=False, activation=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None)
 </code></pre>
@@ -264,7 +258,7 @@ product (i.e., <code>x.dot(w).dot(x.T)</code>);</p>
 </li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L181">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L83">[source]</a></span></p>
 <h3 id="minkowskiproduct">MinkowskiProduct</h3>
 <pre><code class="python">spektral.layers.MinkowskiProduct(input_dim_1=None, activation=None, activity_regularizer=None)
 </code></pre>
@@ -300,81 +294,6 @@ output shape for your layer.</p>
 </li>
 <li>
 <p><code>activity_regularizer</code>: regularization applied to the output;</p>
-</li>
-</ul>
-<hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L254">[source]</a></span></p>
-<h3 id="ccmprojection">CCMProjection</h3>
-<pre><code class="python">spektral.layers.CCMProjection(r=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
-</code></pre>
-
-<p>Projects a tensor to a CCM depending on the value of <code>r</code>. Optionally, 
-<code>r</code> can be learned via backpropagation.</p>
-<p><strong>Input</strong></p>
-<ul>
-<li>tensor of shape <code>(batch_size, input_dim)</code>.</li>
-</ul>
-<p><strong>Output</strong></p>
-<ul>
-<li>tensor of shape <code>(batch_size, input_dim)</code>, where each sample along the
-0th axis is projected to the CCM.</li>
-</ul>
-<p><strong>Arguments</strong>  </p>
-<ul>
-<li>
-<p><code>r</code>: radius of the CCM. If r is a number, then use it as fixed
-radius. If <code>r='spherical'</code>, use a trainable weight as radius, with a
-positivity constraint. If <code>r='hyperbolic'</code>, use a trainable weight
-as radius, with a negativity constraint. If <code>r=None</code>, use a trainable
-weight as radius, with no constraints (points will be projected to the
-correct manifold based on the sign of the weight).</p>
-</li>
-<li>
-<p><code>kernel_initializer</code>: initializer for the kernel matrix;</p>
-</li>
-<li>
-<p><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</p>
-</li>
-<li>
-<p><code>kernel_constraint</code>: constraint applied to the kernel matrix.</p>
-</li>
-</ul>
-<hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L347">[source]</a></span></p>
-<h3 id="ccmmembership">CCMMembership</h3>
-<pre><code class="python">spektral.layers.CCMMembership(r=1.0, mode='average', sigma=1.0)
-</code></pre>
-
-<p>Computes the membership of the given points to a constant-curvature
-manifold of radius <code>r</code>, as: 
-<script type="math/tex; mode=display">
-\mu(x) = \mathrm{exp}\left(\cfrac{-\big( \langle \vec x, \vec x \rangle - r^2 \big)^2}{2\sigma^2}\right).
-</script>
-</p>
-<p>If <code>r=0</code>, then <script type="math/tex">\mu(x) = 1</script>.
-If more than one radius is given, inputs are evenly split across the 
-last dimension and membership is computed for each radius-slice pair.
-The output membership is returned according to the <code>mode</code> option.</p>
-<p><strong>Input</strong></p>
-<ul>
-<li>tensor of shape <code>(batch_size, input_dim)</code>;</li>
-</ul>
-<p><strong>Output</strong></p>
-<ul>
-<li>tensor of shape <code>(batch_size, output_size)</code>, where <code>output_size</code> is
-computed according to the <code>mode</code> option;.</li>
-</ul>
-<p><strong>Arguments</strong>  </p>
-<ul>
-<li>
-<p><code>r</code>: int ot list, radia of the CCMs.</p>
-</li>
-<li>
-<p><code>mode</code>: 'average' to return the average membership across CCMs, or
-'concat' to return the membership for each CCM concatenated;</p>
-</li>
-<li>
-<p><code>sigma</code>: spread of the membership curve;</p>
 </li>
 </ul>
               

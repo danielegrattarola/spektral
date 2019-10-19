@@ -101,6 +101,9 @@
     <li class="toctree-l3"><a href="#diffpool">DiffPool</a></li>
     
 
+    <li class="toctree-l3"><a href="#sagpool">SAGPool</a></li>
+    
+
     <li class="toctree-l3"><a href="#globalsumpool">GlobalSumPool</a></li>
     
 
@@ -288,7 +291,7 @@ tanh;</li>
 <li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L169">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L323">[source]</a></span></p>
 <h3 id="mincutpool">MinCutPool</h3>
 <pre><code class="python">spektral.layers.MinCutPool(k, h=None, return_mask=True, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -336,7 +339,7 @@ shape <code>(n_nodes, k)</code>.</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L384">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L538">[source]</a></span></p>
 <h3 id="diffpool">DiffPool</h3>
 <pre><code class="python">spektral.layers.DiffPool(k, channels=None, return_mask=True, activation=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None)
 </code></pre>
@@ -383,7 +386,60 @@ channels is assumed to be the same as the input);</li>
 <li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L582">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L169">[source]</a></span></p>
+<h3 id="sagpool">SAGPool</h3>
+<pre><code class="python">spektral.layers.SAGPool(ratio, return_mask=False, sigmoid_gating=False, kernel_initializer='glorot_uniform', kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None)
+</code></pre>
+
+<p>A self-attention graph pooling layer as presented by
+<a href="https://arxiv.org/abs/1904.08082">Lee et al. (2019)</a> and
+<a href="https://arxiv.org/abs/1905.02850">Knyazev et al. (2019</a>.</p>
+<p>This layer computes the following operations:</p>
+<p>
+<script type="math/tex; mode=display">
+y = GNN(X, A); \;\;\;\;
+\textrm{idx} = \textrm{rank}(y, k); \;\;\;\;
+\bar X = (X \odot \textrm{tanh}(y))_{\textrm{idx}}; \;\;\;\;
+\bar A = A^2_{\textrm{idx}, \textrm{idx}}
+</script>
+</p>
+<p>where <script type="math/tex"> \textrm{rank}(y, k) </script> returns the indices of the top k values of
+<script type="math/tex"> y </script>, and <script type="math/tex"> p </script> is a learnable parameter vector of size <script type="math/tex">F</script>.
+The gating operation <script type="math/tex"> \textrm{tanh}(y) </script> can be replaced with a sigmoid.</p>
+<p>Due to the lack of sparse-sparse matrix multiplication support, this layer
+temporarily makes the adjacency matrix dense in order to compute <script type="math/tex">A^2</script>
+(needed to preserve connectivity after pooling).
+<strong>If memory is not an issue, considerable speedups can be achieved by using
+dense graphs directly.
+Converting a graph from dense to sparse and viceversa is a costly operation.</strong></p>
+<p><strong>Mode</strong>: single, graph batch.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>node features of shape <code>(n_nodes, n_features)</code>;</li>
+<li>adjacency matrix of shape <code>(n_nodes, n_nodes)</code>;</li>
+<li>(optional) graph IDs of shape <code>(n_nodes, )</code> (graph batch mode);</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>reduced node features of shape <code>(n_graphs * k, n_features)</code>;</li>
+<li>reduced adjacency matrix of shape <code>(n_graphs * k, n_graphs * k)</code>;</li>
+<li>reduced graph IDs with shape <code>(n_graphs * k, )</code> (graph batch mode);</li>
+<li>If <code>return_mask=True</code>, the binary mask used for pooling, with shape
+<code>(n_graphs * k, )</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>ratio</code>: float between 0 and 1, ratio of nodes to keep in each graph;</li>
+<li><code>return_mask</code>: boolean, whether to return the binary mask used for pooling;</li>
+<li><code>sigmoid_gating</code>: boolean, use a sigmoid gating activation instead of a
+tanh;</li>
+<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
+<li><code>activity_regularizer</code>: regularization applied to the output;</li>
+<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L780">[source]</a></span></p>
 <h3 id="globalsumpool">GlobalSumPool</h3>
 <pre><code class="python">spektral.layers.GlobalSumPool()
 </code></pre>
@@ -405,7 +461,7 @@ mode, where the node dimension is preserved and set to 1).</li>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L647">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L808">[source]</a></span></p>
 <h3 id="globalavgpool">GlobalAvgPool</h3>
 <pre><code class="python">spektral.layers.GlobalAvgPool()
 </code></pre>
@@ -427,7 +483,7 @@ mode, where the node dimension is preserved and set to 1).</li>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L711">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L835">[source]</a></span></p>
 <h3 id="globalmaxpool">GlobalMaxPool</h3>
 <pre><code class="python">spektral.layers.GlobalMaxPool()
 </code></pre>
@@ -449,7 +505,7 @@ mode, where the node dimension is preserved and set to 1).</li>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L775">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L862">[source]</a></span></p>
 <h3 id="globalattentionpool">GlobalAttentionPool</h3>
 <pre><code class="python">spektral.layers.GlobalAttentionPool(channels=32, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -480,7 +536,7 @@ dimension changed to <code>channels</code>.</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L897">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L991">[source]</a></span></p>
 <h3 id="globalattnsumpool">GlobalAttnSumPool</h3>
 <pre><code class="python">spektral.layers.GlobalAttnSumPool(attn_kernel_initializer='glorot_uniform', kernel_regularizer=None, attn_kernel_regularizer=None, attn_kernel_constraint=None)
 </code></pre>

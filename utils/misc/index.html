@@ -159,9 +159,6 @@
     <li class="toctree-l3"><a href="#batch_iterator">batch_iterator</a></li>
     
 
-    <li class="toctree-l3"><a href="#set_trainable">set_trainable</a></li>
-    
-
     <li class="toctree-l3"><a href="#pad_jagged_array">pad_jagged_array</a></li>
     
 
@@ -247,23 +244,6 @@ size <code>batch_size</code>.</p>
 array). </p>
 </li>
 </ul>
-<hr />
-<h3 id="set_trainable">set_trainable</h3>
-<pre><code class="python">spektral.utils.set_trainable(model, toset)
-</code></pre>
-
-<p>Sets the trainable parameters of a Keras model and all its layers to toset.</p>
-<p><strong>Arguments</strong>  </p>
-<ul>
-<li>
-<p><code>model</code>: a Keras Model</p>
-</li>
-<li>
-<p><code>toset</code>: boolean</p>
-</li>
-</ul>
-<p><strong>Return</strong><br />
- None</p>
 <hr />
 <h3 id="pad_jagged_array">pad_jagged_array</h3>
 <pre><code class="python">spektral.utils.pad_jagged_array(x, target_shape, dtype=&lt;class 'float'&gt;)

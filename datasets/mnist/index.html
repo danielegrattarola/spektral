@@ -213,11 +213,20 @@
             <div class="section">
               
                 <h3 id="load_data">load_data</h3>
-<pre><code class="python">spektral.datasets.mnist.load_data()
+<pre><code class="python">spektral.datasets.mnist.load_data(k=8, noise_level=0.0)
 </code></pre>
 
-<p>Loads the MNIST dataset and the associated grid.
+<p>Loads the MNIST dataset and a K-NN grid.
 This code is largely taken from <a href="https://github.com/mdeff/cnn_graph/blob/master/nips2016/mnist.ipynb">Michaël Defferrard's Github</a>.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>k</code>: int, number of neighbours for each node;</p>
+</li>
+<li>
+<p><code>noise_level</code>: fraction of edges to flip (from 0 to 1 and vice versa);</p>
+</li>
+</ul>
 <p><strong>Return</strong>  </p>
 <ul>
 <li>X_train, y_train: training node features and labels;</li>
