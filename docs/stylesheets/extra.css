@@ -23,3 +23,8 @@ body > div.wy-grid-for-nav > nav > div.wy-side-nav-search > a {
 .wy-side-nav-search input[type=text] {
     border-color: #e67e22;
 }*/
+
+.MathJax_Display {
+    overflow-x: auto;
+    overflow-y: hidden;
+}

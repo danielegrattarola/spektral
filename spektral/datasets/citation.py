@@ -24,8 +24,6 @@ THE SOFTWARE.
 This code was taken almost verbatim from https://github.com/tkipf/gcn/ and
 adapted to work in Spektral.
 """
-from __future__ import absolute_import
-
 import os
 
 import networkx as nx

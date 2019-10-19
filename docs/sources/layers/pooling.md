@@ -170,7 +170,7 @@ channels is assumed to be the same as the input);
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L574)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L582)</span>
 ### GlobalSumPool
 
 ```python
@@ -201,7 +201,7 @@ None.
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L639)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L647)</span>
 ### GlobalAvgPool
 
 ```python
@@ -231,7 +231,7 @@ None.
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L703)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L711)</span>
 ### GlobalMaxPool
 
 ```python
@@ -261,7 +261,7 @@ None.
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L767)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L775)</span>
 ### GlobalAttentionPool
 
 ```python
@@ -298,7 +298,7 @@ dimension changed to `channels`.
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L889)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L897)</span>
 ### GlobalAttnSumPool
 
 ```python

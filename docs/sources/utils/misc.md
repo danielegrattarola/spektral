@@ -60,8 +60,8 @@ array to match the provided `target_shape`.
 
 **Arguments**  
 
-- ` x`: a np.array of dtype object, containing np.arrays of varying 
-dimensions
+- ` x`: a list or np.array of dtype object, containing np.arrays of
+varying dimensions
 
 - ` target_shape`: a tuple or list s.t. target_shape[i] >= x.shape[i]
 for each x in X.

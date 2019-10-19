@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import tensorflow as tf
 from keras import activations, initializers, regularizers, constraints
 from keras import backend as K
