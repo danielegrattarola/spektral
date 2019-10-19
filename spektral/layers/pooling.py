@@ -266,7 +266,7 @@ class SAGPool(Layer):
         y = K.dot(X, self.kernel)
         y = filter_dot(A, y)
         N = K.shape(X)[-2]
-        indices = ops.top_k(y[:, 0], I, self.ratio, self.top_k_var)
+        indices = ops.segment_top_k(y[:, 0], I, self.ratio, self.top_k_var)
         mask = tf.scatter_nd(tf.expand_dims(indices, 1), tf.ones_like(indices), (N,))
 
         # Multiply X and y to make layer differentiable
