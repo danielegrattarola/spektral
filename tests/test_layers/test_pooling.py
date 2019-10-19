@@ -4,13 +4,18 @@ import tensorflow as tf
 from keras import Input, Model
 from keras import backend as K
 
-from spektral.layers import TopKPool, MinCutPool, DiffPool
+from spektral.layers import TopKPool, MinCutPool, DiffPool, SAGPool
 
 SINGLE, BATCH, GRAPH_BATCH = 1, 2, 3  # Single, batch, graph batch
 LAYER_K_, MODES_K_, KWARGS_K_ = 'layer', 'modes', 'kwargs'
 TESTS = [
     {
         LAYER_K_: TopKPool,
+        MODES_K_: [SINGLE, GRAPH_BATCH],
+        KWARGS_K_: {'ratio': 0.5, 'return_mask': True}
+    },
+    {
+        LAYER_K_: SAGPool,
         MODES_K_: [SINGLE, GRAPH_BATCH],
         KWARGS_K_: {'ratio': 0.5, 'return_mask': True}
     },
