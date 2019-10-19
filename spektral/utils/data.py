@@ -2,7 +2,7 @@ import numpy as np
 import scipy.sparse as sp
 
 
-class Batch(object):
+class Batch:
     """
     Converts a batch of graphs stored in lists to the
     [graph batch format](https://danielegrattarola.github.io/spektral/data/).

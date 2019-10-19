@@ -1,5 +1,3 @@
-import re
-
 import numpy as np
 from scipy import sparse as sp
 
@@ -36,19 +34,6 @@ def pad_jagged_array(x, target_shape, dtype=np.float):
         return np.array(x, dtype=dtype)
     except ValueError:
         return np.array([_ for _ in x], dtype=dtype)
-
-
-def normalize_sum_to_unity(x):
-    """
-    Normalizes each row of the input to have a sum of 1.
-    :param x: np.array or scipy.sparse matrix of shape `(num_nodes, num_nodes)`
-    or `(batch, num_nodes, num_nodes)`
-    :return: np.array of the same shape as x 
-    """
-    if x.ndim == 3:
-        return np.nan_to_num(x / x.sum(-1)[..., np.newaxis])
-    else:
-        return np.nan_to_num(x / x.sum(-1).reshape(-1, 1))
 
 
 def add_eye(x):
@@ -132,16 +117,6 @@ def sub_eye_jagged(x):
     return x_out
 
 
-def natural_key(string_):
-    """
-    Key function for natural sorting using the `sorted` builtin.
-    :param string_: a string
-    :return: a rearrangement of the string s.t. sorting a list of strings with 
-    this function as key results in natural sorting
-    """
-    return [int(s) if s.isdigit() else s for s in re.split(r'(\d+)', string_)]
-
-
 def int_to_one_hot(x, n=None):
     """
     Encodes x in a 1-of-n array. 
@@ -208,53 +183,6 @@ def label_to_one_hot(x, labels=None):
     return output
 
 
-def int_to_one_hot_closure(n):
-    """
-    Retruns a function with signature `foo(x)` equivalent to calling 
-    `int_to_one_hot(x, n=n)`. This is especially useful when using 
-    `int_to_one_hot` as preprocessing function as it would be impossible to 
-    manually assign `n` at evey call (see `utils.datasets.molecules` for an 
-    example of usage).
-    :param n: see the `int_to_one_hot` documentation
-    :return: a function with signature foo(x)
-    """
-
-    def int_to_one_hot_fun(x):
-        return int_to_one_hot(x, n=n)
-
-    return int_to_one_hot_fun
-
-
-def label_to_one_hot_closure(labels):
-    """
-    Retruns a function with signature `foo(x)` equivalent to calling 
-    `label_to_one_hot(x, labels=labels)`. This is especially useful when using 
-    `label_to_one_hot` as preprocessing function as it would be impossible to 
-    manually assign `labels` at evey call (see `utils.datasets.molecules` for an 
-    example of usage).
-    :param labels: see the `label_to_one_hot` documentation
-    :return: a function with signature foo(x)
-    """
-
-    def label_to_one_hot_fun(x):
-        return label_to_one_hot(x, labels=labels)
-
-    return label_to_one_hot_fun
-
-
-def idx_to_mask(idx, shape):
-    """
-    Creates a boolean mask with the given shape in which the elements at idx
-    are True.
-    :param idx: a list or np.array of integer indices 
-    :param shape: a tuple representing the mask shape
-    :return: a boolean np.array  
-    """
-    output = np.zeros(shape)
-    output[idx] = 1
-    return output.astype(np.bool)
-
-
 def flatten_list_gen(alist):
     """
     Performs a depth-first visit of an arbitrarily nested list and yields its 
@@ -312,15 +240,3 @@ def batch_iterator(data, batch_size=32, epochs=1, shuffle=True):
                 yield [item[start:stop] for item in data]
             else:
                 yield data[0][start:stop]
-
-
-def set_trainable(model, toset):
-    """
-    Sets the trainable parameters of a Keras model and all its layers to toset.
-    :param model: a Keras Model
-    :param toset: boolean
-    :return: None
-    """
-    for layer in model.layers:
-        layer.trainable = toset
-    model.trainable = toset

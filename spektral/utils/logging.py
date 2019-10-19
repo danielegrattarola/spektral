@@ -1,5 +1,6 @@
 import os
 import time
+from pprint import pformat
 
 LOGFILE = None
 TIME_STACK = []
@@ -29,7 +30,7 @@ def log(message, print_string=True):
     :param print_string: whether to print the string to stdout;
     """
     global LOGFILE
-    message = str(message)
+    message = pformat(message) if isinstance(message, dict) else str(message)
     if print_string:
         print(message)
     if not message.endswith('\n'):

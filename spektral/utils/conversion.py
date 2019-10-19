@@ -1,7 +1,7 @@
 import networkx as nx
 import numpy as np
 
-from .misc import pad_jagged_array, add_eye_jagged, add_eye_batch, flatten_list
+from spektral.utils.misc import pad_jagged_array, add_eye_jagged, add_eye_batch, flatten_list
 
 
 # Available conversions: Numpy <-> Networkx <-> SDF

@@ -5,9 +5,8 @@ import joblib
 import networkx as nx
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
 
-from ..chem import get_atomic_num
+from spektral.chem import get_atomic_num
 
 
 def load_binary(filename):
@@ -263,7 +262,7 @@ def _parse_bonds_block(sdf, n_atoms, n_bonds):
 
 
 def _parse_properties(sdf, n_atoms, n_bonds):
-    # TODO This should be implemented properly, for now it just returns a list of properties.
+    # TODO This just returns a list of properties.
     # See https://docs.chemaxon.com/display/docs/MDL+MOLfiles%2C+RGfiles%2C+SDfiles%2C+Rxnfiles%2C+RDfiles+formats
     # for documentation.
 
@@ -274,7 +273,7 @@ def _parse_properties(sdf, n_atoms, n_bonds):
 
 
 def _parse_data_fields(sdf):
-    # TODO This should be implemented properly, for now it just returns a list of data fields.
+    # TODO This just returns a list of data fields.
 
     start = sdf.index('M  END') + 1
 
@@ -299,7 +298,7 @@ def parse_sdf_file(sdf_file, amount=None):
         data = data[:-1]
     if amount is not None:
         data = data[:amount]
-    output = [parse_sdf(sdf) for sdf in tqdm(data)]  # Parallel execution doesn't help
+    output = [parse_sdf(sdf) for sdf in data]  # Parallel execution doesn't help
     return output
 
 

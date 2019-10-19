@@ -1,8 +1,5 @@
 import networkx as nx
 import numpy as np
-
-from .utils.plotting import plt
-
 try:
     from rdkit import Chem as rdc
     from rdkit.Chem import Draw
@@ -285,14 +282,14 @@ def plot_rdkit(mol, filename=None):
     Plots an RDKit molecule in Matplotlib
     :param mol: an RDKit molecule 
     :param filename: save the image with the given filename 
-    :return: 
+    :return: the image as np.array
     """
     if rdc is None:
         raise ImportError('`draw_rdkit_mol` requires RDkit.')
     if filename is not None:
         Draw.MolToFile(mol, filename)
     img = Draw.MolToImage(mol)
-    plt.imshow(img)
+    return img
 
 
 def plot_rdkit_svg_grid(mols, mols_per_row=5, filename=None, **kwargs):
