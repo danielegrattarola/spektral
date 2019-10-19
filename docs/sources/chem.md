@@ -282,7 +282,7 @@ Plots an RDKit molecule in Matplotlib
 - ` filename`: save the image with the given filename 
 
 **Return**  
- 
+ The image as np.array
 
 ----
 

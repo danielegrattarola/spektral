@@ -1,4 +1,4 @@
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L11)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L9)</span>
 ### GraphConv
 
 ```python
@@ -61,7 +61,7 @@ output = GraphConv(channels)([X_in, fltr_in])
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L147)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L145)</span>
 ### ChebConv
 
 ```python
@@ -123,7 +123,7 @@ output = ChebConv(channels)([X_in] + fltr_in)
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L287)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L262)</span>
 ### GraphSageConv
 
 ```python
@@ -181,7 +181,7 @@ output = GraphSageConv(channels)([X_in, A_in])
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L985)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L927)</span>
 ### ARMAConv
 
 ```python
@@ -254,7 +254,7 @@ output = ARMAConv(channels)([X_in, fltr_in])
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L418)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L391)</span>
 ### EdgeConditionedConv
 
 ```python
@@ -313,7 +313,7 @@ output = EdgeConditionedConv(channels)([X_in, A_in, E_in])
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L605)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L571)</span>
 ### GraphAttention
 
 ```python
@@ -381,7 +381,7 @@ output = GraphAttention(channels)([X_in, A_in])
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L838)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L803)</span>
 ### GraphConvSkip
 
 ```python
@@ -444,7 +444,7 @@ output = GraphConvSkip(channels)([X_in, fltr_in])
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L1316)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L1251)</span>
 ### APPNP
 
 ```python
@@ -505,7 +505,7 @@ output = APPNP(channels, mlp_channels)([X_in, fltr_in])
 
 ----
 
-<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L1515)</span>
+<span style="float:right;">[[source]](https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L1443)</span>
 ### GINConv
 
 ```python

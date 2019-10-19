@@ -3,13 +3,13 @@ python:
   - "3.5"
   - "3.6"
   - "3.7"
-  - "3.8"
 script:
   - pip install -U pip
   - pip install pytest-cov
   - pip install coverage
   - pip install codecov
   - pip install scikit-learn
+  - pip install -U setuptools
   - pip install "tensorflow<2.0.0"
   - pip install "keras<2.3"
   - python setup.py install

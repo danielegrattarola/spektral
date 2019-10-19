@@ -24,28 +24,6 @@ array).
 
 ----
 
-### set_trainable
-
-
-```python
-spektral.utils.set_trainable(model, toset)
-```
-
-
-
-Sets the trainable parameters of a Keras model and all its layers to toset.
-
-**Arguments**  
-
-- ` model`: a Keras Model
-
-- ` toset`: boolean
-
-**Return**  
- None
-
-----
-
 ### pad_jagged_array
 
 
