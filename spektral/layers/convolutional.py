@@ -208,9 +208,7 @@ class ChebConv(GraphConv):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
-            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
-        super().__init__(**kwargs)
+        super().__init__(channels, **kwargs)
         self.channels = channels
         self.activation = activations.get(activation)
         self.use_bias = use_bias
@@ -325,9 +323,7 @@ class GraphSageConv(GraphConv):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
-            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
-        super().__init__(**kwargs)
+        super().__init__(channels, **kwargs)
         self.channels = channels
         self.activation = activations.get(activation)
         self.use_bias = use_bias
@@ -457,9 +453,7 @@ class EdgeConditionedConv(GraphConv):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
-            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
-        super().__init__(**kwargs)
+        super().__init__(channels, **kwargs)
         self.channels = channels
         self.kernel_network = kernel_network
         self.activation = activations.get(activation)
@@ -574,7 +568,7 @@ class EdgeConditionedConv(GraphConv):
         return output
 
 
-class GraphAttention(Layer):
+class GraphAttention(GraphConv):
     """
     A graph attention layer as presented by
     [Velickovic et al. (2017)](https://arxiv.org/abs/1710.10903).
@@ -652,6 +646,7 @@ class GraphAttention(Layer):
                  bias_constraint=None,
                  attn_kernel_constraint=None,
                  **kwargs):
+        super().__init__(channels, **kwargs)
         if attn_heads_reduction not in {'concat', 'average'}:
             raise ValueError('Possbile reduction methods: concat, average')
 
@@ -684,8 +679,6 @@ class GraphAttention(Layer):
         else:
             # Output will have shape (..., channels)
             self.output_dim = self.channels
-
-        super().__init__(**kwargs)
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
@@ -875,9 +868,7 @@ class GraphConvSkip(GraphConv):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
-            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
-        super().__init__(**kwargs)
+        super().__init__(channels, **kwargs)
         self.channels = channels
         self.activation = activations.get(activation)
         self.use_bias = use_bias
@@ -1016,9 +1007,7 @@ class ARMAConv(GraphConv):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
-            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
-        super().__init__(**kwargs)
+        super().__init__(channels, **kwargs)
         self.channels = channels
         self.T = T
         self.K = K
@@ -1331,9 +1320,7 @@ class APPNP(GraphConv):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
-            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
-        super().__init__(**kwargs)
+        super().__init__(channels, **kwargs)
         self.channels = channels
         self.mlp_channels = mlp_channels
         self.alpha = alpha
@@ -1533,8 +1520,6 @@ class GINConv(GraphConv):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
-            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
         super().__init__(channels, **kwargs)
         self.channels = channels
         self.channels_hid = mlp_channels
