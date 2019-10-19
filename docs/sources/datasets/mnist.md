@@ -2,13 +2,20 @@
 
 
 ```python
-spektral.datasets.mnist.load_data()
+spektral.datasets.mnist.load_data(k=8, noise_level=0.0)
 ```
 
 
 
-Loads the MNIST dataset and the associated grid.
+Loads the MNIST dataset and a K-NN grid.
 This code is largely taken from [Michaël Defferrard's Github](https://github.com/mdeff/cnn_graph/blob/master/nips2016/mnist.ipynb).
+
+
+**Arguments**  
+
+- ` k`:
+
+- ` noise_level`:
 
 
 **Return**  
