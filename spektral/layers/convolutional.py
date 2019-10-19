@@ -77,7 +77,7 @@ class GraphConv(Layer):
                  **kwargs):
         if 'input_shape' not in kwargs and 'input_dim' in kwargs:
             kwargs['input_shape'] = (kwargs.pop('input_dim'),)
-        super(GraphConv, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.channels = channels
         self.activation = activations.get(activation)
         self.use_bias = use_bias
@@ -140,11 +140,11 @@ class GraphConv(Layer):
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
             'bias_constraint': constraints.serialize(self.bias_constraint)
         }
-        base_config = super(GraphConv, self).get_config()
+        base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
 
-class ChebConv(Layer):
+class ChebConv(GraphConv):
     """
     A Chebyshev convolutional layer as presented by
     [Defferrard et al. (2016)](https://arxiv.org/abs/1606.09375).
@@ -212,7 +212,7 @@ class ChebConv(Layer):
                  **kwargs):
         if 'input_shape' not in kwargs and 'input_dim' in kwargs:
             kwargs['input_shape'] = (kwargs.pop('input_dim'),)
-        super(ChebConv, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.channels = channels
         self.activation = activations.get(activation)
         self.use_bias = use_bias
@@ -261,27 +261,6 @@ class ChebConv(Layer):
         if self.activation is not None:
             output = self.activation(output)
         return output
-
-    def compute_output_shape(self, input_shape):
-        features_shape = input_shape[0]
-        output_shape = features_shape[:-1] + (self.channels,)
-        return output_shape
-
-    def get_config(self):
-        config = {
-            'channels': self.channels,
-            'activation': activations.serialize(self.activation),
-            'use_bias': self.use_bias,
-            'kernel_initializer': initializers.serialize(self.kernel_initializer),
-            'bias_initializer': initializers.serialize(self.bias_initializer),
-            'kernel_regularizer': regularizers.serialize(self.kernel_regularizer),
-            'bias_regularizer': regularizers.serialize(self.bias_regularizer),
-            'activity_regularizer': regularizers.serialize(self.activity_regularizer),
-            'kernel_constraint': constraints.serialize(self.kernel_constraint),
-            'bias_constraint': constraints.serialize(self.bias_constraint),
-        }
-        base_config = super(ChebConv, self).get_config()
-        return dict(list(base_config.items()) + list(config.items()))
 
 
 class GraphSageConv(GraphConv):
@@ -350,7 +329,7 @@ class GraphSageConv(GraphConv):
                  **kwargs):
         if 'input_shape' not in kwargs and 'input_dim' in kwargs:
             kwargs['input_shape'] = (kwargs.pop('input_dim'),)
-        super(GraphConv, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.channels = channels
         self.activation = activations.get(activation)
         self.use_bias = use_bias
@@ -415,7 +394,7 @@ class GraphSageConv(GraphConv):
         return output
 
 
-class EdgeConditionedConv(Layer):
+class EdgeConditionedConv(GraphConv):
     """
     An edge-conditioned convolutional layer as presented by [Simonovsky and
     Komodakis (2017)](https://arxiv.org/abs/1704.02901).
@@ -482,7 +461,7 @@ class EdgeConditionedConv(Layer):
                  **kwargs):
         if 'input_shape' not in kwargs and 'input_dim' in kwargs:
             kwargs['input_shape'] = (kwargs.pop('input_dim'),)
-        super(EdgeConditionedConv, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.channels = channels
         self.kernel_network = kernel_network
         self.activation = activations.get(activation)
@@ -549,11 +528,6 @@ class EdgeConditionedConv(Layer):
 
         return output
 
-    def compute_output_shape(self, input_shape):
-        features_shape = input_shape[0]
-        output_shape = features_shape[:-1] + (self.channels,)
-        return output_shape
-
     def get_config(self):
         config = {
             'channels': self.channels,
@@ -568,7 +542,7 @@ class EdgeConditionedConv(Layer):
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
             'bias_constraint': constraints.serialize(self.bias_constraint),
         }
-        base_config = super(EdgeConditionedConv, self).get_config()
+        base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
     def dense_layer(self,
@@ -713,7 +687,7 @@ class GraphAttention(Layer):
             # Output will have shape (..., channels)
             self.output_dim = self.channels
 
-        super(GraphAttention, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
@@ -831,11 +805,11 @@ class GraphAttention(Layer):
             'bias_constraint': constraints.serialize(self.bias_constraint),
             'attn_kernel_constraint': constraints.serialize(self.attn_kernel_constraint),
         }
-        base_config = super(GraphAttention, self).get_config()
+        base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
 
-class GraphConvSkip(Layer):
+class GraphConvSkip(GraphConv):
     """
     A graph convolutional layer as presented by
     [Kipf & Welling (2016)](https://arxiv.org/abs/1609.02907), with the addition
@@ -905,7 +879,7 @@ class GraphConvSkip(Layer):
                  **kwargs):
         if 'input_shape' not in kwargs and 'input_dim' in kwargs:
             kwargs['input_shape'] = (kwargs.pop('input_dim'),)
-        super(GraphConvSkip, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.channels = channels
         self.activation = activations.get(activation)
         self.use_bias = use_bias
@@ -960,29 +934,8 @@ class GraphConvSkip(Layer):
             output = self.activation(output)
         return output
 
-    def compute_output_shape(self, input_shape):
-        features_shape = input_shape[0]
-        output_shape = features_shape[:-1] + (self.channels,)
-        return output_shape
 
-    def get_config(self):
-        config = {
-            'channels': self.channels,
-            'activation': activations.serialize(self.activation),
-            'use_bias': self.use_bias,
-            'kernel_initializer': initializers.serialize(self.kernel_initializer),
-            'bias_initializer': initializers.serialize(self.bias_initializer),
-            'kernel_regularizer': regularizers.serialize(self.kernel_regularizer),
-            'bias_regularizer': regularizers.serialize(self.bias_regularizer),
-            'activity_regularizer': regularizers.serialize(self.activity_regularizer),
-            'kernel_constraint': constraints.serialize(self.kernel_constraint),
-            'bias_constraint': constraints.serialize(self.bias_constraint),
-        }
-        base_config = super(GraphConvSkip, self).get_config()
-        return dict(list(base_config.items()) + list(config.items()))
-
-
-class ARMAConv(Layer):
+class ARMAConv(GraphConv):
     """
     A graph convolutional layer with ARMA(K, K-1) filters, as presented by
     [Bianchi et al. (2019)](https://arxiv.org/abs/1901.01343).
@@ -1067,7 +1020,7 @@ class ARMAConv(Layer):
                  **kwargs):
         if 'input_shape' not in kwargs and 'input_dim' in kwargs:
             kwargs['input_shape'] = (kwargs.pop('input_dim'),)
-        super(ARMAConv, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.channels = channels
         self.T = T
         self.K = K
@@ -1160,11 +1113,6 @@ class ARMAConv(Layer):
         
         return output
 
-    def compute_output_shape(self, input_shape):
-        features_shape = input_shape[0]
-        output_shape = features_shape[:-1] + (self.channels,)
-        return output_shape
-
     def get_config(self):
         config = {
             'channels': self.channels,
@@ -1183,7 +1131,7 @@ class ARMAConv(Layer):
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
             'bias_constraint': constraints.serialize(self.bias_constraint),
         }
-        base_config = super(ARMAConv, self).get_config()
+        base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
     def get_gcn_weights(self, input_dim, input_dim_skip, channels, name,
@@ -1313,7 +1261,7 @@ class ARMAConv(Layer):
         return output
 
 
-class APPNP(Layer):
+class APPNP(GraphConv):
     """
     A graph convolutional layer implementing the APPNP operator, as presented by
     [Klicpera et al. (2019)](https://arxiv.org/abs/1810.05997).
@@ -1387,7 +1335,7 @@ class APPNP(Layer):
                  **kwargs):
         if 'input_shape' not in kwargs and 'input_dim' in kwargs:
             kwargs['input_shape'] = (kwargs.pop('input_dim'),)
-        super(APPNP, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.channels = channels
         self.mlp_channels = mlp_channels
         self.alpha = alpha
@@ -1484,11 +1432,6 @@ class APPNP(Layer):
             output = Z
         return output
 
-    def compute_output_shape(self, input_shape):
-        features_shape = input_shape[0]
-        output_shape = features_shape[:-1] + (self.channels, )
-        return output_shape
-
     def get_config(self):
         config = {
             'channels': self.channels,
@@ -1508,7 +1451,7 @@ class APPNP(Layer):
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
             'bias_constraint': constraints.serialize(self.bias_constraint),
         }
-        base_config = super(APPNP, self).get_config()
+        base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
 
@@ -1594,7 +1537,7 @@ class GINConv(GraphConv):
                  **kwargs):
         if 'input_shape' not in kwargs and 'input_dim' in kwargs:
             kwargs['input_shape'] = (kwargs.pop('input_dim'),)
-        super(GINConv, self).__init__(channels, **kwargs)
+        super().__init__(channels, **kwargs)
         self.channels = channels
         self.channels_hid = mlp_channels
         self.extra_hidden_layers = n_hidden_layers

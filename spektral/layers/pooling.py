@@ -3,7 +3,7 @@ from keras import backend as K, activations
 from keras import regularizers, constraints, initializers
 from keras.engine import Layer
 
-from spektral.layers import ops
+from spektral.layers import ops, filter_dot
 
 
 ################################################################################
@@ -75,7 +75,7 @@ class TopKPool(Layer):
                  **kwargs):
         if 'input_shape' not in kwargs and 'input_dim' in kwargs:
             kwargs['input_shape'] = (kwargs.pop('input_dim'),)
-        super(TopKPool, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.ratio = ratio  # Ratio of nodes to keep in each graph
         self.return_mask = return_mask
         self.sigmoid_gating = sigmoid_gating
@@ -94,7 +94,7 @@ class TopKPool(Layer):
                                       regularizer=self.kernel_regularizer,
                                       constraint=self.kernel_constraint)
         self.top_k_var = tf.Variable(0.0, validate_shape=False)
-        super(TopKPool, self).build(input_shape)
+        super().build(input_shape)
 
     def call(self, inputs):
         if len(inputs) == 3:
@@ -162,7 +162,161 @@ class TopKPool(Layer):
             'activity_regularizer': regularizers.serialize(self.activity_regularizer),
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
         }
-        base_config = super(TopKPool, self).get_config()
+        base_config = super().get_config()
+        return dict(list(base_config.items()) + list(config.items()))
+
+
+class SAGPool(Layer):
+    """
+    A self-attention graph pooling layer as presented by
+    [Lee et al. (2019)](https://arxiv.org/abs/1904.08082) and
+    [Knyazev et al. (2019](https://arxiv.org/abs/1905.02850).
+
+    This layer computes the following operations:
+
+    $$
+    y = GNN(X, A); \\;\\;\\;\\;
+    \\textrm{idx} = \\textrm{rank}(y, k); \\;\\;\\;\\;
+    \\bar X = (X \\odot \\textrm{tanh}(y))_{\\textrm{idx}}; \\;\\;\\;\\;
+    \\bar A = A^2_{\\textrm{idx}, \\textrm{idx}}
+    $$
+
+    where \( \\textrm{rank}(y, k) \) returns the indices of the top k values of
+    \( y \), and \( p \) is a learnable parameter vector of size \(F\).
+    The gating operation \( \\textrm{tanh}(y) \) can be replaced with a sigmoid.
+
+    Due to the lack of sparse-sparse matrix multiplication support, this layer
+    temporarily makes the adjacency matrix dense in order to compute \(A^2\)
+    (needed to preserve connectivity after pooling).
+    **If memory is not an issue, considerable speedups can be achieved by using
+    dense graphs directly.
+    Converting a graph from dense to sparse and viceversa is a costly operation.**
+
+    **Mode**: single, graph batch.
+
+    **Input**
+
+    - node features of shape `(n_nodes, n_features)`;
+    - adjacency matrix of shape `(n_nodes, n_nodes)`;
+    - (optional) graph IDs of shape `(n_nodes, )` (graph batch mode);
+
+    **Output**
+
+    - reduced node features of shape `(n_graphs * k, n_features)`;
+    - reduced adjacency matrix of shape `(n_graphs * k, n_graphs * k)`;
+    - reduced graph IDs with shape `(n_graphs * k, )` (graph batch mode);
+    - If `return_mask=True`, the binary mask used for pooling, with shape
+    `(n_graphs * k, )`.
+
+    **Arguments**
+
+    - `ratio`: float between 0 and 1, ratio of nodes to keep in each graph;
+    - `return_mask`: boolean, whether to return the binary mask used for pooling;
+    - `sigmoid_gating`: boolean, use a sigmoid gating activation instead of a
+        tanh;
+    - `kernel_initializer`: initializer for the kernel matrix;
+    - `kernel_regularizer`: regularization applied to the kernel matrix;
+    - `activity_regularizer`: regularization applied to the output;
+    - `kernel_constraint`: constraint applied to the kernel matrix;
+    """
+
+    def __init__(self, ratio,
+                 return_mask=False,
+                 sigmoid_gating=False,
+                 kernel_initializer='glorot_uniform',
+                 kernel_regularizer=None,
+                 activity_regularizer=None,
+                 kernel_constraint=None,
+                 **kwargs):
+        super().__init__(**kwargs)
+        self.ratio = ratio  # Ratio of nodes to keep in each graph
+        self.return_mask = return_mask
+        self.sigmoid_gating = sigmoid_gating
+        self.gating_op = K.sigmoid if self.sigmoid_gating else K.tanh
+        self.kernel_initializer = initializers.get(kernel_initializer)
+        self.kernel_regularizer = regularizers.get(kernel_regularizer)
+        self.activity_regularizer = regularizers.get(activity_regularizer)
+        self.kernel_constraint = constraints.get(kernel_constraint)
+
+    def build(self, input_shape):
+        self.F = input_shape[0][-1]
+        self.N = input_shape[0][0]
+        self.kernel = self.add_weight(shape=(self.F, 1),
+                                      name='kernel',
+                                      initializer=self.kernel_initializer,
+                                      regularizer=self.kernel_regularizer,
+                                      constraint=self.kernel_constraint)
+        self.top_k_var = tf.Variable(0.0, validate_shape=False)
+        super().build(input_shape)
+
+    def call(self, inputs):
+        if len(inputs) == 3:
+            X, A, I = inputs
+            self.data_mode = 'graph'
+        else:
+            X, A = inputs
+            I = tf.zeros(tf.shape(X)[:1], dtype=tf.int32)
+            self.data_mode = 'single'
+        if K.ndim(I) == 2:
+            I = I[:, 0]
+
+        A_is_sparse = K.is_sparse(A)
+
+        # Get mask
+        y = K.dot(X, self.kernel)
+        y = filter_dot(A, y)
+        N = K.shape(X)[-2]
+        indices = ops.top_k(y[:, 0], I, self.ratio, self.top_k_var)
+        mask = tf.scatter_nd(tf.expand_dims(indices, 1), tf.ones_like(indices), (N,))
+
+        # Multiply X and y to make layer differentiable
+        features = X * self.gating_op(y)
+
+        axis = 0 if len(K.int_shape(A)) == 2 else 1  # Cannot use negative axis in tf.boolean_mask
+        # Reduce X
+        X_pooled = tf.boolean_mask(features, mask, axis=axis)
+
+        # Compute A^2
+        if A_is_sparse:
+            A_dense = tf.sparse.to_dense(A)
+        else:
+            A_dense = A
+        A_squared = K.dot(A, A_dense)
+
+        # Reduce A
+        A_pooled = tf.boolean_mask(A_squared, mask, axis=axis)
+        A_pooled = tf.boolean_mask(A_pooled, mask, axis=axis + 1)
+        if A_is_sparse:
+            A_pooled = tf.contrib.layers.dense_to_sparse(A_pooled)
+
+        output = [X_pooled, A_pooled]
+
+        # Reduce I
+        if self.data_mode == 'graph':
+            I_pooled = tf.boolean_mask(I[:, None], mask)[:, 0]
+            output.append(I_pooled)
+
+        if self.return_mask:
+            output.append(mask)
+
+        return output
+
+    def compute_output_shape(self, input_shape):
+        output_shape = input_shape
+        if self.return_mask:
+            output_shape += [(input_shape[0][:-1])]
+        return output_shape
+
+    def get_config(self):
+        config = {
+            'ratio': self.ratio,
+            'return_mask': self.return_mask,
+            'kernel_initializer': initializers.serialize(self.kernel_initializer),
+            'kernel_regularizer': regularizers.serialize(self.kernel_regularizer),
+            'activity_regularizer': regularizers.serialize(self.activity_regularizer),
+            'kernel_constraint': constraints.serialize(self.kernel_constraint),
+        }
+        base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
 
@@ -229,7 +383,7 @@ class MinCutPool(Layer):
                  **kwargs):
         if 'input_shape' not in kwargs and 'input_dim' in kwargs:
             kwargs['input_shape'] = (kwargs.pop('input_dim'),)
-        super(MinCutPool, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.k = k
         self.h = h
         self.return_mask = return_mask
@@ -278,7 +432,7 @@ class MinCutPool(Layer):
                                             regularizer=self.bias_regularizer,
                                             constraint=self.bias_constraint)
 
-        super(MinCutPool, self).build(input_shape)
+        super().build(input_shape)
 
     def call(self, inputs):
         # Note that I is useless, because thee layer cannot be used in graph
@@ -377,7 +531,7 @@ class MinCutPool(Layer):
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
             'bias_constraint': constraints.serialize(self.bias_constraint)
         }
-        base_config = super(MinCutPool, self).get_config()
+        base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
 
@@ -440,7 +594,7 @@ class DiffPool(Layer):
                  **kwargs):
         if 'input_shape' not in kwargs and 'input_dim' in kwargs:
             kwargs['input_shape'] = (kwargs.pop('input_dim'),)
-        super(DiffPool, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.k = k
         self.channels = channels
         self.return_mask = return_mask
@@ -468,7 +622,7 @@ class DiffPool(Layer):
                                            initializer=self.kernel_initializer,
                                            regularizer=self.kernel_regularizer,
                                            constraint=self.kernel_constraint)
-        super(DiffPool, self).build(input_shape)
+        super().build(input_shape)
 
     def call(self, inputs):
         # Note that I is useless, because thee layer cannot be used in graph
@@ -564,14 +718,58 @@ class DiffPool(Layer):
             'activity_regularizer': regularizers.serialize(self.activity_regularizer),
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
         }
-        base_config = super(DiffPool, self).get_config()
+        base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
 
 ################################################################################
 # Global pooling layers
 ################################################################################
-class GlobalSumPool(Layer):
+class GlobalPooling(Layer):
+    def __init__(self, **kwargs):
+        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
+            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
+        super().__init__(**kwargs)
+        self.supports_masking = True
+        self.pooling_op = None
+
+    def build(self, input_shape):
+        if isinstance(input_shape, list) and len(input_shape) == 2:
+            self.data_mode = 'graph'
+        else:
+            if len(input_shape) == 2:
+                self.data_mode = 'single'
+            else:
+                self.data_mode = 'batch'
+        super().build(input_shape)
+
+    def call(self, inputs):
+        if self.data_mode == 'graph':
+            X = inputs[0]
+            I = inputs[1]
+            if K.ndim(I) == 2:
+                I = I[:, 0]
+        else:
+            X = inputs
+
+        if self.data_mode == 'graph':
+            return self.pooling_op(X, I)
+        else:
+            return K.sum(X, axis=-2, keepdims=(self.data_mode == 'single'))
+
+    def compute_output_shape(self, input_shape):
+        if self.data_mode == 'single':
+            return (1,) + input_shape[-1:]
+        elif self.data_mode == 'batch':
+            return input_shape[:-2] + input_shape[-1:]
+        else:
+            return input_shape[0]  # Input shape is a list of shapes for X and I
+
+    def get_config(self):
+        return super().get_config()
+
+
+class GlobalSumPool(GlobalPooling):
     """
     A global sum pooling layer. Pools a graph by computing the sum of its node
     features.
@@ -595,48 +793,11 @@ class GlobalSumPool(Layer):
 
     """
     def __init__(self, **kwargs):
-        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
-            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
-        super(GlobalSumPool, self).__init__(**kwargs)
-        self.supports_masking = True
-
-    def build(self, input_shape):
-        if isinstance(input_shape, list) and len(input_shape) == 2:
-            self.data_mode = 'graph'
-        else:
-            if len(input_shape) == 2:
-                self.data_mode = 'single'
-            else:
-                self.data_mode = 'batch'
-        super(GlobalSumPool, self).build(input_shape)
-
-    def call(self, inputs):
-        if self.data_mode == 'graph':
-            X = inputs[0]
-            I = inputs[1]
-            if K.ndim(I) == 2:
-                I = I[:, 0]
-        else:
-            X = inputs
-
-        if self.data_mode == 'graph':
-            return tf.segment_sum(X, I)
-        else:
-            return K.sum(X, axis=-2, keepdims=(self.data_mode == 'single'))
-
-    def compute_output_shape(self, input_shape):
-        if self.data_mode == 'single':
-            return (1, ) + input_shape[-1:]
-        elif self.data_mode == 'batch':
-            return input_shape[:-2] + input_shape[-1:]
-        else:
-            return input_shape[0]  # Input shape is a list of shapes for X and I
-
-    def get_config(self):
-        return super(GlobalSumPool, self).get_config()
+        super().__init__(**kwargs)
+        self.pooling_op = tf.segment_sum
 
 
-class GlobalAvgPool(Layer):
+class GlobalAvgPool(GlobalPooling):
     """
     An average pooling layer. Pools a graph by computing the average of its node
     features.
@@ -659,48 +820,11 @@ class GlobalAvgPool(Layer):
     None.
     """
     def __init__(self, **kwargs):
-        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
-            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
-        super(GlobalAvgPool, self).__init__(**kwargs)
-        self.supports_masking = True
-
-    def build(self, input_shape):
-        if isinstance(input_shape, list) and len(input_shape) == 2:
-            self.data_mode = 'graph'
-        else:
-            if len(input_shape) == 2:
-                self.data_mode = 'single'
-            else:
-                self.data_mode = 'batch'
-        super(GlobalAvgPool, self).build(input_shape)
-
-    def call(self, inputs):
-        if self.data_mode == 'graph':
-            X = inputs[0]
-            I = inputs[1]
-            if K.ndim(I) == 2: 
-                I = I[:, 0]
-        else:
-            X = inputs
-
-        if self.data_mode == 'graph':
-            return tf.segment_mean(X, I)
-        else:
-            return K.mean(X, axis=-2, keepdims=(self.data_mode == 'single'))
-
-    def compute_output_shape(self, input_shape):
-        if self.data_mode == 'single':
-            return (1, ) + input_shape[-1:]
-        elif self.data_mode == 'batch':
-            return input_shape[:-2] + input_shape[-1:]
-        else:
-            return input_shape[0]
-
-    def get_config(self):
-        return super(GlobalAvgPool, self).get_config()
+        super().__init__(**kwargs)
+        self.pooling_op = tf.segment_mean
 
 
-class GlobalMaxPool(Layer):
+class GlobalMaxPool(GlobalPooling):
     """
     A max pooling layer. Pools a graph by computing the maximum of its node
     features.
@@ -723,48 +847,11 @@ class GlobalMaxPool(Layer):
     None.
     """
     def __init__(self, **kwargs):
-        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
-            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
-        super(GlobalMaxPool, self).__init__(**kwargs)
-        self.supports_masking = True
-
-    def build(self, input_shape):
-        if isinstance(input_shape, list) and len(input_shape) == 2:
-            self.data_mode = 'graph'
-        else:
-            if len(input_shape) == 2:
-                self.data_mode = 'single'
-            else:
-                self.data_mode = 'batch'
-        super(GlobalMaxPool, self).build(input_shape)
-
-    def call(self, inputs):
-        if self.data_mode == 'graph':
-            X = inputs[0]
-            I = inputs[1]
-            if K.ndim(I) == 2:
-                I = I[:, 0]
-        else:
-            X = inputs
-
-        if self.data_mode == 'graph':
-            return tf.segment_max(X, I)
-        else:
-            return K.max(X, axis=-2, keepdims=(self.data_mode == 'single'))
-
-    def compute_output_shape(self, input_shape):
-        if self.data_mode == 'single':
-            return (1, ) + input_shape[-1:]
-        elif self.data_mode == 'batch':
-            return input_shape[:-2] + input_shape[-1:]
-        else:
-            return input_shape[0]
-
-    def get_config(self):
-        return super(GlobalMaxPool, self).get_config()
+        super().__init__(**kwargs)
+        self.pooling_op = tf.segment_max
 
 
-class GlobalAttentionPool(Layer):
+class GlobalAttentionPool(GlobalPooling):
     """
     A gated attention global pooling layer as presented by
     [Li et al. (2017)](https://arxiv.org/abs/1511.05493).
@@ -802,9 +889,7 @@ class GlobalAttentionPool(Layer):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
-            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
-        super(GlobalAttentionPool, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.channels = channels
         self.kernel_initializer = initializers.get(kernel_initializer)
         self.kernel_regularizer = regularizers.get(kernel_regularizer)
@@ -881,12 +966,21 @@ class GlobalAttentionPool(Layer):
             return output_shape
 
     def get_config(self):
-        config = {}
-        base_config = super(GlobalAttentionPool, self).get_config()
+        config = {
+            'channels': self.channels,
+            'kernel_initializer': self.kernel_initializer,
+            'bias_initializer': self.bias_initializer,
+            'kernel_regularizer': self.kernel_regularizer,
+            'bias_regularizer': self.bias_regularizer,
+            'activity_regularizer': self.activity_regularizer,
+            'kernel_constraint': self.kernel_constraint,
+            'bias_constraint': self.bias_constraint,
+        }
+        base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
 
-class GlobalAttnSumPool(Layer):
+class GlobalAttnSumPool(GlobalPooling):
     """
     A node-attention global pooling layer. Pools a graph by learning attention
     coefficients to sum node features.
@@ -919,9 +1013,7 @@ class GlobalAttnSumPool(Layer):
                  attn_kernel_regularizer=None,
                  attn_kernel_constraint=None,
                  **kwargs):
-        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
-            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
-        super(GlobalAttnSumPool, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.kernel_regularizer = regularizers.get(kernel_regularizer)
         self.attn_kernel_initializer = initializers.get(attn_kernel_initializer)
         self.attn_kernel_regularizer = regularizers.get(attn_kernel_regularizer)
@@ -967,16 +1059,13 @@ class GlobalAttnSumPool(Layer):
 
         return output
 
-    def compute_output_shape(self, input_shape):
-        if self.data_mode == 'single':
-            return (1,) + input_shape[-1:]
-        elif self.data_mode == 'batch':
-            return input_shape[:-2] + input_shape[-1:]
-        else:
-            return input_shape[0]
-
     def get_config(self):
-        config = {}
-        base_config = super(GlobalAttnSumPool, self).get_config()
+        config = {
+            'attn_kernel_initializer': self.attn_kernel_initializer,
+            'kernel_regularizer': self.kernel_regularizer,
+            'attn_kernel_regularizer': self.attn_kernel_regularizer,
+            'attn_kernel_constraint': self.attn_kernel_constraint,
+        }
+        base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
