@@ -53,9 +53,7 @@ PAGES = [
         'methods': [],
         'classes': [
             layers.InnerProduct,
-            layers.MinkowskiProduct,
-            layers.CCMProjection,
-            layers.CCMMembership
+            layers.MinkowskiProduct
         ]
     },
     {
@@ -66,6 +64,7 @@ PAGES = [
             layers.TopKPool,
             layers.MinCutPool,
             layers.DiffPool,
+            layers.SAGPool,
             layers.GlobalSumPool,
             layers.GlobalAvgPool,
             layers.GlobalMaxPool,
@@ -108,7 +107,7 @@ PAGES = [
     {
         'page': 'brain.md',
         'functions': [
-            brain.get_fc
+            brain.get_fc_graphs
         ],
         'methods': [],
         'classes': []
@@ -191,7 +190,6 @@ PAGES = [
         'page': 'utils/misc.md',
         'functions': [
             utils.misc.batch_iterator,
-            utils.misc.set_trainable,
             utils.misc.pad_jagged_array,
             utils.misc.add_eye,
             utils.misc.sub_eye,
