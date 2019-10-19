@@ -13,9 +13,9 @@ This code is largely taken from [Michaël Defferrard's Github](https://github.co
 
 **Arguments**  
 
-- ` k`:
+- ` k`: int, number of neighbours for each node;
 
-- ` noise_level`:
+- ` noise_level`: fraction of edges to flip (from 0 to 1 and vice versa);
 
 
 **Return**  
