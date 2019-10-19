@@ -1,12 +1,10 @@
-from __future__ import absolute_import
-
 import os
 
 from keras.utils import get_file
 
 from spektral.chem import sdf_to_nx
-from spektral.utils.io import load_csv, load_sdf
 from spektral.utils import nx_to_numpy
+from spektral.utils.io import load_csv, load_sdf
 
 DATA_PATH = os.path.expanduser('~/.spektral/datasets/qm9/')
 DATASET_URL = 'http://deepchem.io.s3-website-us-west-1.amazonaws.com/datasets/gdb9.tar.gz'

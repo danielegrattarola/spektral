@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import networkx as nx
 import numpy as np
 
@@ -172,11 +170,15 @@ def numpy_to_nx(adj, node_features=None, edge_features=None, nf_name=None,
     if adj.ndim == 2:
         adj = adj[None, ...]
         if node_features is not None:
+            if nf_name is None:
+                nf_name = 'node_features'
             node_features = node_features[None, ...]
             if node_features.ndim != 3:
                 raise ValueError('node_features must have shape (batch, N, F) '
                                  'or (N, F).')
         if edge_features is not None:
+            if ef_name is None:
+                ef_name = 'edge_features'
             edge_features = edge_features[None, ...]
             if edge_features.ndim != 4:
                 raise ValueError('edge_features must have shape (batch, N, N, S) '
@@ -188,10 +190,10 @@ def numpy_to_nx(adj, node_features=None, edge_features=None, nf_name=None,
         g.remove_nodes_from(list(nx.isolates(g)))
 
         if node_features is not None:
-            node_attrs = {n: node_features[i, n] for n in g.nodes}
+            node_attrs = {n: {nf_name: node_features[i, n]} for n in g.nodes}
             nx.set_node_attributes(g, node_attrs, nf_name)
         if edge_features is not None:
-            edge_attrs = {e: edge_features[i, e[0], e[1]] for e in g.edges}
+            edge_attrs = {e: {ef_name: edge_features[i, e[0], e[1]]} for e in g.edges}
             nx.set_edge_attributes(g, edge_attrs, ef_name)
         output.append(g)
 

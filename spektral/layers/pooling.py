@@ -112,7 +112,7 @@ class TopKPool(Layer):
         # Get mask
         y = K.dot(X, K.l2_normalize(self.kernel))
         N = K.shape(X)[-2]
-        indices = ops.top_k(y[:, 0], I, self.ratio, self.top_k_var)
+        indices = ops.segment_top_k(y[:, 0], I, self.ratio, self.top_k_var)
         mask = tf.scatter_nd(tf.expand_dims(indices, 1), tf.ones_like(indices), (N,))
 
         # Multiply X and y to make layer differentiable
@@ -492,7 +492,7 @@ class MinCutPool(Layer):
 
         if I is not None:
             I_mean = tf.segment_mean(I, I)
-            I_pooled = ops.tf_repeat_1d(I_mean, tf.ones_like(I_mean) * self.k)
+            I_pooled = ops.repeat(I_mean, tf.ones_like(I_mean) * self.k)
             output.append(I_pooled)
 
         if self.return_mask:
@@ -603,6 +603,7 @@ class DiffPool(Layer):
         self.kernel_regularizer = regularizers.get(kernel_regularizer)
         self.activity_regularizer = regularizers.get(activity_regularizer)
         self.kernel_constraint = constraints.get(kernel_constraint)
+        self.mixed_mode = False
 
     def build(self, input_shape):
         assert isinstance(input_shape, list)
@@ -635,7 +636,8 @@ class DiffPool(Layer):
 
         N = K.shape(A)[-1]
         # Check if the layer is operating in batch mode (X and A have rank 3)
-        batch_mode = K.ndim(A) == 3
+        mode = ops.autodetect_mode(A, X)
+        self.reduce_loss = mode in (ops._modes['M'], ops._modes['B'])
 
         # Get normalized adjacency
         if K.is_sparse(A):
@@ -664,14 +666,14 @@ class DiffPool(Layer):
         else:
             LP_loss = A - S_gram
         LP_loss = tf.norm(LP_loss, axis=(-1, -2))
-        if batch_mode:
+        if self.reduce_loss:
             LP_loss = K.mean(LP_loss)
         self.add_loss(LP_loss)
 
         # Entropy loss
         entr = tf.negative(tf.reduce_sum(tf.multiply(S, K.log(S + K.epsilon())), axis=-1))
         entr_loss = K.mean(entr, axis=-1)
-        if batch_mode:
+        if self.reduce_loss:
             entr_loss = K.mean(entr_loss)
         self.add_loss(entr_loss)
 
@@ -679,11 +681,14 @@ class DiffPool(Layer):
         X_pooled = ops.matmul_AT_B(S, Z)
         A_pooled = ops.matmul_AT_B_A(S, A)
 
+        if K.ndim(A_pooled) == 3:
+            self.mixed_mode = True
+
         output = [X_pooled, A_pooled]
 
         if I is not None:
             I_mean = tf.segment_mean(I, I)
-            I_pooled = ops.tf_repeat_1d(I_mean, tf.ones_like(I_mean) * self.k)
+            I_pooled = ops.repeat(I_mean, tf.ones_like(I_mean) * self.k)
             output.append(I_pooled)
 
         if self.return_mask:
@@ -695,7 +700,10 @@ class DiffPool(Layer):
         X_shape = input_shape[0]
         A_shape = input_shape[1]
         X_shape_out = X_shape[:-2] + (self.k, self.channels)
-        A_shape_out = A_shape[:-2] + (self.k, self.k)
+        if self.reduce_loss:
+            A_shape_out = X_shape[:-2] + (self.k, self.k)
+        else:
+            A_shape_out = A_shape[:-2] + (self.k, self.k)
 
         output_shape = [X_shape_out, A_shape_out]
 

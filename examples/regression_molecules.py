@@ -29,7 +29,7 @@ y = y[['cv']].values  # Heat capacity at 298.15K
 uniq_X = np.unique(X)
 X = label_to_one_hot(X, uniq_X)
 uniq_E = np.unique(E)
-ef = label_to_one_hot(E, uniq_E)
+E = label_to_one_hot(E, uniq_E)
 y = StandardScaler().fit_transform(y).reshape(-1, y.shape[-1])
 
 # Parameters
