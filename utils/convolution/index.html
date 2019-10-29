@@ -167,7 +167,13 @@
     <li class="toctree-l3"><a href="#normalized_laplacian">normalized_laplacian</a></li>
     
 
+    <li class="toctree-l3"><a href="#rescale_laplacian">rescale_laplacian</a></li>
+    
+
     <li class="toctree-l3"><a href="#localpooling_filter">localpooling_filter</a></li>
+    
+
+    <li class="toctree-l3"><a href="#chebyshev_polynomial">chebyshev_polynomial</a></li>
     
 
     <li class="toctree-l3"><a href="#chebyshev_filter">chebyshev_filter</a></li>
@@ -308,6 +314,24 @@ normalised Laplacians.</p>
 <p><strong>Return</strong><br />
  The normalized Laplacian.</p>
 <hr />
+<h3 id="rescale_laplacian">rescale_laplacian</h3>
+<pre><code class="python">spektral.utils.rescale_laplacian(L, lmax=None)
+</code></pre>
+
+<p>Rescales the Laplacian eigenvalues in [-1,1], using lmax as largest eigenvalue.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>L</code>: rank 2 array or sparse matrix</p>
+</li>
+<li>
+<p><code>lmax</code>: if None, compute largest eigenvalue with scipy.linalg.eisgh.
+If the eigendecomposition fails, lmax is set to 2 automatically.
+If scalar, use this value as largest eignevalue when rescaling.</p>
+</li>
+</ul>
+<p><strong>Return</strong>  </p>
+<hr />
 <h3 id="localpooling_filter">localpooling_filter</h3>
 <pre><code class="python">spektral.utils.localpooling_filter(adj, symmetric=True)
 </code></pre>
@@ -326,6 +350,24 @@ described by Kipf &amp; Welling (2017).</p>
 </ul>
 <p><strong>Return</strong><br />
  The filter matrix, as dense np.array.</p>
+<hr />
+<h3 id="chebyshev_polynomial">chebyshev_polynomial</h3>
+<pre><code class="python">spektral.utils.chebyshev_polynomial(X, k)
+</code></pre>
+
+<p>Calculates Chebyshev polynomials of X, up to order k.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>X</code>: a np.array or scipy.sparse matrix;</p>
+</li>
+<li>
+<p><code>k</code>: the order up to which compute the polynomials,</p>
+</li>
+</ul>
+<p><strong>Return</strong><br />
+ A list of k + 1 sparse matrices with one element for each degree of 
+the approximation.</p>
 <hr />
 <h3 id="chebyshev_filter">chebyshev_filter</h3>
 <pre><code class="python">spektral.utils.chebyshev_filter(adj, k, symmetric=True)
