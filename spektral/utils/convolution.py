@@ -79,6 +79,11 @@ def normalized_laplacian(adj, symmetric=True):
 def rescale_laplacian(L, lmax=None):
     """
     Rescales the Laplacian eigenvalues in [-1,1], using lmax as largest eigenvalue.
+    :param L: rank 2 array or sparse matrix
+    :param lmax: if None, compute largest eigenvalue with scipy.linalg.eisgh.
+    If the eigendecomposition fails, lmax is set to 2 automatically.
+    If scalar, use this value as largest eignevalue when rescaling.
+    :return:
     """
     if lmax is None:
         try:
@@ -119,7 +124,7 @@ def localpooling_filter(adj, symmetric=True):
 
 def chebyshev_polynomial(X, k):
     """
-    Calculates Chebyshev polynomials up to order k.
+    Calculates Chebyshev polynomials of X, up to order k.
     :param X: a np.array or scipy.sparse matrix;
     :param k: the order up to which compute the polynomials,
     :return: a list of k + 1 sparse matrices with one element for each degree of 

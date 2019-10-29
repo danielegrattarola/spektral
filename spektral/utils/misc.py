@@ -40,7 +40,7 @@ def add_eye(x):
     """
     Adds the identity matrix to the given matrix.
     :param x: a rank 2 np.array or scipy.sparse matrix
-    :return: a rank 2 np.array as described above
+    :return: a rank 2 np.array or scipy.sparse matrix
     """
     if x.ndim != 2:
         raise ValueError('X must be of rank 2 but has rank {}.'.format(x.ndim))
@@ -53,9 +53,9 @@ def add_eye(x):
 
 def sub_eye(x):
     """
-    Subtracts the identity matrix to the given matrix.
+    Subtracts the identity matrix from the given matrix.
     :param x: a rank 2 np.array or scipy.sparse matrix
-    :return: a rank 2 np.array as described above
+    :return: a rank 2 np.array or scipy.sparse matrix
     """
     if x.ndim != 2:
         raise ValueError('x must be of rank 2 but has rank {}.'.format(x.ndim))
@@ -68,9 +68,9 @@ def sub_eye(x):
 
 def add_eye_batch(x):
     """
-    Adds the identity matrix to each 2D slice of the given 3D array.
+    Adds the identity matrix to each submatrix of the given rank 3 array.
     :param x: a rank 3 np.array
-    :return: a rank 3 np.array as described above
+    :return: a rank 3 np.array
     """
     if x.ndim != 3:
         raise ValueError('x must be of rank 3 but has rank {}.'.format(x.ndim))
@@ -79,9 +79,10 @@ def add_eye_batch(x):
 
 def sub_eye_batch(x):
     """
-    Subtracts the identity matrix from each 2D slice of the given 3D array.
+    Subtracts the identity matrix from each submatrix of the given rank 3
+    array.
     :param x: a rank 3 np.array
-    :return: a rank 3 np.array as described above
+    :return: a rank 3 np.array
     """
     if x.ndim != 3:
         raise ValueError('x must be of rank 3 but has rank {}.'.format(x.ndim))
@@ -90,9 +91,9 @@ def sub_eye_batch(x):
 
 def add_eye_jagged(x):
     """
-    Adds the identity matrix to each 2D element of the given 3D jagged array.
+    Adds the identity matrix to each submatrix of the given rank 3 jagged array.
     :param x: a rank 3 jagged np.array
-    :return: a rank 3 jagged np.array as described above
+    :return: a rank 3 jagged np.array
     """
     x_out = x.copy()
     for i in range(len(x)):
@@ -104,10 +105,10 @@ def add_eye_jagged(x):
 
 def sub_eye_jagged(x):
     """
-    Subtracts the identity matrix to each 2D element of the given 3D jagged 
-    array.
+    Subtracts the identity matrix from each submatrix of the given rank 3
+    jagged array.
     :param x: a rank 3 jagged np.array
-    :return: a rank 3 jagged np.array as described above
+    :return: a rank 3 jagged np.array
     """
     x_out = x.copy()
     for i in range(len(x)):

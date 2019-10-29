@@ -180,7 +180,9 @@ PAGES = [
             utils.convolution.normalized_adjacency,
             utils.convolution.laplacian,
             utils.convolution.normalized_laplacian,
+            utils.convolution.rescale_laplacian,
             utils.convolution.localpooling_filter,
+            utils.convolution.chebyshev_polynomial,
             utils.convolution.chebyshev_filter
         ],
         'methods': [],
@@ -193,7 +195,10 @@ PAGES = [
             utils.misc.pad_jagged_array,
             utils.misc.add_eye,
             utils.misc.sub_eye,
-
+            utils.misc.add_eye_batch,
+            utils.misc.sub_eye_batch,
+            utils.misc.add_eye_jagged,
+            utils.misc.sub_eye_jagged,
         ],
         'methods': [],
         'classes': []
