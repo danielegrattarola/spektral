@@ -1,3 +1,8 @@
+"""
+This code is largely take from M. Defferrard's Github
+https://github.com/mdeff/cnn_graph/blob/master/nips2016/mnist.ipynb.
+"""
+
 import numpy as np
 import scipy.sparse as sp
 from keras.datasets import mnist as m
@@ -9,8 +14,15 @@ MNIST_SIZE = 28
 
 def load_data(k=8, noise_level=0.0):
     """
-    Loads the MNIST dataset and a K-NN grid.
-    This code is largely taken from [Michaël Defferrard's Github](https://github.com/mdeff/cnn_graph/blob/master/nips2016/mnist.ipynb).
+    Loads the MNIST dataset and a K-NN graph to perform graph signal
+    classification, as described by [Defferrard et al. (2016)](https://arxiv.org/abs/1606.09375).
+    The K-NN graph is statically determined from a regular grid of pixels using
+    the 2d coordinates.
+
+    The node features of each graph are the MNIST digits vectorized and rescaled
+    to [0, 1].
+    Two nodes are connected if they are neighbours according to the K-NN graph.
+    Labels are the MNIST class associated to each sample.
 
     :param k: int, number of neighbours for each node;
     :param noise_level: fraction of edges to flip (from 0 to 1 and vice versa);
@@ -21,8 +33,8 @@ def load_data(k=8, noise_level=0.0):
         - X_test, y_test: test node features and labels;
         - A: adjacency matrix of the grid;
     """
-    A = mnist_grid_graph(k)
-    A = flip_random_edges(A, noise_level).astype(np.float32)
+    A = _mnist_grid_graph(k)
+    A = _flip_random_edges(A, noise_level).astype(np.float32)
 
     (X_train, y_train), (X_test, y_test) = m.load_data()
     X_train, X_test = X_train / 255.0, X_test / 255.0
@@ -34,7 +46,7 @@ def load_data(k=8, noise_level=0.0):
     return X_train, y_train, X_val, y_val, X_test, y_test, A
 
 
-def grid_coordinates(side):
+def _grid_coordinates(side):
     """
     Returns 2D coordinates for a square grid of equally spaced nodes.
     :param side: int, the side of the grid (i.e., the grid has side * side nodes).
@@ -50,7 +62,7 @@ def grid_coordinates(side):
     return z
 
 
-def get_adj_from_data(X, k, **kwargs):
+def _get_adj_from_data(X, k, **kwargs):
     """
     Computes adjacency matrix of a K-NN graph from the given data.
     :param X: rank 1 np.array, the 2D coordinates of pixels on the grid.
@@ -64,21 +76,21 @@ def get_adj_from_data(X, k, **kwargs):
     return A
 
 
-def mnist_grid_graph(k):
+def _mnist_grid_graph(k):
     """
     Get the adjacency matrix for the KNN graph.
     :param k: int, number of neighbours for each node;
     :return:
     """
-    X = grid_coordinates(MNIST_SIZE)
-    A = get_adj_from_data(
+    X = _grid_coordinates(MNIST_SIZE)
+    A = _get_adj_from_data(
         X, k, mode='connectivity', metric='euclidean', include_self=False
     )
 
     return A
 
 
-def flip_random_edges(A, percent):
+def _flip_random_edges(A, percent):
     """
     Flips values of A randomly.
     :param A: binary scipy sparse matrix.
