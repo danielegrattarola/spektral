@@ -1,4 +1,4 @@
-from spektral.datasets import delaunay, qm9, citation, mnist
+from spektral.datasets import delaunay, qm9, citation, graphsage, mnist
 
 
 def correctly_padded(adj, nf, ef):
@@ -21,7 +21,7 @@ def test_citation():
 
 def test_graphsage():
     for dataset_name in ['ppi', 'reddit']:
-        citation.load_data(dataset_name)
+        graphsage.load_data(dataset_name)
 
 
 def test_delaunay():
