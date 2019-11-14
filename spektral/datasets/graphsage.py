@@ -58,19 +58,35 @@ from networkx.readwrite import json_graph
 
 DATA_PATH = os.path.expanduser('~/.spektral/datasets/')
 AVAILABLE_DATASETS = {'ppi', 'reddit'}
-RETURN_TYPES = {'numpy'}
 
 
 def load_data(dataset_name, max_degree=-1, normalize_features=True):
     """
-    Loads one of the GraphSage datasets
+    Loads one of the datasets (PPI or Reddit) used in
     [Hamilton & Ying (2017)](https://arxiv.org/abs/1706.02216).
-    :param dataset_name: name of the dataset to load ('ppi', or 'reddit');
+
+    The PPI dataset (originally [Stark et al. (2006)](https://www.ncbi.nlm.nih.gov/pubmed/16381927))
+    for inductive node classification uses positional gene sets, motif gene sets
+    and immunological signatures as features and gene ontology sets as labels.
+
+    The Reddit dataset consists of a graph made of Reddit posts in the month of
+    September, 2014. The label for each node is the community that a
+    post belongs to. The graph is built by sampling 50 large communities and
+    two nodes are connected if the same user commented on both. Node features
+    are obtained by concatenating the average GloVe CommonCrawl vectors of
+    the title and comments, the post's score and the number of comments.
+
+    The train, test, and validation splits are returned as binary masks.
+
+    :param dataset_name: name of the dataset to load (`'ppi'`, or `'reddit'`);
     :param max_degree: int, if positive, subsample edges so that each node has
     the specified maximum degree.
     :param normalize_features: if True, the node features are normalized;
-    :return: the graphsage dataset in numpy format, the labels, and the binary
-    masks for train, validation, and test splits.
+    :return:
+        - Adjacency matrix;
+        - Node features;
+        - Labels;
+        - Three binary masks for train, validation, and test splits.
     """
     prefix = DATA_PATH + dataset_name + '/' + dataset_name
     if max_degree == -1:
@@ -79,7 +95,7 @@ def load_data(dataset_name, max_degree=-1, normalize_features=True):
         npz_file = '{}_deg{}.npz'.format(prefix, max_degree)
 
     if not os.path.exists(prefix + "-G.json"):
-        download_data(dataset_name)
+        _download_data(dataset_name)
 
     if os.path.exists(npz_file):
         # Data already prepreccesed
@@ -199,7 +215,7 @@ def load_data(dataset_name, max_degree=-1, normalize_features=True):
     return full_adj, feats, labels, train_mask, val_mask, test_mask
 
 
-def download_data(dataset_name):
+def _download_data(dataset_name):
     print('Dowloading ' + dataset_name + ' dataset.')
     if dataset_name == 'ppi':
         data_url = 'http://snap.stanford.edu/graphsage/ppi.zip'

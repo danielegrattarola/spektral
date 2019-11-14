@@ -36,39 +36,35 @@ from spektral.utils.io import load_binary
 
 DATA_PATH = os.path.expanduser('~/.spektral/datasets/')
 AVAILABLE_DATASETS = {'cora', 'citeseer', 'pubmed'}
-RETURN_TYPES = {'numpy'}
-
-
-def _parse_index_file(filename):
-    index = []
-    for line in open(filename):
-        index.append(int(line.strip()))
-    return index
-
-
-def _sample_mask(idx, l):
-    mask = np.zeros(l)
-    mask[idx] = 1
-    return np.array(mask, dtype=np.bool)
 
 
 def load_data(dataset_name='cora', normalize_features=True, random_split=False):
     """
-    Loads a citation dataset using the public splits as defined in
-    [Kipf & Welling (2016)](https://arxiv.org/abs/1609.02907).
-    :param dataset_name: name of the dataset to load ('cora', 'citeseer', or
-    'pubmed');
+    Loads a citation dataset (Cora, Citeseer or Pubmed) using the "Planetoid"
+    splits intialliy defined in [Yang et al. (2016)](https://arxiv.org/abs/1603.08861).
+    The train, test, and validation splits are given as binary masks.
+
+    Node attributes are bag-of-words vectors representing the most common words
+    in the text document associated to each node.
+    Two papers are connected if either one cites the other.
+    Labels represent the class of the paper.
+
+    :param dataset_name: name of the dataset to load (`'cora'`, `'citeseer'`, or
+    `'pubmed'`);
     :param normalize_features: if True, the node features are normalized;
-    :param random_split: if True, return a randomized split (20/40/40); otherwise,
-    return the popular Planetoid split.
-    :return: the citation network in numpy format, the labels, and the binary
-    masks for train, validation, and test splits.
+    :param random_split: if True, return a randomized split (20/40/40) instead
+    of the default Planetoid split.
+    :return:
+        - Adjacency matrix;
+        - Node features;
+        - Labels;
+        - Three binary masks for train, validation, and test splits.
     """
     if dataset_name not in AVAILABLE_DATASETS:
         raise ValueError('Available datasets: {}'.format(AVAILABLE_DATASETS))
 
     if not os.path.exists(DATA_PATH + dataset_name):
-        download_data(dataset_name)
+        _download_data(dataset_name)
 
     print('Loading {} dataset'.format(dataset_name))
 
@@ -100,7 +96,7 @@ def load_data(dataset_name='cora', normalize_features=True, random_split=False):
     # Row-normalize the features
     if normalize_features:
         print('Pre-processing node features')
-        features = preprocess_features(features)
+        features = _preprocess_features(features)
 
     labels = np.vstack((ally, ty))
     labels[test_idx_reorder, :] = labels[test_idx_range, :]
@@ -122,7 +118,20 @@ def load_data(dataset_name='cora', normalize_features=True, random_split=False):
     return adj, features, labels, train_mask, val_mask, test_mask
 
 
-def preprocess_features(features):
+def _parse_index_file(filename):
+    index = []
+    for line in open(filename):
+        index.append(int(line.strip()))
+    return index
+
+
+def _sample_mask(idx, l):
+    mask = np.zeros(l)
+    mask[idx] = 1
+    return np.array(mask, dtype=np.bool)
+
+
+def _preprocess_features(features):
     rowsum = np.array(features.sum(1))
     r_inv = np.power(rowsum, -1).flatten()
     r_inv[np.isinf(r_inv)] = 0.
@@ -131,7 +140,7 @@ def preprocess_features(features):
     return features
 
 
-def download_data(dataset_name):
+def _download_data(dataset_name):
     names = ['x', 'y', 'tx', 'ty', 'allx', 'ally', 'graph', 'test.index']
 
     os.makedirs(DATA_PATH + dataset_name + '/')

@@ -17,7 +17,6 @@ AVAILABLE_DATASETS = [
     d[:-4]
     for d in pd.read_html(DATASET_URL)[0].Name[2:-1].values.tolist()
 ]
-RETURN_TYPES = {'numpy'}
 
 
 def load_data(dataset_name, normalize_features='zscore', clean=False):
@@ -26,6 +25,7 @@ def load_data(dataset_name, normalize_features='zscore', clean=False):
     ([link](https://ls11-www.cs.tu-dortmund.de/staff/morris/graphkerneldatasets)).
     The node features are computed by concatenating the following features for
     each node:
+
     - node attributes, if available, normalized as specified in `normalize_features`;
     - clustering coefficient, normalized with z-score;
     - node degrees, normalized as specified in `normalize_features`;
@@ -35,8 +35,10 @@ def load_data(dataset_name, normalize_features='zscore', clean=False):
     features (only works for node attributes and node degrees).
     :param clean: if True, return a version of the dataset with no isomorphic
     graphs.
-    :return: a list with the adjacency matrices, a list with the node features,
-    a numpy array with the one-hot encoded targets.
+    :return:
+    - a list of adjacency matrices;
+    - a list of node feature matrices;
+    - a numpy array containing the one-hot encoded targets.
     """
     if dataset_name not in AVAILABLE_DATASETS:
         raise ValueError('Available datasets: {}'.format(AVAILABLE_DATASETS))
@@ -44,7 +46,7 @@ def load_data(dataset_name, normalize_features='zscore', clean=False):
     if clean:
         dataset_name += '_clean'
     if not os.path.exists(DATA_PATH + dataset_name):
-        download_data(dataset_name)
+        _download_data(dataset_name)
 
     # Read data
     nx_graphs, y = _read_graphs(dataset_name)
@@ -162,7 +164,7 @@ def _read_graphs(dataset_name):
     return graph_list, classes
 
 
-def download_data(dataset_name):
+def _download_data(dataset_name):
     print('Dowloading ' + dataset_name + ' dataset.')
     if dataset_name.endswith('_clean'):
         true_name = dataset_name[:-6]

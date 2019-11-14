@@ -7,8 +7,15 @@ spektral.datasets.mnist.load_data(k=8, noise_level=0.0)
 
 
 
-Loads the MNIST dataset and a K-NN grid.
-This code is largely taken from [Michaël Defferrard's Github](https://github.com/mdeff/cnn_graph/blob/master/nips2016/mnist.ipynb).
+Loads the MNIST dataset and a K-NN graph to perform graph signal
+classification, as described by [Defferrard et al. (2016)](https://arxiv.org/abs/1606.09375).
+The K-NN graph is statically determined from a regular grid of pixels using
+the 2d coordinates.
+
+The node features of each graph are the MNIST digits vectorized and rescaled
+to [0, 1].
+Two nodes are connected if they are neighbours according to the K-NN graph.
+Labels are the MNIST class associated to each sample.
 
 
 **Arguments**  

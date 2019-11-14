@@ -7,19 +7,29 @@ spektral.datasets.citation.load_data(dataset_name='cora', normalize_features=Tru
 
 
 
-Loads a citation dataset using the public splits as defined in
-[Kipf & Welling (2016)](https://arxiv.org/abs/1609.02907).
+Loads a citation dataset (Cora, Citeseer or Pubmed) using the "Planetoid"
+splits intialliy defined in [Yang et al. (2016)](https://arxiv.org/abs/1603.08861).
+The train, test, and validation splits are given as binary masks.
+
+Node attributes are bag-of-words vectors representing the most common words
+in the text document associated to each node.
+Two papers are connected if either one cites the other.
+Labels represent the class of the paper.
+
 
 **Arguments**  
 
-- ` dataset_name`: name of the dataset to load ('cora', 'citeseer', or
-'pubmed');
+- ` dataset_name`: name of the dataset to load (`'cora'`, `'citeseer'`, or
+`'pubmed'`);
 
 - ` normalize_features`: if True, the node features are normalized;
 
-- ` random_split`: if True, return a randomized split (20/40/40); otherwise,
-return the popular Planetoid split.
+- ` random_split`: if True, return a randomized split (20/40/40) instead
+of the default Planetoid split.
 
 **Return**  
- The citation network in numpy format, the labels, and the binary
-masks for train, test, and validation splits.
+
+- Adjacency matrix;
+- Node features;
+- Labels;
+- Three binary masks for train, validation, and test splits.
