@@ -1,4 +1,4 @@
-from spektral.datasets import delaunay, qm9, citation, graphsage, mnist
+from spektral.datasets import delaunay, qm9, citation, graphsage, mnist, tud
 
 
 def correctly_padded(adj, nf, ef):
@@ -46,3 +46,8 @@ def test_qm9():
     # Test that it doesn't crash
     qm9.load_data('networkx', amount=1000)
     qm9.load_data('sdf', amount=1000)
+
+
+def test_tud():
+    tud.load_data('PROTEINS', normalize_features='ohe', clean=False)
+    tud.load_data('ENZYMES', normalize_features='zscore', clean=True)
