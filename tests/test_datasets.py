@@ -19,6 +19,11 @@ def test_citation():
         citation.load_data(dataset_name, random_split=True)
 
 
+def test_graphsage():
+    for dataset_name in ['ppi', 'reddit']:
+        citation.load_data(dataset_name)
+
+
 def test_delaunay():
     adj, nf, labels = delaunay.generate_data('numpy', classes=[0, 1, 2])
     correctly_padded(adj, nf, None)

@@ -62,7 +62,7 @@ def load_data(dataset_name='cora', normalize_features=True, random_split=False):
     :param random_split: if True, return a randomized split (20/40/40); otherwise,
     return the popular Planetoid split.
     :return: the citation network in numpy format, the labels, and the binary
-    masks for train, test, and validation splits.
+    masks for train, validation, and test splits.
     """
     if dataset_name not in AVAILABLE_DATASETS:
         raise ValueError('Available datasets: {}'.format(AVAILABLE_DATASETS))
