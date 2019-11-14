@@ -81,6 +81,14 @@ PAGES = [
         'classes': []
     },
     {
+        'page': 'datasets/graphsage.md',
+        'functions': [
+            datasets.graphsage.load_data
+        ],
+        'methods': [],
+        'classes': []
+    },
+    {
         'page': 'datasets/delaunay.md',
         'functions': [
             datasets.delaunay.generate_data
