@@ -8,6 +8,7 @@ script:
   - pip install pytest-cov
   - pip install coverage
   - pip install codecov
+  - pip install lxml
   - pip install scikit-learn
   - pip install -U setuptools
   - pip install "tensorflow<2.0.0"
