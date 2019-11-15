@@ -108,7 +108,7 @@ for c in CONFIG:
     times = []
     for i in range(runs):
         A, X, y, train_mask, val_mask, test_mask = citation.load_data(
-            'pubmed', random_split=True
+            dataset, random_split=True
         )
 
         # Parameters
