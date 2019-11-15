@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='spektral',
-    version='0.1.0',
+    version='0.1.1',
     packages=find_packages(),
     install_requires=['keras<2.3',
                       'tensorflow<2.0.0',
