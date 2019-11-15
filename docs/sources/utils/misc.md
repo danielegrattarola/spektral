@@ -71,7 +71,7 @@ Adds the identity matrix to the given matrix.
 - ` x`: a rank 2 np.array or scipy.sparse matrix
 
 **Return**  
- A rank 2 np.array as described above
+ A rank 2 np.array or scipy.sparse matrix
 
 ----
 
@@ -84,11 +84,93 @@ spektral.utils.sub_eye(x)
 
 
 
-Subtracts the identity matrix to the given matrix.
+Subtracts the identity matrix from the given matrix.
 
 **Arguments**  
 
 - ` x`: a rank 2 np.array or scipy.sparse matrix
 
 **Return**  
- A rank 2 np.array as described above
+ A rank 2 np.array or scipy.sparse matrix
+
+----
+
+### add_eye_batch
+
+
+```python
+spektral.utils.add_eye_batch(x)
+```
+
+
+
+Adds the identity matrix to each submatrix of the given rank 3 array.
+
+**Arguments**  
+
+- ` x`: a rank 3 np.array
+
+**Return**  
+ A rank 3 np.array
+
+----
+
+### sub_eye_batch
+
+
+```python
+spektral.utils.sub_eye_batch(x)
+```
+
+
+
+Subtracts the identity matrix from each submatrix of the given rank 3
+array.
+
+**Arguments**  
+
+- ` x`: a rank 3 np.array
+
+**Return**  
+ A rank 3 np.array
+
+----
+
+### add_eye_jagged
+
+
+```python
+spektral.utils.add_eye_jagged(x)
+```
+
+
+
+Adds the identity matrix to each submatrix of the given rank 3 jagged array.
+
+**Arguments**  
+
+- ` x`: a rank 3 jagged np.array
+
+**Return**  
+ A rank 3 jagged np.array
+
+----
+
+### sub_eye_jagged
+
+
+```python
+spektral.utils.sub_eye_jagged(x)
+```
+
+
+
+Subtracts the identity matrix from each submatrix of the given rank 3
+jagged array.
+
+**Arguments**  
+
+- ` x`: a rank 3 jagged np.array
+
+**Return**  
+ A rank 3 jagged np.array
