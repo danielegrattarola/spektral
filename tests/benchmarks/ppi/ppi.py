@@ -1,3 +1,6 @@
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
 import time
 
 import pandas as pd
@@ -16,7 +19,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', type=str, default='ppi')
-parser.add_argument('--neighbourhood', type=int, default=3)
+parser.add_argument('--neighbourhood', type=int, default=1)
 args = parser.parse_args()
 
 dataset = args.dataset
@@ -24,7 +27,7 @@ neighbourhood = args.neighbourhood
 
 dropout_rate = 0.5      # Dropout rate applied to the input of GCN layers
 l2_reg = 5e-4           # Regularization rate for l2
-learning_rate = 3e-4    # Learning rate for SGD
+learning_rate = 1e-3    # Learning rate for SGD
 epochs = 20000          # Number of training epochs
 es_patience = 50        # Patience for early stopping
 runs = 10
@@ -163,8 +166,11 @@ for c in CONFIG:
         eval_results = model.evaluate([X, fltr],
                                       y,
                                       sample_weight=test_mask,
-                                      batch_size=N)
+                                      batch_size=N,
+                                      verbose=0)
         acc.append(eval_results[1])
+        print('{} - Test loss: {}, Test accuracy: {}'
+              .format(c['layer'].__name__, *eval_results))
         K.clear_session()
 
     results[c['layer'].__name__ + ' acc'] = acc
