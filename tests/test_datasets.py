@@ -26,12 +26,12 @@ def test_graphsage():
 
 
 def test_delaunay():
-    adj, nf, labels = delaunay.generate_data('numpy', classes=[0, 1, 2])
+    adj, nf, labels = delaunay.generate_data(return_type='numpy', classes=[0, 1, 2])
     correctly_padded(adj, nf, None)
     assert adj.shape[0] == labels.shape[0]
 
     # Test that it doesn't crash
-    delaunay.generate_data('networkx')
+    delaunay.generate_data(return_type='networkx')
 
 
 def test_mnist():
@@ -39,13 +39,13 @@ def test_mnist():
 
 
 def test_qm9():
-    adj, nf, ef, labels = qm9.load_data('numpy', amount=1000)
+    adj, nf, ef, labels = qm9.load_data(return_type='numpy', amount=1000)
     correctly_padded(adj, nf, ef)
     assert adj.shape[0] == labels.shape[0]
 
     # Test that it doesn't crash
-    qm9.load_data('networkx', amount=1000)
-    qm9.load_data('sdf', amount=1000)
+    qm9.load_data(return_type='networkx', amount=1000)
+    qm9.load_data(return_type='sdf', amount=1000)
 
 
 def test_tud():
