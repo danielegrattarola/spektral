@@ -17,7 +17,7 @@ Some frameworks (like the [graph networks](https://arxiv.org/abs/1806.01261) pro
 In code, and in this documentation, we use the following convention to refer to the formulation above:
 
 - `A` is the adjacency matrix, `N` is the number of nodes;
-- `X` is the node attributes matrix, `F` is the size of the edge attributes;
+- `X` is the node attributes matrix, `F` is the size of the node attributes;
 - `E` is the edge attributes matrix, `S` is the size of the edge attributes;
 
 See the table below for how these matrices are represented in Numpy. 
