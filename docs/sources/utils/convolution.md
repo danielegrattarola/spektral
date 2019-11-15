@@ -107,6 +107,30 @@ Computes a  normalized Laplacian of the given adjacency matrix as
 
 ----
 
+### rescale_laplacian
+
+
+```python
+spektral.utils.rescale_laplacian(L, lmax=None)
+```
+
+
+
+Rescales the Laplacian eigenvalues in [-1,1], using lmax as largest eigenvalue.
+
+**Arguments**  
+
+- ` L`: rank 2 array or sparse matrix
+
+- ` lmax`: if None, compute largest eigenvalue with scipy.linalg.eisgh.
+If the eigendecomposition fails, lmax is set to 2 automatically.
+If scalar, use this value as largest eignevalue when rescaling.
+
+**Return**  
+
+
+----
+
 ### localpooling_filter
 
 
@@ -128,6 +152,29 @@ described by Kipf & Welling (2017).
 
 **Return**  
  The filter matrix, as dense np.array.
+
+----
+
+### chebyshev_polynomial
+
+
+```python
+spektral.utils.chebyshev_polynomial(X, k)
+```
+
+
+
+Calculates Chebyshev polynomials of X, up to order k.
+
+**Arguments**  
+
+- ` X`: a np.array or scipy.sparse matrix;
+
+- ` k`: the order up to which compute the polynomials,
+
+**Return**  
+ A list of k + 1 sparse matrices with one element for each degree of 
+the approximation.
 
 ----
 
