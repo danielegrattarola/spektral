@@ -8,7 +8,7 @@
   
   <meta name="author" content="Daniele Grattarola">
   <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>Base Layers - Spektral</title>
+  <title>TU Dortmund - Spektral</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
@@ -18,9 +18,9 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Base Layers";
-    var mkdocs_page_input_path = "layers/base.md";
-    var mkdocs_page_url = "/spektral/layers/base/";
+    var mkdocs_page_name = "TU Dortmund";
+    var mkdocs_page_input_path = "datasets/tud.md";
+    var mkdocs_page_url = "/spektral/datasets/tud/";
   </script>
   
   <script src="../../js/jquery-2.1.1.min.js" defer></script>
@@ -85,24 +85,15 @@
     <ul class="subnav">
                 <li class="">
                     
-    <a class="" href="../convolution/">Convolutional Layers</a>
+    <a class="" href="../../layers/convolution/">Convolutional Layers</a>
                 </li>
                 <li class="">
                     
-    <a class="" href="../pooling/">Pooling Layers</a>
+    <a class="" href="../../layers/pooling/">Pooling Layers</a>
                 </li>
-                <li class=" current">
+                <li class="">
                     
-    <a class="current" href="./">Base Layers</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l3"><a href="#innerproduct">InnerProduct</a></li>
-    
-
-    <li class="toctree-l3"><a href="#minkowskiproduct">MinkowskiProduct</a></li>
-    
-
-    </ul>
+    <a class="" href="../../layers/base/">Base Layers</a>
                 </li>
     </ul>
 	    </li>
@@ -113,27 +104,33 @@
     <ul class="subnav">
                 <li class="">
                     
-    <a class="" href="../../datasets/citation/">Citation</a>
+    <a class="" href="../citation/">Citation</a>
                 </li>
                 <li class="">
                     
-    <a class="" href="../../datasets/delaunay/">Delaunay</a>
+    <a class="" href="../delaunay/">Delaunay</a>
                 </li>
                 <li class="">
                     
-    <a class="" href="../../datasets/graphsage/">GraphSage</a>
+    <a class="" href="../graphsage/">GraphSage</a>
                 </li>
                 <li class="">
                     
-    <a class="" href="../../datasets/qm9/">QM9</a>
+    <a class="" href="../qm9/">QM9</a>
                 </li>
                 <li class="">
                     
-    <a class="" href="../../datasets/mnist/">MNIST</a>
+    <a class="" href="../mnist/">MNIST</a>
                 </li>
-                <li class="">
+                <li class=" current">
                     
-    <a class="" href="../../datasets/tud/">TU Dortmund</a>
+    <a class="current" href="./">TU Dortmund</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#load_data">load_data</a></li>
+    
+
+    </ul>
                 </li>
     </ul>
 	    </li>
@@ -206,14 +203,14 @@
     
       
         
-          <li>Layers &raquo;</li>
+          <li>Datasets &raquo;</li>
         
       
     
-    <li>Base Layers</li>
+    <li>TU Dortmund</li>
     <li class="wy-breadcrumbs-aside">
       
-        <a href="https://github.com/danielegrattarola/spektral/edit/master/docs/sources/layers/base.md"
+        <a href="https://github.com/danielegrattarola/spektral/edit/master/docs/sources/datasets/tud.md"
           class="icon icon-github"> Edit on GitHub</a>
       
     </li>
@@ -223,86 +220,39 @@
           <div role="main">
             <div class="section">
               
-                <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L7">[source]</a></span></p>
-<h3 id="innerproduct">InnerProduct</h3>
-<pre><code class="python">spektral.layers.InnerProduct(trainable_kernel=False, activation=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None)
+                <h3 id="load_data">load_data</h3>
+<pre><code class="python">spektral.datasets.tud.load_data(dataset_name, normalize_features='zscore', clean=False)
 </code></pre>
 
-<p>Computes the inner product between elements of a given 2d tensor <script type="math/tex">x</script>: 
-<script type="math/tex; mode=display">
-\langle x, x \rangle = xx^T.
-</script>
-</p>
-<p><strong>Mode</strong>: single.</p>
-<p><strong>Input</strong></p>
+<p>Loads one of the Benchmark Data Sets for Graph Kernels from TU Dortmund
+(<a href="https://ls11-www.cs.tu-dortmund.de/staff/morris/graphkerneldatasets">link</a>).
+The node features are computed by concatenating the following features for
+each node:</p>
 <ul>
-<li>rank 2 tensor of shape <code>(input_dim_1, input_dim_2)</code> (e.g. node features
-of shape <code>(num_nodes, num_features)</code>);</li>
-</ul>
-<p><strong>Output</strong></p>
-<ul>
-<li>rank 2 tensor of shape <code>(input_dim_1, input_dim_1)</code></li>
+<li>node attributes, if available, normalized as specified in <code>normalize_features</code>;</li>
+<li>clustering coefficient, normalized with z-score;</li>
+<li>node degrees, normalized as specified in <code>normalize_features</code>;</li>
+<li>node labels, if available, one-hot encoded.</li>
 </ul>
 <p><strong>Arguments</strong>  </p>
 <ul>
 <li>
-<p><code>trainable_kernel</code>: add a trainable square matrix between the inner
-product (i.e., <code>x.dot(w).dot(x.T)</code>);</p>
+<p><code>dataset_name</code>: name of the dataset to load (see <code>spektral.datasets.tud.AVAILABLE_DATASETS</code>).</p>
 </li>
 <li>
-<p><code>activation</code>: activation function to use;</p>
+<p><code>normalize_features</code>: <code>'zscore'</code> or <code>'ohe'</code>, how to normalize the node
+features (only works for node attributes and node degrees).</p>
 </li>
 <li>
-<p><code>kernel_initializer</code>: initializer for the kernel matrix;</p>
-</li>
-<li>
-<p><code>kernel_regularizer</code>: regularization applied to the kernel;</p>
-</li>
-<li>
-<p><code>activity_regularizer</code>: regularization applied to the output;</p>
-</li>
-<li>
-<p><code>kernel_constraint</code>: constraint applied to the kernel;</p>
+<p><code>clean</code>: if True, return a version of the dataset with no isomorphic
+graphs.</p>
 </li>
 </ul>
-<hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L83">[source]</a></span></p>
-<h3 id="minkowskiproduct">MinkowskiProduct</h3>
-<pre><code class="python">spektral.layers.MinkowskiProduct(input_dim_1=None, activation=None, activity_regularizer=None)
-</code></pre>
-
-<p>Computes the hyperbolic inner product between elements of a given 2d tensor
-<script type="math/tex">x</script>: 
-<script type="math/tex; mode=display">
-\langle x, x \rangle = x \,
-\begin{pmatrix}
-I_{d\times d} & 0 \\ 0 & -1
-\end{pmatrix} \,x^T.
-</script>
-</p>
-<p><strong>Mode</strong>: single.</p>
-<p><strong>Input</strong></p>
+<p><strong>Return</strong>  </p>
 <ul>
-<li>rank 2 tensor of shape <code>(input_dim_1, input_dim_2)</code> (e.g. node features
-of shape <code>(num_nodes, num_features)</code>);</li>
-</ul>
-<p><strong>Output</strong></p>
-<ul>
-<li>rank 2 tensor of shape <code>(input_dim_1, input_dim_1)</code></li>
-</ul>
-<p><strong>Arguments</strong>  </p>
-<ul>
-<li>
-<p><code>input_dim_1</code>: first dimension of the input tensor; set this if you
-encounter issues with shapes in your model, in order to provide an explicit
-output shape for your layer.</p>
-</li>
-<li>
-<p><code>activation</code>: activation function to use;</p>
-</li>
-<li>
-<p><code>activity_regularizer</code>: regularization applied to the output;</p>
-</li>
+<li>a list of adjacency matrices;</li>
+<li>a list of node feature matrices;</li>
+<li>a numpy array containing the one-hot encoded targets.</li>
 </ul>
               
             </div>
@@ -311,10 +261,10 @@ output shape for your layer.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../../datasets/citation/" class="btn btn-neutral float-right" title="Citation">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../../chem/" class="btn btn-neutral float-right" title="Chemistry">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../pooling/" class="btn btn-neutral" title="Pooling Layers"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../mnist/" class="btn btn-neutral" title="MNIST"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -342,10 +292,10 @@ output shape for your layer.</p>
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../pooling/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../mnist/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../../datasets/citation/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../../chem/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

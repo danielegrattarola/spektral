@@ -110,6 +110,10 @@
                     
     <a class="" href="../delaunay/">Delaunay</a>
                 </li>
+                <li class="">
+                    
+    <a class="" href="../graphsage/">GraphSage</a>
+                </li>
                 <li class=" current">
                     
     <a class="current" href="./">QM9</a>
@@ -123,6 +127,10 @@
                 <li class="">
                     
     <a class="" href="../mnist/">MNIST</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../tud/">TU Dortmund</a>
                 </li>
     </ul>
 	    </li>
@@ -213,15 +221,26 @@
             <div class="section">
               
                 <h3 id="load_data">load_data</h3>
-<pre><code class="python">spektral.datasets.qm9.load_data(return_type='numpy', nf_keys=None, ef_keys=None, auto_pad=True, self_loops=False, amount=None)
+<pre><code class="python">spektral.datasets.qm9.load_data(nf_keys=None, ef_keys=None, auto_pad=True, self_loops=False, amount=None, return_type='numpy')
 </code></pre>
 
-<p>Loads the QM9 molecules dataset.</p>
+<p>Loads the QM9 chemical data set of small molecules.</p>
+<p>Nodes represent heavy atoms (hydrogens are discarded), edges represent
+chemical bonds.</p>
+<p>The node features represent the chemical properties of each atom, and are
+loaded according to the <code>nf_keys</code> argument.
+See <code>spektral.datasets.qm9.NODE_FEATURES</code> for possible node features, and
+see <a href="http://www.nonlinear.com/progenesis/sdf-studio/v0.9/faq/sdf-file-format-guidance.aspx">this link</a>
+for the meaning of each property. Usually, it is sufficient to load the
+atomic number.</p>
+<p>The edge features represent the type and stereoscopy of each chemical bond
+between two atoms.
+See <code>spektral.datasets.qm9.EDGE_FEATURES</code> for possible edge features, and
+see <a href="http://www.nonlinear.com/progenesis/sdf-studio/v0.9/faq/sdf-file-format-guidance.aspx">this link</a>
+for the meaning of each property. Usually, it is sufficient to load the
+type of bond.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
-<li>
-<p><code>return_type</code>: 'networkx', 'numpy', or 'sdf', data format to return;</p>
-</li>
 <li>
 <p><code>nf_keys</code>: list or str, node features to return (see <code>qm9.NODE_FEATURES</code>
 for available features);</p>
@@ -239,16 +258,22 @@ the same number of nodes;</p>
 matrices;</p>
 </li>
 <li>
-<p><code>amount</code>: the amount of molecules to return (in order).</p>
+<p><code>amount</code>: the amount of molecules to return (in ascending order by
+number of atoms).</p>
+</li>
+<li>
+<p><code>return_type</code>: <code>'numpy'</code>, <code>'networkx'</code>, or <code>'sdf'</code>, data format to return;</p>
 </li>
 </ul>
-<p><strong>Return</strong><br />
- If <code>return_type='numpy'</code>, the adjacency matrix, node features,
-edge features, and a Pandas dataframe containing labels;
-if <code>return_type='networkx'</code>, a list of graphs in Networkx format,
-and a dataframe containing labels; <br />
-if <code>return_type='sdf'</code>, a list of molecules in the internal SDF format and
-a dataframe containing labels.</p>
+<p><strong>Return</strong>  </p>
+<ul>
+<li>if <code>return_type='numpy'</code>, the adjacency matrix, node features,
+edge features, and a Pandas dataframe containing labels;</li>
+<li>if <code>return_type='networkx'</code>, a list of graphs in Networkx format,
+and a dataframe containing labels;   </li>
+<li>if <code>return_type='sdf'</code>, a list of molecules in the internal SDF format and
+a dataframe containing labels.</li>
+</ul>
               
             </div>
           </div>
@@ -259,7 +284,7 @@ a dataframe containing labels.</p>
         <a href="../mnist/" class="btn btn-neutral float-right" title="MNIST">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../delaunay/" class="btn btn-neutral" title="Delaunay"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../graphsage/" class="btn btn-neutral" title="GraphSage"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -287,7 +312,7 @@ a dataframe containing labels.</p>
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../delaunay/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../graphsage/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
         <span style="margin-left: 15px"><a href="../mnist/" style="color: #fcfcfc">Next &raquo;</a></span>

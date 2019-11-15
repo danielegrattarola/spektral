@@ -112,6 +112,10 @@
                 </li>
                 <li class="">
                     
+    <a class="" href="../graphsage/">GraphSage</a>
+                </li>
+                <li class="">
+                    
     <a class="" href="../qm9/">QM9</a>
                 </li>
                 <li class=" current">
@@ -123,6 +127,10 @@
     
 
     </ul>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../tud/">TU Dortmund</a>
                 </li>
     </ul>
 	    </li>
@@ -216,8 +224,14 @@
 <pre><code class="python">spektral.datasets.mnist.load_data(k=8, noise_level=0.0)
 </code></pre>
 
-<p>Loads the MNIST dataset and a K-NN grid.
-This code is largely taken from <a href="https://github.com/mdeff/cnn_graph/blob/master/nips2016/mnist.ipynb">Michaël Defferrard's Github</a>.</p>
+<p>Loads the MNIST dataset and a K-NN graph to perform graph signal
+classification, as described by <a href="https://arxiv.org/abs/1606.09375">Defferrard et al. (2016)</a>.
+The K-NN graph is statically determined from a regular grid of pixels using
+the 2d coordinates.</p>
+<p>The node features of each graph are the MNIST digits vectorized and rescaled
+to [0, 1].
+Two nodes are connected if they are neighbours according to the K-NN graph.
+Labels are the MNIST class associated to each sample.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
 <li>
@@ -241,7 +255,7 @@ This code is largely taken from <a href="https://github.com/mdeff/cnn_graph/blob
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../../chem/" class="btn btn-neutral float-right" title="Chemistry">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../tud/" class="btn btn-neutral float-right" title="TU Dortmund">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../qm9/" class="btn btn-neutral" title="QM9"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -275,7 +289,7 @@ This code is largely taken from <a href="https://github.com/mdeff/cnn_graph/blob
         <span><a href="../qm9/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../../chem/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../tud/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

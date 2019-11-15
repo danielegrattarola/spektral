@@ -118,11 +118,19 @@
                 </li>
                 <li class="">
                     
+    <a class="" href="../graphsage/">GraphSage</a>
+                </li>
+                <li class="">
+                    
     <a class="" href="../qm9/">QM9</a>
                 </li>
                 <li class="">
                     
     <a class="" href="../mnist/">MNIST</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../tud/">TU Dortmund</a>
                 </li>
     </ul>
 	    </li>
@@ -216,25 +224,34 @@
 <pre><code class="python">spektral.datasets.citation.load_data(dataset_name='cora', normalize_features=True, random_split=False)
 </code></pre>
 
-<p>Loads a citation dataset using the public splits as defined in
-<a href="https://arxiv.org/abs/1609.02907">Kipf &amp; Welling (2016)</a>.</p>
+<p>Loads a citation dataset (Cora, Citeseer or Pubmed) using the "Planetoid"
+splits intialliy defined in <a href="https://arxiv.org/abs/1603.08861">Yang et al. (2016)</a>.
+The train, test, and validation splits are given as binary masks.</p>
+<p>Node attributes are bag-of-words vectors representing the most common words
+in the text document associated to each node.
+Two papers are connected if either one cites the other.
+Labels represent the class of the paper.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
 <li>
-<p><code>dataset_name</code>: name of the dataset to load ('cora', 'citeseer', or
-'pubmed');</p>
+<p><code>dataset_name</code>: name of the dataset to load (<code>'cora'</code>, <code>'citeseer'</code>, or
+<code>'pubmed'</code>);</p>
 </li>
 <li>
 <p><code>normalize_features</code>: if True, the node features are normalized;</p>
 </li>
 <li>
-<p><code>random_split</code>: if True, return a randomized split (20/40/40); otherwise,
-return the popular Planetoid split.</p>
+<p><code>random_split</code>: if True, return a randomized split (20/40/40) instead
+of the default Planetoid split.</p>
 </li>
 </ul>
-<p><strong>Return</strong><br />
- The citation network in numpy format, the labels, and the binary
-masks for train, test, and validation splits.</p>
+<p><strong>Return</strong>  </p>
+<ul>
+<li>Adjacency matrix;</li>
+<li>Node features;</li>
+<li>Labels;</li>
+<li>Three binary masks for train, validation, and test splits.</li>
+</ul>
               
             </div>
           </div>

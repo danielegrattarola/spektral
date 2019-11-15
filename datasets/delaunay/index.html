@@ -118,11 +118,19 @@
                 </li>
                 <li class="">
                     
+    <a class="" href="../graphsage/">GraphSage</a>
+                </li>
+                <li class="">
+                    
     <a class="" href="../qm9/">QM9</a>
                 </li>
                 <li class="">
                     
     <a class="" href="../mnist/">MNIST</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../tud/">TU Dortmund</a>
                 </li>
     </ul>
 	    </li>
@@ -213,17 +221,18 @@
             <div class="section">
               
                 <h3 id="generate_data">generate_data</h3>
-<pre><code class="python">spektral.datasets.delaunay.generate_data(return_type='numpy', classes=0, n_samples_in_class=1000, n_nodes=7, support_low=0.0, support_high=10.0, drift_amount=1.0, one_hot_labels=True, support=None, seed=None)
+<pre><code class="python">spektral.datasets.delaunay.generate_data(classes=0, n_samples_in_class=1000, n_nodes=7, support_low=0.0, support_high=10.0, drift_amount=1.0, one_hot_labels=True, support=None, seed=None, return_type='numpy')
 </code></pre>
 
 <p>Generates a dataset of Delaunay triangulations as described by
-<a href="https://arxiv.org/abs/1706.06941">Zambon et al. (2017)</a>.
-Note that this function is basically deprecated and will change soon.</p>
+<a href="https://arxiv.org/abs/1706.06941">Zambon et al. (2017)</a>.</p>
+<p>Node attributes are the 2D coordinates of the points.
+Two nodes are connected if they share an edge in the Delaunay triangulation.
+Labels represent the class of the graph (0 to 20, each class index i
+represent the "difficulty" of the classification problem 0 v. i. In other
+words, the higher the class index, the more similar the class is to class 0).</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
-<li>
-<p><code>return_type</code>: 'numpy' or 'networkx', data format to return;</p>
-</li>
 <li>
 <p><code>classes</code>: indices of the classes to load (integer, or list of integers
 between 0 and 20);</p>
@@ -255,12 +264,17 @@ classes;</p>
 <li>
 <p><code>seed</code>: random numpy seed;</p>
 </li>
+<li>
+<p><code>return_type</code>: <code>'numpy'</code> or <code>'networkx'</code>, data format to return;</p>
+</li>
 </ul>
-<p><strong>Return</strong><br />
- If <code>return_type='numpy'</code>, the adjacency matrix, node features, and
-an array containing labels;
-if <code>return_type='networkx'</code>, a list of graphs in Networkx format, and an
-array containing labels;</p>
+<p><strong>Return</strong>  </p>
+<ul>
+<li>if <code>return_type='numpy'</code>, the adjacency matrix, node features, and
+an array containing labels;</li>
+<li>if <code>return_type='networkx'</code>, a list of graphs in Networkx format, and an
+array containing labels;</li>
+</ul>
               
             </div>
           </div>
@@ -268,7 +282,7 @@ array containing labels;</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../qm9/" class="btn btn-neutral float-right" title="QM9">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../graphsage/" class="btn btn-neutral float-right" title="GraphSage">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../citation/" class="btn btn-neutral" title="Citation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -302,7 +316,7 @@ array containing labels;</p>
         <span><a href="../citation/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../qm9/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../graphsage/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
