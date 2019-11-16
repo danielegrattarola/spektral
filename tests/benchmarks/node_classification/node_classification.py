@@ -111,7 +111,7 @@ for c in CONFIG:
     acc = []
     times = []
     for i in range(runs):
-        if dataset is 'ppi':
+        if dataset == 'ppi':
             A, X, y, train_mask, val_mask, test_mask = graphsage.load_data(
                 dataset_name=dataset
             )
@@ -159,15 +159,20 @@ for c in CONFIG:
         # Train model
         validation_data = ([X, fltr], y, val_mask)
         timer = -time.time()
-        model.fit([X, fltr],
-                  y,
-                  sample_weight=train_mask,
-                  epochs=epochs,
-                  batch_size=N,
-                  validation_data=validation_data,
-                  shuffle=False,
-                  callbacks=callbacks,
-                  verbose=0)
+        try:
+            model.fit([X, fltr],
+                      y,
+                      sample_weight=train_mask,
+                      epochs=epochs,
+                      batch_size=N,
+                      validation_data=validation_data,
+                      shuffle=False,
+                      callbacks=callbacks,
+                      verbose=0)
+        except:
+            print('{} - OOM'.format(c['layer'].__name__))
+            K.clear_session()
+            break
         timer += time.time()
         times.append(timer)
 
