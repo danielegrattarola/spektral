@@ -1,11 +1,11 @@
 """
 This example shows how to perform graph classification with a synthetic
 benchmark dataset created by F. M. Bianchi (https://github.com/FilippoMB/Benchmark_dataset_for_graph_classification),
-using a GNN with convolutional and pooling blocks in graph batch mode.
+using a GNN with convolutional and pooling blocks in disjoint mode.
 Note that the main training loop is written in TensorFlow, because we need to
 avoid the restriction imposed by Keras that the input and the output have the
 same first dimension. This is the most efficient way of training a GNN in
-graph batch mode.
+disjoint mode.
 """
 
 import os

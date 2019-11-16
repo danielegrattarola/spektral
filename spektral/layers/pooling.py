@@ -37,19 +37,19 @@ class TopKPool(Layer):
     dense graphs directly.
     Converting a graph from dense to sparse and viceversa is a costly operation.**
 
-    **Mode**: single, graph batch.
+    **Mode**: single, disjoint.
 
     **Input**
 
     - node features of shape `(n_nodes, n_features)`;
     - adjacency matrix of shape `(n_nodes, n_nodes)`;
-    - (optional) graph IDs of shape `(n_nodes, )` (graph batch mode);
+    - (optional) graph IDs of shape `(n_nodes, )` (disjoint mode);
 
     **Output**
 
     - reduced node features of shape `(n_graphs * k, n_features)`;
     - reduced adjacency matrix of shape `(n_graphs * k, n_graphs * k)`;
-    - reduced graph IDs with shape `(n_graphs * k, )` (graph batch mode);
+    - reduced graph IDs with shape `(n_graphs * k, )` (disjoint mode);
     - If `return_mask=True`, the binary mask used for pooling, with shape
     `(n_graphs * k, )`.
 
@@ -192,19 +192,19 @@ class SAGPool(Layer):
     dense graphs directly.
     Converting a graph from dense to sparse and viceversa is a costly operation.**
 
-    **Mode**: single, graph batch.
+    **Mode**: single, disjoint.
 
     **Input**
 
     - node features of shape `(n_nodes, n_features)`;
     - adjacency matrix of shape `(n_nodes, n_nodes)`;
-    - (optional) graph IDs of shape `(n_nodes, )` (graph batch mode);
+    - (optional) graph IDs of shape `(n_nodes, )` (disjoint mode);
 
     **Output**
 
     - reduced node features of shape `(n_graphs * k, n_features)`;
     - reduced adjacency matrix of shape `(n_graphs * k, n_graphs * k)`;
-    - reduced graph IDs with shape `(n_graphs * k, )` (graph batch mode);
+    - reduced graph IDs with shape `(n_graphs * k, )` (disjoint mode);
     - If `return_mask=True`, the binary mask used for pooling, with shape
     `(n_graphs * k, )`.
 
@@ -350,7 +350,7 @@ class MinCutPool(Layer):
 
     - reduced node features of shape `(k, n_features)`;
     - reduced adjacency matrix of shape `(k, k)`;
-    - reduced graph IDs with shape `(k, )` (graph batch mode);
+    - reduced graph IDs with shape `(k, )` (disjoint mode);
     - If `return_mask=True`, the soft assignment matrix used for pooling, with
     shape `(n_nodes, k)`.
 
@@ -566,7 +566,7 @@ class DiffPool(Layer):
 
     - reduced node features of shape `(k, channels)`;
     - reduced adjacency matrix of shape `(k, k)`;
-    - reduced graph IDs with shape `(k, )` (graph batch mode);
+    - reduced graph IDs with shape `(k, )` (disjoint mode);
     - If `return_mask=True`, the soft assignment matrix used for pooling, with
     shape `(n_nodes, k)`.
 
@@ -782,13 +782,13 @@ class GlobalSumPool(GlobalPooling):
     A global sum pooling layer. Pools a graph by computing the sum of its node
     features.
 
-    **Mode**: single, mixed, batch, graph batch.
+    **Mode**: single, mixed, batch, disjoint.
 
     **Input**
 
     - node features of shape `(n_nodes, n_features)` (with optional `batch`
     dimension);
-    - (optional) graph IDs of shape `(n_nodes, )` (graph batch mode);
+    - (optional) graph IDs of shape `(n_nodes, )` (disjoint mode);
 
     **Output**
 
@@ -810,13 +810,13 @@ class GlobalAvgPool(GlobalPooling):
     An average pooling layer. Pools a graph by computing the average of its node
     features.
 
-    **Mode**: single, mixed, batch, graph batch.
+    **Mode**: single, mixed, batch, disjoint.
 
     **Input**
 
     - node features of shape `(n_nodes, n_features)` (with optional `batch`
     dimension);
-    - (optional) graph IDs of shape `(n_nodes, )` (graph batch mode);
+    - (optional) graph IDs of shape `(n_nodes, )` (disjoint mode);
 
     **Output**
 
@@ -837,13 +837,13 @@ class GlobalMaxPool(GlobalPooling):
     A max pooling layer. Pools a graph by computing the maximum of its node
     features.
 
-    **Mode**: single, mixed, batch, graph batch.
+    **Mode**: single, mixed, batch, disjoint.
 
     **Input**
 
     - node features of shape `(n_nodes, n_features)` (with optional `batch`
     dimension);
-    - (optional) graph IDs of shape `(n_nodes, )` (graph batch mode);
+    - (optional) graph IDs of shape `(n_nodes, )` (disjoint mode);
 
     **Output**
 
@@ -864,13 +864,13 @@ class GlobalAttentionPool(GlobalPooling):
     A gated attention global pooling layer as presented by
     [Li et al. (2017)](https://arxiv.org/abs/1511.05493).
 
-    **Mode**: single, mixed, batch, graph batch.
+    **Mode**: single, mixed, batch, disjoint.
 
     **Input**
 
     - node features of shape `(n_nodes, n_features)` (with optional `batch`
     dimension);
-    - (optional) graph IDs of shape `(n_nodes, )` (graph batch mode);
+    - (optional) graph IDs of shape `(n_nodes, )` (disjoint mode);
 
     **Output**
 
@@ -993,13 +993,13 @@ class GlobalAttnSumPool(GlobalPooling):
     A node-attention global pooling layer. Pools a graph by learning attention
     coefficients to sum node features.
 
-    **Mode**: single, mixed, batch, graph batch.
+    **Mode**: single, mixed, batch, disjoint.
 
     **Input**
 
     - node features of shape `(n_nodes, n_features)` (with optional `batch`
     dimension);
-    - (optional) graph IDs of shape `(n_nodes, )` (graph batch mode);
+    - (optional) graph IDs of shape `(n_nodes, )` (disjoint mode);
 
     **Output**
 

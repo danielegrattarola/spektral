@@ -10,6 +10,7 @@ htmlcov/
 
 # Docs
 docs/site/
+docs/sources/
 
 # Logs
 logs/
