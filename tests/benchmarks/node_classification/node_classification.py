@@ -11,14 +11,14 @@ from keras.models import Model
 from keras.optimizers import Adam
 from keras.regularizers import l2
 
-from spektral.datasets import graphsage
+from spektral.datasets import citation, graphsage
 from spektral.layers import GraphConv, GraphConvSkip, GraphSageConv, ARMAConv, GraphAttention, APPNP, GINConv
 from spektral.utils.convolution import localpooling_filter, rescale_laplacian, normalized_laplacian
 
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--dataset', type=str, default='ppi')
+parser.add_argument('--dataset', type=str, default='cora')
 parser.add_argument('--neighbourhood', type=int, default=1)
 args = parser.parse_args()
 
@@ -27,13 +27,13 @@ neighbourhood = args.neighbourhood
 
 dropout_rate = 0.5      # Dropout rate applied to the input of GCN layers
 l2_reg = 5e-4           # Regularization rate for l2
-learning_rate = 1e-3    # Learning rate for SGD
+learning_rate = 5e-3    # Learning rate for SGD
 epochs = 20000          # Number of training epochs
 es_patience = 50        # Patience for early stopping
 runs = 10
 
 base_kwargs = {
-    'channels': 64,
+    'channels': 32,
     'activation': 'relu',
     'kernel_regularizer': l2(l2_reg),
 }
@@ -59,7 +59,8 @@ CONFIG = [
         'kwargs': {
             'T': neighbourhood,
             'K': 1,
-            'recurrent': True
+            'recurrent': True,
+            'dropout_rate': dropout_rate
         },
         'fltr': lambda A: rescale_laplacian(normalized_laplacian(A), lmax=2),
         'sparse': True
@@ -67,7 +68,9 @@ CONFIG = [
     {
         'layer': GraphAttention,
         'n_layers': neighbourhood,
-        'kwargs': {},
+        'kwargs': {
+            'dropout_rate': dropout_rate
+        },
         'fltr': lambda A: A,
         'sparse': False
     },
@@ -85,7 +88,8 @@ CONFIG = [
             'mlp_channels': 32,
             'alpha': 0.1,
             'H': 1,
-            'K': neighbourhood
+            'K': neighbourhood,
+            'dropout_rate': dropout_rate
         },
         'fltr': lambda A: localpooling_filter(A),
         'sparse': True
@@ -107,9 +111,14 @@ for c in CONFIG:
     acc = []
     times = []
     for i in range(runs):
-        A, X, y, train_mask, val_mask, test_mask = graphsage.load_data(
-            dataset_name=dataset
-        )
+        if dataset is 'ppi':
+            A, X, y, train_mask, val_mask, test_mask = graphsage.load_data(
+                dataset_name=dataset
+            )
+        else:
+            A, X, y, train_mask, val_mask, test_mask = citation.load_data(
+                dataset, random_split=True
+            )
 
         # Parameters
         N = X.shape[0]          # Number of nodes in the graph
@@ -175,7 +184,7 @@ for c in CONFIG:
 
     results[c['layer'].__name__ + ' acc'] = acc
     results[c['layer'].__name__ + ' time'] = times
-    pd.DataFrame(results).to_csv('{}_results.csv'.format(dataset, neighbourhood), index=False)
+    pd.DataFrame(results).to_csv('{}_{}_results.csv'.format(dataset, neighbourhood), index=False)
 
 pd.DataFrame(weights).to_csv('{}_{}_weights.csv'.format(dataset, neighbourhood), index=False)
 print(weights)
