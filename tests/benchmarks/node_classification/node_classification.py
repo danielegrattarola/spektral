@@ -171,6 +171,8 @@ for c in CONFIG:
                       verbose=0)
         except:
             print('{} - OOM'.format(c['layer'].__name__))
+            acc = [-1] * runs
+            times = [-1] * runs
             K.clear_session()
             break
         timer += time.time()
