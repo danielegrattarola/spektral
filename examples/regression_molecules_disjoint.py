@@ -1,11 +1,11 @@
 """
 This example shows how to perform regression of molecular properties with the
-QM9 database, using a simple GNN in graph batch mode (note that in this example
+QM9 database, using a simple GNN in disjoint mode (note that in this example
 we ignore edge attributes).
 Note that the main training loop is written in TensorFlow, because we need to
 avoid the restriction imposed by Keras that the input and the output have the
 same first dimension. This is the most efficient way of training a GNN in
-graph batch mode.
+disjoint mode.
 """
 
 import keras.backend as K
