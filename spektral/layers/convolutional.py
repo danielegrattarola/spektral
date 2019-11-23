@@ -1082,20 +1082,9 @@ class ARMAConv(GraphConv):
                                                 bias_constraint=self.bias_constraint)
             output.append(output_k)
 
-        # Aggregate parallel filters
-        output = K.concatenate(output, axis=-1)
-                
         # Average pooling
-        output = K.expand_dims(output, axis=-1)
-        output_dim = K.int_shape(output)
-        if len(output_dim) == 3:  # [nodes, feat, 1] -> [nodes, feat_red, 1]
-            output = AveragePooling1D(pool_size=self.K, padding='same')(output)
-        elif len(output_dim) == 4:  # [batch, nodes, feat, 1] -> [batch, nodes, feat_red, 1]
-            output = AveragePooling2D(pool_size=(1, self.K), padding='same')(output)
-        else:
-            raise RuntimeError('GCN_ARMA layer: wrong output dim')
-        output = K.squeeze(output, axis=-1)
-        
+        output = K.stack(output, axis=-1)
+        output = K.mean(output, axis=-1)
         output = self.activation(output)
         
         return output
@@ -1310,7 +1299,7 @@ class APPNP(GraphConv):
                  K=1,
                  mlp_activation='relu',
                  dropout_rate=0.0,
-                 activation='softmax',
+                 activation=None,
                  use_bias=True,
                  kernel_initializer='glorot_uniform',
                  bias_initializer='zeros',
