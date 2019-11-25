@@ -41,7 +41,7 @@ A_in = Input(shape=(N, ))
 dropout_1 = Dropout(dropout_rate)(X_in)
 graph_attention_1 = GraphAttention(gat_channels,
                                    attn_heads=n_attn_heads,
-                                   attn_heads_reduction='concat',
+                                   concat_heads=True,
                                    dropout_rate=dropout_rate,
                                    activation='elu',
                                    kernel_regularizer=l2(l2_reg),
@@ -49,7 +49,7 @@ graph_attention_1 = GraphAttention(gat_channels,
 dropout_2 = Dropout(dropout_rate)(graph_attention_1)
 graph_attention_2 = GraphAttention(n_classes,
                                    attn_heads=1,
-                                   attn_heads_reduction='average',
+                                   concat_heads=False,
                                    dropout_rate=dropout_rate,
                                    activation='softmax',
                                    kernel_regularizer=l2(l2_reg),

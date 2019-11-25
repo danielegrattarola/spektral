@@ -42,21 +42,21 @@ fltr_in = Input((N, ), sparse=True)
 
 dropout_1 = Dropout(dropout_rate)(X_in)
 graph_conv_1 = ARMAConv(16,
-                        T=ARMA_T,
-                        K=ARMA_K,
+                        iterations=ARMA_T,
+                        order=ARMA_K,
                         recurrent=recurrent,
+                        gcn_activation='elu',
                         dropout_rate=dropout_rate,
                         activation='elu',
-                        gcn_activation='elu',
                         kernel_regularizer=l2(l2_reg))([dropout_1, fltr_in])
 dropout_2 = Dropout(dropout_rate)(graph_conv_1)
 graph_conv_2 = ARMAConv(n_classes,
-                        T=1,
-                        K=1,
+                        iterations=1,
+                        order=1,
                         recurrent=recurrent,
+                        gcn_activation=None,
                         dropout_rate=dropout_rate,
                         activation='softmax',
-                        gcn_activation=None,
                         kernel_regularizer=l2(l2_reg))([dropout_2, fltr_in])
 
 # Build model
