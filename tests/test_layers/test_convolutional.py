@@ -41,12 +41,12 @@ TESTS = [
     {
         LAYER_K_: ARMAConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
-        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'T': 2, 'K': 2, 'recurrent': True}
+        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'iterations': 2, 'order': 2, 'recurrent': True}
     },
     {
         LAYER_K_: APPNP,
         MODES_K_: [SINGLE, BATCH, MIXED],
-        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'mlp_channels': 16, 'H': 2}
+        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'mlp_hidden': [16]}
     },
     {
         LAYER_K_: GINConv,
