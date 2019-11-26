@@ -107,7 +107,7 @@ def load_data(dataset_name='cora', normalize_features=True, random_split=False):
         indices = np.arange(labels.shape[0])
         n_classes = labels.shape[1]
         idx_train, idx_test, y_train, y_test = train_test_split(indices, labels, train_size=20 * n_classes, stratify=labels)
-        idx_test, idx_val, y_test, y_val = train_test_split(idx_test, y_test, train_size=30 * n_classes, stratify=y_test)
+        idx_val, idx_test, y_val, y_test = train_test_split(idx_test, y_test, train_size=30 * n_classes, stratify=y_test)
     else:
         idx_test = test_idx_range.tolist()
         idx_train = range(len(y))
