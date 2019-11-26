@@ -597,7 +597,7 @@ class GraphAttention(GraphConv):
     - `attn_heads`: number of attention heads to use;
     - `attn_heads_reduction`: how to reduce the outputs of the attention heads 
     (can be either 'concat' or 'average');
-    - `dropout_rate`: internal dropout rate;
+    - `dropout_rate`: internal dropout rate for attention coefficients;
     - `activation`: activation function to use;
     - `use_bias`: boolean, whether to add a bias to the linear transformation;
     - `kernel_initializer`: initializer for the kernel matrix;
@@ -753,10 +753,9 @@ class GraphAttention(GraphConv):
 
             # Apply dropout to features and attention coefficients
             dropout_attn = Dropout(self.dropout_rate)(dense)  # (N x N)
-            dropout_feat = Dropout(self.dropout_rate)(features)  # (N x F')
 
             # Convolution
-            node_features = filter_dot(dropout_attn, dropout_feat)
+            node_features = filter_dot(dropout_attn, features)
 
             if self.use_bias:
                 node_features = K.bias_add(node_features, self.biases[head])
