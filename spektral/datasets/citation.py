@@ -52,8 +52,9 @@ def load_data(dataset_name='cora', normalize_features=True, random_split=False):
     :param dataset_name: name of the dataset to load (`'cora'`, `'citeseer'`, or
     `'pubmed'`);
     :param normalize_features: if True, the node features are normalized;
-    :param random_split: if True, return a randomized split (20/40/40) instead
-    of the default Planetoid split.
+    :param random_split: if True, return a randomized split (20 nodes per class
+    for training, 30 nodes per class for validation and the remaining nodes for
+    testing, [Shchur et al. (2018)](https://arxiv.org/abs/1811.05868)).
     :return:
         - Adjacency matrix;
         - Node features;
@@ -104,8 +105,9 @@ def load_data(dataset_name='cora', normalize_features=True, random_split=False):
     # Data splits
     if random_split:
         indices = np.arange(labels.shape[0])
-        idx_train, idx_test, y_train, y_test = train_test_split(indices, labels, test_size=0.8, stratify=labels)
-        idx_test, idx_val, y_test, y_val = train_test_split(idx_test, y_test, test_size=0.5, stratify=y_test)
+        n_classes = labels.shape[1]
+        idx_train, idx_test, y_train, y_test = train_test_split(indices, labels, train_size=20 * n_classes, stratify=labels)
+        idx_val, idx_test, y_val, y_test = train_test_split(idx_test, y_test, train_size=30 * n_classes, stratify=y_test)
     else:
         idx_test = test_idx_range.tolist()
         idx_train = range(len(y))
