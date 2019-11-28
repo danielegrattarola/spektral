@@ -1102,7 +1102,7 @@ class ARMAConv(GraphConv):
             'channels': self.channels,
             'iterations': self.iterations,
             'order': self.order,
-            'recurrent': self.share_weights,
+            'share_weights': self.share_weights,
             'activation': activations.serialize(self.activation),
             'gcn_activation': activations.serialize(self.gcn_activation),
             'dropout_rate': self.dropout_rate,
