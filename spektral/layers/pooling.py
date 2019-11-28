@@ -641,7 +641,7 @@ class DiffPool(Layer):
         N = K.shape(A)[-1]
         # Check if the layer is operating in batch mode (X and A have rank 3)
         mode = ops.autodetect_mode(A, X)
-        self.reduce_loss = mode in (ops._modes['M'], ops._modes['B'])
+        self.reduce_loss = mode in (ops.modes['M'], ops.modes['B'])
 
         # Get normalized adjacency
         if K.is_sparse(A):

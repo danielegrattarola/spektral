@@ -3,7 +3,7 @@ import scipy.sparse as sp
 import tensorflow as tf
 from keras import backend as K
 
-_modes = {
+modes = {
     'S': 1,    # Single (rank(A)=2, rank(B)=2)
     'M': 2,    # Mixed (rank(A)=2, rank(B)=3)
     'iM': 3,   # Inverted mixed (rank(A)=3, rank(B)=2)
@@ -162,17 +162,17 @@ def matmul_A_B(A, B):
     :return:
     """
     mode = autodetect_mode(A, B)
-    if mode == _modes['S']:
+    if mode == modes['S']:
         # Single mode
         output = single_mode_dot(A, B)
-    elif mode == _modes['M']:
+    elif mode == modes['M']:
         # Mixed mode
         output = mixed_mode_dot(A, B)
-    elif mode == _modes['iM']:
+    elif mode == modes['iM']:
         # Inverted mixed (rank(A)=3, rank(B)=2)
         # Works only with dense tensors
         output = K.dot(A, B)
-    elif mode == _modes['B']:
+    elif mode == modes['B']:
         # Batch mode
         # Works only with dense tensors
         output = K.batch_dot(A, B)
@@ -192,10 +192,10 @@ def matmul_AT_B_A(A, B):
     :return:
     """
     mode = autodetect_mode(A, B)
-    if mode == _modes['S']:
+    if mode == modes['S']:
         # Single (rank(A)=2, rank(B)=2)
         output = single_mode_dot(single_mode_dot(transpose(A), B), A)
-    elif mode == _modes['M']:
+    elif mode == modes['M']:
         # Mixed (rank(A)=2, rank(B)=3)
         output = mixed_mode_dot(transpose(A), B)
         if K.is_sparse(A):
@@ -205,12 +205,12 @@ def matmul_AT_B_A(A, B):
             )
         else:
             output = K.dot(output, A)
-    elif mode == _modes['iM']:
+    elif mode == modes['iM']:
         # Inverted mixed (rank(A)=3, rank(B)=2)
         # Works only with dense tensors
         output = mixed_mode_dot(B, A)
         output = K.batch_dot(transpose(A, (0, 2, 1)), output)
-    elif mode == _modes['B']:
+    elif mode == modes['B']:
         # Batch (rank(A)=3, rank(B)=3)
         # Works only with dense tensors
         output = K.batch_dot(
@@ -236,17 +236,17 @@ def matmul_AT_B(A, B):
     :return:
     """
     mode = autodetect_mode(A, B)
-    if mode == _modes['S']:
+    if mode == modes['S']:
         # Single (rank(A)=2, rank(B)=2)
         output = single_mode_dot(transpose(A), B)
-    elif mode == _modes['M']:
+    elif mode == modes['M']:
         # Mixed (rank(A)=2, rank(B)=3)
         output = mixed_mode_dot(transpose(A), B)
-    elif mode == _modes['iM']:
+    elif mode == modes['iM']:
         # Inverted mixed (rank(A)=3, rank(B)=2)
         # Works only with dense tensors
         output = K.dot(transpose(A, (0, 2, 1)), B)
-    elif mode == _modes['B']:
+    elif mode == modes['B']:
         # Batch (rank(A)=3, rank(B)=3)
         # Works only with dense tensors
         output = K.batch_dot(transpose(A, (0, 2, 1)), B)
@@ -266,17 +266,17 @@ def matmul_A_BT(A, B):
     :return:
     """
     mode = autodetect_mode(A, B)
-    if mode == _modes['S']:
+    if mode == modes['S']:
         # Single (rank(A)=2, rank(B)=2)
         output = single_mode_dot(A, transpose(B))
-    elif mode == _modes['M']:
+    elif mode == modes['M']:
         # Mixed (rank(A)=2, rank(B)=3)
         output = mixed_mode_dot(A, transpose(B, (0, 2, 1)))
-    elif mode == _modes['iM']:
+    elif mode == modes['iM']:
         # Inverted mixed (rank(A)=3, rank(B)=2)
         # Works only with dense tensors
         output = K.dot(A, transpose(B))
-    elif mode == _modes['B']:
+    elif mode == modes['B']:
         # Batch (rank(A)=3, rank(B)=3)
         # Works only with dense tensors
         output = K.batch_dot(A, transpose(B, (0, 2, 1)))
@@ -289,30 +289,30 @@ def matmul_A_BT(A, B):
 ################################################################################
 # Ops related to the modes of operation (single, mixed, batch)
 ################################################################################
-def autodetect_mode(A, B):
+def autodetect_mode(A, X):
     """
     Return a code identifying the mode of operation (single, mixed, batch),
-    given A and B. See _modes variable for meaning of codes.
+    given A and X. See the modes variable for meaning of codes.
     :param A: Tensor.
-    :param B: Tensor.
+    :param X: Tensor.
     :return: mode of operation.
     """
-    if K.ndim(B) == 2:
+    if K.ndim(X) == 2:
         if K.ndim(A) == 2:
-            return _modes['S']
+            return modes['S']
         elif K.ndim(A) == 3:
-            return _modes['iM']
+            return modes['iM']
         else:
-            return _modes['UNK']
-    elif K.ndim(B) == 3:
+            return modes['UNK']
+    elif K.ndim(X) == 3:
         if K.ndim(A) == 2:
-            return _modes['M']
+            return modes['M']
         elif K.ndim(A) == 3:
-            return _modes['B']
+            return modes['B']
         else:
-            return _modes['UNK']
+            return modes['UNK']
     else:
-        return _modes['UNK']
+        return modes['UNK']
 
 
 def single_mode_dot(A, B):

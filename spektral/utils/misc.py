@@ -172,9 +172,12 @@ def label_to_one_hot(x, labels=None):
         x = np.array(x, dtype=np.int)
         orig_shp = x.shape
         x = np.reshape(x, (-1))
-        x = np.array([labels_idx[_] for _ in x])
         output = np.zeros((x.shape[0], n))
-        output[np.arange(x.shape[0]), x] = 1
+        for i in range(len(x)):
+            try:
+                output[i, labels_idx[x[i]]] = 1
+            except KeyError:
+                pass
         if len(orig_shp) == 1:
             output_shape = orig_shp + (n,)
         else:
