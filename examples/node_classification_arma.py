@@ -44,18 +44,18 @@ fltr_in = Input((N, ), sparse=True)
 
 dropout_1 = Dropout(dropout)(X_in)
 graph_conv_1 = ARMAConv(channels,
-                        iterations=iterations,
                         order=order,
-                        recurrent=share_weights,
+                        iterations=iterations,
+                        share_weights=share_weights,
                         gcn_activation='elu',
                         dropout_rate=dropout_skip,
                         activation='elu',
                         kernel_regularizer=l2(l2_reg))([dropout_1, fltr_in])
 dropout_2 = Dropout(dropout_skip)(graph_conv_1)
 graph_conv_2 = ARMAConv(n_classes,
-                        iterations=1,
                         order=1,
-                        recurrent=share_weights,
+                        iterations=1,
+                        share_weights=share_weights,
                         gcn_activation=None,
                         dropout_rate=dropout_skip,
                         activation='softmax',

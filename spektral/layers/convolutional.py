@@ -923,7 +923,7 @@ class GraphConvSkip(GraphConv):
 
 class ARMAConv(GraphConv):
     """
-    A graph convolutional layer with ARMA(K, K-1) filters, as presented by
+    A graph convolutional layer with ARMA(K) filters, as presented by
     [Bianchi et al. (2019)](https://arxiv.org/abs/1901.01343).
 
     **Mode**: single, mixed, batch.
@@ -932,12 +932,12 @@ class ARMAConv(GraphConv):
     $$
         Z = \\frac{1}{K}\\sum \\limits_{k=1}^K \\bar{X}_k^{(T)},
     $$
-    where \(K\) is the order of the ARMA(K, K-1) filter, and where:
+    where \(K\) is the order of the ARMA(K) filter, and where:
     $$
         \\bar{X}_k^{(t + 1)} =  \\sigma\\left(\\tilde{L}\\bar{X}^{(t)}W^{(t)} + XV^{(t)}\\right)
     $$
     is a graph convolutional skip layer implementing a recursive approximation
-    of an ARMA(1, 0) filter, \(\\tilde{L}\) is  normalized graph Laplacian with
+    of an ARMA(1) filter, \(\\tilde{L}\) is  normalized graph Laplacian with
     a rescaled spectrum, \(\\bar{X}^{(0)} = X\), and \(W, V\) are trainable
     kernels.
 
@@ -956,12 +956,12 @@ class ARMAConv(GraphConv):
     **Arguments**
 
     - `channels`: integer, number of output channels;
-    - `iterations`: number of iterations to compute each ARMA(1) approximation;
     - `order`: order of the full ARMA(K) filter, i.e., the number of parallel
     stacks in the layer;
-    - `recurrent`: whether to share each head's weights like a recurrent net;
-    - `gcn_activation`: activation function to use to compute the ARMA filter;
-    - `dropout_rate`: dropout rate for Laplacian and output layer;
+    - `iterations`: number of iterations to compute each ARMA(1) approximation;
+    - `share_weights`: share the weights in each ARMA(1) stack.
+    - `gcn_activation`: activation function to use to compute each ARMA(1) stack;
+    - `dropout_rate`: dropout rate for skip connection;
     - `activation`: activation function to use;
     - `use_bias`: whether to add a bias to the linear transformation;
     - `kernel_initializer`: initializer for the kernel matrix;
@@ -989,9 +989,9 @@ class ARMAConv(GraphConv):
 
     def __init__(self,
                  channels,
-                 iterations=1,
                  order=1,
-                 recurrent=False,
+                 iterations=1,
+                 share_weights=False,
                  gcn_activation='relu',
                  dropout_rate=0.0,
                  activation=None,
@@ -1008,7 +1008,7 @@ class ARMAConv(GraphConv):
         self.channels = channels
         self.iterations = iterations
         self.order = order
-        self.recurrent = recurrent
+        self.share_weights = share_weights
         self.activation = activations.get(activation)
         self.gcn_activation = activations.get(gcn_activation)
         self.dropout_rate = dropout_rate
@@ -1025,7 +1025,7 @@ class ARMAConv(GraphConv):
     def build(self, input_shape):
         assert len(input_shape) >= 2
         # When using shared weights, pre-compute them here
-        if self.recurrent:
+        if self.share_weights:
             self.kernels_in = []  # Weights from input space to output space
             self.kernels_hid = []  # Weights from output space to output space
             for k in range(self.order):
@@ -1062,13 +1062,12 @@ class ARMAConv(GraphConv):
         output = []  # Stores the parallel filters
         for k in range(self.order):
             output_k = features
-            for d in range(self.iterations):
-                features_drop = Dropout(self.dropout_rate)(features)
-                output_k = self.graph_conv_skip([output_k, features_drop, fltr],
+            for t in range(self.iterations):
+                output_k = self.graph_conv_skip([output_k, features, fltr],
                                                 self.channels,
-                                                'ARMA_skip_{}{}'.format(k, d),
-                                                recurrent_k=k if self.recurrent else None,
-                                                recurrent_d=d if self.recurrent else None,
+                                                'ARMA_skip_{}{}'.format(k, t),
+                                                recurrent_k=k if self.share_weights else None,
+                                                recurrent_t=t if self.share_weights else None,
                                                 activation=self.gcn_activation,
                                                 use_bias=self.use_bias,
                                                 kernel_initializer=self.kernel_initializer,
@@ -1091,7 +1090,7 @@ class ARMAConv(GraphConv):
             'channels': self.channels,
             'iterations': self.iterations,
             'order': self.order,
-            'recurrent': self.recurrent,
+            'recurrent': self.share_weights,
             'activation': activations.serialize(self.activation),
             'gcn_activation': activations.serialize(self.gcn_activation),
             'dropout_rate': self.dropout_rate,
@@ -1161,7 +1160,7 @@ class ARMAConv(GraphConv):
 
     def graph_conv_skip(self, x, channels, name,
                         recurrent_k=None,
-                        recurrent_d=None,
+                        recurrent_t=None,
                         activation=None,
                         use_bias=True,
                         kernel_initializer='glorot_uniform',
@@ -1180,9 +1179,9 @@ class ARMAConv(GraphConv):
         :param name: name of the layer
         :param recurrent_k: if the recurrent flag was set, then use the shared
         weights of the k-th filter when creating the layer
-        :param recurrent_d: if the recurrent flag was set, then use the shared
-        weights when computing the i-th recursive step of the k-th filter.
-        Note that this parameter cannot be None if reccurent_k is not None.
+        :param recurrent_t: if the recurrent flag was set, then use the shared
+        weights when computing the t-th recursive step of the k-th filter.
+        Note that this parameter cannot be None if recurent_k is not None.
         :param activation: activation function for the layer
         :param use_bias: whether to add a bias vector
         :param kernel_initializer: initializer for the kernels
@@ -1209,9 +1208,9 @@ class ARMAConv(GraphConv):
                                                             bias_constraint=bias_constraint)
         else:
             # When using shared weights, use the pre-computed ones.
-            if recurrent_d is None:
-                raise ValueError('recurrent_k and recurrent_d must be set together.')
-            if recurrent_d == 0:
+            if recurrent_t is None:
+                raise ValueError('recurrent_k and recurrent_t must be set together.')
+            if recurrent_t == 0:
                 kernel_1, kernel_2, bias = self.kernels_in[recurrent_k]
             else:
                 kernel_1, kernel_2, bias = self.kernels_hid[recurrent_k]
@@ -1225,6 +1224,7 @@ class ARMAConv(GraphConv):
 
         # Skip connection
         skip = K.dot(features_skip, kernel_2)
+        skip = Dropout(self.dropout_rate)(skip)
         output += skip
 
         if use_bias:
