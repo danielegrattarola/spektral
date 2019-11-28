@@ -31,7 +31,7 @@ TESTS = [
     {
         LAYER_K_: GraphAttention,
         MODES_K_: [SINGLE, BATCH, MIXED],
-        KWARGS_K_: {'channels': 8, 'activation': 'relu'}
+        KWARGS_K_: {'channels': 8, 'attn_heads': 2, 'concat_heads': False, 'activation': 'relu'}
     },
     {
         LAYER_K_: GraphConvSkip,
@@ -41,7 +41,7 @@ TESTS = [
     {
         LAYER_K_: ARMAConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
-        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'iterations': 2, 'order': 2, 'recurrent': True}
+        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'order': 2, 'iterations': 2, 'share_weights': True}
     },
     {
         LAYER_K_: APPNP,
