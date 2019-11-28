@@ -1,7 +1,7 @@
 import tensorflow as tf
 from keras import activations, initializers, regularizers, constraints
 from keras import backend as K
-from keras.layers import Layer, LeakyReLU, Dropout, AveragePooling2D, AveragePooling1D
+from keras.layers import Layer, LeakyReLU, Dropout
 
 from spektral.layers.ops import filter_dot
 
@@ -590,6 +590,9 @@ class GraphAttention(GraphConv):
 
     - node features with the same shape of the input, but the last dimension
     changed to `channels`.
+    - if `return_attn_coef=True`, a list with the attention coefficients for each
+    attention head is returned as well. Each attention coefficient matrix has
+    shape `(n_nodes, n_nodes)` (with optional `batch` dimension);
     
     **Arguments**
     
@@ -598,6 +601,8 @@ class GraphAttention(GraphConv):
     - `concat_heads`: bool, whether to concatenate the output of the attention
      heads instead of averaging;
     - `dropout_rate`: internal dropout rate for attention coefficients;
+    - `return_attn_coef`: bool, if True, return the attention coefficients for
+    the given input (one N x N matrix for each head).
     - `activation`: activation function to use;
     - `use_bias`: boolean, whether to add a bias to the linear transformation;
     - `kernel_initializer`: initializer for the kernel matrix;
@@ -626,6 +631,8 @@ class GraphAttention(GraphConv):
     X_in = Input(shape=(F, ))
     A_in = Input((N, ))
     output = GraphAttention(channels)([X_in, A_in])
+    # Alternative
+    # output, attn_coef = GraphAttention(channels, return_attn_coef=True)([X_in, A_in])
     ```
     """
     def __init__(self,
@@ -633,6 +640,7 @@ class GraphAttention(GraphConv):
                  attn_heads=1,
                  concat_heads=True,
                  dropout_rate=0.5,
+                 return_attn_coef=False,
                  activation='relu',
                  use_bias=True,
                  kernel_initializer='glorot_uniform',
@@ -652,6 +660,7 @@ class GraphAttention(GraphConv):
         self.attn_heads = attn_heads
         self.concat_heads = concat_heads
         self.dropout_rate = dropout_rate
+        self.return_attn_coef = return_attn_coef
         self.activation = activations.get(activation)
         self.use_bias = use_bias
         self.kernel_initializer = initializers.get(kernel_initializer)
@@ -716,59 +725,62 @@ class GraphAttention(GraphConv):
         self.built = True
 
     def call(self, inputs):
-        X = inputs[0]  # Node features (N x F)
-        A = inputs[1]  # Adjacency matrix (N x N)
+        X = inputs[0]
+        A = inputs[1]
 
         outputs = []
+        output_attn = []
         for head in range(self.attn_heads):
-            kernel = self.kernels[head]  # W in the paper (F x F')
+            kernel = self.kernels[head]
             attention_kernel = self.attn_kernels[head]  # Attention kernel a in the paper (2F' x 1)
 
             # Compute inputs to attention network
-            features = K.dot(X, kernel)  # (N x F')
+            features = K.dot(X, kernel)
 
-            # Compute feature combinations
-            # Note: [[a_1], [a_2]]^T [[Wh_i], [Wh_2]] = [a_1]^T [Wh_i] + [a_2]^T [Wh_j]
-            attn_for_self = K.dot(features, attention_kernel[0])    # (N x 1), [a_1]^T [Wh_i]
-            attn_for_neighs = K.dot(features, attention_kernel[1])  # (N x 1), [a_2]^T [Wh_j]
-
-            # Attention head a(Wh_i, Wh_j) = a^T [[Wh_i], [Wh_j]]
+            # Compue attention coefficients
+            # [[a_1], [a_2]]^T [[Wh_i], [Wh_2]] = [a_1]^T [Wh_i] + [a_2]^T [Wh_j]
+            attn_for_self = K.dot(features, attention_kernel[0])    # [a_1]^T [Wh_i]
+            attn_for_neighs = K.dot(features, attention_kernel[1])  # [a_2]^T [Wh_j]
             if len(K.int_shape(features)) == 2:
+                # Single / mixed mode
                 attn_for_neighs_T = K.transpose(attn_for_neighs)
             else:
+                # Batch mode
                 attn_for_neighs_T = K.permute_dimensions(attn_for_neighs, (0, 2, 1))
-            dense = attn_for_self + attn_for_neighs_T
-
-            # Add nonlinearity
-            dense = LeakyReLU(alpha=0.2)(dense)
+            attn_coef = attn_for_self + attn_for_neighs_T
+            attn_coef = LeakyReLU(alpha=0.2)(attn_coef)
 
             # Mask values before activation (Vaswani et al., 2017)
             mask = -10e9 * (1.0 - A)
-            dense += mask
+            attn_coef += mask
 
             # Apply softmax to get attention coefficients
-            dense = K.softmax(dense)  # (N x N)
+            attn_coef = K.softmax(attn_coef)
+            output_attn.append(attn_coef)
 
-            # Apply dropout to features and attention coefficients
-            dropout_attn = Dropout(self.dropout_rate)(dense)  # (N x N)
+            # Apply dropout to attention coefficients
+            attn_coef_drop = Dropout(self.dropout_rate)(attn_coef)
 
             # Convolution
-            node_features = filter_dot(dropout_attn, features)
-
+            features = filter_dot(attn_coef_drop, features)
             if self.use_bias:
-                node_features = K.bias_add(node_features, self.biases[head])
+                features = K.bias_add(features, self.biases[head])
 
             # Add output of attention head to final output
-            outputs.append(node_features)
+            outputs.append(features)
 
         # Aggregate the heads' output according to the reduction method
         if self.concat_heads:
-            output = K.concatenate(outputs)  # (N x KF')
+            output = K.concatenate(outputs)
         else:
-            output = K.mean(K.stack(outputs), axis=0)  # N x F')
+            output = K.mean(K.stack(outputs), axis=0)
 
         output = self.activation(output)
-        return output
+
+        if self.return_attn_coef:
+            return output, output_attn
+        else:
+            return output
 
     def compute_output_shape(self, input_shape):
         output_shape = input_shape[0][:-1] + (self.output_dim,)
