@@ -31,21 +31,20 @@ SW_KEY = 'dense_1_sample_weights:0'  # Keras automatically creates a placeholder
 
 
 def evaluate(A_list, X_list, y_list, ops, batch_size):
-    batches_ = batch_iterator([A_list, X_list, y_list], batch_size=batch_size)
-    output_ = []
-    for b_ in batches_:
-        batch_ = Batch(b_[0], b_[1])
-        X__, A__, I__ = batch_.get('XAI')
-        y__ = b[2]
-        feed_dict_ = {X_in: X__,
-                     A_in: sp_matrix_to_sp_tensor_value(A__),
-                     I_in: I__,
-                     target: y__,
+    batches = batch_iterator([A_list, X_list, y_list], batch_size=batch_size)
+    output = []
+    for b in batches:
+        X, A, I = Batch(b[0], b[1]).get('XAI')
+        y = b[2]
+        feed_dict = {X_in: X,
+                     A_in: sp_matrix_to_sp_tensor_value(A),
+                     I_in: I,
+                     target: y,
                      SW_KEY: np.ones((1,))}
 
-        outs_ = sess.run(ops, feed_dict=feed_dict_)
-        output_.append(outs_)
-    return np.mean(output_, 0)
+        outs = sess.run(ops, feed_dict=feed_dict)
+        output.append(outs)
+    return np.mean(output, 0)
 
 
 ################################################################################
@@ -60,20 +59,20 @@ epochs = 500               # Number of training epochs
 es_patience = 50           # Patience for early stopping
 learning_rate = 1e-3       # Learning rate
 batch_size = 1             # Batch size. NOTE: it MUST be 1 when using MinCutPool and DiffPool
+data_url = 'https://github.com/FilippoMB/Benchmark_dataset_for_graph_classification/raw/master/datasets/'
 dataset_name = 'easy.npz'  # Dataset ('easy.npz' or 'hard.npz')
 
 ################################################################################
 # LOAD DATA
 ################################################################################
-
 # Download graph classification data
 if not os.path.exists(dataset_name):
-    data_url = 'https://github.com/FilippoMB/Benchmark_dataset_for_graph_classification/raw/master/datasets/' + dataset_name
     print('Downloading ' + dataset_name + ' from ' + data_url)
-    req = requests.get(data_url)
+    req = requests.get(data_url + dataset_name)
     with open(dataset_name, 'wb') as out_file:
         out_file.write(req.content)
 
+# Load data
 loaded = np.load(dataset_name, allow_pickle=True)
 X_train, A_train, y_train = loaded['tr_feat'], list(loaded['tr_adj']), loaded['tr_class']
 X_test, A_test, y_test = loaded['te_feat'], list(loaded['te_adj']), loaded['te_class']
@@ -126,7 +125,9 @@ output = Dense(n_out, activation='softmax')(avgpool)
 
 # Build model
 model = Model([X_in, A_in, I_in], output)
-model.compile(optimizer='adam', loss='categorical_crossentropy', target_tensors=[target])
+model.compile(optimizer='adam',  # Doesn't matter, won't be used
+              loss='categorical_crossentropy',
+              target_tensors=[target])
 model.summary()
 
 # Training setup
@@ -135,8 +136,6 @@ loss = model.total_loss
 acc = K.mean(categorical_accuracy(target, model.output))
 opt = tf.train.AdamOptimizer(learning_rate=learning_rate)
 train_step = opt.minimize(loss)
-
-# Initialize all variables
 init_op = tf.global_variables_initializer()
 sess.run(init_op)
 
@@ -148,16 +147,14 @@ current_batch = 0
 model_loss = 0
 model_acc = 0
 best_val_loss = np.inf
+best_weights = None
 patience = es_patience
 batches_in_epoch = np.ceil(y_train.shape[0] / batch_size)
-total_batches = batches_in_epoch * epochs
 
 print('Fitting model')
 batches = batch_iterator([A_train, X_train, y_train], batch_size=batch_size, epochs=epochs)
-epoch_time = [0]
 for b in batches:
-    batch = Batch(b[0], b[1])
-    X_, A_, I_ = batch.get('XAI')
+    X_, A_, I_ = Batch(b[0], b[1]).get('XAI')
     y_ = b[2]
     tr_feed_dict = {X_in: X_,
                     A_in: sp_matrix_to_sp_tensor_value(A_),
@@ -175,16 +172,15 @@ for b in batches:
 
         # Compute validation loss and accuracy
         val_loss, val_acc = evaluate(A_val, X_val, y_val, [loss, acc], batch_size=batch_size)
-        ep = int(current_batch / batches_in_epoch)
-        print('Ep: {:d} - Loss: {:.2f} - Acc: {:.2f} - Val loss: {:.2f} - Val acc: {:.2f}'
-              .format(ep, model_loss, model_acc, val_loss, val_acc))
+        print('Ep. {} - Loss: {:.2f} - Acc: {:.2f} - Val loss: {:.2f} - Val acc: {:.2f}'
+              .format(current_batch // batches_in_epoch, model_loss, model_acc, val_loss, val_acc))
 
         # Check if loss improved for early stopping
         if val_loss < best_val_loss:
             best_val_loss = val_loss
             patience = es_patience
             print('New best val_loss {:.3f}'.format(val_loss))
-            model.save_weights('best_model.h5')
+            best_weights = model.get_weights()
         else:
             patience -= 1
             if patience == 0:
@@ -197,7 +193,7 @@ for b in batches:
 # EVALUATE MODEL
 ################################################################################
 # Load best model
-model.load_weights('best_model.h5')
+model.set_weights(best_weights)
 
 # Test model
 print('Testing model')
