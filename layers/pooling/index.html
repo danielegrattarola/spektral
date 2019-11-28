@@ -272,18 +272,18 @@ temporarily makes the adjacency matrix dense in order to compute <script type="m
 <strong>If memory is not an issue, considerable speedups can be achieved by using
 dense graphs directly.
 Converting a graph from dense to sparse and viceversa is a costly operation.</strong></p>
-<p><strong>Mode</strong>: single, graph batch.</p>
+<p><strong>Mode</strong>: single, disjoint.</p>
 <p><strong>Input</strong></p>
 <ul>
 <li>node features of shape <code>(n_nodes, n_features)</code>;</li>
 <li>adjacency matrix of shape <code>(n_nodes, n_nodes)</code>;</li>
-<li>(optional) graph IDs of shape <code>(n_nodes, )</code> (graph batch mode);</li>
+<li>(optional) graph IDs of shape <code>(n_nodes, )</code> (disjoint mode);</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
 <li>reduced node features of shape <code>(n_graphs * k, n_features)</code>;</li>
 <li>reduced adjacency matrix of shape <code>(n_graphs * k, n_graphs * k)</code>;</li>
-<li>reduced graph IDs with shape <code>(n_graphs * k, )</code> (graph batch mode);</li>
+<li>reduced graph IDs with shape <code>(n_graphs * k, )</code> (disjoint mode);</li>
 <li>If <code>return_mask=True</code>, the binary mask used for pooling, with shape
 <code>(n_graphs * k, )</code>.</li>
 </ul>
@@ -329,7 +329,7 @@ dimension);</li>
 <ul>
 <li>reduced node features of shape <code>(k, n_features)</code>;</li>
 <li>reduced adjacency matrix of shape <code>(k, k)</code>;</li>
-<li>reduced graph IDs with shape <code>(k, )</code> (graph batch mode);</li>
+<li>reduced graph IDs with shape <code>(k, )</code> (disjoint mode);</li>
 <li>If <code>return_mask=True</code>, the soft assignment matrix used for pooling, with
 shape <code>(n_nodes, k)</code>.</li>
 </ul>
@@ -347,7 +347,7 @@ shape <code>(n_nodes, k)</code>.</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L538">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L540">[source]</a></span></p>
 <h3 id="diffpool">DiffPool</h3>
 <pre><code class="python">spektral.layers.DiffPool(k, channels=None, return_mask=True, activation=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None)
 </code></pre>
@@ -378,7 +378,7 @@ dimension);</li>
 <ul>
 <li>reduced node features of shape <code>(k, channels)</code>;</li>
 <li>reduced adjacency matrix of shape <code>(k, k)</code>;</li>
-<li>reduced graph IDs with shape <code>(k, )</code> (graph batch mode);</li>
+<li>reduced graph IDs with shape <code>(k, )</code> (disjoint mode);</li>
 <li>If <code>return_mask=True</code>, the soft assignment matrix used for pooling, with
 shape <code>(n_nodes, k)</code>.</li>
 </ul>
@@ -420,18 +420,18 @@ temporarily makes the adjacency matrix dense in order to compute <script type="m
 <strong>If memory is not an issue, considerable speedups can be achieved by using
 dense graphs directly.
 Converting a graph from dense to sparse and viceversa is a costly operation.</strong></p>
-<p><strong>Mode</strong>: single, graph batch.</p>
+<p><strong>Mode</strong>: single, disjoint.</p>
 <p><strong>Input</strong></p>
 <ul>
 <li>node features of shape <code>(n_nodes, n_features)</code>;</li>
 <li>adjacency matrix of shape <code>(n_nodes, n_nodes)</code>;</li>
-<li>(optional) graph IDs of shape <code>(n_nodes, )</code> (graph batch mode);</li>
+<li>(optional) graph IDs of shape <code>(n_nodes, )</code> (disjoint mode);</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
 <li>reduced node features of shape <code>(n_graphs * k, n_features)</code>;</li>
 <li>reduced adjacency matrix of shape <code>(n_graphs * k, n_graphs * k)</code>;</li>
-<li>reduced graph IDs with shape <code>(n_graphs * k, )</code> (graph batch mode);</li>
+<li>reduced graph IDs with shape <code>(n_graphs * k, )</code> (disjoint mode);</li>
 <li>If <code>return_mask=True</code>, the binary mask used for pooling, with shape
 <code>(n_graphs * k, )</code>.</li>
 </ul>
@@ -447,19 +447,19 @@ tanh;</li>
 <li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L780">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L785">[source]</a></span></p>
 <h3 id="globalsumpool">GlobalSumPool</h3>
 <pre><code class="python">spektral.layers.GlobalSumPool()
 </code></pre>
 
 <p>A global sum pooling layer. Pools a graph by computing the sum of its node
 features.</p>
-<p><strong>Mode</strong>: single, mixed, batch, graph batch.</p>
+<p><strong>Mode</strong>: single, mixed, batch, disjoint.</p>
 <p><strong>Input</strong></p>
 <ul>
 <li>node features of shape <code>(n_nodes, n_features)</code> (with optional <code>batch</code>
 dimension);</li>
-<li>(optional) graph IDs of shape <code>(n_nodes, )</code> (graph batch mode);</li>
+<li>(optional) graph IDs of shape <code>(n_nodes, )</code> (disjoint mode);</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
@@ -469,19 +469,19 @@ mode, where the node dimension is preserved and set to 1).</li>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L808">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L814">[source]</a></span></p>
 <h3 id="globalavgpool">GlobalAvgPool</h3>
 <pre><code class="python">spektral.layers.GlobalAvgPool()
 </code></pre>
 
 <p>An average pooling layer. Pools a graph by computing the average of its node
 features.</p>
-<p><strong>Mode</strong>: single, mixed, batch, graph batch.</p>
+<p><strong>Mode</strong>: single, mixed, batch, disjoint.</p>
 <p><strong>Input</strong></p>
 <ul>
 <li>node features of shape <code>(n_nodes, n_features)</code> (with optional <code>batch</code>
 dimension);</li>
-<li>(optional) graph IDs of shape <code>(n_nodes, )</code> (graph batch mode);</li>
+<li>(optional) graph IDs of shape <code>(n_nodes, )</code> (disjoint mode);</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
@@ -491,19 +491,19 @@ mode, where the node dimension is preserved and set to 1).</li>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L835">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L842">[source]</a></span></p>
 <h3 id="globalmaxpool">GlobalMaxPool</h3>
 <pre><code class="python">spektral.layers.GlobalMaxPool()
 </code></pre>
 
 <p>A max pooling layer. Pools a graph by computing the maximum of its node
 features.</p>
-<p><strong>Mode</strong>: single, mixed, batch, graph batch.</p>
+<p><strong>Mode</strong>: single, mixed, batch, disjoint.</p>
 <p><strong>Input</strong></p>
 <ul>
 <li>node features of shape <code>(n_nodes, n_features)</code> (with optional <code>batch</code>
 dimension);</li>
-<li>(optional) graph IDs of shape <code>(n_nodes, )</code> (graph batch mode);</li>
+<li>(optional) graph IDs of shape <code>(n_nodes, )</code> (disjoint mode);</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
@@ -513,19 +513,19 @@ mode, where the node dimension is preserved and set to 1).</li>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L862">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L870">[source]</a></span></p>
 <h3 id="globalattentionpool">GlobalAttentionPool</h3>
 <pre><code class="python">spektral.layers.GlobalAttentionPool(channels=32, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
 <p>A gated attention global pooling layer as presented by
 <a href="https://arxiv.org/abs/1511.05493">Li et al. (2017)</a>.</p>
-<p><strong>Mode</strong>: single, mixed, batch, graph batch.</p>
+<p><strong>Mode</strong>: single, mixed, batch, disjoint.</p>
 <p><strong>Input</strong></p>
 <ul>
 <li>node features of shape <code>(n_nodes, n_features)</code> (with optional <code>batch</code>
 dimension);</li>
-<li>(optional) graph IDs of shape <code>(n_nodes, )</code> (graph batch mode);</li>
+<li>(optional) graph IDs of shape <code>(n_nodes, )</code> (disjoint mode);</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
@@ -544,19 +544,19 @@ dimension changed to <code>channels</code>.</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L991">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L999">[source]</a></span></p>
 <h3 id="globalattnsumpool">GlobalAttnSumPool</h3>
 <pre><code class="python">spektral.layers.GlobalAttnSumPool(attn_kernel_initializer='glorot_uniform', kernel_regularizer=None, attn_kernel_regularizer=None, attn_kernel_constraint=None)
 </code></pre>
 
 <p>A node-attention global pooling layer. Pools a graph by learning attention
 coefficients to sum node features.</p>
-<p><strong>Mode</strong>: single, mixed, batch, graph batch.</p>
+<p><strong>Mode</strong>: single, mixed, batch, disjoint.</p>
 <p><strong>Input</strong></p>
 <ul>
 <li>node features of shape <code>(n_nodes, n_features)</code> (with optional <code>batch</code>
 dimension);</li>
-<li>(optional) graph IDs of shape <code>(n_nodes, )</code> (graph batch mode);</li>
+<li>(optional) graph IDs of shape <code>(n_nodes, )</code> (disjoint mode);</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>

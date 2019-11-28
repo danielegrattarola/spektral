@@ -87,7 +87,7 @@
         
             <li><a class="toctree-l3" href="#mixed-mode">Mixed mode</a></li>
         
-            <li><a class="toctree-l3" href="#graph-batch-mode">Graph batch mode</a></li>
+            <li><a class="toctree-l3" href="#disjoint-mode">Disjoint mode</a></li>
         
         </ul>
     
@@ -280,7 +280,7 @@ On the other hand, when working with molecules in a dataset, we are in a much mo
 <li><strong>batch</strong>, where we have a set of different graphs, each with its own topology and attributes;</li>
 <li><strong>mixed</strong>, where we have a graph with fixed topology, but a set of different attributes (usually called <em>graph signals</em>); this can be seen as a particular case of the batch mode, but it is handled separately in Spektral to improve memory efficiency.</li>
 </ul>
-<p>We also have the <strong>graph batch</strong> mode, which is a simple trick to represent a batch of graphs in single mode. This requires an additional data structure to keep track of the graphs, and is explained in detail at the end of this section.</p>
+<p>We also have the <strong>disjoint</strong> mode, which is a simple trick to represent a batch of graphs in single mode. This requires an additional data structure to keep track of the graphs, and is explained in detail at the end of this section.</p>
 <p>The difference between the three main modes can be easily seen in how <code>A</code>, <code>X</code>, and <code>E</code> have different shapes in each case:</p>
 <table>
 <thead>
@@ -350,7 +350,7 @@ Out[5]: (133885, 9, 9, 1)
 </code></pre>
 
 <p>Note that the graphs in QM9 have variable order (i.e., different <code>N</code> for each graph), and that by default <code>load_data()</code> pads them with zeros in order to store the data in Numpy arrays.<br />
-See the <a href="https://danielegrattarola.github.io/spektral/data/#graph-batch-mode">graph batch mode</a> section for an alternative to zero-padding. </p>
+See the <a href="https://danielegrattarola.github.io/spektral/data/#disjoint-mode">disjoint mode</a> section for an alternative to zero-padding. </p>
 <h3 id="mixed-mode">Mixed mode</h3>
 <p>In <strong>mixed mode</strong> we consider a single adjacency matrix, and different node and edge attributes matrices. An example of a mixed mode dataset is the MNIST random grid proposed by <a href="https://arxiv.org/abs/1606.09375">Defferrard et al.</a>:</p>
 <pre><code class="py">In [1]: from spektral.datasets import mnist
@@ -365,8 +365,8 @@ In [4]: X.shape
 Out[4]: (50000, 784, 1)
 </code></pre>
 
-<h3 id="graph-batch-mode">Graph batch mode</h3>
-<p><img alt="" src="https://danielegrattarola.github.io/spektral/img/graph_batch.svg" /></p>
+<h3 id="disjoint-mode">Disjoint mode</h3>
+<p><img alt="" src="https://danielegrattarola.github.io/spektral/img/disjoint.svg" /></p>
 <p>When dealing with graphs with a variable number of nodes, representing a group of graphs in batch mode requires padding <code>A</code>, <code>X</code>, and <code>E</code> to a fixed dimension.  <br />
 In order to avoid this issue, a common approach is to represent a batch of graphs as a single disjoint union, and then using this "supergraph" in single mode.</p>
 <p>The disjoint union of a batch of graphs is a graph where: </p>

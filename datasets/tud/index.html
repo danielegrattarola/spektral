@@ -221,7 +221,7 @@
             <div class="section">
               
                 <h3 id="load_data">load_data</h3>
-<pre><code class="python">spektral.datasets.tud.load_data(dataset_name, normalize_features='zscore', clean=False)
+<pre><code class="python">spektral.datasets.tud.load_data(dataset_name, normalize_features=None, clean=False)
 </code></pre>
 
 <p>Loads one of the Benchmark Data Sets for Graph Kernels from TU Dortmund
@@ -240,8 +240,8 @@ each node:</p>
 <p><code>dataset_name</code>: name of the dataset to load (see <code>spektral.datasets.tud.AVAILABLE_DATASETS</code>).</p>
 </li>
 <li>
-<p><code>normalize_features</code>: <code>'zscore'</code> or <code>'ohe'</code>, how to normalize the node
-features (only works for node attributes and node degrees).</p>
+<p><code>normalize_features</code>: <code>None</code>, <code>'zscore'</code> or <code>'ohe'</code>, how to normalize
+the node features (only works for node attributes).</p>
 </li>
 <li>
 <p><code>clean</code>: if True, return a version of the dataset with no isomorphic

@@ -401,24 +401,24 @@ output = GraphSageConv(channels)([X_in, A_in])
 </code></pre>
 
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L927">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L936">[source]</a></span></p>
 <h3 id="armaconv">ARMAConv</h3>
-<pre><code class="python">spektral.layers.ARMAConv(channels, T=1, K=1, recurrent=False, gcn_activation='relu', dropout_rate=0.0, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<pre><code class="python">spektral.layers.ARMAConv(channels, order=1, iterations=1, share_weights=False, gcn_activation='relu', dropout_rate=0.0, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
-<p>A graph convolutional layer with ARMA(K, K-1) filters, as presented by
+<p>A graph convolutional layer with ARMA(K) filters, as presented by
 <a href="https://arxiv.org/abs/1901.01343">Bianchi et al. (2019)</a>.</p>
 <p><strong>Mode</strong>: single, mixed, batch.</p>
 <p>This layer computes:
 <script type="math/tex; mode=display">
 Z = \frac{1}{K}\sum \limits_{k=1}^K \bar{X}_k^{(T)},
 </script>
-where <script type="math/tex">K</script> is the order of the ARMA(K, K-1) filter, and where:
+where <script type="math/tex">K</script> is the order of the ARMA(K) filter, and where:
 <script type="math/tex; mode=display">
 \bar{X}_k^{(t + 1)} =  \sigma\left(\tilde{L}\bar{X}^{(t)}W^{(t)} + XV^{(t)}\right)
 </script>
 is a graph convolutional skip layer implementing a recursive approximation
-of an ARMA(1, 0) filter, <script type="math/tex">\tilde{L}</script> is  normalized graph Laplacian with
+of an ARMA(1) filter, <script type="math/tex">\tilde{L}</script> is  normalized graph Laplacian with
 a rescaled spectrum, <script type="math/tex">\bar{X}^{(0)} = X</script>, and <script type="math/tex">W, V</script> are trainable
 kernels.</p>
 <p><strong>Input</strong></p>
@@ -436,12 +436,12 @@ changed to <code>channels</code>.</li>
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>channels</code>: integer, number of output channels;</li>
-<li><code>T</code>: depth of each ARMA(1, 0) approximation (number of recursive updates);</li>
-<li><code>K</code>: order of the full ARMA(K, K-1) filter (combination of K ARMA(1, 0)
-filters);</li>
-<li><code>recurrent</code>: whether to share each head's weights like a recurrent net;</li>
-<li><code>gcn_activation</code>: activation function to use to compute the ARMA filter;</li>
-<li><code>dropout_rate</code>: dropout rate for Laplacian and output layer;</li>
+<li><code>order</code>: order of the full ARMA(K) filter, i.e., the number of parallel
+stacks in the layer;</li>
+<li><code>iterations</code>: number of iterations to compute each ARMA(1) approximation;</li>
+<li><code>share_weights</code>: share the weights in each ARMA(1) stack.</li>
+<li><code>gcn_activation</code>: activation function to use to compute each ARMA(1) stack;</li>
+<li><code>dropout_rate</code>: dropout rate for skip connection;</li>
 <li><code>activation</code>: activation function to use;</li>
 <li><code>use_bias</code>: whether to add a bias to the linear transformation;</li>
 <li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
@@ -519,7 +519,7 @@ output = EdgeConditionedConv(channels)([X_in, A_in, E_in])
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L571">[source]</a></span></p>
 <h3 id="graphattention">GraphAttention</h3>
-<pre><code class="python">spektral.layers.GraphAttention(channels, attn_heads=1, attn_heads_reduction='concat', dropout_rate=0.5, activation='relu', use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', attn_kernel_initializer='glorot_uniform', kernel_regularizer=None, bias_regularizer=None, attn_kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None, attn_kernel_constraint=None)
+<pre><code class="python">spektral.layers.GraphAttention(channels, attn_heads=1, concat_heads=True, dropout_rate=0.5, return_attn_coef=False, activation='relu', use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', attn_kernel_initializer='glorot_uniform', kernel_regularizer=None, bias_regularizer=None, attn_kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None, attn_kernel_constraint=None)
 </code></pre>
 
 <p>A graph attention layer as presented by
@@ -539,14 +539,19 @@ dimension);</li>
 <ul>
 <li>node features with the same shape of the input, but the last dimension
 changed to <code>channels</code>.</li>
+<li>if <code>return_attn_coef=True</code>, a list with the attention coefficients for each
+attention head is returned as well. Each attention coefficient matrix has
+shape <code>(n_nodes, n_nodes)</code> (with optional <code>batch</code> dimension);</li>
 </ul>
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>channels</code>: integer, number of output channels;</li>
 <li><code>attn_heads</code>: number of attention heads to use;</li>
-<li><code>attn_heads_reduction</code>: how to reduce the outputs of the attention heads 
-(can be either 'concat' or 'average');</li>
-<li><code>dropout_rate</code>: internal dropout rate;</li>
+<li><code>concat_heads</code>: bool, whether to concatenate the output of the attention
+heads instead of averaging;</li>
+<li><code>dropout_rate</code>: internal dropout rate for attention coefficients;</li>
+<li><code>return_attn_coef</code>: bool, if True, return the attention coefficients for
+the given input (one N x N matrix for each head).</li>
 <li><code>activation</code>: activation function to use;</li>
 <li><code>use_bias</code>: boolean, whether to add a bias to the linear transformation;</li>
 <li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
@@ -573,10 +578,12 @@ A = utils.add_eye(A).toarray()  # Add self-loops
 X_in = Input(shape=(F, ))
 A_in = Input((N, ))
 output = GraphAttention(channels)([X_in, A_in])
+# Alternative
+# output, attn_coef = GraphAttention(channels, return_attn_coef=True)([X_in, A_in])
 </code></pre>
 
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L803">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L812">[source]</a></span></p>
 <h3 id="graphconvskip">GraphConvSkip</h3>
 <pre><code class="python">spektral.layers.GraphConvSkip(channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -631,9 +638,9 @@ output = GraphConvSkip(channels)([X_in, fltr_in])
 </code></pre>
 
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L1251">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L1249">[source]</a></span></p>
 <h3 id="appnp">APPNP</h3>
-<pre><code class="python">spektral.layers.APPNP(channels, mlp_channels, alpha=0.2, H=1, K=1, mlp_activation='relu', dropout_rate=0.0, activation='softmax', use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<pre><code class="python">spektral.layers.APPNP(channels, alpha=0.2, propagations=1, mlp_hidden=None, mlp_activation='relu', dropout_rate=0.0, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
 <p>A graph convolutional layer implementing the APPNP operator, as presented by
@@ -643,8 +650,8 @@ output = GraphConvSkip(channels)([X_in, fltr_in])
 <ul>
 <li>node features of shape <code>(n_nodes, n_features)</code> (with optional <code>batch</code>
 dimension);</li>
-<li>Normalized adjacency matrix of shape <code>(n_nodes, n_nodes)</code> (with optional
-<code>batch</code> dimension); see <code>spektral.utils.convolution.normalized_adjacency</code>.</li>
+<li>Normalized Laplacian of shape <code>(n_nodes, n_nodes)</code> (with optional
+<code>batch</code> dimension); see <code>spektral.utils.convolution.localpooling_filter</code>.</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
@@ -654,10 +661,10 @@ changed to <code>channels</code>.</li>
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>channels</code>: integer, number of output channels;</li>
-<li><code>mlp_channels</code>: integer, number of hidden units for the MLP layers;</li>
-<li><code>alpha</code>: teleport probability;</li>
-<li><code>H</code>: number of MLP layers;</li>
-<li><code>K</code>: number of power iterations;</li>
+<li><code>alpha</code>: teleport probability during propagation;</li>
+<li><code>propagations</code>: number of propagation steps;</li>
+<li><code>mlp_hidden</code>: list of integers, number of hidden units for each hidden
+layer in the MLP (if None, the MLP has only one layer);</li>
 <li><code>mlp_activation</code>: activation for the MLP layers;</li>
 <li><code>dropout_rate</code>: dropout rate for Laplacian and MLP layers;</li>
 <li><code>activation</code>: activation function to use;</li>
@@ -672,20 +679,19 @@ changed to <code>channels</code>.</li>
 </ul>
 <p><strong>Usage</strong></p>
 <pre><code class="py"># Load data
-A, X, _, _, _, _, _, _ = citation.load_data('cora')
+A, X, _, _, _, _, _ = citation.load_data('cora')
 
 # Preprocessing operations
-I = sp.identity(A.shape[0], dtype=A.dtype)
-fltr = utils.normalize_adjacency(A + I)
+fltr = utils.localpooling_filter(A)
 
 # Model definition
 X_in = Input(shape=(F, ))
 fltr_in = Input((N, ))
-output = APPNP(channels, mlp_channels)([X_in, fltr_in])
+output = APPNP(channels)([X_in, fltr_in])
 </code></pre>
 
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L1443">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L1427">[source]</a></span></p>
 <h3 id="ginconv">GINConv</h3>
 <pre><code class="python">spektral.layers.GINConv(channels, mlp_channels=16, n_hidden_layers=0, epsilon=None, mlp_activation='relu', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
