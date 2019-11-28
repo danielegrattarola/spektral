@@ -48,16 +48,15 @@ optimizer = Adam(lr=learning_rate)
 model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['acc'])
 model.summary()
 
-# Callbacks
-es_callback = EarlyStopping(monitor='val_acc', patience=es_patience)
-
 # Train model
 model.fit([x_train, A_train],
           y_train,
           batch_size=batch_size,
           validation_split=0.1,
           epochs=epochs,
-          callbacks=[es_callback])
+          callbacks=[
+              EarlyStopping(patience=es_patience, restore_best_weights=True)
+          ])
 
 # Evaluate model
 print('Evaluating model.')

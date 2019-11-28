@@ -30,7 +30,6 @@ uniq_X = np.unique(X)
 X = label_to_one_hot(X, uniq_X)
 uniq_E = np.unique(E)
 E = label_to_one_hot(E, uniq_E)
-y = StandardScaler().fit_transform(y).reshape(-1, y.shape[-1])
 
 # Parameters
 N = X.shape[-2]           # Number of nodes in the graphs
@@ -66,16 +65,15 @@ optimizer = Adam(lr=learning_rate)
 model.compile(optimizer=optimizer, loss='mse')
 model.summary()
 
-# Callbacks
-es_callback = EarlyStopping(monitor='val_loss', patience=es_patience)
-
 # Train model
 model.fit([X_train, A_train, E_train],
           y_train,
           batch_size=batch_size,
           validation_split=0.1,
           epochs=epochs,
-          callbacks=[es_callback])
+          callbacks=[
+              EarlyStopping(patience=es_patience,  restore_best_weights=True)
+          ])
 
 # Evaluate model
 print('Evaluating model.')

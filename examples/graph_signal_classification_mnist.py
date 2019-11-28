@@ -1,5 +1,5 @@
 from keras import Input, Model
-from keras.callbacks import EarlyStopping, ModelCheckpoint
+from keras.callbacks import EarlyStopping
 from keras.layers import Dense, Flatten
 from keras.optimizers import Adam
 from keras.regularizers import l2
@@ -51,12 +51,6 @@ model.compile(optimizer=optimizer,
               metrics=['acc'])
 model.summary()
 
-# Callbacks
-callbacks = [
-    EarlyStopping(monitor='val_loss', patience=es_patience),
-    ModelCheckpoint('best_model.h5', save_best_only=True, save_weights_only=True)
-]
-
 # Train model
 validation_data = (X_val, y_val)
 model.fit(X_train,
@@ -64,10 +58,9 @@ model.fit(X_train,
           batch_size=batch_size,
           validation_data=validation_data,
           epochs=epochs,
-          callbacks=callbacks)
-
-# Load best model
-model.load_weights('best_model.h5')
+          callbacks=[
+              EarlyStopping(patience=es_patience, restore_best_weights=True)
+          ])
 
 # Evaluate model
 print('Evaluating model.')

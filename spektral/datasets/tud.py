@@ -19,7 +19,7 @@ AVAILABLE_DATASETS = [
 ]
 
 
-def load_data(dataset_name, normalize_features='zscore', clean=False):
+def load_data(dataset_name, normalize_features=None, clean=False):
     """
     Loads one of the Benchmark Data Sets for Graph Kernels from TU Dortmund
     ([link](https://ls11-www.cs.tu-dortmund.de/staff/morris/graphkerneldatasets)).
@@ -31,8 +31,8 @@ def load_data(dataset_name, normalize_features='zscore', clean=False):
     - node degrees, normalized as specified in `normalize_features`;
     - node labels, if available, one-hot encoded.
     :param dataset_name: name of the dataset to load (see `spektral.datasets.tud.AVAILABLE_DATASETS`).
-    :param normalize_features: `'zscore'` or `'ohe'`, how to normalize the node
-    features (only works for node attributes and node degrees).
+    :param normalize_features: `None`, `'zscore'` or `'ohe'`, how to normalize
+    the node features (only works for node attributes).
     :param clean: if True, return a version of the dataset with no isomorphic
     graphs.
     :return:
@@ -61,7 +61,7 @@ def load_data(dataset_name, normalize_features='zscore', clean=False):
         X_attr = _normalize_node_features(X_attr, normalize_features)
     except KeyError:
         print('Featureless nodes')
-        A, X_attr, _ = nx_to_numpy(nx_graphs, auto_pad=False)  # na will be None
+        A, X_attr, _ = nx_to_numpy(nx_graphs, auto_pad=False)
 
     # Get clustering coefficients (always zscore norm)
     clustering_coefficients = [np.array(list(nx.clustering(g).values()))[..., None] for g in nx_graphs]
@@ -69,9 +69,9 @@ def load_data(dataset_name, normalize_features='zscore', clean=False):
 
     # Get node degrees
     node_degrees = np.array([np.sum(_, axis=-1, keepdims=True) for _ in A])
-    node_degrees = _normalize_node_features(node_degrees, normalize_features)
+    node_degrees = _normalize_node_features(node_degrees, 'zscore')
 
-    # Get node labels (always ohe norm)
+    # Get node labels
     try:
         _, X_labs, _ = nx_to_numpy(nx_graphs, nf_keys=['label'], auto_pad=False)
         X_labs = _normalize_node_features(X_labs, 'ohe')
@@ -196,7 +196,7 @@ def _download_data(dataset_name):
     shutil.rmtree(subfolder)
 
 
-def _normalize_node_features(feat_list, norm='ohe'):
+def _normalize_node_features(feat_list, norm=None):
     """
     Apply one-hot encoding or z-score to a list of node features
     """
@@ -205,7 +205,7 @@ def _normalize_node_features(feat_list, norm='ohe'):
     elif norm == 'zscore':
         fnorm = StandardScaler()
     else:
-        raise ValueError('Possible feat_norm: ohe, zscore')
+        return feat_list
     fnorm.fit(np.vstack(feat_list))
     feat_list = [fnorm.transform(feat_.astype(np.float32)) for feat_ in feat_list]
     return feat_list

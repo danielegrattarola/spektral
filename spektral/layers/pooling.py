@@ -439,6 +439,8 @@ class MinCutPool(Layer):
         # batch mode.
         if len(inputs) == 3:
             X, A, I = inputs
+            if K.ndim(I) == 2:
+                I = I[:, 0]
         else:
             X, A = inputs
             I = None
@@ -630,6 +632,8 @@ class DiffPool(Layer):
         # batch mode.
         if len(inputs) == 3:
             X, A, I = inputs
+            if K.ndim(I) == 2:
+                I = I[:, 0]
         else:
             X, A = inputs
             I = None
@@ -740,6 +744,7 @@ class GlobalPooling(Layer):
         super().__init__(**kwargs)
         self.supports_masking = True
         self.pooling_op = None
+        self.batch_pooling_op = None
 
     def build(self, input_shape):
         if isinstance(input_shape, list) and len(input_shape) == 2:
@@ -763,7 +768,7 @@ class GlobalPooling(Layer):
         if self.data_mode == 'graph':
             return self.pooling_op(X, I)
         else:
-            return K.sum(X, axis=-2, keepdims=(self.data_mode == 'single'))
+            return self.batch_pooling_op(X, axis=-2, keepdims=(self.data_mode == 'single'))
 
     def compute_output_shape(self, input_shape):
         if self.data_mode == 'single':
@@ -803,6 +808,7 @@ class GlobalSumPool(GlobalPooling):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.pooling_op = tf.segment_sum
+        self.batch_pooling_op = tf.reduce_sum
 
 
 class GlobalAvgPool(GlobalPooling):
@@ -830,6 +836,7 @@ class GlobalAvgPool(GlobalPooling):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.pooling_op = tf.segment_mean
+        self.batch_pooling_op = tf.reduce_mean
 
 
 class GlobalMaxPool(GlobalPooling):
@@ -857,6 +864,7 @@ class GlobalMaxPool(GlobalPooling):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.pooling_op = tf.segment_max
+        self.batch_pooling_op = tf.reduce_max
 
 
 class GlobalAttentionPool(GlobalPooling):
