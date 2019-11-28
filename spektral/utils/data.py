@@ -5,7 +5,7 @@ import scipy.sparse as sp
 class Batch:
     """
     Converts a batch of graphs stored in lists to the
-    [graph batch format](https://danielegrattarola.github.io/spektral/data/).
+    [disjoint format](https://danielegrattarola.github.io/spektral/data/).
 
     **Input**
 

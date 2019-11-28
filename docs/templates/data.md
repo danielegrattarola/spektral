@@ -39,7 +39,7 @@ In practice, we actually distinguish between three main **modes** of operation:
 - **batch**, where we have a set of different graphs, each with its own topology and attributes;
 - **mixed**, where we have a graph with fixed topology, but a set of different attributes (usually called _graph signals_); this can be seen as a particular case of the batch mode, but it is handled separately in Spektral to improve memory efficiency.
 
-We also have the **graph batch** mode, which is a simple trick to represent a batch of graphs in single mode. This requires an additional data structure to keep track of the graphs, and is explained in detail at the end of this section.
+We also have the **disjoint** mode, which is a simple trick to represent a batch of graphs in single mode. This requires an additional data structure to keep track of the graphs, and is explained in detail at the end of this section.
 
 The difference between the three main modes can be easily seen in how `A`, `X`, and `E` have different shapes in each case:
 
@@ -93,7 +93,7 @@ Out[5]: (133885, 9, 9, 1)
 ```
 
 Note that the graphs in QM9 have variable order (i.e., different `N` for each graph), and that by default `load_data()` pads them with zeros in order to store the data in Numpy arrays.  
-See the [graph batch mode](https://danielegrattarola.github.io/spektral/data/#graph-batch-mode) section for an alternative to zero-padding. 
+See the [disjoint mode](https://danielegrattarola.github.io/spektral/data/#disjoint-mode) section for an alternative to zero-padding. 
 
 ### Mixed mode
 In **mixed mode** we consider a single adjacency matrix, and different node and edge attributes matrices. An example of a mixed mode dataset is the MNIST random grid proposed by [Defferrard et al.](https://arxiv.org/abs/1606.09375):
@@ -111,9 +111,9 @@ In [4]: X.shape
 Out[4]: (50000, 784, 1)
 ```
 
-### Graph batch mode
+### Disjoint mode
 
-![](https://danielegrattarola.github.io/spektral/img/graph_batch.svg)
+![](https://danielegrattarola.github.io/spektral/img/disjoint.svg)
 
 When dealing with graphs with a variable number of nodes, representing a group of graphs in batch mode requires padding `A`, `X`, and `E` to a fixed dimension.    
 In order to avoid this issue, a common approach is to represent a batch of graphs as a single disjoint union, and then using this "supergraph" in single mode.

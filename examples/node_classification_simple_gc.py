@@ -5,7 +5,7 @@ Simplifying Graph Convolutional Networks (https://arxiv.org/abs/1902.07153)
 Felix Wu, Tianyi Zhang, Amauri Holanda de Souza Jr., Christopher Fifty, Tao Yu, Kilian Q. Weinberger
 """
 
-from keras.callbacks import EarlyStopping, ModelCheckpoint
+from keras.callbacks import EarlyStopping
 from keras.layers import Input
 from keras.models import Model
 from keras.optimizers import Adam
@@ -52,13 +52,6 @@ model.compile(optimizer=optimizer,
               weighted_metrics=['acc'])
 model.summary()
 
-# Callbacks
-callbacks = [
-    EarlyStopping(monitor='val_weighted_acc', patience=es_patience),
-    ModelCheckpoint('best_model.h5', monitor='val_weighted_acc',
-                    save_best_only=True, save_weights_only=True)
-]
-
 # Train model
 validation_data = ([X, fltr], y, val_mask)
 model.fit([X, fltr],
@@ -68,10 +61,9 @@ model.fit([X, fltr],
           batch_size=N,
           validation_data=validation_data,
           shuffle=False,  # Shuffling data means shuffling the whole graph
-          callbacks=callbacks)
-
-# Load best model
-model.load_weights('best_model.h5')
+          callbacks=[
+              EarlyStopping(patience=es_patience,  restore_best_weights=True)
+          ])
 
 # Evaluate model
 print('Evaluating model.')

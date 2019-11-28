@@ -1,11 +1,11 @@
 """
 This example shows how to perform regression of molecular properties with the
-QM9 database, using a simple GNN in graph batch mode (note that in this example
+QM9 database, using a simple GNN in disjoint mode (note that in this example
 we ignore edge attributes).
 Note that the main training loop is written in TensorFlow, because we need to
 avoid the restriction imposed by Keras that the input and the output have the
 same first dimension. This is the most efficient way of training a GNN in
-graph batch mode.
+disjoint mode.
 """
 
 import keras.backend as K
@@ -24,7 +24,7 @@ from spektral.utils import Batch, batch_iterator
 from spektral.utils import label_to_one_hot
 
 np.random.seed(0)
-SW_KEY = 'dense_2_sample_weights:0'  # Keras automatically creates a placeholder for sample weights, which must be fed
+SW_KEY = 'dense_1_sample_weights:0'  # Keras automatically creates a placeholder for sample weights, which must be fed
 
 # Load data
 A, X, _, y = qm9.load_data(return_type='numpy',
@@ -61,8 +61,7 @@ target = Input(tensor=tf.placeholder(tf.float32, shape=(None, n_out), name='targ
 gc1 = GraphConv(64, activation='relu')([X_in, A_in])
 gc2 = GraphConv(64, activation='relu')([gc1, A_in])
 pool = GlobalAvgPool()([gc2, I_in])
-dense1 = Dense(64, activation='relu')(pool)
-output = Dense(n_out)(dense1)
+output = Dense(n_out)(pool)
 
 # Build model
 model = Model(inputs=[X_in, A_in, I_in], outputs=output)
@@ -75,8 +74,6 @@ sess = K.get_session()
 loss = model.total_loss
 opt = tf.train.AdamOptimizer(learning_rate=learning_rate)
 train_step = opt.minimize(loss)
-
-# Initialize all variables
 init_op = tf.global_variables_initializer()
 sess.run(init_op)
 
@@ -87,8 +84,7 @@ batches_in_epoch = np.ceil(len(A_train) / batch_size)
 
 # Training loop
 for b in batches_train:
-    batch = Batch(b[0], b[1])
-    X_, A_, I_ = batch.get('XAI')
+    X_, A_, I_ = Batch(b[0], b[1]).get('XAI')
     y_ = b[2]
     tr_feed_dict = {X_in: X_,
                     A_in: sp_matrix_to_sp_tensor_value(A_),
@@ -111,8 +107,7 @@ batches_in_epoch = np.ceil(len(A_test) / batch_size)
 
 # Test loop
 for b in batches_test:
-    batch = Batch(b[0], b[1])
-    X_, A_, I_ = batch.get('XAI')
+    X_, A_, I_ = Batch(b[0], b[1]).get('XAI')
     y_ = b[2]
     tr_feed_dict = {X_in: X_,
                     A_in: sp_matrix_to_sp_tensor_value(A_),
@@ -120,5 +115,5 @@ for b in batches_test:
                     target: y_,
                     SW_KEY: np.ones((1,))}
     model_loss += sess.run([loss], feed_dict=tr_feed_dict)[0]
-print('---------------------------------------------')
+
 print('Test loss: {}'.format(model_loss / batches_in_epoch))

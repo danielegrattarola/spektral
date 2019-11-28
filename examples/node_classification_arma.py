@@ -5,7 +5,7 @@ Graph Neural Networks with convolutional ARMA filters (https://arxiv.org/abs/190
 Filippo Maria Bianchi, Daniele Grattarola, Cesare Alippi, Lorenzo Livi
 """
 
-from keras.callbacks import EarlyStopping, ModelCheckpoint
+from keras.callbacks import EarlyStopping
 from keras.layers import Input, Dropout
 from keras.models import Model
 from keras.optimizers import Adam
@@ -20,13 +20,15 @@ dataset = 'cora'
 A, X, y, train_mask, val_mask, test_mask = citation.load_data(dataset)
 
 # Parameters
-ARMA_T = 1              # Depth of each ARMA_1 filter
-ARMA_K = 2              # Number of parallel ARMA_1 filters
-recurrent = True        # Share weights like a recurrent net in each head
+channels = 16           # Number of channels in the first layer
+iterations = 1          # Number of iterations to approximate each ARMA(1)
+order = 2               # Order of the ARMA filter (number of parallel stacks)
+share_weights = True    # Share weights in each ARMA stack
 N = X.shape[0]          # Number of nodes in the graph
 F = X.shape[1]          # Original feature dimensionality
 n_classes = y.shape[1]  # Number of classes
-dropout_rate = 0.75     # Dropout rate applied to the input of GCN layers
+dropout = 0.5           # Dropout rate applied between layers
+dropout_skip = 0.75     # Dropout rate for the internal skip connection of ARMA
 l2_reg = 5e-4           # Regularization rate for l2
 learning_rate = 1e-2    # Learning rate for SGD
 epochs = 20000          # Number of training epochs
@@ -40,23 +42,23 @@ fltr = rescale_laplacian(fltr, lmax=2)
 X_in = Input(shape=(F, ))
 fltr_in = Input((N, ), sparse=True)
 
-dropout_1 = Dropout(dropout_rate)(X_in)
-graph_conv_1 = ARMAConv(16,
-                        T=ARMA_T,
-                        K=ARMA_K,
-                        recurrent=recurrent,
-                        dropout_rate=dropout_rate,
-                        activation='elu',
+dropout_1 = Dropout(dropout)(X_in)
+graph_conv_1 = ARMAConv(channels,
+                        order=order,
+                        iterations=iterations,
+                        share_weights=share_weights,
                         gcn_activation='elu',
+                        dropout_rate=dropout_skip,
+                        activation='elu',
                         kernel_regularizer=l2(l2_reg))([dropout_1, fltr_in])
-dropout_2 = Dropout(dropout_rate)(graph_conv_1)
+dropout_2 = Dropout(dropout_skip)(graph_conv_1)
 graph_conv_2 = ARMAConv(n_classes,
-                        T=1,
-                        K=1,
-                        recurrent=recurrent,
-                        dropout_rate=dropout_rate,
-                        activation='softmax',
+                        order=1,
+                        iterations=1,
+                        share_weights=share_weights,
                         gcn_activation=None,
+                        dropout_rate=dropout_skip,
+                        activation='softmax',
                         kernel_regularizer=l2(l2_reg))([dropout_2, fltr_in])
 
 # Build model
@@ -67,13 +69,6 @@ model.compile(optimizer=optimizer,
               weighted_metrics=['acc'])
 model.summary()
 
-# Callbacks
-callbacks = [
-    EarlyStopping(monitor='val_weighted_acc', patience=es_patience),
-    ModelCheckpoint('best_model.h5', monitor='val_weighted_acc',
-                    save_best_only=True, save_weights_only=True)
-]
-
 # Train model
 validation_data = ([X, fltr], y, val_mask)
 model.fit([X, fltr],
@@ -83,10 +78,9 @@ model.fit([X, fltr],
           batch_size=N,
           validation_data=validation_data,
           shuffle=False,  # Shuffling data means shuffling the whole graph
-          callbacks=callbacks)
-
-# Load best model
-model.load_weights('best_model.h5')
+          callbacks=[
+              EarlyStopping(patience=es_patience,  restore_best_weights=True)
+          ])
 
 # Evaluate model
 print('Evaluating model.')

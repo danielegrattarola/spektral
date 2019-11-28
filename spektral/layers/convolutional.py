@@ -1,7 +1,7 @@
 import tensorflow as tf
 from keras import activations, initializers, regularizers, constraints
 from keras import backend as K
-from keras.layers import Layer, LeakyReLU, Dropout, AveragePooling2D, AveragePooling1D
+from keras.layers import Layer, LeakyReLU, Dropout
 
 from spektral.layers.ops import filter_dot
 
@@ -590,14 +590,19 @@ class GraphAttention(GraphConv):
 
     - node features with the same shape of the input, but the last dimension
     changed to `channels`.
+    - if `return_attn_coef=True`, a list with the attention coefficients for each
+    attention head is returned as well. Each attention coefficient matrix has
+    shape `(n_nodes, n_nodes)` (with optional `batch` dimension);
     
     **Arguments**
     
     - `channels`: integer, number of output channels;
     - `attn_heads`: number of attention heads to use;
-    - `attn_heads_reduction`: how to reduce the outputs of the attention heads 
-    (can be either 'concat' or 'average');
-    - `dropout_rate`: internal dropout rate;
+    - `concat_heads`: bool, whether to concatenate the output of the attention
+     heads instead of averaging;
+    - `dropout_rate`: internal dropout rate for attention coefficients;
+    - `return_attn_coef`: bool, if True, return the attention coefficients for
+    the given input (one N x N matrix for each head).
     - `activation`: activation function to use;
     - `use_bias`: boolean, whether to add a bias to the linear transformation;
     - `kernel_initializer`: initializer for the kernel matrix;
@@ -626,13 +631,16 @@ class GraphAttention(GraphConv):
     X_in = Input(shape=(F, ))
     A_in = Input((N, ))
     output = GraphAttention(channels)([X_in, A_in])
+    # Alternative
+    # output, attn_coef = GraphAttention(channels, return_attn_coef=True)([X_in, A_in])
     ```
     """
     def __init__(self,
                  channels,
                  attn_heads=1,
-                 attn_heads_reduction='concat',  # {'concat', 'average'}
+                 concat_heads=True,
                  dropout_rate=0.5,
+                 return_attn_coef=False,
                  activation='relu',
                  use_bias=True,
                  kernel_initializer='glorot_uniform',
@@ -647,13 +655,12 @@ class GraphAttention(GraphConv):
                  attn_kernel_constraint=None,
                  **kwargs):
         super().__init__(channels, **kwargs)
-        if attn_heads_reduction not in {'concat', 'average'}:
-            raise ValueError('Possbile reduction methods: concat, average')
 
         self.channels = channels
         self.attn_heads = attn_heads
-        self.attn_heads_reduction = attn_heads_reduction
+        self.concat_heads = concat_heads
         self.dropout_rate = dropout_rate
+        self.return_attn_coef = return_attn_coef
         self.activation = activations.get(activation)
         self.use_bias = use_bias
         self.kernel_initializer = initializers.get(kernel_initializer)
@@ -673,7 +680,7 @@ class GraphAttention(GraphConv):
         self.biases = []        # Layer biases for attention heads
         self.attn_kernels = []  # Attention kernels for attention heads
 
-        if attn_heads_reduction == 'concat':
+        if concat_heads:
             # Output will have shape (..., attention_heads * channels)
             self.output_dim = self.channels * self.attn_heads
         else:
@@ -718,60 +725,62 @@ class GraphAttention(GraphConv):
         self.built = True
 
     def call(self, inputs):
-        X = inputs[0]  # Node features (N x F)
-        A = inputs[1]  # Adjacency matrix (N x N)
+        X = inputs[0]
+        A = inputs[1]
 
         outputs = []
+        output_attn = []
         for head in range(self.attn_heads):
-            kernel = self.kernels[head]  # W in the paper (F x F')
+            kernel = self.kernels[head]
             attention_kernel = self.attn_kernels[head]  # Attention kernel a in the paper (2F' x 1)
 
             # Compute inputs to attention network
-            features = K.dot(X, kernel)  # (N x F')
+            features = K.dot(X, kernel)
 
-            # Compute feature combinations
-            # Note: [[a_1], [a_2]]^T [[Wh_i], [Wh_2]] = [a_1]^T [Wh_i] + [a_2]^T [Wh_j]
-            attn_for_self = K.dot(features, attention_kernel[0])    # (N x 1), [a_1]^T [Wh_i]
-            attn_for_neighs = K.dot(features, attention_kernel[1])  # (N x 1), [a_2]^T [Wh_j]
-
-            # Attention head a(Wh_i, Wh_j) = a^T [[Wh_i], [Wh_j]]
+            # Compue attention coefficients
+            # [[a_1], [a_2]]^T [[Wh_i], [Wh_2]] = [a_1]^T [Wh_i] + [a_2]^T [Wh_j]
+            attn_for_self = K.dot(features, attention_kernel[0])    # [a_1]^T [Wh_i]
+            attn_for_neighs = K.dot(features, attention_kernel[1])  # [a_2]^T [Wh_j]
             if len(K.int_shape(features)) == 2:
+                # Single / mixed mode
                 attn_for_neighs_T = K.transpose(attn_for_neighs)
             else:
+                # Batch mode
                 attn_for_neighs_T = K.permute_dimensions(attn_for_neighs, (0, 2, 1))
-            dense = attn_for_self + attn_for_neighs_T
-
-            # Add nonlinearity
-            dense = LeakyReLU(alpha=0.2)(dense)
+            attn_coef = attn_for_self + attn_for_neighs_T
+            attn_coef = LeakyReLU(alpha=0.2)(attn_coef)
 
             # Mask values before activation (Vaswani et al., 2017)
             mask = -10e9 * (1.0 - A)
-            dense += mask
+            attn_coef += mask
 
             # Apply softmax to get attention coefficients
-            dense = K.softmax(dense)  # (N x N)
+            attn_coef = K.softmax(attn_coef)
+            output_attn.append(attn_coef)
 
-            # Apply dropout to features and attention coefficients
-            dropout_attn = Dropout(self.dropout_rate)(dense)  # (N x N)
-            dropout_feat = Dropout(self.dropout_rate)(features)  # (N x F')
+            # Apply dropout to attention coefficients
+            attn_coef_drop = Dropout(self.dropout_rate)(attn_coef)
 
             # Convolution
-            node_features = filter_dot(dropout_attn, dropout_feat)
-
+            features = filter_dot(attn_coef_drop, features)
             if self.use_bias:
-                node_features = K.bias_add(node_features, self.biases[head])
+                features = K.bias_add(features, self.biases[head])
 
             # Add output of attention head to final output
-            outputs.append(node_features)
+            outputs.append(features)
 
         # Aggregate the heads' output according to the reduction method
-        if self.attn_heads_reduction == 'concat':
-            output = K.concatenate(outputs)  # (N x KF')
+        if self.concat_heads:
+            output = K.concatenate(outputs)
         else:
-            output = K.mean(K.stack(outputs), axis=0)  # N x F')
+            output = K.mean(K.stack(outputs), axis=0)
 
         output = self.activation(output)
-        return output
+
+        if self.return_attn_coef:
+            return output, output_attn
+        else:
+            return output
 
     def compute_output_shape(self, input_shape):
         output_shape = input_shape[0][:-1] + (self.output_dim,)
@@ -781,7 +790,7 @@ class GraphAttention(GraphConv):
         config = {
             'channels': self.channels,
             'attn_heads': self.attn_heads,
-            'attn_heads_reduction': self.attn_heads_reduction,
+            'concat_heads': self.concat_heads,
             'dropout_rate': self.dropout_rate,
             'activation': activations.serialize(self.activation),
             'use_bias': self.use_bias,
@@ -926,7 +935,7 @@ class GraphConvSkip(GraphConv):
 
 class ARMAConv(GraphConv):
     """
-    A graph convolutional layer with ARMA(K, K-1) filters, as presented by
+    A graph convolutional layer with ARMA(K) filters, as presented by
     [Bianchi et al. (2019)](https://arxiv.org/abs/1901.01343).
 
     **Mode**: single, mixed, batch.
@@ -935,12 +944,12 @@ class ARMAConv(GraphConv):
     $$
         Z = \\frac{1}{K}\\sum \\limits_{k=1}^K \\bar{X}_k^{(T)},
     $$
-    where \(K\) is the order of the ARMA(K, K-1) filter, and where:
+    where \(K\) is the order of the ARMA(K) filter, and where:
     $$
         \\bar{X}_k^{(t + 1)} =  \\sigma\\left(\\tilde{L}\\bar{X}^{(t)}W^{(t)} + XV^{(t)}\\right)
     $$
     is a graph convolutional skip layer implementing a recursive approximation
-    of an ARMA(1, 0) filter, \(\\tilde{L}\) is  normalized graph Laplacian with
+    of an ARMA(1) filter, \(\\tilde{L}\) is  normalized graph Laplacian with
     a rescaled spectrum, \(\\bar{X}^{(0)} = X\), and \(W, V\) are trainable
     kernels.
 
@@ -959,12 +968,12 @@ class ARMAConv(GraphConv):
     **Arguments**
 
     - `channels`: integer, number of output channels;
-    - `T`: depth of each ARMA(1, 0) approximation (number of recursive updates);
-    - `K`: order of the full ARMA(K, K-1) filter (combination of K ARMA(1, 0)
-    filters);
-    - `recurrent`: whether to share each head's weights like a recurrent net;
-    - `gcn_activation`: activation function to use to compute the ARMA filter;
-    - `dropout_rate`: dropout rate for Laplacian and output layer;
+    - `order`: order of the full ARMA(K) filter, i.e., the number of parallel
+    stacks in the layer;
+    - `iterations`: number of iterations to compute each ARMA(1) approximation;
+    - `share_weights`: share the weights in each ARMA(1) stack.
+    - `gcn_activation`: activation function to use to compute each ARMA(1) stack;
+    - `dropout_rate`: dropout rate for skip connection;
     - `activation`: activation function to use;
     - `use_bias`: whether to add a bias to the linear transformation;
     - `kernel_initializer`: initializer for the kernel matrix;
@@ -992,9 +1001,9 @@ class ARMAConv(GraphConv):
 
     def __init__(self,
                  channels,
-                 T=1,
-                 K=1,
-                 recurrent=False,
+                 order=1,
+                 iterations=1,
+                 share_weights=False,
                  gcn_activation='relu',
                  dropout_rate=0.0,
                  activation=None,
@@ -1009,9 +1018,9 @@ class ARMAConv(GraphConv):
                  **kwargs):
         super().__init__(channels, **kwargs)
         self.channels = channels
-        self.T = T
-        self.K = K
-        self.recurrent = recurrent
+        self.iterations = iterations
+        self.order = order
+        self.share_weights = share_weights
         self.activation = activations.get(activation)
         self.gcn_activation = activations.get(gcn_activation)
         self.dropout_rate = dropout_rate
@@ -1028,10 +1037,10 @@ class ARMAConv(GraphConv):
     def build(self, input_shape):
         assert len(input_shape) >= 2
         # When using shared weights, pre-compute them here
-        if self.recurrent:
+        if self.share_weights:
             self.kernels_in = []  # Weights from input space to output space
             self.kernels_hid = []  # Weights from output space to output space
-            for k in range(self.K):
+            for k in range(self.order):
                 self.kernels_in.append(self.get_gcn_weights(input_shape[0][-1],
                                                             input_shape[0][-1],
                                                             self.channels,
@@ -1043,7 +1052,7 @@ class ARMAConv(GraphConv):
                                                             bias_regularizer=self.bias_regularizer,
                                                             kernel_constraint=self.kernel_constraint,
                                                             bias_constraint=self.bias_constraint))
-                if self.T > 1:
+                if self.iterations > 1:
                     self.kernels_hid.append(self.get_gcn_weights(self.channels,
                                                                  input_shape[0][-1],
                                                                  self.channels,
@@ -1063,15 +1072,14 @@ class ARMAConv(GraphConv):
 
         # Convolution
         output = []  # Stores the parallel filters
-        for k in range(self.K):
+        for k in range(self.order):
             output_k = features
-            for d in range(self.T):
-                features_drop = Dropout(self.dropout_rate)(features)
-                output_k = self.graph_conv_skip([output_k, features_drop, fltr],
+            for t in range(self.iterations):
+                output_k = self.graph_conv_skip([output_k, features, fltr],
                                                 self.channels,
-                                                'ARMA_skip_{}{}'.format(k, d),
-                                                recurrent_k=k if self.recurrent else None,
-                                                recurrent_d=d if self.recurrent else None,
+                                                'ARMA_skip_{}{}'.format(k, t),
+                                                recurrent_k=k if self.share_weights else None,
+                                                recurrent_t=t if self.share_weights else None,
                                                 activation=self.gcn_activation,
                                                 use_bias=self.use_bias,
                                                 kernel_initializer=self.kernel_initializer,
@@ -1082,20 +1090,9 @@ class ARMAConv(GraphConv):
                                                 bias_constraint=self.bias_constraint)
             output.append(output_k)
 
-        # Aggregate parallel filters
-        output = K.concatenate(output, axis=-1)
-                
         # Average pooling
-        output = K.expand_dims(output, axis=-1)
-        output_dim = K.int_shape(output)
-        if len(output_dim) == 3:  # [nodes, feat, 1] -> [nodes, feat_red, 1]
-            output = AveragePooling1D(pool_size=self.K, padding='same')(output)
-        elif len(output_dim) == 4:  # [batch, nodes, feat, 1] -> [batch, nodes, feat_red, 1]
-            output = AveragePooling2D(pool_size=(1, self.K), padding='same')(output)
-        else:
-            raise RuntimeError('GCN_ARMA layer: wrong output dim')
-        output = K.squeeze(output, axis=-1)
-        
+        output = K.stack(output, axis=-1)
+        output = K.mean(output, axis=-1)
         output = self.activation(output)
         
         return output
@@ -1103,9 +1100,9 @@ class ARMAConv(GraphConv):
     def get_config(self):
         config = {
             'channels': self.channels,
-            'T': self.T,
-            'K': self.K,
-            'recurrent': self.recurrent,
+            'iterations': self.iterations,
+            'order': self.order,
+            'share_weights': self.share_weights,
             'activation': activations.serialize(self.activation),
             'gcn_activation': activations.serialize(self.gcn_activation),
             'dropout_rate': self.dropout_rate,
@@ -1175,7 +1172,7 @@ class ARMAConv(GraphConv):
 
     def graph_conv_skip(self, x, channels, name,
                         recurrent_k=None,
-                        recurrent_d=None,
+                        recurrent_t=None,
                         activation=None,
                         use_bias=True,
                         kernel_initializer='glorot_uniform',
@@ -1194,9 +1191,9 @@ class ARMAConv(GraphConv):
         :param name: name of the layer
         :param recurrent_k: if the recurrent flag was set, then use the shared
         weights of the k-th filter when creating the layer
-        :param recurrent_d: if the recurrent flag was set, then use the shared
-        weights when computing the i-th recursive step of the k-th filter.
-        Note that this parameter cannot be None if reccurent_k is not None.
+        :param recurrent_t: if the recurrent flag was set, then use the shared
+        weights when computing the t-th recursive step of the k-th filter.
+        Note that this parameter cannot be None if recurent_k is not None.
         :param activation: activation function for the layer
         :param use_bias: whether to add a bias vector
         :param kernel_initializer: initializer for the kernels
@@ -1223,9 +1220,9 @@ class ARMAConv(GraphConv):
                                                             bias_constraint=bias_constraint)
         else:
             # When using shared weights, use the pre-computed ones.
-            if recurrent_d is None:
-                raise ValueError('recurrent_k and recurrent_d must be set together.')
-            if recurrent_d == 0:
+            if recurrent_t is None:
+                raise ValueError('recurrent_k and recurrent_t must be set together.')
+            if recurrent_t == 0:
                 kernel_1, kernel_2, bias = self.kernels_in[recurrent_k]
             else:
                 kernel_1, kernel_2, bias = self.kernels_hid[recurrent_k]
@@ -1239,6 +1236,7 @@ class ARMAConv(GraphConv):
 
         # Skip connection
         skip = K.dot(features_skip, kernel_2)
+        skip = Dropout(self.dropout_rate)(skip)
         output += skip
 
         if use_bias:
@@ -1259,8 +1257,8 @@ class APPNP(GraphConv):
 
     - node features of shape `(n_nodes, n_features)` (with optional `batch`
     dimension);
-    - Normalized adjacency matrix of shape `(n_nodes, n_nodes)` (with optional
-    `batch` dimension); see `spektral.utils.convolution.normalized_adjacency`.
+    - Normalized Laplacian of shape `(n_nodes, n_nodes)` (with optional
+    `batch` dimension); see `spektral.utils.convolution.localpooling_filter`.
 
     **Output**
 
@@ -1270,10 +1268,10 @@ class APPNP(GraphConv):
     **Arguments**
 
     - `channels`: integer, number of output channels;
-    - `mlp_channels`: integer, number of hidden units for the MLP layers;
-    - `alpha`: teleport probability;
-    - `H`: number of MLP layers;
-    - `K`: number of power iterations;
+    - `alpha`: teleport probability during propagation;
+    - `propagations`: number of propagation steps;
+    - `mlp_hidden`: list of integers, number of hidden units for each hidden
+    layer in the MLP (if None, the MLP has only one layer);
     - `mlp_activation`: activation for the MLP layers;
     - `dropout_rate`: dropout rate for Laplacian and MLP layers;
     - `activation`: activation function to use;
@@ -1289,28 +1287,26 @@ class APPNP(GraphConv):
     **Usage**
     ```py
     # Load data
-    A, X, _, _, _, _, _, _ = citation.load_data('cora')
+    A, X, _, _, _, _, _ = citation.load_data('cora')
 
     # Preprocessing operations
-    I = sp.identity(A.shape[0], dtype=A.dtype)
-    fltr = utils.normalize_adjacency(A + I)
+    fltr = utils.localpooling_filter(A)
 
     # Model definition
     X_in = Input(shape=(F, ))
     fltr_in = Input((N, ))
-    output = APPNP(channels, mlp_channels)([X_in, fltr_in])
+    output = APPNP(channels)([X_in, fltr_in])
     ```
     """
 
     def __init__(self,
                  channels,
-                 mlp_channels,
                  alpha=0.2,
-                 H=1,
-                 K=1,
+                 propagations=1,
+                 mlp_hidden=None,
                  mlp_activation='relu',
                  dropout_rate=0.0,
-                 activation='softmax',
+                 activation=None,
                  use_bias=True,
                  kernel_initializer='glorot_uniform',
                  bias_initializer='zeros',
@@ -1322,10 +1318,9 @@ class APPNP(GraphConv):
                  **kwargs):
         super().__init__(channels, **kwargs)
         self.channels = channels
-        self.mlp_channels = mlp_channels
+        self.mlp_hidden = mlp_hidden if mlp_hidden else []
         self.alpha = alpha
-        self.H = H
-        self.K = K
+        self.propagations = propagations
         self.mlp_activation = activations.get(mlp_activation)
         self.activation = activations.get(activation)
         self.dropout_rate = dropout_rate
@@ -1340,39 +1335,31 @@ class APPNP(GraphConv):
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
-        input_dim = input_shape[0][-1]
         self.kernels_mlp = []
         self.biases_mlp = []
 
         # Hidden layers
-        for h in range(self.H):
-            if h == 0:
-                self.kernels_mlp.append(
-                    self.add_weight(shape=(input_dim, self.mlp_channels),
-                                    initializer=self.kernel_initializer,
-                                    name='kernel_mlp_{}'.format(h),
-                                    regularizer=self.kernel_regularizer,
-                                    constraint=self.kernel_constraint)
-                )
-            else:
-                self.kernels_mlp.append(
-                    self.add_weight(shape=(self.mlp_channels, self.mlp_channels),
-                                    initializer=self.kernel_initializer,
-                                    name='kernel_mlp_{}'.format(h),
-                                    regularizer=self.kernel_regularizer,
-                                    constraint=self.kernel_constraint)
-                )
+        input_dim = input_shape[0][-1]
+        for i, channels in enumerate(self.mlp_hidden):
+            self.kernels_mlp.append(
+                self.add_weight(shape=(input_dim, channels),
+                                initializer=self.kernel_initializer,
+                                name='kernel_mlp_{}'.format(i),
+                                regularizer=self.kernel_regularizer,
+                                constraint=self.kernel_constraint)
+            )
             if self.use_bias:
                 self.biases_mlp.append(
-                    self.add_weight(shape=(self.mlp_channels,),
+                    self.add_weight(shape=(channels,),
                                     initializer=self.bias_initializer,
-                                    name='bias_mlp_{}'.format(h),
+                                    name='bias_mlp_{}'.format(i),
                                     regularizer=self.bias_regularizer,
                                     constraint=self.bias_constraint)
                 )
+            input_dim = channels
 
         # Output layer
-        self.kernel_out = self.add_weight(shape=(self.mlp_channels, self.channels),
+        self.kernel_out = self.add_weight(shape=(input_dim, self.channels),
                                           initializer=self.kernel_initializer,
                                           name='kernel_mlp_out',
                                           regularizer=self.kernel_regularizer,
@@ -1392,11 +1379,10 @@ class APPNP(GraphConv):
 
         # Compute MLP hidden features
         for i in range(len(self.kernels_mlp)):
+            features = Dropout(self.dropout_rate)(features)
             features = K.dot(features, self.kernels_mlp[i])
             if self.use_bias:
                 features += self.biases_mlp[i]
-            features = filter_dot(fltr, features)
-            features = Dropout(self.dropout_rate)(features)
             if self.mlp_activation is not None:
                 features = self.mlp_activation(features)
 
@@ -1407,10 +1393,9 @@ class APPNP(GraphConv):
 
         # Propagation
         Z = mlp_out
-        for k in range(self.K):
+        for k in range(self.propagations):
             Z = (1 - self.alpha) * filter_dot(fltr, Z) + self.alpha * mlp_out
 
-        # TODO Softmax?
         if self.activation is not None:
             output = self.activation(Z)
         else:
@@ -1420,10 +1405,9 @@ class APPNP(GraphConv):
     def get_config(self):
         config = {
             'channels': self.channels,
-            'mlp_channels': self.mlp_channels,
             'alpha': self.alpha,
-            'H': self.H,
-            'K': self.K,
+            'propagations': self.propagations,
+            'mlp_hidden': self.mlp_hidden,
             'mlp_activation': activations.serialize(self.mlp_activation),
             'activation': activations.serialize(self.activation),
             'dropout_rate': self.dropout_rate,
