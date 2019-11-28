@@ -4,6 +4,7 @@ from keras import backend as K
 from keras.layers import Layer, LeakyReLU, Dropout
 
 from spektral.layers.ops import filter_dot
+from spektral.layers import ops
 
 
 class GraphConv(Layer):
@@ -393,7 +394,9 @@ class EdgeConditionedConv(GraphConv):
     An edge-conditioned convolutional layer as presented by [Simonovsky and
     Komodakis (2017)](https://arxiv.org/abs/1704.02901).
 
-    **Mode**: batch.
+    **Mode**: single, batch.
+
+    **This layer expects dense inputs.**
     
     For each node \(i\), this layer computes:
     $$
@@ -406,9 +409,12 @@ class EdgeConditionedConv(GraphConv):
 
     **Input**
 
-    - node features of shape `(batch, n_nodes, n_node_features)`;
-    - adjacency matrices of shape `(batch, n_nodes, num_nodes)`;
-    - edge features of shape `(batch, n_nodes, n_nodes, n_edge_features)`;
+    - node features of shape `(n_nodes, n_node_features)` (with optional `batch`
+    dimension);
+    - binary adjacency matrices with self-loops, of shape `(n_nodes, num_nodes)`
+    (with optional `batch` dimension);
+    - edge features of shape `(n_nodes, n_nodes, n_edge_features)` (with
+    optional `batch` dimension);
 
     **Output**
 
@@ -480,19 +486,22 @@ class EdgeConditionedConv(GraphConv):
         self.built = True
 
     def call(self, inputs):
-        node_features = inputs[0]  # (batch_size, N, F)
-        fltr = inputs[1]           # (batch_size, N, N)
-        edge_features = inputs[2]  # (batch_size, N, N, S)
+        X = inputs[0]  # (batch_size, N, F)
+        A = inputs[1]  # (batch_size, N, N)
+        E = inputs[2]  # (batch_size, N, N, S)
+
+        mode = ops.autodetect_mode(A, X)
 
         # Parameters
-        F = K.int_shape(node_features)[-1]
+        N = K.shape(X)[-2]
+        F = K.int_shape(X)[-1]
         F_ = self.channels
 
         # Normalize adjacency matrix
-        fltr = fltr / K.maximum(K.sum(fltr, axis=-1, keepdims=True), 10e-12)
+        A = ops.normalize_A(A)
 
         # Filter network
-        kernel_network = edge_features
+        kernel_network = E
         if self.kernel_network is not None:
             for i, l in enumerate(self.kernel_network):
                 kernel_network = self.dense_layer(kernel_network, l,
@@ -508,10 +517,14 @@ class EdgeConditionedConv(GraphConv):
         kernel_network = self.dense_layer(kernel_network, F_ * F, 'FGN_out')
 
         # Convolution
-        target_shape = (-1,) + K.int_shape(kernel_network)[1:-1] + (F_, F)
+        target_shape = (-1, N, N, F_, F) if mode == ops.modes['B'] else (N, N, F_, F)
         kernel = K.reshape(kernel_network, target_shape)
-        output = kernel * fltr[..., None, None]
-        output = tf.einsum('abicf,aif->abc', output, node_features)
+        output = kernel * A[..., None, None]
+
+        if mode == ops.modes['B']:
+            output = tf.einsum('abicf,aif->abc', output, X)
+        else:
+            output = tf.einsum('bicf,if->bc', output, X)
 
         if self.use_bias:
             output = K.bias_add(output, self.bias)
@@ -574,6 +587,8 @@ class GraphAttention(GraphConv):
     [Velickovic et al. (2017)](https://arxiv.org/abs/1710.10903).
 
     **Mode**: single, mixed, batch.
+
+    **This layer expects dense inputs.**
     
     This layer computes a convolution similar to `layers.GraphConv`, but
     uses the attention mechanism to weight the adjacency matrix instead of
