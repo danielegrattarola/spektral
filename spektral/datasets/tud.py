@@ -159,7 +159,7 @@ def _read_graphs(dataset_name):
 
     # Classes
     with open(file_prefix + "_graph_labels.txt", "r") as f:
-        classes = [int(i.strip()) for i in list(f)]
+        classes = [int(float(i.strip())) for i in list(f)]
 
     return graph_list, classes
 
