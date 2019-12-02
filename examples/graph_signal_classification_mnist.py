@@ -13,7 +13,7 @@ from spektral.utils import normalized_laplacian
 l2_reg = 5e-4         # Regularization rate for l2
 learning_rate = 1e-3  # Learning rate for SGD
 batch_size = 32       # Batch size
-epochs = 20000        # Number of training epochs
+epochs = 20           # Number of training epochs
 es_patience = 200     # Patience fot early stopping
 
 # Load data
