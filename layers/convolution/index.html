@@ -244,7 +244,7 @@
           <div role="main">
             <div class="section">
               
-                <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L9">[source]</a></span></p>
+                <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L10">[source]</a></span></p>
 <h3 id="graphconv">GraphConv</h3>
 <pre><code class="python">spektral.layers.GraphConv(channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -298,7 +298,7 @@ output = GraphConv(channels)([X_in, fltr_in])
 </code></pre>
 
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L145">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L146">[source]</a></span></p>
 <h3 id="chebconv">ChebConv</h3>
 <pre><code class="python">spektral.layers.ChebConv(channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -352,7 +352,7 @@ output = ChebConv(channels)([X_in] + fltr_in)
 </code></pre>
 
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L262">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L263">[source]</a></span></p>
 <h3 id="graphsageconv">GraphSageConv</h3>
 <pre><code class="python">spektral.layers.GraphSageConv(channels, aggregate_method='mean', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -401,7 +401,7 @@ output = GraphSageConv(channels)([X_in, A_in])
 </code></pre>
 
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L936">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L951">[source]</a></span></p>
 <h3 id="armaconv">ARMAConv</h3>
 <pre><code class="python">spektral.layers.ARMAConv(channels, order=1, iterations=1, share_weights=False, gcn_activation='relu', dropout_rate=0.0, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -466,14 +466,15 @@ output = ARMAConv(channels)([X_in, fltr_in])
 </code></pre>
 
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L391">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L392">[source]</a></span></p>
 <h3 id="edgeconditionedconv">EdgeConditionedConv</h3>
 <pre><code class="python">spektral.layers.EdgeConditionedConv(channels, kernel_network=None, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
 <p>An edge-conditioned convolutional layer as presented by <a href="https://arxiv.org/abs/1704.02901">Simonovsky and
 Komodakis (2017)</a>.</p>
-<p><strong>Mode</strong>: batch.</p>
+<p><strong>Mode</strong>: single, batch.</p>
+<p><strong>This layer expects dense inputs.</strong></p>
 <p>For each node <script type="math/tex">i</script>, this layer computes:
 <script type="math/tex; mode=display">
 Z_i =  \frac{1}{\mathcal{N}(i)} \sum\limits_{j \in \mathcal{N}(i)} F(E_{ji}) X_{j} + b
@@ -484,9 +485,12 @@ function of edge attributes, <script type="math/tex">E</script> is the edge attr
 is a bias vector.</p>
 <p><strong>Input</strong></p>
 <ul>
-<li>node features of shape <code>(batch, n_nodes, n_node_features)</code>;</li>
-<li>adjacency matrices of shape <code>(batch, n_nodes, num_nodes)</code>;</li>
-<li>edge features of shape <code>(batch, n_nodes, n_nodes, n_edge_features)</code>;</li>
+<li>node features of shape <code>(n_nodes, n_node_features)</code> (with optional <code>batch</code>
+dimension);</li>
+<li>binary adjacency matrices with self-loops, of shape <code>(n_nodes, num_nodes)</code>
+(with optional <code>batch</code> dimension);</li>
+<li>edge features of shape <code>(n_nodes, n_nodes, n_edge_features)</code> (with
+optional <code>batch</code> dimension);</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
@@ -517,7 +521,7 @@ output = EdgeConditionedConv(channels)([X_in, A_in, E_in])
 </code></pre>
 
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L571">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L584">[source]</a></span></p>
 <h3 id="graphattention">GraphAttention</h3>
 <pre><code class="python">spektral.layers.GraphAttention(channels, attn_heads=1, concat_heads=True, dropout_rate=0.5, return_attn_coef=False, activation='relu', use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', attn_kernel_initializer='glorot_uniform', kernel_regularizer=None, bias_regularizer=None, attn_kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None, attn_kernel_constraint=None)
 </code></pre>
@@ -525,6 +529,7 @@ output = EdgeConditionedConv(channels)([X_in, A_in, E_in])
 <p>A graph attention layer as presented by
 <a href="https://arxiv.org/abs/1710.10903">Velickovic et al. (2017)</a>.</p>
 <p><strong>Mode</strong>: single, mixed, batch.</p>
+<p><strong>This layer expects dense inputs.</strong></p>
 <p>This layer computes a convolution similar to <code>layers.GraphConv</code>, but
 uses the attention mechanism to weight the adjacency matrix instead of
 using the normalized Laplacian.</p>
@@ -583,7 +588,7 @@ output = GraphAttention(channels)([X_in, A_in])
 </code></pre>
 
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L812">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L827">[source]</a></span></p>
 <h3 id="graphconvskip">GraphConvSkip</h3>
 <pre><code class="python">spektral.layers.GraphConvSkip(channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -638,7 +643,7 @@ output = GraphConvSkip(channels)([X_in, fltr_in])
 </code></pre>
 
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L1249">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L1264">[source]</a></span></p>
 <h3 id="appnp">APPNP</h3>
 <pre><code class="python">spektral.layers.APPNP(channels, alpha=0.2, propagations=1, mlp_hidden=None, mlp_activation='relu', dropout_rate=0.0, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -691,7 +696,7 @@ output = APPNP(channels)([X_in, fltr_in])
 </code></pre>
 
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L1427">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional.py#L1442">[source]</a></span></p>
 <h3 id="ginconv">GINConv</h3>
 <pre><code class="python">spektral.layers.GINConv(channels, mlp_channels=16, n_hidden_layers=0, epsilon=None, mlp_activation='relu', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
