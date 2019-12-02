@@ -21,7 +21,7 @@ X_train, y_train, X_val, y_val, X_test, y_test, adj = mnist.load_data()
 X_train, X_val, X_test = X_train[..., None], X_val[..., None], X_test[..., None]
 N = X_train.shape[-2]      # Number of nodes in the graphs
 F = X_train.shape[-1]      # Node features dimensionality
-n_out = y_train.shape[-1]  # Dimension of the target
+n_out = 10  # Dimension of the target
 
 fltr = normalized_laplacian(adj)
 
