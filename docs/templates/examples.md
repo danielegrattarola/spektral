@@ -13,3 +13,7 @@ This is a collection of example scripts that you can use as template to solve yo
 - [Regression of molecular properties on QM9 (disjoint mode)](https://github.com/danielegrattarola/spektral/blob/master/examples/regression_molecules_disjoint.py);
 - [Graph signal classification on MNIST (mixed mode)](https://github.com/danielegrattarola/spektral/blob/master/examples/graph_signal_classification_mnist.py);
 - [Node clustering on citation networks with minCUT pooling (unsupervised)](https://github.com/danielegrattarola/spektral/blob/master/examples/node_clustering_mincut.py);
+
+Further notebooks are available on Kaggle with more visualizations and exploration
+- [MNIST Graph Deep Learning](https://www.kaggle.com/kmader/mnist-graph-deep-learning)
+- [MNIST Graph Pooling](https://www.kaggle.com/kmader/mnist-graph-nn-with-pooling)
