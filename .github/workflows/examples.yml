@@ -1,0 +1,38 @@
+name: Examples
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: System Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y graphviz libgraphviz-dev libcgraph6
+    - name: Python Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install dyfunconn lxml tqdm
+    - name: Install spektral
+      run: |
+        pip install .
+    - name: Just one epoch
+      run: |
+        sed -i -e 's/epochs = /epochs = 1 #/g' examples/*.py
+    - name: Run all examples
+      run: |
+        cd examples/
+        for c_py in *.py; do
+          echo "##### $c_py #####"
+          python $c_py 
+        done
+        cd ..
+        
