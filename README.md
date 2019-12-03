@@ -9,7 +9,9 @@
 <a href="https://travis-ci.org/danielegrattarola/spektral">
     <img src="https://travis-ci.org/danielegrattarola/spektral.svg?branch=master" style="width: auto !important" />
 </a>
-![Running example scripts](https://github.com/danielegrattarola/spektral/workflows/Examples/badge.svg)
+<a href="https://github.com/danielegrattarola/spektral/actions?query=workflow%3AExamples">
+    <img src="https://github.com/danielegrattarola/spektral/workflows/Examples/badge.svg" style="width: auto !important" />
+</a>                                                                                                                       
 <a href="https://codecov.io/github/danielegrattarola/spektral?branch=develop">
     <img src="https://codecov.io/gh/danielegrattarola/spektral/branch/develop/graph/badge.svg" style="width: auto !important" />
 </a>
