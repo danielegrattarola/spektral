@@ -11,10 +11,9 @@ from keras.layers import Input, Dense
 from keras.models import Model
 from keras.optimizers import Adam
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
 
 from spektral.datasets import qm9
-from spektral.layers import EdgeConditionedConv, GlobalAttentionPool
+from spektral.layers import EdgeConditionedConv, GlobalAvgPool
 from spektral.utils import label_to_one_hot
 
 # Load data
@@ -27,8 +26,10 @@ y = y[['cv']].values  # Heat capacity at 298.15K
 
 # Preprocessing
 uniq_X = np.unique(X)
+uniq_X = uniq_X[uniq_X != 0]
 X = label_to_one_hot(X, uniq_X)
 uniq_E = np.unique(E)
+uniq_E = uniq_E[uniq_E != 0]
 E = label_to_one_hot(E, uniq_E)
 
 # Parameters
@@ -38,7 +39,7 @@ S = E.shape[-1]           # Edge features dimensionality
 n_out = y.shape[-1]       # Dimensionality of the target
 learning_rate = 1e-3      # Learning rate for SGD
 epochs = 25               # Number of training epochs
-batch_size = 64           # Batch size
+batch_size = 32           # Batch size
 es_patience = 5           # Patience fot early stopping
 
 # Train/test split
@@ -53,11 +54,9 @@ A_in = Input(shape=(N, N))
 E_in = Input(shape=(N, N, S))
 
 gc1 = EdgeConditionedConv(32, activation='relu')([X_in, A_in, E_in])
-gc2 = EdgeConditionedConv(64, activation='relu')([gc1, A_in, E_in])
-pool = GlobalAttentionPool(128)(gc2)
-dense1 = Dense(128, activation='relu')(pool)
-
-output = Dense(n_out)(dense1)
+gc2 = EdgeConditionedConv(32, activation='relu')([gc1, A_in, E_in])
+pool = GlobalAvgPool()(gc2)
+output = Dense(n_out)(pool)
 
 # Build model
 model = Model(inputs=[X_in, A_in, E_in], outputs=output)

@@ -65,15 +65,17 @@ class Batch:
      array([0, 0, 1, 1, 2, 2]))
     ```
     """
-    def __init__(self, A_list, X_list):
+    def __init__(self, A_list, X_list, E_list=None):
         self.A_list = A_list
         self.X_list = X_list
+        self.E_list = E_list
 
         n_nodes = np.array([a_.shape[0] for a_ in self.A_list])
         self.I_list = np.repeat(np.arange(len(n_nodes)), n_nodes)
 
         self.attr_map = {'A': self.A,
                          'X': self.X,
+                         'E': self.E,
                          'I': self.I}
 
     def get(self, attr):
@@ -95,6 +97,25 @@ class Batch:
     @property
     def X(self):
         return np.vstack(self.X_list)
+
+    @property
+    def E(self):
+        if self.E_list is not None:
+            return self.get_E()
+        else:
+            return None
+
+    def get_E(self, sparse=False, tensor=False):
+        S = self.E_list[0].shape[-1]
+        output = []
+        for i in range(S):
+            output.append(
+                sp.block_diag([e[..., i] for e in self.E_list])
+            )
+        if sparse:
+            return output
+        else:
+            return np.stack([o.toarray() for o in output], axis=-1)
 
     @property
     def I(self):

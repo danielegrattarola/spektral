@@ -25,7 +25,7 @@ TESTS = [
     },
     {
         LAYER_K_: EdgeConditionedConv,
-        MODES_K_: [BATCH],
+        MODES_K_: [SINGLE, BATCH],
         KWARGS_K_: {'channels': 8, 'activation': 'relu', 'edges': True}
     },
     {
@@ -69,13 +69,21 @@ E = np.random.normal(size=(N, N, S))
 def _test_single_mode(layer, **kwargs):
     A_in = Input(shape=(None,))
     X_in = Input(shape=(F,))
+    inputs = [X_in, A_in]
+    feed_dict = {X_in: X, A_in: A}
+
+    if kwargs.get('edges'):
+        kwargs.pop('edges')
+        E_in = Input(shape=(None, S))
+        inputs.append(E_in)
+        feed_dict[E_in] = E
 
     layer_instance = layer(**kwargs)
-    output = layer_instance([X_in, A_in])
-    model = Model([X_in, A_in], output)
+    output = layer_instance(inputs)
+    model = Model(inputs, output)
 
     sess.run(tf.global_variables_initializer())
-    output = sess.run(model.output, feed_dict={X_in: X, A_in: A})
+    output = sess.run(model.output, feed_dict=feed_dict)
 
     assert output.shape == (N, kwargs['channels'])
 
