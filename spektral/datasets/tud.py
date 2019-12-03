@@ -121,7 +121,7 @@ def _read_graphs(dataset_name):
 
     # Edges
     with open(file_prefix + "_A.txt", "r") as f:
-        edges = [i.split(',') for i in list(f)]
+        edges = [i.strip().split(',') for i in list(f)]
 
     edges = [(int(e[0].strip()) - 1, int(e[1].strip()) - 1) for e in edges]
 
@@ -139,7 +139,7 @@ def _read_graphs(dataset_name):
     # Node labels
     if os.path.exists(file_prefix + "_node_labels.txt"):
         with open(file_prefix + "_node_labels.txt", "r") as f:
-            node_labels = [int(i) for i in list(f)]
+            node_labels = [int(i.strip()) for i in list(f)]
 
         i = 0
         for g in graph_list:
@@ -150,7 +150,7 @@ def _read_graphs(dataset_name):
     # Node Attributes
     if os.path.exists(file_prefix + "_node_attributes.txt"):
         with open(file_prefix + "_node_attributes.txt", "r") as f:
-            node_attributes = [map(float, i.split(',')) for i in list(f)]
+            node_attributes = [map(float, i.strip().split(',')) for i in list(f)]
         i = 0
         for g in graph_list:
             for n in g.nodes():
@@ -159,7 +159,7 @@ def _read_graphs(dataset_name):
 
     # Classes
     with open(file_prefix + "_graph_labels.txt", "r") as f:
-        classes = [int(i) for i in list(f)]
+        classes = [int(float(i.strip())) for i in list(f)]
 
     return graph_list, classes
 

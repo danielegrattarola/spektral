@@ -15,11 +15,9 @@ from keras.layers import Input, Dense
 from keras.models import Model
 from keras.optimizers import Adam
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
 
 from spektral.datasets import qm9
-from spektral.layers import GraphConv, GlobalAvgPool
-from spektral.layers.ops import sp_matrix_to_sp_tensor_value
+from spektral.layers import GlobalAvgPool, EdgeConditionedConv
 from spektral.utils import Batch, batch_iterator
 from spektral.utils import label_to_one_hot
 
@@ -27,7 +25,7 @@ np.random.seed(0)
 SW_KEY = 'dense_1_sample_weights:0'  # Keras automatically creates a placeholder for sample weights, which must be fed
 
 # Load data
-A, X, _, y = qm9.load_data(return_type='numpy',
+A, X, E, y = qm9.load_data(return_type='numpy',
                            nf_keys='atomic_num',
                            ef_keys='type',
                            self_loops=True,
@@ -38,33 +36,38 @@ y = y[['cv']].values  # Heat capacity at 298.15K
 # Preprocessing
 uniq_X = np.unique([v for x in X for v in np.unique(x)])
 X = [label_to_one_hot(x, uniq_X) for x in X]
-y = StandardScaler().fit_transform(y).reshape(-1, y.shape[-1])
+uniq_E = np.unique([v for e in E for v in np.unique(e)])
+uniq_E = uniq_E[uniq_E != 0]
+E = [label_to_one_hot(e, uniq_E) for e in E]
 
 # Parameters
 F = X[0].shape[-1]    # Dimension of node features
+S = E[0].shape[-1]    # Dimension of edge features
 n_out = y.shape[-1]   # Dimension of the target
 learning_rate = 1e-3  # Learning rate
 epochs = 25           # Number of training epochs
-batch_size = 64       # Batch size
+batch_size = 32       # Batch size
 
 # Train/test split
 A_train, A_test, \
 X_train, X_test, \
-y_train, y_test = train_test_split(A, X, y, test_size=0.1)
+E_train, E_test, \
+y_train, y_test = train_test_split(A, X, E, y, test_size=0.1)
 
 # Model definition
 X_in = Input(batch_shape=(None, F))
-A_in = Input(batch_shape=(None, None), sparse=True)
+A_in = Input(batch_shape=(None, None))
+E_in = Input(batch_shape=(None, None, S))
 I_in = Input(batch_shape=(None, ), dtype='int64')
 target = Input(tensor=tf.placeholder(tf.float32, shape=(None, n_out), name='target'))
 
-gc1 = GraphConv(64, activation='relu')([X_in, A_in])
-gc2 = GraphConv(64, activation='relu')([gc1, A_in])
+gc1 = EdgeConditionedConv(32, activation='relu')([X_in, A_in, E_in])
+gc2 = EdgeConditionedConv(32, activation='relu')([gc1, A_in, E_in])
 pool = GlobalAvgPool()([gc2, I_in])
 output = Dense(n_out)(pool)
 
 # Build model
-model = Model(inputs=[X_in, A_in, I_in], outputs=output)
+model = Model(inputs=[X_in, A_in, E_in, I_in], outputs=output)
 optimizer = Adam(lr=learning_rate)
 model.compile(optimizer=optimizer, loss='mse', target_tensors=target)
 model.summary()
@@ -77,17 +80,18 @@ train_step = opt.minimize(loss)
 init_op = tf.global_variables_initializer()
 sess.run(init_op)
 
-batches_train = batch_iterator([A_train, X_train, y_train], batch_size=batch_size, epochs=epochs)
+batches_train = batch_iterator([A_train, X_train, E_train, y_train], batch_size=batch_size, epochs=epochs)
 model_loss = 0
 batch_index = 0
 batches_in_epoch = np.ceil(len(A_train) / batch_size)
 
 # Training loop
 for b in batches_train:
-    X_, A_, I_ = Batch(b[0], b[1]).get('XAI')
-    y_ = b[2]
+    X_, A_, E_, I_ = Batch(b[0], b[1], b[2]).get('XAEI')
+    y_ = b[3]
     tr_feed_dict = {X_in: X_,
-                    A_in: sp_matrix_to_sp_tensor_value(A_),
+                    A_in: A_.toarray(),
+                    E_in: E_,
                     I_in: I_,
                     target: y_,
                     SW_KEY: np.ones((1,))}
@@ -101,16 +105,17 @@ for b in batches_train:
         batch_index = 0
 
 # Test setup
-batches_test = batch_iterator([A_test, X_test, y_test], batch_size=batch_size)
+batches_test = batch_iterator([A_test, X_test, E_test, y_test], batch_size=batch_size)
 model_loss = 0
 batches_in_epoch = np.ceil(len(A_test) / batch_size)
 
 # Test loop
 for b in batches_test:
-    X_, A_, I_ = Batch(b[0], b[1]).get('XAI')
-    y_ = b[2]
+    X_, A_, E_, I_ = Batch(b[0], b[1], b[2]).get('XAEI')
+    y_ = b[3]
     tr_feed_dict = {X_in: X_,
-                    A_in: sp_matrix_to_sp_tensor_value(A_),
+                    A_in: A_.toarray(),
+                    E_in: E_,
                     I_in: I_,
                     target: y_,
                     SW_KEY: np.ones((1,))}
