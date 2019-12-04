@@ -12,7 +12,7 @@ from sklearn.neighbors import kneighbors_graph
 MNIST_SIZE = 28
 
 
-def load_data(k=8, noise_level=0.0):
+def load_data(k=8, noise_level=0.0, random_state=None):
     """
     Loads the MNIST dataset and a K-NN graph to perform graph signal
     classification, as described by [Defferrard et al. (2016)](https://arxiv.org/abs/1606.09375).
@@ -26,6 +26,7 @@ def load_data(k=8, noise_level=0.0):
 
     :param k: int, number of neighbours for each node;
     :param noise_level: fraction of edges to flip (from 0 to 1 and vice versa);
+    :param random_state: random state for splitting and flipping for reproducibility
 
     :return:
         - X_train, y_train: training node features and labels;
@@ -34,6 +35,8 @@ def load_data(k=8, noise_level=0.0):
         - A: adjacency matrix of the grid;
     """
     A = _mnist_grid_graph(k)
+    if random_state is not None:
+        np.random.seed(random_state)
     A = _flip_random_edges(A, noise_level).astype(np.float32)
 
     (X_train, y_train), (X_test, y_test) = m.load_data()
@@ -41,7 +44,9 @@ def load_data(k=8, noise_level=0.0):
     X_train = X_train.reshape(-1, MNIST_SIZE ** 2)
     X_test = X_test.reshape(-1, MNIST_SIZE ** 2)
 
-    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=10000)
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, 
+                                                      test_size=10000, 
+                                                      random_state=random_state)
 
     return X_train, y_train, X_val, y_val, X_test, y_test, A
 
