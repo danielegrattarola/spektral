@@ -175,6 +175,8 @@ def _download_data(dataset_name):
 
     data_url = '{}/{}.zip'.format(url, true_name)
     req = requests.get(data_url)
+
+    os.makedirs(DATA_PATH, exist_ok=True)
     with open(DATA_PATH + dataset_name + '.zip', 'wb') as out_file:
         out_file.write(req.content)
     with zipfile.ZipFile(DATA_PATH + dataset_name + '.zip', 'r') as zip_ref:

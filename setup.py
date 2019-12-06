@@ -11,6 +11,7 @@ setup(
                       'tensorflow<2.0.0',
                       'networkx',
                       'pandas',
+                      'lxml',
                       'joblib',
                       'pygraphviz',
                       'numpy',
