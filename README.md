@@ -81,5 +81,12 @@ $ cd spektral
 $ python setup.py install  # Or 'pip install .'
 ```
 
+To install Spektral on [Google Colab](https://colab.research.google.com/):
+
+```jupyter
+! apt install graphviz libgraphviz-dev libcgraph6
+! pip install spektral
+```
+
 ## Contributing
 Spektral is an open source project available [on Github](https://github.com/danielegrattarola/spektral), and contributions of all types are welcome. Feel free to open a pull request if you have something interesting that you want to add to the framework.

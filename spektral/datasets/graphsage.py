@@ -224,6 +224,8 @@ def _download_data(dataset_name):
     else:
         raise ValueError('dataset_name must be one of: {}'.format(AVAILABLE_DATASETS))
     req = requests.get(data_url)
+
+    os.makedirs(DATA_PATH, exist_ok=True)
     with open(DATA_PATH + dataset_name + '.zip', 'wb') as out_file:
         out_file.write(req.content)
     with zipfile.ZipFile(DATA_PATH + dataset_name + '.zip', 'r') as zip_ref:
