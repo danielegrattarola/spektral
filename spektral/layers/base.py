@@ -1,7 +1,7 @@
 import numpy as np
-from keras import activations, initializers, regularizers, constraints
-from keras import backend as K
-from keras.layers import Layer
+from tensorflow.keras import activations, initializers, regularizers, constraints
+from tensorflow.keras import backend as K
+from tensorflow.keras.layers import Layer
 
 
 class InnerProduct(Layer):

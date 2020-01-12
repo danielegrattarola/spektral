@@ -1,8 +1,7 @@
 from spektral.layers.ops import matmul_A_B, matmul_AT_B, matmul_A_BT, matmul_AT_B_A, sp_matrix_to_sp_tensor, reshape
 import numpy as np
-from keras import backend as K
+from tensorflow.keras import backend as K
 
-sess = K.get_session()
 batch_size = 10
 N = 3
 tol = 5.e-7
@@ -56,8 +55,7 @@ def _check_op_dense(op, numpy_inputs):
     tf_inputs = [K.constant(x) for x in numpy_inputs]
     tf_inputs = _cast_all_to_dtype(tf_inputs, np.float32)
 
-    op_result = op(*tf_inputs)
-    output = sess.run(op_result)
+    output = op(*tf_inputs)
 
     return np.asarray(output)
 
@@ -75,8 +73,7 @@ def _check_op_sparse(op, numpy_inputs, convert_to_sparse):
             )
     tf_inputs = _cast_all_to_dtype(tf_inputs, np.float32)
 
-    op_result = op(*tf_inputs)
-    output = sess.run(op_result)
+    output = op(*tf_inputs)
 
     if hasattr(output, 'toarray'):
         return output.toarray()

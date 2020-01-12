@@ -5,11 +5,11 @@ Semi-Supervised Classification with Graph Convolutional Networks (https://arxiv.
 Thomas N. Kipf, Max Welling
 """
 
-from keras.callbacks import EarlyStopping
-from keras.layers import Input, Dropout
-from keras.models import Model
-from keras.optimizers import Adam
-from keras.regularizers import l2
+from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.layers import Input, Dropout
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.regularizers import l2
 
 from spektral.datasets import citation
 from spektral.layers import GraphConv
@@ -31,7 +31,7 @@ epochs = 20000          # Number of training epochs
 es_patience = 200       # Patience for early stopping
 
 # Preprocessing operations
-fltr = localpooling_filter(A)
+fltr = localpooling_filter(A).astype('f4')
 
 # Model definition
 X_in = Input(shape=(F, ))

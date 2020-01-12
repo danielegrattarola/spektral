@@ -5,7 +5,7 @@ https://github.com/mdeff/cnn_graph/blob/master/nips2016/mnist.ipynb.
 
 import numpy as np
 import scipy.sparse as sp
-from keras.datasets import mnist as m
+from tensorflow.keras.datasets import mnist as m
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import kneighbors_graph
 

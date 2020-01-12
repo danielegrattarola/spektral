@@ -8,12 +8,12 @@ same first dimension. This is the most efficient way of training a GNN in
 disjoint mode.
 """
 
-import keras.backend as K
+from tensorflow.keras import backend as K
 import numpy as np
 import tensorflow as tf
-from keras.layers import Input, Dense
-from keras.models import Model
-from keras.optimizers import Adam
+from tensorflow.keras.layers import Input, Dense
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
 from sklearn.model_selection import train_test_split
 
 from spektral.datasets import qm9

@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.sparse as sp
 import tensorflow as tf
-from keras import backend as K
+from tensorflow.keras import backend as K
 
 modes = {
     'S': 1,    # Single (rank(A)=2, rank(B)=2)
@@ -147,6 +147,13 @@ def sp_matrix_to_sp_tensor(x):
         values=x.data,
         dense_shape=x.shape
     )
+
+
+def dense_to_sparse(x):
+    indices = tf.where(tf.not_equal(x, 0))
+    values = tf.gather_nd(x, indices)
+    shape = tf.shape(x, out_type=tf.int64)
+    return tf.SparseTensor(indices, values, shape)
 
 
 ################################################################################
@@ -328,10 +335,10 @@ def single_mode_dot(A, B):
     if a_sparse and b_sparse:
         raise ValueError('Sparse x Sparse matmul is not implemented yet.')
     elif a_sparse:
-        output = tf.sparse_tensor_dense_matmul(A, B)
+        output = tf.sparse.sparse_dense_matmul(A, B)
     elif b_sparse:
         output = transpose(
-            tf.sparse_tensor_dense_matmul(
+            tf.sparse.sparse_dense_matmul(
                 transpose(B), transpose(A)
             )
         )
@@ -455,13 +462,13 @@ def segment_top_k(x, I, ratio, top_k_var):
     :return: a rank 1 tensor containing the indices to get the top K values of
     each segment in x.
     """
-    num_nodes = tf.segment_sum(tf.ones_like(I), I)  # Number of nodes in each graph
+    num_nodes = tf.math.segment_sum(tf.ones_like(I), I)  # Number of nodes in each graph
     cumsum = tf.cumsum(num_nodes)  # Cumulative number of nodes (A, A+B, A+B+C)
     cumsum_start = cumsum - num_nodes  # Start index of each graph
     n_graphs = tf.shape(num_nodes)[0]  # Number of graphs in batch
     max_n_nodes = tf.reduce_max(num_nodes)  # Order of biggest graph in batch
     batch_n_nodes = tf.shape(I)[0]  # Number of overall nodes in batch
-    to_keep = tf.ceil(ratio * tf.cast(num_nodes, tf.float32))
+    to_keep = tf.math.ceil(ratio * tf.cast(num_nodes, tf.float32))
     to_keep = tf.cast(to_keep, tf.int32)  # Nodes to keep in each graph
 
     index = tf.range(batch_n_nodes)
@@ -472,8 +479,8 @@ def segment_top_k(x, I, ratio, top_k_var):
     # subtract 1 to ensure that filler values do not get picked
     dense_y = dense_y * tf.cast(y_min - 1, tf.float32)
     # top_k_var is a variable with unknown shape defined in the elsewhere
-    dense_y = tf.assign(top_k_var, dense_y, validate_shape=False)
-    dense_y = tf.scatter_update(dense_y, index, x)
+    top_k_var.assign(dense_y)
+    dense_y = tf.tensor_scatter_nd_update(top_k_var, index[..., None], x)
     dense_y = tf.reshape(dense_y, (n_graphs, max_n_nodes))
 
     perm = tf.argsort(dense_y, direction='DESCENDING')

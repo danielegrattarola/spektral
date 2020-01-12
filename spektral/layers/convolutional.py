@@ -1,7 +1,7 @@
 import tensorflow as tf
-from keras import activations, initializers, regularizers, constraints
-from keras import backend as K
-from keras.layers import Layer, LeakyReLU, Dropout
+from tensorflow.keras import activations, initializers, regularizers, constraints
+from tensorflow.keras import backend as K
+from tensorflow.keras.layers import Layer, LeakyReLU, Dropout
 
 from spektral.layers.ops import filter_dot
 from spektral.layers import ops
@@ -337,15 +337,15 @@ class GraphSageConv(GraphConv):
         self.bias_constraint = constraints.get(bias_constraint)
         self.supports_masking = False
         if aggregate_method == 'sum':
-            self.aggregate_op = tf.segment_sum
+            self.aggregate_op = tf.math.segment_sum
         elif aggregate_method == 'mean':
-            self.aggregate_op = tf.segment_mean
+            self.aggregate_op = tf.math.segment_mean
         elif aggregate_method == 'max':
-            self.aggregate_op = tf.segment_max
+            self.aggregate_op = tf.math.segment_max
         elif aggregate_method == 'min':
-            self.aggregate_op = tf.segment_sum
+            self.aggregate_op = tf.math.segment_sum
         elif aggregate_method == 'prod':
-            self.aggregate_op = tf.segment_prod
+            self.aggregate_op = tf.math.segment_prod
         else:
             raise ValueError('Possbile aggragation methods: sum, mean, max, min, '
                              'prod')
@@ -373,7 +373,7 @@ class GraphSageConv(GraphConv):
         fltr = inputs[1]
 
         if not K.is_sparse(fltr):
-            fltr = tf.contrib.layers.dense_to_sparse(fltr)
+            fltr = ops.dense_to_sparse(fltr)
 
         features_neigh = self.aggregate_op(
             tf.gather(features, fltr.indices[:, -1]), fltr.indices[:, -2]
@@ -737,6 +737,7 @@ class GraphAttention(GraphConv):
                                                  constraint=self.attn_kernel_constraint,
                                                  name='attn_kernel_neigh_{}'.format(head))
             self.attn_kernels.append([attn_kernel_self, attn_kernel_neighs])
+        self.dropout = Dropout(self.dropout_rate)
         self.built = True
 
     def call(self, inputs):
@@ -774,7 +775,7 @@ class GraphAttention(GraphConv):
             output_attn.append(attn_coef)
 
             # Apply dropout to attention coefficients
-            attn_coef_drop = Dropout(self.dropout_rate)(attn_coef)
+            attn_coef_drop = self.dropout(attn_coef)
 
             # Convolution
             features = filter_dot(attn_coef_drop, features)
@@ -1596,10 +1597,10 @@ class GINConv(GraphConv):
         fltr = inputs[1]
 
         if not K.is_sparse(fltr):
-            fltr = tf.contrib.layers.dense_to_sparse(fltr)
+            fltr = ops.dense_to_sparse(fltr)
 
         # Input layer
-        features_neigh = tf.segment_sum(tf.gather(features, fltr.indices[:, -1]), fltr.indices[:, -2])
+        features_neigh = tf.math.segment_sum(tf.gather(features, fltr.indices[:, -1]), fltr.indices[:, -2])
         hidden = (1.0 + self.eps) * features + features_neigh
         hidden = K.dot(hidden, self.kernel_in)
         if self.use_bias:

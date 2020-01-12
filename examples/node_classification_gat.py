@@ -5,11 +5,11 @@ Graph Attention Networks (https://arxiv.org/abs/1710.10903)
 Petar Veličković, Guillem Cucurull, Arantxa Casanova, Adriana Romero, Pietro Liò, Yoshua Bengio
 """
 
-from keras.callbacks import EarlyStopping
-from keras.layers import Input, Dropout
-from keras.models import Model
-from keras.optimizers import Adam
-from keras.regularizers import l2
+from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.layers import Input, Dropout
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.regularizers import l2
 
 from spektral.datasets import citation
 from spektral.layers import GraphAttention
@@ -29,14 +29,14 @@ dropout = 0.6           # Dropout rate applied to the features and adjacency mat
 l2_reg = 5e-4           # Regularization rate for l2
 learning_rate = 5e-3    # Learning rate for SGD
 epochs = 20000          # Number of training epochs
-es_patience = 200       # Patience for early stopping
+es_patience = 100       # Patience for early stopping
 
 # Preprocessing operations
 A = add_eye(A).toarray()  # Add self-loops
 
 # Model definition
 X_in = Input(shape=(F, ))
-A_in = Input(shape=(N, ))
+A_in = Input(shape=(N, ), sparse=False)
 
 dropout_1 = Dropout(dropout)(X_in)
 graph_attention_1 = GraphAttention(channels,
@@ -45,7 +45,8 @@ graph_attention_1 = GraphAttention(channels,
                                    dropout_rate=dropout,
                                    activation='elu',
                                    kernel_regularizer=l2(l2_reg),
-                                   attn_kernel_regularizer=l2(l2_reg))([dropout_1, A_in])
+                                   attn_kernel_regularizer=l2(l2_reg),
+                                   use_bias=False)([dropout_1, A_in])
 dropout_2 = Dropout(dropout)(graph_attention_1)
 graph_attention_2 = GraphAttention(n_classes,
                                    attn_heads=1,
@@ -53,7 +54,8 @@ graph_attention_2 = GraphAttention(n_classes,
                                    dropout_rate=dropout,
                                    activation='softmax',
                                    kernel_regularizer=l2(l2_reg),
-                                   attn_kernel_regularizer=l2(l2_reg))([dropout_2, A_in])
+                                   attn_kernel_regularizer=l2(l2_reg),
+                                   use_bias=False)([dropout_2, A_in])
 
 # Build model
 model = Model(inputs=[X_in, A_in], outputs=graph_attention_2)
