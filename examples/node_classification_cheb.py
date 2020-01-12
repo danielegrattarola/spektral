@@ -6,11 +6,11 @@ Convolutional Neural Networks on Graphs with Fast Localized Spectral Filtering (
 Michaël Defferrard, Xavier Bresson, Pierre Vandergheynst
 """
 
-from keras.callbacks import EarlyStopping, ModelCheckpoint
-from keras.layers import Input, Dropout
-from keras.models import Model
-from keras.optimizers import Adam
-from keras.regularizers import l2
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+from tensorflow.keras.layers import Input, Dropout
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.regularizers import l2
 
 from spektral.datasets import citation
 from spektral.layers import ChebConv
@@ -34,7 +34,7 @@ epochs = 20000          # Number of training epochs
 es_patience = 200       # Patience for early stopping
 
 # Preprocessing operations
-fltr = chebyshev_filter(A, cheb_k)
+fltr = chebyshev_filter(A.astype('f4'), cheb_k)
 
 # Model definition
 X_in = Input(shape=(F, ))

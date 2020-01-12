@@ -10,17 +10,17 @@ disjoint mode.
 
 import os
 
-import keras.backend as K
 import numpy as np
 import requests
 import tensorflow as tf
-from keras.layers import Input, Dense
-from keras.metrics import categorical_accuracy
-from keras.models import Model
-from keras.regularizers import l2
+from tensorflow.keras import backend as K
+from tensorflow.keras.layers import Input, Dense
+from tensorflow.keras.metrics import categorical_accuracy
+from tensorflow.keras.models import Model
+from tensorflow.keras.regularizers import l2
 
 from spektral.layers import GraphConvSkip, GlobalAvgPool
-from spektral.layers.ops import sp_matrix_to_sp_tensor_value
+from spektral.layers.ops import sp_matrix_to_sp_tensor_value, sp_matrix_to_sp_tensor
 from spektral.layers.pooling import MinCutPool
 from spektral.utils import batch_iterator
 from spektral.utils.convolution import normalized_adjacency
@@ -35,14 +35,10 @@ def evaluate(A_list, X_list, y_list, ops, batch_size):
     output = []
     for b in batches:
         X, A, I = Batch(b[0], b[1]).get('XAI')
+        A = sp_matrix_to_sp_tensor(A)
         y = b[2]
-        feed_dict = {X_in: X,
-                     A_in: sp_matrix_to_sp_tensor_value(A),
-                     I_in: I,
-                     target: y,
-                     SW_KEY: np.ones((1,))}
-
-        outs = sess.run(ops, feed_dict=feed_dict)
+        pred = model([X, A, I])
+        outs = [o(pred, y) for o in ops]
         output.append(outs)
     return np.mean(output, 0)
 
@@ -91,10 +87,10 @@ average_N = np.ceil(np.mean([a.shape[-1] for a in A_train]))  # Average number o
 ################################################################################
 # BUILD MODEL
 ################################################################################
-X_in = Input(tensor=tf.placeholder(tf.float32, shape=(None, F), name='X_in'))
-A_in = Input(tensor=tf.sparse_placeholder(tf.float32, shape=(None, None)), sparse=True)
-I_in = Input(tensor=tf.placeholder(tf.int32, shape=(None,), name='segment_ids_in'))
-target = Input(tensor=tf.placeholder(tf.float32, shape=(None, n_out), name='target'))
+X_in = Input(shape=(F, ), name='X_in', dtype=tf.float64)
+A_in = Input(shape=(None,), sparse=True, dtype=tf.float64)
+I_in = Input(shape=(), name='segment_ids_in', dtype=tf.int32)
+target = Input(shape=(n_out,), name='target', dtype=tf.float64)
 
 # Block 1
 gc1 = GraphConvSkip(n_channels,
@@ -130,14 +126,24 @@ model.compile(optimizer='adam',  # Doesn't matter, won't be used
               target_tensors=[target])
 model.summary()
 
-# Training setup
-sess = K.get_session()
-loss = model.total_loss
-acc = K.mean(categorical_accuracy(target, model.output))
-opt = tf.train.AdamOptimizer(learning_rate=learning_rate)
-train_step = opt.minimize(loss)
-init_op = tf.global_variables_initializer()
-sess.run(init_op)
+
+opt = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+loss_fn = model.loss_functions[0]
+acc_fn = lambda x, y: K.mean(categorical_accuracy(x, y))
+
+
+def train_loop(inputs, targets):
+    # Define the GradientTape context
+    with tf.GradientTape() as tape:
+        # Get the probabilities
+        predictions = model(inputs)
+        # Calculate the loss
+        loss = loss_fn(targets, predictions)
+    # Get the gradients
+    gradients = tape.gradient(loss, model.trainable_variables)
+    # Update the weights
+    opt.apply_gradients(zip(gradients, model.trainable_variables))
+    return loss, acc_fn(targets, predictions)
 
 ################################################################################
 # FIT MODEL
@@ -155,23 +161,19 @@ print('Fitting model')
 batches = batch_iterator([A_train, X_train, y_train], batch_size=batch_size, epochs=epochs)
 for b in batches:
     X_, A_, I_ = Batch(b[0], b[1]).get('XAI')
+    A_ = sp_matrix_to_sp_tensor(A_)
     y_ = b[2]
-    tr_feed_dict = {X_in: X_,
-                    A_in: sp_matrix_to_sp_tensor_value(A_),
-                    I_in: I_,
-                    target: y_,
-                    SW_KEY: np.ones((1,))}
-    outs = sess.run([train_step, loss, acc], feed_dict=tr_feed_dict)
+    outs = train_loop([X_, A_, I_], y_)
 
-    model_loss += outs[1]
-    model_acc += outs[2]
+    model_loss += outs[0]
+    model_acc += outs[1]
     current_batch += 1
     if current_batch % batches_in_epoch == 0:
         model_loss /= batches_in_epoch
         model_acc /= batches_in_epoch
 
         # Compute validation loss and accuracy
-        val_loss, val_acc = evaluate(A_val, X_val, y_val, [loss, acc], batch_size=batch_size)
+        val_loss, val_acc = evaluate(A_val, X_val, y_val, [loss_fn, acc_fn], batch_size=batch_size)
         print('Ep. {} - Loss: {:.2f} - Acc: {:.2f} - Val loss: {:.2f} - Val acc: {:.2f}'
               .format(current_batch // batches_in_epoch, model_loss, model_acc, val_loss, val_acc))
 
@@ -197,7 +199,7 @@ model.set_weights(best_weights)
 
 # Test model
 print('Testing model')
-test_loss, test_acc = evaluate(A_test, X_test, y_test, [loss, acc], batch_size=batch_size)
+test_loss, test_acc = evaluate(A_test, X_test, y_test, [loss_fn, acc_fn], batch_size=batch_size)
 print('Done.\n'
       'Test loss: {:.2f}\n'
       'Test acc: {:.2f}'

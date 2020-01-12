@@ -1,6 +1,6 @@
 import os
 
-from keras.utils import get_file
+from tensorflow.keras.utils import get_file
 
 from spektral.chem import sdf_to_nx
 from spektral.utils import nx_to_numpy

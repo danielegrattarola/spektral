@@ -13,9 +13,9 @@ clustring found by the model.
 import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
-from keras import backend as K
-from keras.layers import Input
-from keras.models import Model
+from tensorflow.keras import backend as K
+from tensorflow.keras.layers import Input
+from tensorflow.keras.models import Model
 from sklearn.metrics.cluster import v_measure_score, homogeneity_score, completeness_score
 from tqdm import tqdm
 

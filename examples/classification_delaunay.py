@@ -4,11 +4,11 @@ of Delaunay triangulations, using a graph attention network (Velickovic et al.)
 in batch mode.
 """
 
-from keras.callbacks import EarlyStopping
-from keras.layers import Input, Dense
-from keras.models import Model
-from keras.optimizers import Adam
-from keras.regularizers import l2
+from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.layers import Input, Dense
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.regularizers import l2
 from sklearn.model_selection import train_test_split
 
 from spektral.datasets import delaunay

@@ -1,11 +1,10 @@
 import numpy as np
 import tensorflow as tf
-from keras import Input, Model
-from keras import backend as K
+from tensorflow.keras import Input, Model
+from tensorflow.keras import backend as K
 
 from spektral.layers import GlobalSumPool, GlobalAttnSumPool, GlobalAttentionPool, GlobalAvgPool, GlobalMaxPool
 
-sess = K.get_session()
 batch_size = 32
 N = 11
 F = 7
@@ -28,8 +27,8 @@ def _test_single_mode(layer, **kwargs):
     layer_instance = layer(**kwargs)
     output = layer_instance(X_in)
     model = Model(X_in, output)
-    sess.run(tf.global_variables_initializer())
-    output = sess.run(model.output, feed_dict={X_in: X})
+
+    output = model(X)
     assert output.shape == (1, kwargs.get('channels', F))
     assert output.shape == layer_instance.compute_output_shape(X.shape)
     _check_output_and_model_output_shapes(output.shape, model.output_shape)
@@ -41,8 +40,7 @@ def _test_batch_mode(layer, **kwargs):
     layer_instance = layer(**kwargs)
     output = layer_instance(X_in)
     model = Model(X_in, output)
-    sess.run(tf.global_variables_initializer())
-    output = sess.run(model.output, feed_dict={X_in: X})
+    output = model(X)
     assert output.shape == (batch_size, kwargs.get('channels', F))
     assert output.shape == layer_instance.compute_output_shape(X.shape)
     _check_output_and_model_output_shapes(output.shape, model.output_shape)
@@ -56,8 +54,7 @@ def _test_graph_mode(layer, **kwargs):
     layer_instance = layer(**kwargs)
     output = layer_instance([X_in, S_in])
     model = Model([X_in, S_in], output)
-    sess.run(tf.global_variables_initializer())
-    output = sess.run(model.output, feed_dict={X_in: X, S_in: S})
+    output = model([X, S])
     assert output.shape == (batch_size, kwargs.get('channels', F))
     # When creating actual graph, the bacth dimension is None
     assert output.shape[1:] == layer_instance.compute_output_shape([X.shape, S.shape])[1:]

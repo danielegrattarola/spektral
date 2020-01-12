@@ -1,7 +1,7 @@
 import tensorflow as tf
-from keras import backend as K, activations
-from keras import regularizers, constraints, initializers
-from keras.engine import Layer
+from tensorflow.keras import backend as K, activations
+from tensorflow.keras import regularizers, constraints, initializers
+from tensorflow.keras.layers import Layer
 
 from spektral.layers import ops, filter_dot
 
@@ -93,7 +93,7 @@ class TopKPool(Layer):
                                       initializer=self.kernel_initializer,
                                       regularizer=self.kernel_regularizer,
                                       constraint=self.kernel_constraint)
-        self.top_k_var = tf.Variable(0.0, validate_shape=False)
+        self.top_k_var = tf.Variable(0.0, validate_shape=False, shape=tf.TensorShape(None))
         super().build(input_shape)
 
     def call(self, inputs):
@@ -102,10 +102,11 @@ class TopKPool(Layer):
             self.data_mode = 'graph'
         else:
             X, A = inputs
-            I = tf.zeros(tf.shape(X)[:1], dtype=tf.int32)
+            I = tf.zeros(tf.shape(X)[:1])
             self.data_mode = 'single'
         if K.ndim(I) == 2:
             I = I[:, 0]
+        I = tf.cast(I, tf.int32)
 
         A_is_sparse = K.is_sparse(A)
 
@@ -246,7 +247,7 @@ class SAGPool(Layer):
                                       initializer=self.kernel_initializer,
                                       regularizer=self.kernel_regularizer,
                                       constraint=self.kernel_constraint)
-        self.top_k_var = tf.Variable(0.0, validate_shape=False)
+        self.top_k_var = tf.Variable(0.0, validate_shape=False, shape=tf.TensorShape(None))
         super().build(input_shape)
 
     def call(self, inputs):
@@ -255,10 +256,11 @@ class SAGPool(Layer):
             self.data_mode = 'graph'
         else:
             X, A = inputs
-            I = tf.zeros(tf.shape(X)[:1], dtype=tf.int32)
+            I = tf.zeros(tf.shape(X)[:1])
             self.data_mode = 'single'
         if K.ndim(I) == 2:
             I = I[:, 0]
+        I = tf.cast(I, tf.int32)
 
         A_is_sparse = K.is_sparse(A)
 
@@ -466,10 +468,10 @@ class MinCutPool(Layer):
 
         # MinCut regularization
         A_pooled = ops.matmul_AT_B_A(S, A)
-        num = tf.trace(A_pooled)
+        num = tf.linalg.trace(A_pooled)
 
         D = ops.degree_matrix(A)
-        den = tf.trace(ops.matmul_AT_B_A(S, D))
+        den = tf.linalg.trace(ops.matmul_AT_B_A(S, D))
         cut_loss = -(num / den)
         if batch_mode:
             cut_loss = K.mean(cut_loss)
@@ -479,7 +481,8 @@ class MinCutPool(Layer):
         SS = ops.matmul_AT_B(S, S)
         I_S = tf.eye(self.k)
         ortho_loss = tf.norm(
-            SS / tf.norm(SS, axis=(-1, -2)) - I_S / tf.norm(I_S), axis=(-1, -2)
+            SS / tf.norm(SS, axis=(-1, -2), keepdims=True) - I_S / tf.norm(I_S),
+            axis=(-1, -2)
         )
         if batch_mode:
             ortho_loss = K.mean(cut_loss)
@@ -493,7 +496,7 @@ class MinCutPool(Layer):
         output = [X_pooled, A_pooled]
 
         if I is not None:
-            I_mean = tf.segment_mean(I, I)
+            I_mean = tf.math.segment_mean(I, I)
             I_pooled = ops.repeat(I_mean, tf.ones_like(I_mean) * self.k)
             output.append(I_pooled)
 
@@ -691,7 +694,7 @@ class DiffPool(Layer):
         output = [X_pooled, A_pooled]
 
         if I is not None:
-            I_mean = tf.segment_mean(I, I)
+            I_mean = tf.math.segment_mean(I, I)
             I_pooled = ops.repeat(I_mean, tf.ones_like(I_mean) * self.k)
             output.append(I_pooled)
 
@@ -807,7 +810,7 @@ class GlobalSumPool(GlobalPooling):
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.pooling_op = tf.segment_sum
+        self.pooling_op = tf.math.segment_sum
         self.batch_pooling_op = tf.reduce_sum
 
 
@@ -835,7 +838,7 @@ class GlobalAvgPool(GlobalPooling):
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.pooling_op = tf.segment_mean
+        self.pooling_op = tf.math.segment_mean
         self.batch_pooling_op = tf.reduce_mean
 
 
@@ -863,7 +866,7 @@ class GlobalMaxPool(GlobalPooling):
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.pooling_op = tf.segment_max
+        self.pooling_op = tf.math.segment_max
         self.batch_pooling_op = tf.reduce_max
 
 
@@ -966,7 +969,7 @@ class GlobalAttentionPool(GlobalPooling):
         if self.data_mode in {'single', 'batch'}:
             output = K.sum(masked_inputs, axis=-2, keepdims=self.data_mode=='single')
         else:
-            output = tf.segment_sum(masked_inputs, I)
+            output = tf.math.segment_sum(masked_inputs, I)
 
         return output
 
@@ -1071,7 +1074,7 @@ class GlobalAttnSumPool(GlobalPooling):
             output = K.batch_dot(attn_coeff, X)
         else:
             output = attn_coeff[:, None] * X
-            output = tf.segment_sum(output, I)
+            output = tf.math.segment_sum(output, I)
 
         return output
 
