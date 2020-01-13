@@ -70,7 +70,7 @@ def _test_single_mode(layer, **kwargs):
         N_exp = kwargs['k']
     else:
         raise ValueError('Need k or ratio.')
-    N_pool_expected = np.ceil(N_exp)
+    N_pool_expected = int(np.ceil(N_exp))
     N_pool_true = A_pool.shape[-1]
 
     _check_number_of_nodes(N_pool_expected, N_pool_true)
@@ -101,7 +101,7 @@ def _test_batch_mode(layer, **kwargs):
         N_exp = kwargs['k']
     else:
         raise ValueError('Need k or ratio.')
-    N_pool_expected = np.ceil(N_exp)
+    N_pool_expected = int(np.ceil(N_exp))
     N_pool_true = A_pool.shape[-1]
 
     _check_number_of_nodes(N_pool_expected, N_pool_true)
@@ -131,6 +131,7 @@ def _test_disjoint_mode(layer, **kwargs):
     N_pool_expected = np.ceil(kwargs['ratio'] * N1) + \
                       np.ceil(kwargs['ratio'] * N2) + \
                       np.ceil(kwargs['ratio'] * N3)
+    N_pool_expected = int(N_pool_expected)
     N_pool_true = A_pool.shape[0]
 
     _check_number_of_nodes(N_pool_expected, N_pool_true)
