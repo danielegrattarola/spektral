@@ -14,7 +14,6 @@ from tensorflow.keras.models import Model
 
 from spektral.datasets import qm9
 from spektral.layers import GlobalAvgPool, EdgeConditionedConv
-from spektral.layers.ops import sp_matrix_to_sp_tensor
 from spektral.utils import Batch, batch_iterator
 from spektral.utils import label_to_one_hot
 
