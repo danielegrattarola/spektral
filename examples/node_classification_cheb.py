@@ -35,7 +35,8 @@ es_patience = 200       # Patience for early stopping
 
 # Preprocessing operations
 X = X.toarray()
-fltr = chebyshev_filter(A.astype('f4'), cheb_k)
+fltr = chebyshev_filter(A, cheb_k)
+fltr = [f.astype('f4') for f in fltr]
 
 # Model definition
 X_in = Input(shape=(F, ))
