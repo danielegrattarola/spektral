@@ -13,10 +13,10 @@ clustring found by the model.
 import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
-from tqdm import tqdm
 from sklearn.metrics.cluster import v_measure_score, homogeneity_score, completeness_score
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
+from tqdm import tqdm
 
 from spektral.datasets import citation
 from spektral.layers.convolutional import GraphConvSkip

@@ -6,7 +6,7 @@ Convolutional Neural Networks on Graphs with Fast Localized Spectral Filtering (
 Michaël Defferrard, Xavier Bresson, Pierre Vandergheynst
 """
 
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.layers import Input, Dropout
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam

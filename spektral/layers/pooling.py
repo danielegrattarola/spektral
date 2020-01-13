@@ -134,7 +134,7 @@ class TopKPool(Layer):
         A_pooled = tf.boolean_mask(A_squared, mask, axis=axis)
         A_pooled = tf.boolean_mask(A_pooled, mask, axis=axis + 1)
         if A_is_sparse:
-            A_pooled = tf.contrib.layers.dense_to_sparse(A_pooled)
+            A_pooled = ops.dense_to_sparse(A_pooled)
 
         output = [X_pooled, A_pooled]
 
@@ -289,7 +289,7 @@ class SAGPool(Layer):
         A_pooled = tf.boolean_mask(A_squared, mask, axis=axis)
         A_pooled = tf.boolean_mask(A_pooled, mask, axis=axis + 1)
         if A_is_sparse:
-            A_pooled = tf.contrib.layers.dense_to_sparse(A_pooled)
+            A_pooled = ops.dense_to_sparse(A_pooled)
 
         output = [X_pooled, A_pooled]
 

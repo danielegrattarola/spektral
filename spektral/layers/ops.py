@@ -426,7 +426,7 @@ def matrix_power(x, k):
         x_k = K.dot(x_k, x_dense)
 
     if sparse:
-        return tf.contrib.layers.dense_to_sparse(x_k)
+        return dense_to_sparse(x_k)
     else:
         return x_k
 
