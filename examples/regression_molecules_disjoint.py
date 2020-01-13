@@ -126,7 +126,7 @@ print('Testing model')
 batches_test = batch_iterator([A_test, X_test, E_test, y_test], batch_size=batch_size)
 for b in batches_test:
     X_, A_, E_, I_ = Batch(b[0], b[1], b[2]).get('XAEI')
-    A_ = sp_matrix_to_sp_tensor(A_)
+    A_ = A_.toarray()
     y_ = b[3]
 
     predictions = model([X_, A_, E_, I_])
