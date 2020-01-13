@@ -11,7 +11,7 @@ script:
   - pip install lxml
   - pip install scikit-learn
   - pip install -U setuptools
-  - pip install neteworkx
+  - pip install networkx
   - pip install "tensorflow>=2.0.0"
   - pip install "keras"
   - python setup.py install
