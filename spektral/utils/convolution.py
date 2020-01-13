@@ -173,6 +173,10 @@ def chebyshev_filter(adj, k, symmetric=True):
     # Compute Chebyshev polynomial approximation
     T_k = chebyshev_polynomial(L_scaled, k)
 
+    # Sort indices
+    for i in range(len(T_k)):
+        T_k[i].sort_indices()
+
     return T_k
 
 
