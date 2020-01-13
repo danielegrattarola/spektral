@@ -11,8 +11,9 @@ script:
   - pip install lxml
   - pip install scikit-learn
   - pip install -U setuptools
-  - pip install "tensorflow<2.0.0"
-  - pip install "keras<2.3"
+  - pip install neteworkx
+  - pip install "tensorflow>=2.0.0"
+  - pip install "keras"
   - python setup.py install
   - pytest --cov=spektral
 after_success:
