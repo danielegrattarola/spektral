@@ -8,12 +8,18 @@ script:
   - pip install pytest-cov
   - pip install coverage
   - pip install codecov
-  - pip install lxml
-  - pip install scikit-learn
-  - pip install -U setuptools
-  - pip install networkx
   - pip install "tensorflow>=2.0.0"
   - pip install "keras"
+  - pip install networkx
+  - pip install pandas
+  - pip install lxml
+  - pip install joblib
+  - pip install pygraphviz
+  - pip install numpy
+  - pip install scipy
+  - pip install requests
+  - pip install scikit-learn
+  - pip install -U setuptools
   - python setup.py install
   - pytest --cov=spektral
 after_success:
