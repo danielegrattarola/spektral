@@ -34,6 +34,7 @@ epochs = 20000          # Number of training epochs
 es_patience = 200       # Patience for early stopping
 
 # Preprocessing operations
+X = X.toarray()
 fltr = chebyshev_filter(A.astype('f4'), cheb_k)
 
 # Model definition

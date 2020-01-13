@@ -35,6 +35,7 @@ epochs = 20000          # Number of training epochs
 es_patience = 100       # Patience for early stopping
 
 # Preprocessing operations
+X = X.toarray()
 fltr = normalized_laplacian(A, symmetric=True)
 fltr = rescale_laplacian(fltr, lmax=2).astype('f4')
 

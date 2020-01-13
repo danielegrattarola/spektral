@@ -13,17 +13,29 @@ clustring found by the model.
 import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras import backend as K
+from tqdm import tqdm
+from sklearn.metrics.cluster import v_measure_score, homogeneity_score, completeness_score
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
-from sklearn.metrics.cluster import v_measure_score, homogeneity_score, completeness_score
-from tqdm import tqdm
 
 from spektral.datasets import citation
 from spektral.layers.convolutional import GraphConvSkip
-from spektral.layers.ops import sp_matrix_to_sp_tensor_value
+from spektral.layers.ops import sp_matrix_to_sp_tensor
 from spektral.layers.pooling import MinCutPool
 from spektral.utils.convolution import normalized_adjacency
+
+
+def train_step(inputs):
+    # Define the GradientTape context
+    with tf.GradientTape() as tape:
+        _, S_pool = model(inputs)
+        losses = sum(model.losses)
+    # Get the gradients
+    gradients = tape.gradient(losses, model.trainable_variables)
+    # Update the weights
+    opt.apply_gradients(zip(gradients, model.trainable_variables))
+    return model.losses[0], model.losses[1], S_pool
+
 
 np.random.seed(1)
 
@@ -47,13 +59,13 @@ n_clust = y.max() + 1
 ################################################################################
 # MODEL
 ################################################################################
-X_in = Input(tensor=tf.placeholder(tf.float32, shape=(None, n_feat), name='X_in'))
-A_in = Input(tensor=tf.sparse_placeholder(tf.float32, shape=(None, None)), name='A_in', sparse=True)
+X_in = Input(shape=(n_feat, ), name='X_in')
+A_in = Input(shape=(None, ), name='A_in', sparse=True)
 
 X_1 = GraphConvSkip(gnn_channels,
                     kernel_initializer='he_normal',
                     activation=gnn_activ)([X_in, A_in])
-pool1, adj1, S = MinCutPool(k=n_clust,
+pool1, adj1, S = MinCutPool(n_clust,
                             h=mlp_channels,
                             activation=mlp_activ)([X_1, A_in])
 
@@ -64,35 +76,27 @@ model.compile('adam', None)
 # TRAINING
 ################################################################################
 # Setup
-sess = K.get_session()
-
 loss = model.total_loss        # The full unsupervised loss of MinCutPool
 mincut_loss = model.losses[0]  # The minCUT loss of MinCutPool
 ortho_loss = model.losses[1]   # The orthogonality loss of MinCutPool
-
-opt = tf.train.AdamOptimizer(learning_rate=lr)
-train_step = opt.minimize(loss)
-
-# Initialize all variables
-init_op = tf.global_variables_initializer()
-sess.run(init_op)
+inputs = [X, sp_matrix_to_sp_tensor(A_norm)]
+opt = tf.keras.optimizers.Adam(learning_rate=lr)
 
 # Fit model
-tr_feed_dict = {X_in: X,
-                A_in: sp_matrix_to_sp_tensor_value(A_norm)}
 loss_history = []
 nmi_history = []
 for _ in tqdm(range(iterations)):
-    outs = sess.run([train_step, mincut_loss, ortho_loss, S], feed_dict=tr_feed_dict)
-    loss_history.append((outs[1], outs[2], outs[1] + outs[2]))
-    s = np.argmax(outs[3], axis=-1)
+    outs = train_step(inputs)
+    outs = [o.numpy() for o in outs]
+    loss_history.append((outs[0], outs[1], (outs[0] + outs[1])))
+    s = np.argmax(outs[2], axis=-1)
     nmi_history.append(v_measure_score(y, s))
 loss_history = np.array(loss_history)
 
 ################################################################################
 # RESULTS
 ################################################################################
-S_ = sess.run([S], feed_dict=tr_feed_dict)[0]
+_, S_ = model(inputs)
 s = np.argmax(S_, axis=-1)
 hs = homogeneity_score(y, s)
 cs = completeness_score(y, s)
