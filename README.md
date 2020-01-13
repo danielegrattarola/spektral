@@ -88,5 +88,18 @@ To install Spektral on [Google Colab](https://colab.research.google.com/):
 ! pip install spektral
 ```
 
+### TensorFlow 2, tf.keras, and future development
+Starting from version 0.2, Spektral will only support TensorFlow 2 and tf.keras.  
+The migration is happening on the `tf2` branch (which is now the active development branch), and TF2 users can already use the library (including examples) by installing from source:
+
+```bash
+$ git clone https://github.com/danielegrattarola/spektral.git
+$ cd spektral
+$ git checkout tf2
+$ python setup.py install  # Or 'pip install .'
+```
+
+In the future, the TF1-compatible version of Spektral (<0.2) will gradually be discontinued.  
+
 ## Contributing
 Spektral is an open source project available [on Github](https://github.com/danielegrattarola/spektral), and contributions of all types are welcome. Feel free to open a pull request if you have something interesting that you want to add to the framework.
