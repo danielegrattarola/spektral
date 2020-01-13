@@ -32,6 +32,7 @@ epochs = 20000          # Number of training epochs
 es_patience = 100       # Patience for early stopping
 
 # Preprocessing operations
+X = X.toarray()
 A = add_eye(A).toarray()  # Add self-loops
 
 # Model definition

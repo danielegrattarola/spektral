@@ -4,8 +4,7 @@ benchmark dataset created by F. M. Bianchi (https://github.com/FilippoMB/Benchma
 using a GNN with convolutional and pooling blocks in disjoint mode.
 Note that the main training loop is written in TensorFlow, because we need to
 avoid the restriction imposed by Keras that the input and the output have the
-same first dimension. This is the most efficient way of training a GNN in
-disjoint mode.
+same first dimension.
 """
 
 import os
@@ -20,7 +19,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.regularizers import l2
 
 from spektral.layers import GraphConvSkip, GlobalAvgPool
-from spektral.layers.ops import sp_matrix_to_sp_tensor_value, sp_matrix_to_sp_tensor
+from spektral.layers.ops import sp_matrix_to_sp_tensor
 from spektral.layers.pooling import MinCutPool
 from spektral.utils import batch_iterator
 from spektral.utils.convolution import normalized_adjacency
@@ -93,22 +92,22 @@ I_in = Input(shape=(), name='segment_ids_in', dtype=tf.int32)
 target = Input(shape=(n_out,), name='target', dtype=tf.float64)
 
 # Block 1
-gc1 = GraphConvSkip(n_channels,
+X_1 = GraphConvSkip(n_channels,
                     activation=activ,
                     kernel_regularizer=l2(GNN_l2))([X_in, A_in])
 X_1, A_1, I_1, M_1 = MinCutPool(k=int(average_N // 2),
                                 h=mincut_H,
                                 activation=activ,
-                                kernel_regularizer=l2(pool_l2))([gc1, A_in, I_in])
+                                kernel_regularizer=l2(pool_l2))([X_1, A_in, I_in])
 
 # Block 2
-gc2 = GraphConvSkip(n_channels,
+X_2 = GraphConvSkip(n_channels,
                     activation=activ,
                     kernel_regularizer=l2(GNN_l2))([X_1, A_1])
 X_2, A_2, I_2, M_2 = MinCutPool(k=int(average_N // 4),
                                 h=mincut_H,
                                 activation=activ,
-                                kernel_regularizer=l2(pool_l2))([gc2, A_1, I_1])
+                                kernel_regularizer=l2(pool_l2))([X_2, A_1, I_1])
 
 # Block 3
 X_3 = GraphConvSkip(n_channels,
@@ -126,7 +125,7 @@ model.compile(optimizer='adam',  # Doesn't matter, won't be used
               target_tensors=[target])
 model.summary()
 
-
+# Training setup
 opt = tf.keras.optimizers.Adam(learning_rate=learning_rate)
 loss_fn = model.loss_functions[0]
 acc_fn = lambda x, y: K.mean(categorical_accuracy(x, y))
@@ -148,7 +147,6 @@ def train_loop(inputs, targets):
 ################################################################################
 # FIT MODEL
 ################################################################################
-# Run training loop
 current_batch = 0
 model_loss = 0
 model_acc = 0

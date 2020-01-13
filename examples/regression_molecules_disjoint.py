@@ -1,30 +1,33 @@
 """
 This example shows how to perform regression of molecular properties with the
-QM9 database, using a simple GNN in disjoint mode (note that in this example
-we ignore edge attributes).
-Note that the main training loop is written in TensorFlow, because we need to
-avoid the restriction imposed by Keras that the input and the output have the
-same first dimension. This is the most efficient way of training a GNN in
-disjoint mode.
+QM9 database, using a simple GNN in disjoint mode .
+The main training loop is written in TensorFlow, because we need to avoid the
+restriction imposed by Keras that the input and the output have the same first
+dimension.
 """
 
-from tensorflow.keras import backend as K
 import numpy as np
 import tensorflow as tf
+from sklearn.model_selection import train_test_split
 from tensorflow.keras.layers import Input, Dense
 from tensorflow.keras.models import Model
-from tensorflow.keras.optimizers import Adam
-from sklearn.model_selection import train_test_split
 
 from spektral.datasets import qm9
 from spektral.layers import GlobalAvgPool, EdgeConditionedConv
+from spektral.layers.ops import sp_matrix_to_sp_tensor
 from spektral.utils import Batch, batch_iterator
 from spektral.utils import label_to_one_hot
 
-np.random.seed(0)
-SW_KEY = 'dense_1_sample_weights:0'  # Keras automatically creates a placeholder for sample weights, which must be fed
+################################################################################
+# PARAMETERS
+################################################################################
+learning_rate = 1e-3  # Learning rate
+epochs = 25           # Number of training epochs
+batch_size = 32       # Batch size
 
-# Load data
+################################################################################
+# LOAD DATA
+################################################################################
 A, X, E, y = qm9.load_data(return_type='numpy',
                            nf_keys='atomic_num',
                            ef_keys='type',
@@ -44,9 +47,6 @@ E = [label_to_one_hot(e, uniq_E) for e in E]
 F = X[0].shape[-1]    # Dimension of node features
 S = E[0].shape[-1]    # Dimension of edge features
 n_out = y.shape[-1]   # Dimension of the target
-learning_rate = 1e-3  # Learning rate
-epochs = 25           # Number of training epochs
-batch_size = 32       # Batch size
 
 # Train/test split
 A_train, A_test, \
@@ -54,71 +54,83 @@ X_train, X_test, \
 E_train, E_test, \
 y_train, y_test = train_test_split(A, X, E, y, test_size=0.1)
 
-# Model definition
-X_in = Input(batch_shape=(None, F))
-A_in = Input(batch_shape=(None, None))
-E_in = Input(batch_shape=(None, None, S))
-I_in = Input(batch_shape=(None, ), dtype='int64')
-target = Input(tensor=tf.placeholder(tf.float32, shape=(None, n_out), name='target'))
+################################################################################
+# BUILD MODEL
+################################################################################
+X_in = Input(shape=(F,), name='X_in')
+A_in = Input(shape=(None,), name='A_in')
+E_in = Input(shape=(None, S), name='E_in')
+I_in = Input(shape=(), name='segment_ids_in', dtype=tf.int32)
+target = Input(shape=(n_out,), name='target')
 
-gc1 = EdgeConditionedConv(32, activation='relu')([X_in, A_in, E_in])
-gc2 = EdgeConditionedConv(32, activation='relu')([gc1, A_in, E_in])
-pool = GlobalAvgPool()([gc2, I_in])
-output = Dense(n_out)(pool)
+X_1 = EdgeConditionedConv(32, activation='relu')([X_in, A_in, E_in])
+X_2 = EdgeConditionedConv(32, activation='relu')([X_1, A_in, E_in])
+X_3 = GlobalAvgPool()([X_2, I_in])
+output = Dense(n_out)(X_3)
 
 # Build model
 model = Model(inputs=[X_in, A_in, E_in, I_in], outputs=output)
-optimizer = Adam(lr=learning_rate)
-model.compile(optimizer=optimizer, loss='mse', target_tensors=target)
+model.compile(optimizer='adam',  # Doesn't matter, won't be used
+              loss='mse',
+              target_tensors=[target])
 model.summary()
 
 # Training setup
-sess = K.get_session()
-loss = model.total_loss
-opt = tf.train.AdamOptimizer(learning_rate=learning_rate)
-train_step = opt.minimize(loss)
-init_op = tf.global_variables_initializer()
-sess.run(init_op)
+opt = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+loss_fn = model.loss_functions[0]
 
-batches_train = batch_iterator([A_train, X_train, E_train, y_train], batch_size=batch_size, epochs=epochs)
+
+def train_loop(inputs, targets):
+    # Define the GradientTape context
+    with tf.GradientTape() as tape:
+        # Get the probabilities
+        predictions = model(inputs)
+        # Calculate the loss
+        loss = loss_fn(targets, predictions)
+    # Get the gradients
+    gradients = tape.gradient(loss, model.trainable_variables)
+    # Update the weights
+    opt.apply_gradients(zip(gradients, model.trainable_variables))
+    return loss
+
+################################################################################
+# FIT MODEL
+################################################################################
+current_batch = 0
 model_loss = 0
-batch_index = 0
 batches_in_epoch = np.ceil(len(A_train) / batch_size)
 
-# Training loop
+print('Fitting model')
+batches_train = batch_iterator([A_train, X_train, E_train, y_train], batch_size=batch_size, epochs=epochs)
 for b in batches_train:
     X_, A_, E_, I_ = Batch(b[0], b[1], b[2]).get('XAEI')
+    A_ = A_.toarray()  # ECC wants dense inputs
     y_ = b[3]
-    tr_feed_dict = {X_in: X_,
-                    A_in: A_.toarray(),
-                    E_in: E_,
-                    I_in: I_,
-                    target: y_,
-                    SW_KEY: np.ones((1,))}
-    outs = sess.run([train_step, loss], feed_dict=tr_feed_dict)
-    model_loss += outs[-1]
+    outs = train_loop([X_, A_, E_, I_], y_)
 
-    batch_index += 1
-    if batch_index == batches_in_epoch:
+    model_loss += outs.numpy()
+    current_batch += 1
+    if current_batch == batches_in_epoch:
         print('Loss: {}'.format(model_loss / batches_in_epoch))
         model_loss = 0
-        batch_index = 0
+        current_batch = 0
 
-# Test setup
-batches_test = batch_iterator([A_test, X_test, E_test, y_test], batch_size=batch_size)
+################################################################################
+# EVALUATE MODEL
+################################################################################
 model_loss = 0
 batches_in_epoch = np.ceil(len(A_test) / batch_size)
 
-# Test loop
+# Test model
+print('Testing model')
+batches_test = batch_iterator([A_test, X_test, E_test, y_test], batch_size=batch_size)
 for b in batches_test:
     X_, A_, E_, I_ = Batch(b[0], b[1], b[2]).get('XAEI')
+    A_ = sp_matrix_to_sp_tensor(A_)
     y_ = b[3]
-    tr_feed_dict = {X_in: X_,
-                    A_in: A_.toarray(),
-                    E_in: E_,
-                    I_in: I_,
-                    target: y_,
-                    SW_KEY: np.ones((1,))}
-    model_loss += sess.run([loss], feed_dict=tr_feed_dict)[0]
 
-print('Test loss: {}'.format(model_loss / batches_in_epoch))
+    predictions = model([X_, A_, E_, I_])
+    model_loss += loss_fn(y_, predictions)
+
+print('Done.\n'
+      'Test loss: {}'.format(model_loss / batches_in_epoch))

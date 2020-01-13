@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras import activations, initializers, regularizers, constraints
 from tensorflow.keras import backend as K
-from tensorflow.keras.layers import Layer, LeakyReLU, Dropout
+from tensorflow.keras.layers import Layer, LeakyReLU, Dropout, Dense
 
 from spektral.layers.ops import filter_dot
 from spektral.layers import ops
@@ -445,7 +445,6 @@ class EdgeConditionedConv(GraphConv):
     output = EdgeConditionedConv(channels)([X_in, A_in, E_in])
     ```
     """
-    # TODO: single, mixed
     def __init__(self,
                  channels,
                  kernel_network=None,
@@ -474,7 +473,24 @@ class EdgeConditionedConv(GraphConv):
         self.supports_masking = False
 
     def build(self, input_shape):
-        assert len(input_shape) >= 2
+        F = input_shape[0][-1]
+        F_ = self.channels
+        self.kernel_network_layers = []
+        if self.kernel_network is not None:
+            for i, l in enumerate(self.kernel_network):
+                self.kernel_network_layers.append(
+                    Dense(l,
+                          name='FGN_{}'.format(i),
+                          activation='relu',
+                          use_bias=self.use_bias,
+                          kernel_initializer=self.kernel_initializer,
+                          bias_initializer=self.bias_initializer,
+                          kernel_regularizer=self.kernel_regularizer,
+                          bias_regularizer=self.bias_regularizer,
+                          kernel_constraint=self.kernel_constraint,
+                          bias_constraint=self.bias_constraint)
+                )
+        self.kernel_network_layers.append(Dense(F_ * F, name='FGN_out'))
         if self.use_bias:
             self.bias = self.add_weight(shape=(self.channels,),
                                         initializer=self.bias_initializer,
@@ -502,19 +518,8 @@ class EdgeConditionedConv(GraphConv):
 
         # Filter network
         kernel_network = E
-        if self.kernel_network is not None:
-            for i, l in enumerate(self.kernel_network):
-                kernel_network = self.dense_layer(kernel_network, l,
-                                                  'FGN_{}'.format(i),
-                                                  activation='relu',
-                                                  use_bias=self.use_bias,
-                                                  kernel_initializer=self.kernel_initializer,
-                                                  bias_initializer=self.bias_initializer,
-                                                  kernel_regularizer=self.kernel_regularizer,
-                                                  bias_regularizer=self.bias_regularizer,
-                                                  kernel_constraint=self.kernel_constraint,
-                                                  bias_constraint=self.bias_constraint)
-        kernel_network = self.dense_layer(kernel_network, F_ * F, 'FGN_out')
+        for l in self.kernel_network_layers:
+            kernel_network = l(kernel_network)
 
         # Convolution
         target_shape = (-1, N, N, F_, F) if mode == ops.modes['B'] else (N, N, F_, F)
@@ -549,36 +554,6 @@ class EdgeConditionedConv(GraphConv):
         }
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
-
-    def dense_layer(self,
-                    x,
-                    units,
-                    name,
-                    activation=None,
-                    use_bias=True,
-                    kernel_initializer='glorot_uniform',
-                    bias_initializer='zeros',
-                    kernel_regularizer=None,
-                    bias_regularizer=None,
-                    kernel_constraint=None,
-                    bias_constraint=None):
-        input_dim = K.int_shape(x)[-1]
-        kernel = self.add_weight(shape=(input_dim, units),
-                                 name=name + '_kernel',
-                                 initializer=kernel_initializer,
-                                 regularizer=kernel_regularizer,
-                                 constraint=kernel_constraint)
-        bias = self.add_weight(shape=(units,),
-                               name=name + '_bias',
-                               initializer=bias_initializer,
-                               regularizer=bias_regularizer,
-                               constraint=bias_constraint)
-        act = activations.get(activation)
-        output = K.dot(x, kernel)
-        if use_bias:
-            output = K.bias_add(output, bias)
-        output = act(output)
-        return output
 
 
 class GraphAttention(GraphConv):
