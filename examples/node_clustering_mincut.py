@@ -39,7 +39,7 @@ def train_step(inputs):
 
 np.random.seed(1)
 
-iterations = 5000    # Training iterations
+epochs = 5000        # Training iterations
 gnn_channels = 16    # Units in the GNN layer
 mlp_channels = None  # Units in the MLP of MinCutPool Layer (if None, the MLP has no hidden layers)
 gnn_activ = 'elu'    # Activation for the GNN layer
@@ -85,7 +85,7 @@ opt = tf.keras.optimizers.Adam(learning_rate=lr)
 # Fit model
 loss_history = []
 nmi_history = []
-for _ in tqdm(range(iterations)):
+for _ in tqdm(range(epochs)):
     outs = train_step(inputs)
     outs = [o.numpy() for o in outs]
     loss_history.append((outs[0], outs[1], (outs[0] + outs[1])))
