@@ -69,6 +69,12 @@
 
     <li class="toctree-l2"><a href="#installation">Installation</a></li>
     
+        <ul>
+        
+            <li><a class="toctree-l3" href="#tensorflow-2-tfkeras-and-future-development">TensorFlow 2, tf.keras, and future development</a></li>
+        
+        </ul>
+    
 
     <li class="toctree-l2"><a href="#contributing">Contributing</a></li>
     
@@ -297,6 +303,16 @@ $ python setup.py install  # Or 'pip install .'
 ! pip install spektral
 </code></pre>
 
+<h3 id="tensorflow-2-tfkeras-and-future-development">TensorFlow 2, tf.keras, and future development</h3>
+<p>Starting from version 0.2, Spektral will only support TensorFlow 2 and tf.keras.<br />
+The migration is happening on the <code>tf2</code> branch (which is now the active development branch), and TF2 users can already use the library (including examples) by installing from source:</p>
+<pre><code class="bash">$ git clone https://github.com/danielegrattarola/spektral.git
+$ cd spektral
+$ git checkout tf2
+$ python setup.py install  # Or 'pip install .'
+</code></pre>
+
+<p>In the future, the TF1-compatible version of Spektral (&lt;0.2) will gradually be discontinued.  </p>
 <h2 id="contributing">Contributing</h2>
 <p>Spektral is an open source project available <a href="https://github.com/danielegrattarola/spektral">on Github</a>, and contributions of all types are welcome. Feel free to open a pull request if you have something interesting that you want to add to the framework.</p>
               
@@ -350,5 +366,5 @@ $ python setup.py install  # Or 'pip install .'
 
 <!--
 MkDocs version : 1.0.4
-Build Date UTC : 2019-12-06 17:01:09
+Build Date UTC : 2020-01-13 23:38:12
 -->
