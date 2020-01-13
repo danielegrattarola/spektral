@@ -119,6 +119,9 @@ def localpooling_filter(adj, symmetric=True):
     else:
         A_tilde = adj + I
         fltr = normalized_adjacency(A_tilde, symmetric=symmetric)
+
+    if sp.issparse(fltr):
+        fltr.sort_indices()
     return fltr
 
 
@@ -174,8 +177,9 @@ def chebyshev_filter(adj, k, symmetric=True):
     T_k = chebyshev_polynomial(L_scaled, k)
 
     # Sort indices
-    for i in range(len(T_k)):
-        T_k[i].sort_indices()
+    if sp.issparse(T_k[0]):
+        for i in range(len(T_k)):
+            T_k[i].sort_indices()
 
     return T_k
 

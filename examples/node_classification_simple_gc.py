@@ -36,6 +36,7 @@ fltr = localpooling_filter(A).astype('f4')
 # Pre-compute propagation
 for i in range(K - 1):
     fltr = fltr.dot(fltr)
+fltr.sort_indices()
 
 # Model definition
 X_in = Input(shape=(F, ))
