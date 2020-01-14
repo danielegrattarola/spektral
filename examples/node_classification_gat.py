@@ -41,9 +41,8 @@ X = X.todense()
 X_in = Input(shape=(F,))
 A_in = Input(shape=(N,), sparse=False)
 
-net = X_in
 
-net = Dropout(dropout)(net)
+net = Dropout(dropout)(X_in)
 net = GraphAttention(
     channels,
     attn_heads=n_attn_heads,
@@ -91,3 +90,4 @@ model.fit(
 print("Evaluating model.")
 eval_results = model.evaluate([X, A], y, sample_weight=test_mask, batch_size=N)
 print("Done.\n" "Test loss: {}\n" "Test accuracy: {}".format(*eval_results))
+
