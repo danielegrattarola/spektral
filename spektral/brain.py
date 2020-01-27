@@ -2,7 +2,7 @@ import numpy as np
 from scipy import stats
 
 try:
-    from dyfunconn import fc
+    from dyconnmap import fc
 except ImportError:
     fc = None
 
@@ -27,17 +27,17 @@ def get_fc_graphs(x, fc_measure, nf_mode,
     percentile.
     :param self_loops: add self-loops to the adjacency matrices.
     :param band_freq: tuple of 2 floats >0, filter the signal with a bandpass
-    filter in this band. mandatory when using dyfunconn.
-    :param band_freq_hi: mandatory when using dyfunconn.aec().
+    filter in this band. mandatory when using dyconnmap.
+    :param band_freq_hi: mandatory when using dyconnmap.aec().
     :param sampling_freq: sampling frequency of the data. Mandatory when
-    using dyfunconn.
-    :param nfft: mandatory when using dyfunconn.wpli() and dyfunconn.dwpli().
-    :param n_overlap: mandatory when using dyfunconn.wpli() and dyfunconn.dwpli().
+    using dyconnmap.
+    :param nfft: mandatory when using dyconnmap.wpli() and dyconnmap.dwpli().
+    :param n_overlap: mandatory when using dyconnmap.wpli() and dyconnmap.dwpli().
     :return:
     """
     if fc is None:
         raise ImportError('Creating functional connectivity networks '
-                          'requires dyfunconn.')
+                          'requires dyconnmap.')
     if x.ndim != 2:
         raise ValueError('Expected x to have rank 2, got {}'.format(x.ndim))
     if samples_per_graph is None:

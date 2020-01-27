@@ -27,21 +27,21 @@ You can use Spektral for classifying the nodes of a network, predicting molecula
 
 Spektral implements some of the most popular layers for graph deep learning, including: 
 
-- [Graph convolutional networks (GCN)](https://arxiv.org/abs/1609.02907)
+- [Graph Convolutional Networks (GCN)](https://arxiv.org/abs/1609.02907)
 - [Chebyshev networks (ChebNets)](https://arxiv.org/abs/1606.09375)
-- [GraphSage](https://arxiv.org/abs/1706.02216)
-- [Edge-conditioned convolutions (ECC)](https://arxiv.org/abs/1704.02901)
-- [Graph attention networks (GAT)](https://arxiv.org/abs/1710.10903)
+- [GraphSAGE](https://arxiv.org/abs/1706.02216)
 - [ARMA convolutions](https://arxiv.org/abs/1901.01343)
-- [Approximated personalized propagation of neural predictions (APPNP)](https://arxiv.org/abs/1810.0599)
-- [Graph isomorphism networks (GIN)](https://arxiv.org/abs/1810.00826)
+- [Edge-Conditioned Convolutions (ECC)](https://arxiv.org/abs/1704.02901)
+- [Graph attention networks (GAT)](https://arxiv.org/abs/1710.10903)
+- [Approximated Personalized Propagation of Neural Predictions (APPNP)](https://arxiv.org/abs/1810.05997)
+- [Graph Isomorphism Networks (GIN)](https://arxiv.org/abs/1810.00826)
 
 You can also find [pooling layers](https://danielegrattarola.github.io/spektral/layers/pooling/), including:
 
-- [Top-K pooling](http://proceedings.mlr.press/v97/gao19a/gao19a.pdf)
-- [Self-attention graph (SAG) pooling](https://arxiv.org/abs/1904.08082)
-- [MinCUT pooling](https://arxiv.org/abs/1907.00481)
 - [DiffPool](https://arxiv.org/abs/1806.08804)
+- [MinCUT pooling](https://arxiv.org/abs/1907.00481)
+- [Top-K pooling](http://proceedings.mlr.press/v97/gao19a/gao19a.pdf)
+- [Self-Attention Graph (SAG) pooling](https://arxiv.org/abs/1904.08082)
 - Global sum, average, and max pooling
 - [Global gated attention pooling](https://arxiv.org/abs/1511.05493)
 
@@ -50,7 +50,7 @@ Spektral also includes lots of utilities for your graph deep learning projects.
 See how to [get started with Spektral](https://danielegrattarola.github.io/spektral/getting-started/) and have a look at the [examples](https://danielegrattarola.github.io/spektral/examples/) for some project templates.
 
 The source code of the project is available on [Github](https://github.com/danielegrattarola/spektral).  
-Read the documentation [here](https://danielegrattarola.github.io/spektral).
+Read the documentation [here](https://spektral.graphneural.network).
 
 ## Installation
 Spektral is compatible with Python 3.5+, and is tested on Ubuntu 16.04+ and MacOS. 
@@ -59,26 +59,26 @@ Other Linux distros should work as well, but Windows is not supported for now.
 To install the required dependencies on Ubuntu run:
 
 ```bash
-$ sudo apt install graphviz libgraphviz-dev libcgraph6
+sudo apt install graphviz libgraphviz-dev libcgraph6
 ```
 
 Some features of Spektral also require the following optional dependencies:
 
  - [RDKit](http://www.rdkit.org/docs/index.html), a library for cheminformatics and molecule manipulation (available through Anaconda);
- - [dyfunconn](https://dyfunconn.readthedocs.io/), a library to build functional connectivity networks (available through PyPi);
+ - [dyconnmap](https://github.com/makism/dyconnmap), a library to build functional connectivity networks (available through PyPi);
 
 The simplest way to install Spektral is from PyPi: 
 
 ```bash
-$ pip install spektral
+pip install spektral
 ```
 
 To install Spektral from source, run this in a terminal:
 
 ```bash
-$ git clone https://github.com/danielegrattarola/spektral.git
-$ cd spektral
-$ python setup.py install  # Or 'pip install .'
+git clone https://github.com/danielegrattarola/spektral.git
+cd spektral
+python setup.py install  # Or 'pip install .'
 ```
 
 To install Spektral on [Google Colab](https://colab.research.google.com/):

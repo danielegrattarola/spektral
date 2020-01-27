@@ -77,7 +77,7 @@ def degree_matrix(A, return_sparse_batch=False):
     automatically.
     :param A: Tensor or SparseTensor with rank k = {2, 3}.
     :param return_sparse_batch: if operating in batch mode, return a
-    SparseTensor. Note that the sparse degree tensor returned by this function
+    SparseTensor. Note that the sparse degree Tensor returned by this function
     cannot be used for sparse matrix multiplication afterwards.
     :return: SparseTensor of rank k.
     """
@@ -435,10 +435,10 @@ def repeat(x, repeats):
     """
     Repeats elements of a Tensor (equivalent to np.repeat, but only for 1D
     tensors).
-    :param x: rank 1 tensor;
-    :param repeats: rank 1 tensor with same shape as x, the number of
+    :param x: rank 1 Tensor;
+    :param repeats: rank 1 Tensor with same shape as x, the number of
     repetitions for each element;
-    :return: rank 1 tensor, of shape `(sum(repeats), )`.
+    :return: rank 1 Tensor, of shape `(sum(repeats), )`.
     """
     x = tf.expand_dims(x, 1)
     max_repeats = tf.reduce_max(repeats)
@@ -454,12 +454,12 @@ def segment_top_k(x, I, ratio, top_k_var):
     Returns indices to get the top K values in x segment-wise, according to
     the segments defined in I. K is not fixed, but it is defined as a ratio of
     the number of elements in each segment.
-    :param x: a rank 1 tensor;
-    :param I: a rank 1 tensor with segment IDs for x;
+    :param x: a rank 1 Tensor;
+    :param I: a rank 1 Tensor with segment IDs for x;
     :param ratio: float, ratio of elements to keep for each segment;
     :param top_k_var: a tf.Variable created without shape validation (i.e.,
     `tf.Variable(0.0, validate_shape=False)`);
-    :return: a rank 1 tensor containing the indices to get the top K values of
+    :return: a rank 1 Tensor containing the indices to get the top K values of
     each segment in x.
     """
     num_nodes = tf.math.segment_sum(tf.ones_like(I), I)  # Number of nodes in each graph
