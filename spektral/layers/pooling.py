@@ -10,39 +10,47 @@ from spektral.layers import ops, filter_dot
 # Pooling layers
 ################################################################################
 class DiffPool(Layer):
-    """
-    A DiffPool layer as presented by [Ying et al.](https://arxiv.org/abs/1806.08804).
+    r"""
+    A DiffPool layer as presented by
+    [Ying et al.](https://arxiv.org/abs/1806.08804).
 
     **Mode**: single, batch.
 
-    This layer computes a soft clustering \(S\) of the input graphs using a GNN,
+    This layer computes a soft clustering \(\S\) of the input graphs using a GNN,
     and reduces graphs as follows:
 
     $$
-        A^{pool} = S^T A S; X^{pool} = S^T X;
+        \S = \textrm{GNN}(\A, \X); \\
+        \A' = \S^\top \A \S; \X' = \S^\top \X;
     $$
 
-    Besides training the GNN, two additional unsupervised loss terms are
-    minimized. The layer also applies a GNN to the input features, and returns
+    where GNN consists of one GraphConv layer with softmax activation.
+    Two auxiliary loss terms are also added to the model: the _link prediction
+    loss_
+    $$
+        \big\| \A - \S\S^\top \big\|_F
+    $$
+    and the _entropy loss_
+    $$
+        - \frac{1}{N} \sum\limits_{i = 1}^{N} \S \log (\S).
+    $$
+
+    The layer also applies a 1-layer GCN to the input features, and returns
     the updated graph signal (the number of output channels is controlled by
     the `channels` parameter).
     The layer can be used without a supervised loss, to compute node clustering
-    simply by minimizing the unsupervised loss.
+    simply by minimizing the two auxiliary losses.
 
     **Input**
 
-    - node features of shape `(n_nodes, n_features)` (with optional `batch`
-    dimension);
-    - adjacency matrix of shape `(n_nodes, n_nodes)` (with optional `batch`
-    dimension);
+    - Node features of shape `([batch], N, F)`;
+    - Binary adjacency matrix of shape `([batch], N, N)`;
 
     **Output**
 
-    - reduced node features of shape `(k, channels)`;
-    - reduced adjacency matrix of shape `(k, k)`;
-    - reduced graph IDs with shape `(k, )` (disjoint mode);
-    - If `return_mask=True`, the soft assignment matrix used for pooling, with
-    shape `(n_nodes, k)`.
+    - Reduced node features of shape `([batch], K, channels)`;
+    - Reduced adjacency matrix of shape `([batch], K, K)`;
+    - If `return_mask=True`, the soft clustering matrix of shape `([batch], N, K)`.
 
     **Arguments**
 
@@ -207,51 +215,57 @@ class DiffPool(Layer):
 
 
 class MinCutPool(Layer):
-    """
-    A minCUT pooling layer as presented by [Bianchi et al.](https://arxiv.org/abs/1907.00481).
+    r"""
+    A minCUT pooling layer as presented by
+    [Bianchi et al.](https://arxiv.org/abs/1907.00481).
 
     **Mode**: single, batch.
 
-    This layer computes a soft clustering \(S\) of the input graphs using a MLP,
+    This layer computes a soft clustering \(\S\) of the input graphs using a MLP,
     and reduces graphs as follows:
 
     $$
-        A^{pool} = S^T A S; X^{pool} = S^T X;
+        \S = \textrm{MLP}(\X); \\
+        \A' = \S^\top \A \S; \X' = \S^\top \X;
     $$
 
-    Besides training the MLP, two additional unsupervised loss terms are
-    minimized to ensure that the cluster assignment solves the minCUT
-    optimization problem.
+    where MLP is a multi-layer perceptron with softmax output.
+    Two auxiliary loss terms are also added to the model: the _minCUT loss_
+    $$
+        - \frac{ \mathrm{Tr}(\S^\top \A \S) }{ \mathrm{Tr}(\S^\top \D \S) }
+    $$
+    and the _orthogonality loss_
+    $$
+        \left\|
+            \frac{\S^\top \S}{\| \S^\top \S \|_F}
+            - \frac{\I_K}{\sqrt{K}}
+        \right\|_F.
+    $$
+
     The layer can be used without a supervised loss, to compute node clustering
-    simply by minimizing the unsupervised loss.
+    simply by minimizing the two auxiliary losses.
 
     **Input**
 
-    - node features of shape `(n_nodes, n_features)` (with optional `batch`
-    dimension);
-    - adjacency matrix of shape `(n_nodes, n_nodes)` (with optional `batch`
-    dimension);
+    - Node features of shape `([batch], N, F)`;
+    - Binary adjacency matrix of shape `([batch], N, N)`;
 
     **Output**
 
-    - reduced node features of shape `(k, n_features)`;
-    - reduced adjacency matrix of shape `(k, k)`;
-    - reduced graph IDs with shape `(k, )` (disjoint mode);
-    - If `return_mask=True`, the soft assignment matrix used for pooling, with
-    shape `(n_nodes, k)`.
+    - Reduced node features of shape `([batch], K, channels)`;
+    - Reduced adjacency matrix of shape `([batch], K, K)`;
+    - If `return_mask=True`, the soft clustering matrix of shape `([batch], N, K)`.
 
     **Arguments**
 
     - `k`: number of nodes to keep;
-    - `h`: number of units in the hidden layer;
+    - `channels`: number of output channels (if None, the number of output
+    channels is assumed to be the same as the input);
     - `return_mask`: boolean, whether to return the cluster assignment matrix,
     - `kernel_initializer`: initializer for the kernel matrix;
-    - `bias_initializer`: initializer for the bias vector;
     - `kernel_regularizer`: regularization applied to the kernel matrix;
-    - `bias_regularizer`: regularization applied to the bias vector;
     - `activity_regularizer`: regularization applied to the output;
     - `kernel_constraint`: constraint applied to the kernel matrix;
-    - `bias_constraint`: constraint applied to the bias vector.
     """
     def __init__(self,
                  k,
@@ -425,48 +439,49 @@ class MinCutPool(Layer):
 
 
 class TopKPool(Layer):
-    """
+    r"""
     A gPool/Top-K layer as presented by
-    [Gao & Ji (2017)](http://proceedings.mlr.press/v97/gao19a/gao19a.pdf) and
+    [Gao & Ji](http://proceedings.mlr.press/v97/gao19a/gao19a.pdf) and
     [Cangea et al.](https://arxiv.org/abs/1811.01287).
 
     This layer computes the following operations:
 
     $$
-    y = \\cfrac{Xp}{\\| p \\|}; \\;\\;\\;\\;
-    \\textrm{idx} = \\textrm{rank}(y, k); \\;\\;\\;\\;
-    \\bar X = (X \\odot \\textrm{tanh}(y))_{\\textrm{idx}}; \\;\\;\\;\\;
-    \\bar A = A^2_{\\textrm{idx}, \\textrm{idx}}
+    \y = \frac{\X\p}{\|\p\|}; \;\;\;\;
+    \i = \textrm{rank}(\y, K); \;\;\;\;
+    \X' = (\X \odot \textrm{tanh}(\y))_\i; \;\;\;\;
+    \A' = \A^2_{\i, \i}
     $$
 
-    where \( \\textrm{rank}(y, k) \) returns the indices of the top k values of
-    \( y \), and \( p \) is a learnable parameter vector of size \(F\).
-    Note that the the gating operation \( \\textrm{tanh}(y) \) (Cangea et al.)
-    can be replaced with a sigmoid (Gao & Ji). The original paper by Gao & Ji
+    where \( \textrm{rank}(\y, K) \) returns the indices of the top K values of
+    \(\y\), and \(\p\) is a learnable parameter vector of size \(F\).
+    Note that the the gating operation \(\textrm{tanh}(\y)\) (Cangea et al.)
+    can be replaced with a sigmoid (Gao & Ji). The paper by Gao & Ji originally
     used a tanh as well, but was later updated to use a sigmoid activation.
 
     Due to the lack of sparse-sparse matrix multiplication support, this layer
-    temporarily makes the adjacency matrix dense in order to compute \(A^2\)
+    temporarily makes the adjacency matrix dense in order to compute \(\A^2\)
     (needed to preserve connectivity after pooling).
+
     **If memory is not an issue, considerable speedups can be achieved by using
     dense graphs directly.
-    Converting a graph from dense to sparse and viceversa is a costly operation.**
+    Converting a graph from sparse to dense and back to sparse is an expensive
+    operation.**
 
     **Mode**: single, disjoint.
 
     **Input**
 
-    - node features of shape `(n_nodes, n_features)`;
-    - adjacency matrix of shape `(n_nodes, n_nodes)`;
-    - (optional) graph IDs of shape `(n_nodes, )` (disjoint mode);
+    - Node features of shape `(N, F)`;
+    - Binary adjacency matrix of shape `(N, N)`;
+    - Graph IDs of shape `(N, )` (only in disjoint mode);
 
     **Output**
 
-    - reduced node features of shape `(n_graphs * k, n_features)`;
-    - reduced adjacency matrix of shape `(n_graphs * k, n_graphs * k)`;
-    - reduced graph IDs with shape `(n_graphs * k, )` (disjoint mode);
-    - If `return_mask=True`, the binary mask used for pooling, with shape
-    `(n_graphs * k, )`.
+    - Reduced node features of shape `(K, channels)`;
+    - Reduced adjacency matrix of shape `(K, K)`;
+    - Reduced graph IDs of shape `(K, )` (only in disjoint mode);
+    - If `return_mask=True`, the binary pooling mask of shape `(K, )`.
 
     **Arguments**
 
@@ -583,30 +598,32 @@ class TopKPool(Layer):
 
 
 class SAGPool(Layer):
-    """
+    r"""
     A self-attention graph pooling layer as presented by
     [Lee et al. (2019)](https://arxiv.org/abs/1904.08082) and
-    [Knyazev et al. (2019](https://arxiv.org/abs/1905.02850).
+    [Knyazev et al. (2019)](https://arxiv.org/abs/1905.02850).
 
     This layer computes the following operations:
 
     $$
-    y = GNN(X, A); \\;\\;\\;\\;
-    \\textrm{idx} = \\textrm{rank}(y, k); \\;\\;\\;\\;
-    \\bar X = (X \\odot \\textrm{tanh}(y))_{\\textrm{idx}}; \\;\\;\\;\\;
-    \\bar A = A^2_{\\textrm{idx}, \\textrm{idx}}
+    \y = \textrm{GNN}(\A, \X); \;\;\;\;
+    \i = \textrm{rank}(\y, K); \;\;\;\;
+    \X' = (\X \odot \textrm{tanh}(\y))_\i; \;\;\;\;
+    \A' = \A^2_{\i, \i}
     $$
 
-    where \( \\textrm{rank}(y, k) \) returns the indices of the top k values of
-    \( y \), and \( p \) is a learnable parameter vector of size \(F\).
-    The gating operation \( \\textrm{tanh}(y) \) can be replaced with a sigmoid.
+    where \( \textrm{rank}(\y, K) \) returns the indices of the top K values of
+    \(\y\), and \(\textrm{GNN}\) consists of one GraphConv layer with no
+    activation.
 
     Due to the lack of sparse-sparse matrix multiplication support, this layer
-    temporarily makes the adjacency matrix dense in order to compute \(A^2\)
+    temporarily makes the adjacency matrix dense in order to compute \(\A^2\)
     (needed to preserve connectivity after pooling).
+
     **If memory is not an issue, considerable speedups can be achieved by using
     dense graphs directly.
-    Converting a graph from dense to sparse and viceversa is a costly operation.**
+    Converting a graph from sparse to dense and back to sparse is an expensive
+    operation.**
 
     **Mode**: single, disjoint.
 
@@ -794,14 +811,13 @@ class GlobalSumPool(GlobalPooling):
 
     **Input**
 
-    - node features of shape `(n_nodes, n_features)` (with optional `batch`
-    dimension);
-    - (optional) graph IDs of shape `(n_nodes, )` (disjoint mode);
+    - Node features of shape `([batch], N, F)`;
+    - Graph IDs of shape `(N, )` (only in disjoint mode);
 
     **Output**
 
-    - Tensor like node features, but without node dimension (except for single
-    mode, where the node dimension is preserved and set to 1).
+    - Pooled node features of shape `([batch], F)` (if single mode, shape will
+    be `(1, F)`).
 
     **Arguments**
 
@@ -823,18 +839,18 @@ class GlobalAvgPool(GlobalPooling):
 
     **Input**
 
-    - node features of shape `(n_nodes, n_features)` (with optional `batch`
-    dimension);
-    - (optional) graph IDs of shape `(n_nodes, )` (disjoint mode);
+    - Node features of shape `([batch], N, F)`;
+    - Graph IDs of shape `(N, )` (only in disjoint mode);
 
     **Output**
 
-    - Tensor like node features, but without node dimension (except for single
-    mode, where the node dimension is preserved and set to 1).
+    - Pooled node features of shape `([batch], F)` (if single mode, shape will
+    be `(1, F)`).
 
     **Arguments**
 
     None.
+
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -851,18 +867,18 @@ class GlobalMaxPool(GlobalPooling):
 
     **Input**
 
-    - node features of shape `(n_nodes, n_features)` (with optional `batch`
-    dimension);
-    - (optional) graph IDs of shape `(n_nodes, )` (disjoint mode);
+    - Node features of shape `([batch], N, F)`;
+    - Graph IDs of shape `(N, )` (only in disjoint mode);
 
     **Output**
 
-    - Tensor like node features, but without node dimension (except for single
-    mode, where the node dimension is preserved and set to 1).
+    - Pooled node features of shape `([batch], F)` (if single mode, shape will
+    be `(1, F)`).
 
     **Arguments**
 
     None.
+
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -871,23 +887,27 @@ class GlobalMaxPool(GlobalPooling):
 
 
 class GlobalAttentionPool(GlobalPooling):
-    """
+    r"""
     A gated attention global pooling layer as presented by
     [Li et al. (2017)](https://arxiv.org/abs/1511.05493).
+
+    This layer computes:
+    $$
+        \X' = \sum\limits_{i=1}^{N} (\sigma(\X \W_1 + \b_1) \odot (\X \W_2 + \b_2))_i
+    $$
+    where \(\sigma\) is the sigmoid activation function.
 
     **Mode**: single, mixed, batch, disjoint.
 
     **Input**
 
-    - node features of shape `(n_nodes, n_features)` (with optional `batch`
-    dimension);
-    - (optional) graph IDs of shape `(n_nodes, )` (disjoint mode);
+    - Node features of shape `([batch], N, F)`;
+    - Graph IDs of shape `(N, )` (only in disjoint mode);
 
     **Output**
 
-    - Tensor like node features, but without node dimension (except for single
-    mode, where the node dimension is preserved and set to 1), and last
-    dimension changed to `channels`.
+    - Pooled node features of shape `([batch], F)` (if single mode, shape will
+    be `(1, F)`).
 
     **Arguments**
 
@@ -1000,22 +1020,29 @@ class GlobalAttentionPool(GlobalPooling):
 
 
 class GlobalAttnSumPool(GlobalPooling):
-    """
+    r"""
     A node-attention global pooling layer. Pools a graph by learning attention
     coefficients to sum node features.
+
+    This layer computes:
+    $$
+        \alpha = \textrm{softmax}( \X \a); \\
+        \X' = \sum\limits_{i=1}^{N} \alpha_i \cdot \X_i
+    $$
+    where \(\a \in \mathbb{R}^F\) is a trainable vector. Note that the softmax
+    is applied across nodes, and not across features.
 
     **Mode**: single, mixed, batch, disjoint.
 
     **Input**
 
-    - node features of shape `(n_nodes, n_features)` (with optional `batch`
-    dimension);
-    - (optional) graph IDs of shape `(n_nodes, )` (disjoint mode);
+    - Node features of shape `([batch], N, F)`;
+    - Graph IDs of shape `(N, )` (only in disjoint mode);
 
     **Output**
 
-    - Tensor like node features, but without node dimension (except for single
-    mode, where the node dimension is preserved and set to 1).
+    - Pooled node features of shape `([batch], F)` (if single mode, shape will
+    be `(1, F)`).
 
     **Arguments**
 
