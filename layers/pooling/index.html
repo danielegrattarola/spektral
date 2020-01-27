@@ -92,13 +92,13 @@
     <a class="current" href="./">Pooling Layers</a>
     <ul class="subnav">
             
-    <li class="toctree-l3"><a href="#topkpool">TopKPool</a></li>
+    <li class="toctree-l3"><a href="#diffpool">DiffPool</a></li>
     
 
     <li class="toctree-l3"><a href="#mincutpool">MinCutPool</a></li>
     
 
-    <li class="toctree-l3"><a href="#diffpool">DiffPool</a></li>
+    <li class="toctree-l3"><a href="#topkpool">TopKPool</a></li>
     
 
     <li class="toctree-l3"><a href="#sagpool">SAGPool</a></li>
@@ -244,7 +244,115 @@
           <div role="main">
             <div class="section">
               
-                <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L12">[source]</a></span></p>
+                <p>The pooling layers from these papers are available in Spektral:</p>
+<ul>
+<li><a href="https://arxiv.org/abs/1806.08804">Hierarchical Graph Representation Learning with Differentiable Pooling</a></li>
+<li><a href="https://arxiv.org/abs/1907.00481">Mincut pooling in Graph Neural Networks</a></li>
+<li><a href="http://proceedings.mlr.press/v97/gao19a/gao19a.pdf">Graph U-Nets</a></li>
+<li><a href="https://arxiv.org/abs/1904.08082">Self-Attention Graph Pooling</a></li>
+<li><a href="https://arxiv.org/abs/1511.05493">Gated Graph Sequence Neural Networks</a></li>
+</ul>
+<p>Additionally, sum, average, and max global pooling are implemented, as well as 
+a simple global weighted sum pooling where weights are calculated with an 
+attention mechanism. </p>
+<p>See <a href="/layers/convolution">the convolutional layers page</a> for the notation. </p>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L12">[source]</a></span></p>
+<h3 id="diffpool">DiffPool</h3>
+<pre><code class="python">spektral.layers.DiffPool(k, channels=None, return_mask=True, activation=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None)
+</code></pre>
+
+<p>A DiffPool layer as presented by <a href="https://arxiv.org/abs/1806.08804">Ying et al.</a>.</p>
+<p><strong>Mode</strong>: single, batch.</p>
+<p>This layer computes a soft clustering <script type="math/tex">S</script> of the input graphs using a GNN,
+and reduces graphs as follows:</p>
+<p>
+<script type="math/tex; mode=display">
+A^{pool} = S^T A S; X^{pool} = S^T X;
+</script>
+</p>
+<p>Besides training the GNN, two additional unsupervised loss terms are
+minimized. The layer also applies a GNN to the input features, and returns
+the updated graph signal (the number of output channels is controlled by
+the <code>channels</code> parameter).
+The layer can be used without a supervised loss, to compute node clustering
+simply by minimizing the unsupervised loss.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>node features of shape <code>(n_nodes, n_features)</code> (with optional <code>batch</code>
+dimension);</li>
+<li>adjacency matrix of shape <code>(n_nodes, n_nodes)</code> (with optional <code>batch</code>
+dimension);</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>reduced node features of shape <code>(k, channels)</code>;</li>
+<li>reduced adjacency matrix of shape <code>(k, k)</code>;</li>
+<li>reduced graph IDs with shape <code>(k, )</code> (disjoint mode);</li>
+<li>If <code>return_mask=True</code>, the soft assignment matrix used for pooling, with
+shape <code>(n_nodes, k)</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>k</code>: number of nodes to keep;</li>
+<li><code>channels</code>: number of output channels (if None, the number of output
+channels is assumed to be the same as the input);</li>
+<li><code>return_mask</code>: boolean, whether to return the cluster assignment matrix,</li>
+<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
+<li><code>activity_regularizer</code>: regularization applied to the output;</li>
+<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L209">[source]</a></span></p>
+<h3 id="mincutpool">MinCutPool</h3>
+<pre><code class="python">spektral.layers.MinCutPool(k, h=None, return_mask=True, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+</code></pre>
+
+<p>A minCUT pooling layer as presented by <a href="https://arxiv.org/abs/1907.00481">Bianchi et al.</a>.</p>
+<p><strong>Mode</strong>: single, batch.</p>
+<p>This layer computes a soft clustering <script type="math/tex">S</script> of the input graphs using a MLP,
+and reduces graphs as follows:</p>
+<p>
+<script type="math/tex; mode=display">
+A^{pool} = S^T A S; X^{pool} = S^T X;
+</script>
+</p>
+<p>Besides training the MLP, two additional unsupervised loss terms are
+minimized to ensure that the cluster assignment solves the minCUT
+optimization problem.
+The layer can be used without a supervised loss, to compute node clustering
+simply by minimizing the unsupervised loss.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>node features of shape <code>(n_nodes, n_features)</code> (with optional <code>batch</code>
+dimension);</li>
+<li>adjacency matrix of shape <code>(n_nodes, n_nodes)</code> (with optional <code>batch</code>
+dimension);</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>reduced node features of shape <code>(k, n_features)</code>;</li>
+<li>reduced adjacency matrix of shape <code>(k, k)</code>;</li>
+<li>reduced graph IDs with shape <code>(k, )</code> (disjoint mode);</li>
+<li>If <code>return_mask=True</code>, the soft assignment matrix used for pooling, with
+shape <code>(n_nodes, k)</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>k</code>: number of nodes to keep;</li>
+<li><code>h</code>: number of units in the hidden layer;</li>
+<li><code>return_mask</code>: boolean, whether to return the cluster assignment matrix,</li>
+<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
+<li><code>bias_initializer</code>: initializer for the bias vector;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
+<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
+<li><code>activity_regularizer</code>: regularization applied to the output;</li>
+<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
+<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L427">[source]</a></span></p>
 <h3 id="topkpool">TopKPool</h3>
 <pre><code class="python">spektral.layers.TopKPool(ratio, return_mask=False, sigmoid_gating=False, kernel_initializer='glorot_uniform', kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None)
 </code></pre>
@@ -299,102 +407,7 @@ tanh;</li>
 <li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L323">[source]</a></span></p>
-<h3 id="mincutpool">MinCutPool</h3>
-<pre><code class="python">spektral.layers.MinCutPool(k, h=None, return_mask=True, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
-</code></pre>
-
-<p>A minCUT pooling layer as presented by <a href="https://arxiv.org/abs/1907.00481">Bianchi et al.</a>.</p>
-<p><strong>Mode</strong>: single, batch.</p>
-<p>This layer computes a soft clustering <script type="math/tex">S</script> of the input graphs using a MLP,
-and reduces graphs as follows:</p>
-<p>
-<script type="math/tex; mode=display">
-A^{pool} = S^T A S; X^{pool} = S^T X;
-</script>
-</p>
-<p>Besides training the MLP, two additional unsupervised loss terms are
-minimized to ensure that the cluster assignment solves the minCUT
-optimization problem.
-The layer can be used without a supervised loss, to compute node clustering
-simply by minimizing the unsupervised loss.</p>
-<p><strong>Input</strong></p>
-<ul>
-<li>node features of shape <code>(n_nodes, n_features)</code> (with optional <code>batch</code>
-dimension);</li>
-<li>adjacency matrix of shape <code>(n_nodes, n_nodes)</code> (with optional <code>batch</code>
-dimension);</li>
-</ul>
-<p><strong>Output</strong></p>
-<ul>
-<li>reduced node features of shape <code>(k, n_features)</code>;</li>
-<li>reduced adjacency matrix of shape <code>(k, k)</code>;</li>
-<li>reduced graph IDs with shape <code>(k, )</code> (disjoint mode);</li>
-<li>If <code>return_mask=True</code>, the soft assignment matrix used for pooling, with
-shape <code>(n_nodes, k)</code>.</li>
-</ul>
-<p><strong>Arguments</strong></p>
-<ul>
-<li><code>k</code>: number of nodes to keep;</li>
-<li><code>h</code>: number of units in the hidden layer;</li>
-<li><code>return_mask</code>: boolean, whether to return the cluster assignment matrix,</li>
-<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
-<li><code>bias_initializer</code>: initializer for the bias vector;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
-<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
-<li><code>activity_regularizer</code>: regularization applied to the output;</li>
-<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
-<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
-</ul>
-<hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L540">[source]</a></span></p>
-<h3 id="diffpool">DiffPool</h3>
-<pre><code class="python">spektral.layers.DiffPool(k, channels=None, return_mask=True, activation=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None)
-</code></pre>
-
-<p>A DiffPool layer as presented by <a href="https://arxiv.org/abs/1806.08804">Ying et al.</a>.</p>
-<p><strong>Mode</strong>: single, batch.</p>
-<p>This layer computes a soft clustering <script type="math/tex">S</script> of the input graphs using a GNN,
-and reduces graphs as follows:</p>
-<p>
-<script type="math/tex; mode=display">
-A^{pool} = S^T A S; X^{pool} = S^T X;
-</script>
-</p>
-<p>Besides training the GNN, two additional unsupervised loss terms are
-minimized. The layer also applies a GNN to the input features, and returns
-the updated graph signal (the number of output channels is controlled by
-the <code>channels</code> parameter).
-The layer can be used without a supervised loss, to compute node clustering
-simply by minimizing the unsupervised loss.</p>
-<p><strong>Input</strong></p>
-<ul>
-<li>node features of shape <code>(n_nodes, n_features)</code> (with optional <code>batch</code>
-dimension);</li>
-<li>adjacency matrix of shape <code>(n_nodes, n_nodes)</code> (with optional <code>batch</code>
-dimension);</li>
-</ul>
-<p><strong>Output</strong></p>
-<ul>
-<li>reduced node features of shape <code>(k, channels)</code>;</li>
-<li>reduced adjacency matrix of shape <code>(k, k)</code>;</li>
-<li>reduced graph IDs with shape <code>(k, )</code> (disjoint mode);</li>
-<li>If <code>return_mask=True</code>, the soft assignment matrix used for pooling, with
-shape <code>(n_nodes, k)</code>.</li>
-</ul>
-<p><strong>Arguments</strong></p>
-<ul>
-<li><code>k</code>: number of nodes to keep;</li>
-<li><code>channels</code>: number of output channels (if None, the number of output
-channels is assumed to be the same as the input);</li>
-<li><code>return_mask</code>: boolean, whether to return the cluster assignment matrix,</li>
-<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
-<li><code>activity_regularizer</code>: regularization applied to the output;</li>
-<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
-</ul>
-<hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L169">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L585">[source]</a></span></p>
 <h3 id="sagpool">SAGPool</h3>
 <pre><code class="python">spektral.layers.SAGPool(ratio, return_mask=False, sigmoid_gating=False, kernel_initializer='glorot_uniform', kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None)
 </code></pre>
@@ -447,7 +460,7 @@ tanh;</li>
 <li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L785">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L788">[source]</a></span></p>
 <h3 id="globalsumpool">GlobalSumPool</h3>
 <pre><code class="python">spektral.layers.GlobalSumPool()
 </code></pre>
@@ -463,13 +476,13 @@ dimension);</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li>tensor like node features, but without node dimension (except for single
+<li>Tensor like node features, but without node dimension (except for single
 mode, where the node dimension is preserved and set to 1).</li>
 </ul>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L814">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L817">[source]</a></span></p>
 <h3 id="globalavgpool">GlobalAvgPool</h3>
 <pre><code class="python">spektral.layers.GlobalAvgPool()
 </code></pre>
@@ -485,13 +498,13 @@ dimension);</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li>tensor like node features, but without node dimension (except for single
+<li>Tensor like node features, but without node dimension (except for single
 mode, where the node dimension is preserved and set to 1).</li>
 </ul>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L842">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L845">[source]</a></span></p>
 <h3 id="globalmaxpool">GlobalMaxPool</h3>
 <pre><code class="python">spektral.layers.GlobalMaxPool()
 </code></pre>
@@ -507,13 +520,13 @@ dimension);</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li>tensor like node features, but without node dimension (except for single
+<li>Tensor like node features, but without node dimension (except for single
 mode, where the node dimension is preserved and set to 1).</li>
 </ul>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L870">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L873">[source]</a></span></p>
 <h3 id="globalattentionpool">GlobalAttentionPool</h3>
 <pre><code class="python">spektral.layers.GlobalAttentionPool(channels=32, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -529,7 +542,7 @@ dimension);</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li>tensor like node features, but without node dimension (except for single
+<li>Tensor like node features, but without node dimension (except for single
 mode, where the node dimension is preserved and set to 1), and last
 dimension changed to <code>channels</code>.</li>
 </ul>
@@ -544,7 +557,7 @@ dimension changed to <code>channels</code>.</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L999">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L1002">[source]</a></span></p>
 <h3 id="globalattnsumpool">GlobalAttnSumPool</h3>
 <pre><code class="python">spektral.layers.GlobalAttnSumPool(attn_kernel_initializer='glorot_uniform', kernel_regularizer=None, attn_kernel_regularizer=None, attn_kernel_constraint=None)
 </code></pre>
@@ -560,7 +573,7 @@ dimension);</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li>tensor like node features, but without node dimension (except for single
+<li>Tensor like node features, but without node dimension (except for single
 mode, where the node dimension is preserved and set to 1).</li>
 </ul>
 <p><strong>Arguments</strong></p>
@@ -620,6 +633,7 @@ matrix;</li>
     <script>var base_url = '../..';</script>
     <script src="../../js/theme.js" defer></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+      <script src="../../js/macros.js" defer></script>
       <script src="../../search/main.js" defer></script>
 
 </body>

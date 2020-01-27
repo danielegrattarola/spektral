@@ -228,26 +228,25 @@
 <pre><code class="python">spektral.layers.InnerProduct(trainable_kernel=False, activation=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None)
 </code></pre>
 
-<p>Computes the inner product between elements of a given 2d tensor <script type="math/tex">x</script>: 
+<p>Computes the inner product between elements of a 2d Tensor:
 <script type="math/tex; mode=display">
-\langle x, x \rangle = xx^T.
+\langle \x, \x \rangle = \x\x^\top.
 </script>
 </p>
 <p><strong>Mode</strong>: single.</p>
 <p><strong>Input</strong></p>
 <ul>
-<li>rank 2 tensor of shape <code>(input_dim_1, input_dim_2)</code> (e.g. node features
-of shape <code>(num_nodes, num_features)</code>);</li>
+<li>Tensor of shape <code>(N, M)</code>;</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li>rank 2 tensor of shape <code>(input_dim_1, input_dim_1)</code></li>
+<li>Tensor of shape <code>(N, N)</code>.</li>
 </ul>
 <p><strong>Arguments</strong>  </p>
 <ul>
 <li>
 <p><code>trainable_kernel</code>: add a trainable square matrix between the inner
-product (i.e., <code>x.dot(w).dot(x.T)</code>);</p>
+product (e.g., <code>X @ W @ X.T</code>);</p>
 </li>
 <li>
 <p><code>activation</code>: activation function to use;</p>
@@ -266,34 +265,33 @@ product (i.e., <code>x.dot(w).dot(x.T)</code>);</p>
 </li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L83">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L82">[source]</a></span></p>
 <h3 id="minkowskiproduct">MinkowskiProduct</h3>
 <pre><code class="python">spektral.layers.MinkowskiProduct(input_dim_1=None, activation=None, activity_regularizer=None)
 </code></pre>
 
-<p>Computes the hyperbolic inner product between elements of a given 2d tensor
-<script type="math/tex">x</script>: 
+<p>Computes the hyperbolic inner product between elements of a rank 2 Tensor:
 <script type="math/tex; mode=display">
-\langle x, x \rangle = x \,
+\langle \x, \x \rangle = \x \,
 \begin{pmatrix}
-I_{d\times d} & 0 \\ 0 & -1
-\end{pmatrix} \,x^T.
+\I_{d \times d} & 0 \\
+0              & -1
+\end{pmatrix} \, \x^\top.
 </script>
 </p>
 <p><strong>Mode</strong>: single.</p>
 <p><strong>Input</strong></p>
 <ul>
-<li>rank 2 tensor of shape <code>(input_dim_1, input_dim_2)</code> (e.g. node features
-of shape <code>(num_nodes, num_features)</code>);</li>
+<li>Tensor of shape <code>(N, M)</code>;</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li>rank 2 tensor of shape <code>(input_dim_1, input_dim_1)</code></li>
+<li>Tensor of shape <code>(N, N)</code>.</li>
 </ul>
 <p><strong>Arguments</strong>  </p>
 <ul>
 <li>
-<p><code>input_dim_1</code>: first dimension of the input tensor; set this if you
+<p><code>input_dim_1</code>: first dimension of the input Tensor; set this if you
 encounter issues with shapes in your model, in order to provide an explicit
 output shape for your layer.</p>
 </li>
@@ -352,6 +350,7 @@ output shape for your layer.</p>
     <script>var base_url = '../..';</script>
     <script src="../../js/theme.js" defer></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+      <script src="../../js/macros.js" defer></script>
       <script src="../../search/main.js" defer></script>
 
 </body>
