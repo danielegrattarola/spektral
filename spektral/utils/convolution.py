@@ -18,8 +18,8 @@ def degree(adj):
 
 
 def degree_power(adj, pow):
-    """
-    Computes \(D^{p}\) from the given adjacency matrix. Useful for computing
+    r"""
+    Computes \(\D^{p}\) from the given adjacency matrix. Useful for computing
     normalised Laplacians.
     :param adj: rank 2 array or sparse matrix
     :param pow: exponent to which elevate the degree matrix
@@ -35,9 +35,9 @@ def degree_power(adj, pow):
 
 
 def normalized_adjacency(adj, symmetric=True):
-    """
+    r"""
     Normalizes the given adjacency matrix using the degree matrix as either
-    \(D^{-1}A\) or \(D^{-1/2}AD^{-1/2}\) (symmetric normalization).
+    \(\D^{-1}\A\) or \(\D^{-1/2}\A\D^{-1/2}\) (symmetric normalization).
     :param adj: rank 2 array or sparse matrix;
     :param symmetric: boolean, compute symmetric normalization;
     :return: the normalized adjacency matrix.
@@ -52,8 +52,8 @@ def normalized_adjacency(adj, symmetric=True):
 
 
 def laplacian(adj):
-    """
-    Computes the Laplacian of the given adjacency matrix as \(D - A\).
+    r"""
+    Computes the Laplacian of the given adjacency matrix as \(\D - \A\).
     :param adj: rank 2 array or sparse matrix;
     :return: the Laplacian.
     """
@@ -61,9 +61,9 @@ def laplacian(adj):
 
 
 def normalized_laplacian(adj, symmetric=True):
-    """
+    r"""
     Computes a  normalized Laplacian of the given adjacency matrix as
-    \(I - D^{-1}A\) or \(I - D^{-1/2}AD^{-1/2}\) (symmetric normalization).
+    \(\I - \D^{-1}\A\) or \(\I - \D^{-1/2}\A\D^{-1/2}\) (symmetric normalization).
     :param adj: rank 2 array or sparse matrix;
     :param symmetric: boolean, compute symmetric normalization;
     :return: the normalized Laplacian.
