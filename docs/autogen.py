@@ -61,9 +61,9 @@ PAGES = [
         'functions': [],
         'methods': [],
         'classes': [
-            layers.TopKPool,
-            layers.MinCutPool,
             layers.DiffPool,
+            layers.MinCutPool,
+            layers.TopKPool,
             layers.SAGPool,
             layers.GlobalSumPool,
             layers.GlobalAvgPool,
@@ -594,6 +594,9 @@ if __name__ == '__main__':
         if not os.path.exists('sources/stylesheets/'):
             os.makedirs('sources/stylesheets/')
 
+        if not os.path.exists('sources/js/'):
+            os.makedirs('sources/js/')
+
         if not os.path.exists('sources/img/'):
             os.makedirs('sources/img/')
 
@@ -601,6 +604,7 @@ if __name__ == '__main__':
             os.makedirs('sources/custom_theme/img/')
 
         shutil.copy('./stylesheets/extra.css', './sources/stylesheets/extra.css')
+        shutil.copy('./js/macros.js', './sources/js/macros.js')
         for file in glob.glob(r'./img/*.svg'):
             shutil.copy(file, './sources/img/')
         shutil.copy('./img/favicon.ico', './sources/custom_theme/img/favicon.ico')
