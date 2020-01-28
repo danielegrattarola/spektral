@@ -8,7 +8,7 @@ setup(
     version='0.2.0',
     packages=find_packages(),
     install_requires=['keras',
-                      'tensorflow>=2.0.0',
+                      'tensorflow>=2.0.1',
                       'networkx',
                       'pandas',
                       'lxml',
