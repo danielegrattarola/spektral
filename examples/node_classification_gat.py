@@ -46,8 +46,8 @@ graph_attention_1 = GraphAttention(channels,
                                    dropout_rate=dropout,
                                    activation='elu',
                                    kernel_regularizer=l2(l2_reg),
-                                   attn_kernel_regularizer=l2(l2_reg),
-                                   use_bias=False)([dropout_1, A_in])
+                                   attn_kernel_regularizer=l2(l2_reg)
+                                   )([dropout_1, A_in])
 dropout_2 = Dropout(dropout)(graph_attention_1)
 graph_attention_2 = GraphAttention(n_classes,
                                    attn_heads=1,
@@ -55,8 +55,8 @@ graph_attention_2 = GraphAttention(n_classes,
                                    dropout_rate=dropout,
                                    activation='softmax',
                                    kernel_regularizer=l2(l2_reg),
-                                   attn_kernel_regularizer=l2(l2_reg),
-                                   use_bias=False)([dropout_2, A_in])
+                                   attn_kernel_regularizer=l2(l2_reg)
+                                   )([dropout_2, A_in])
 
 # Build model
 model = Model(inputs=[X_in, A_in], outputs=graph_attention_2)
@@ -76,7 +76,7 @@ model.fit([X, A],
           validation_data=validation_data,
           shuffle=False,  # Shuffling data means shuffling the whole graph
           callbacks=[
-              EarlyStopping(patience=es_patience,  restore_best_weights=True)
+              EarlyStopping(patience=es_patience, restore_best_weights=True)
           ])
 
 # Evaluate model
