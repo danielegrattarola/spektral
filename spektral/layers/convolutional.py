@@ -3,8 +3,10 @@ from tensorflow.keras import activations, initializers, regularizers, constraint
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Layer, LeakyReLU, Dropout, Dense
 
-from spektral.layers.ops import filter_dot
 from spektral.layers import ops
+from spektral.layers.ops import filter_dot
+from spektral.utils import localpooling_filter, chebyshev_filter, normalized_laplacian, rescale_laplacian, add_eye, \
+    normalized_adjacency
 
 
 class GraphConv(Layer):
@@ -125,6 +127,11 @@ class GraphConv(Layer):
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
+    @staticmethod
+    def preprocess(A):
+        return localpooling_filter(A)
+
+
 
 class ChebConv(GraphConv):
     r"""
@@ -237,6 +244,10 @@ class ChebConv(GraphConv):
         if self.activation is not None:
             output = self.activation(output)
         return output
+
+    @staticmethod
+    def preprocess(A, k=1):
+        return chebyshev_filter(A, k)
 
 
 class GraphSageConv(GraphConv):
@@ -358,6 +369,10 @@ class GraphSageConv(GraphConv):
             output = self.activation(output)
         output = K.l2_normalize(output, axis=-1)
         return output
+
+    @staticmethod
+    def preprocess(A):
+        return A
 
 
 class ARMAConv(GraphConv):
@@ -663,6 +678,12 @@ class ARMAConv(GraphConv):
             output = activations.get(activation)(output)
         return output
 
+    @staticmethod
+    def preprocess(A):
+        fltr = normalized_laplacian(A, symmetric=True)
+        fltr = rescale_laplacian(fltr, lmax=2)
+        return fltr
+
 
 class EdgeConditionedConv(GraphConv):
     r"""
@@ -817,6 +838,10 @@ class EdgeConditionedConv(GraphConv):
         }
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
+
+    @staticmethod
+    def preprocess(A):
+        return A
 
 
 class GraphAttention(GraphConv):
@@ -1067,6 +1092,13 @@ class GraphAttention(GraphConv):
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
+    @staticmethod
+    def preprocess(A):
+        A = add_eye(A)
+        if hasattr(A, 'toarray'):
+            A = A.toarray()
+        return A
+
 
 class GraphConvSkip(GraphConv):
     r"""
@@ -1172,6 +1204,10 @@ class GraphConvSkip(GraphConv):
         if self.activation is not None:
             output = self.activation(output)
         return output
+
+    @staticmethod
+    def preprocess(A):
+        return normalized_adjacency(A)
 
 
 class APPNP(GraphConv):
@@ -1513,3 +1549,7 @@ class GINConv(GraphConv):
             output = self.activation(output)
 
         return output
+
+    @staticmethod
+    def preprocess(A):
+        return A
