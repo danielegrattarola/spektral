@@ -469,34 +469,24 @@ class ARMAConv(GraphConv):
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
-        # When using shared weights, pre-compute them here
-        if self.share_weights:
-            self.kernels_in = []  # Weights from input space to output space
-            self.kernels_hid = []  # Weights from output space to output space
-            for k in range(self.order):
-                self.kernels_in.append(self.get_gcn_weights(input_shape[0][-1],
-                                                            input_shape[0][-1],
-                                                            self.channels,
-                                                            name='ARMA_skip_{}r_in'.format(k),
-                                                            use_bias=self.use_bias,
-                                                            kernel_initializer=self.kernel_initializer,
-                                                            bias_initializer=self.bias_initializer,
-                                                            kernel_regularizer=self.kernel_regularizer,
-                                                            bias_regularizer=self.bias_regularizer,
-                                                            kernel_constraint=self.kernel_constraint,
-                                                            bias_constraint=self.bias_constraint))
-                if self.iterations > 1:
-                    self.kernels_hid.append(self.get_gcn_weights(self.channels,
-                                                                 input_shape[0][-1],
-                                                                 self.channels,
-                                                                 name='ARMA_skip_{}r_hid'.format(k),
-                                                                 use_bias=self.use_bias,
-                                                                 kernel_initializer=self.kernel_initializer,
-                                                                 bias_initializer=self.bias_initializer,
-                                                                 kernel_regularizer=self.kernel_regularizer,
-                                                                 bias_regularizer=self.bias_regularizer,
-                                                                 kernel_constraint=self.kernel_constraint,
-                                                                 bias_constraint=self.bias_constraint))
+        F = input_shape[0][-1]
+
+        # Create weights for parallel stacks
+        # self.kernels[k][i] refers to the k-th stack, i-th iteration
+        self.kernels = []
+        for k in range(self.order):
+            kernel_stack = []
+            current_shape = F
+            for i in range(self.iterations):
+                kernel_stack.append(
+                    self.create_weights(current_shape, F, self.channels,
+                                        'ARMA_GCS_{}{}'.format(k, i))
+                )
+                current_shape = self.channels
+                if self.share_weights and i == 1:
+                    # No need to continue because all following weights will be shared
+                    break
+            self.kernels.append(kernel_stack)
         self.built = True
 
     def call(self, inputs):
@@ -507,23 +497,11 @@ class ARMAConv(GraphConv):
         output = []  # Stores the parallel filters
         for k in range(self.order):
             output_k = features
-            for t in range(self.iterations):
-                output_k = self.graph_conv_skip([output_k, features, fltr],
-                                                self.channels,
-                                                'ARMA_skip_{}{}'.format(k, t),
-                                                recurrent_k=k if self.share_weights else None,
-                                                recurrent_t=t if self.share_weights else None,
-                                                activation=self.gcn_activation,
-                                                use_bias=self.use_bias,
-                                                kernel_initializer=self.kernel_initializer,
-                                                bias_initializer=self.bias_initializer,
-                                                kernel_regularizer=self.kernel_regularizer,
-                                                bias_regularizer=self.bias_regularizer,
-                                                kernel_constraint=self.kernel_constraint,
-                                                bias_constraint=self.bias_constraint)
+            for i in range(self.iterations):
+                output_k = self.gcs([output_k, features, fltr], k, i)
             output.append(output_k)
 
-        # Average pooling
+        # Average stacks
         output = K.stack(output, axis=-1)
         output = K.mean(output, axis=-1)
         output = self.activation(output)
@@ -551,131 +529,71 @@ class ARMAConv(GraphConv):
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
-    def get_gcn_weights(self, input_dim, input_dim_skip, channels, name,
-                        use_bias=True,
-                        kernel_initializer='glorot_uniform',
-                        bias_initializer='zeros',
-                        kernel_regularizer=None,
-                        bias_regularizer=None,
-                        kernel_constraint=None,
-                        bias_constraint=None):
+    def create_weights(self, input_dim, input_dim_skip, channels, name):
         """
-        Creates a set of weights for a GCN with skip connections
-        :param input_dim: dimension of the input space of the layer
+        Creates a set of weights for a GCN with skip connections.
+        :param input_dim: dimension of the input space
         :param input_dim_skip: dimension of the input space for the skip connection
         :param channels: dimension of the output space
         :param name: name of the layer
-        :param use_bias: whether to create a bias vector (if False, returns None as bias)
-        :param kernel_initializer: initializer for the kernels
-        :param bias_initializer: initializer for the bias
-        :param kernel_regularizer: regularizer for the kernels
-        :param bias_regularizer: regularizer for the bias
-        :param kernel_constraint: constraint for the kernel
-        :param bias_constraint: constraint for the bias
         :return:
             - kernel_1, from input space of the layer to output space
             - kernel_2, from input space of the skip connection to output space
             - bias, bias vector on the output space if use_bias=True, None otherwise.
         """
-        kernel_initializer = initializers.get(kernel_initializer)
-        kernel_regularizer = regularizers.get(kernel_regularizer)
-        kernel_constraint = constraints.get(kernel_constraint)
-        bias_initializer = initializers.get(bias_initializer)
-        bias_regularizer = regularizers.get(bias_regularizer)
-        bias_constraint = constraints.get(bias_constraint)
         kernel_1 = self.add_weight(shape=(input_dim, channels),
                                    name=name + '_kernel_1',
-                                   initializer=kernel_initializer,
-                                   regularizer=kernel_regularizer,
-                                   constraint=kernel_constraint)
+                                   initializer=self.kernel_initializer,
+                                   regularizer=self.kernel_regularizer,
+                                   constraint=self.kernel_constraint)
         kernel_2 = self.add_weight(shape=(input_dim_skip, channels),
                                    name=name + '_kernel_2',
-                                   initializer=kernel_initializer,
-                                   regularizer=kernel_regularizer,
-                                   constraint=kernel_constraint)
-        if use_bias:
+                                   initializer=self.kernel_initializer,
+                                   regularizer=self.kernel_regularizer,
+                                   constraint=self.kernel_constraint)
+        if self.use_bias:
             bias = self.add_weight(shape=(channels,),
                                    name=name + '_bias',
-                                   initializer=bias_initializer,
-                                   regularizer=bias_regularizer,
-                                   constraint=bias_constraint)
+                                   initializer=self.bias_initializer,
+                                   regularizer=self.bias_regularizer,
+                                   constraint=self.bias_constraint)
         else:
             bias = None
         return kernel_1, kernel_2, bias
 
-    def graph_conv_skip(self, x, channels, name,
-                        recurrent_k=None,
-                        recurrent_t=None,
-                        activation=None,
-                        use_bias=True,
-                        kernel_initializer='glorot_uniform',
-                        bias_initializer='zeros',
-                        kernel_regularizer=None,
-                        bias_regularizer=None,
-                        kernel_constraint=None,
-                        bias_constraint=None):
+    def gcs(self, inputs, stack, iteration):
         """
-        Creates a graph convolutional layer with a skip connection
-        :param x: list of input Tensors, namely
-            - input of the layer
-            - input for the skip connection
-            - laplacian, or normalized adjacency matrix
-        :param channels: dimension of the output space
-        :param name: name of the layer
-        :param recurrent_k: if the recurrent flag was set, then use the shared
-        weights of the k-th filter when creating the layer
-        :param recurrent_t: if the recurrent flag was set, then use the shared
-        weights when computing the t-th recursive step of the k-th filter.
-        Note that this parameter cannot be None if recurent_k is not None.
-        :param activation: activation function;
-        :param use_bias: whether to add a bias vector
-        :param kernel_initializer: initializer for the kernels
-        :param bias_initializer: initializer for the bias
-        :param kernel_regularizer: regularizer for the kernels
-        :param bias_regularizer: regularizer for the bias
-        :param kernel_constraint: constraint for the kernel
-        :param bias_constraint: constraint for the bias
-        :return: output of the layer
+        Creates a graph convolutional layer with a skip connection.
+        :param inputs: list of input Tensors, namely
+            - input node features
+            - input node features for the skip connection
+            - normalized adjacency matrix;
+        :param stack: int, current stack (used to retrieve kernels);
+        :param iteration: int, current iteration (used to retrieve kernels);
+        :return: output node features.
         """
-        input_dim = K.int_shape(x[0])[-1]
-        input_dim_skip = K.int_shape(x[1])[-1]
+        X = inputs[0]
+        X_skip = inputs[1]
+        fltr = inputs[2]
 
-        if recurrent_k is None:
-            kernel_1, kernel_2, bias = self.get_gcn_weights(input_dim,
-                                                            input_dim_skip,
-                                                            channels,
-                                                            name,
-                                                            kernel_initializer=kernel_initializer,
-                                                            bias_initializer=bias_initializer,
-                                                            kernel_regularizer=kernel_regularizer,
-                                                            bias_regularizer=bias_regularizer,
-                                                            kernel_constraint=kernel_constraint,
-                                                            bias_constraint=bias_constraint)
+        if self.share_weights and iteration >= 1:
+            iter = 1
         else:
-            # When using shared weights, use the pre-computed ones.
-            if recurrent_t is None:
-                raise ValueError('recurrent_k and recurrent_t must be set together.')
-            if recurrent_t == 0:
-                kernel_1, kernel_2, bias = self.kernels_in[recurrent_k]
-            else:
-                kernel_1, kernel_2, bias = self.kernels_hid[recurrent_k]
-        features = x[0]
-        features_skip = x[1]
-        fltr = x[2]
+            iter = iteration
+        kernel_1, kernel_2, bias = self.kernels[stack][iter]
 
         # Convolution
-        output = K.dot(features, kernel_1)
+        output = K.dot(X, kernel_1)
         output = filter_dot(fltr, output)
 
         # Skip connection
-        skip = K.dot(features_skip, kernel_2)
+        skip = K.dot(X_skip, kernel_2)
         skip = Dropout(self.dropout_rate)(skip)
         output += skip
 
-        if use_bias:
+        if self.use_bias:
             output = K.bias_add(output, bias)
-        if activation is not None:
-            output = activations.get(activation)(output)
+        output = self.gcn_activation(output)
         return output
 
     @staticmethod
