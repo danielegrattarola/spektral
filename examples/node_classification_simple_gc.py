@@ -22,16 +22,16 @@ A, X, y, train_mask, val_mask, test_mask = citation.load_data(dataset)
 # Parameters
 K = 2                   # Degree of propagation
 N = X.shape[0]          # Number of nodes in the graph
-F = X.shape[1]          # Original feature dimensionality
+F = X.shape[1]          # Original size of node features
 n_classes = y.shape[1]  # Number of classes
-l2_reg = 5e-6           # Regularization rate for l2
-learning_rate = 0.2     # Learning rate for SGD
+l2_reg = 5e-6           # L2 regularization rate
+learning_rate = 0.2     # Learning rate
 epochs = 20000          # Number of training epochs
 es_patience = 200       # Patience for early stopping
 
 # Preprocessing operations
-X = X.toarray()
 fltr = localpooling_filter(A).astype('f4')
+X = X.toarray()
 
 # Pre-compute propagation
 for i in range(K - 1):
