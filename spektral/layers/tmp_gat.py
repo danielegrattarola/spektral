@@ -229,7 +229,7 @@ class GraphAttention(GraphConv):
         input_dim = input_shape[0][-1]
 
 
-        self.a = DenseMultiHead(
+        self.Wh_dense = DenseMultiHead(
             self.attn_heads,
             self.channels,
             kernel_initializer="glorot_uniform",
@@ -301,7 +301,7 @@ class GraphAttention(GraphConv):
         X = inputs[0]
         A = inputs[1]
 
-        features = self.query_dense(query)
+        features = self.Wh_dense(query)
 
         print(features.shape)
         exit()
