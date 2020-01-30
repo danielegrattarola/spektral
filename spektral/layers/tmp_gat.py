@@ -27,6 +27,7 @@ class DenseMultiHead(tf.keras.layers.Layer):
     ):
         """Inits DenseMultiHead."""
         super(DenseMultiHead, self).__init__(**kwargs)
+
         self.num_attention_heads = num_attention_heads
         self.size_per_head = size_per_head
         self.hidden_size = num_attention_heads * size_per_head
@@ -34,14 +35,6 @@ class DenseMultiHead(tf.keras.layers.Layer):
         self.bias_initializer = bias_initializer
         self.activation = activation
         self.use_bias = use_bias
-
-    @property
-    def kernel_shape(self):
-        return [self.last_dim, self.num_attention_heads, self.size_per_head]
-
-    @property
-    def bias_shape(self):
-        return [self.num_attention_heads, self.size_per_head]
 
     def build(self, input_shape):
         """Implements build() for the layer."""
@@ -62,12 +55,10 @@ class DenseMultiHead(tf.keras.layers.Layer):
             min_ndim=3, axes={-1: self.last_dim}
         )
 
-        kernel_shape = self.kernel_shape
-        bias_shape = self.bias_shape
 
         self.kernel = self.add_weight(
             "kernel",
-            shape=kernel_shape,
+            shape=[self.last_dim, self.num_attention_heads, self.size_per_head],
             initializer=self.kernel_initializer,
             dtype=self.dtype,
             trainable=True,
@@ -75,7 +66,7 @@ class DenseMultiHead(tf.keras.layers.Layer):
         if self.use_bias:
             self.bias = self.add_weight(
                 "bias",
-                shape=bias_shape,
+                shape=[self.num_attention_heads, self.size_per_head],
                 initializer=self.bias_initializer,
                 dtype=self.dtype,
                 trainable=True,
@@ -100,7 +91,7 @@ class DenseMultiHead(tf.keras.layers.Layer):
         kernel = self.kernel
         bias = self.bias
 
-        ret = tf.einsum("abc,cde->abde", inputs, kernel)
+        ret = tf.einsum("...ND,DHF->...NHF", inputs, kernel)
 
         if self.use_bias:
             ret += bias
@@ -111,28 +102,165 @@ class DenseMultiHead(tf.keras.layers.Layer):
         return ret
 
 
-class GraphAttention(tf.keras.layers.Layer):
-    """Multi-headed graph attention layer."""
+class GraphAttention(GraphConv):
+    r"""
+    A graph attention layer (GAT) as presented by
+    [Velickovic et al. (2017)](https://arxiv.org/abs/1710.10903).
 
-    def __init__(self, size_per_head, num_heads, output_size=None):
-        """Initialize Attention.
+    **Mode**: single, mixed, batch.
 
-    Args:
-      size_per_head: int, output dim of hidden layer.
-      num_heads: int, number of heads to repeat the same attention structure.
-      dropout_rate: float, dropout rate inside attention for training.
+    **This layer expects dense inputs.**
+    
+    This layer computes a convolution similar to `layers.GraphConv`, but
+    uses the attention mechanism to weight the adjacency matrix instead of
+    using the normalized Laplacian:
+    $$
+        \Z = \mathbf{\alpha}\X\W + \b
+    $$
+    where
+    $$
+        \mathbf{\alpha}_{ij} =
+            \frac{
+                \exp\left(
+                    \mathrm{LeakyReLU}\left(
+                        \a^{\top} [(\X\W)_i \, \| \, (\X\W)_j]
+                    \right)
+                \right)
+            }
+            {\sum\limits_{k \in \mathcal{N}(i) \cup \{ i \}}
+                \exp\left(
+                    \mathrm{LeakyReLU}\left(
+                        \a^{\top} [(\X\W)_i \, \| \, (\X\W)_k]
+                    \right)
+                \right)
+            }
+    $$
+    where \(\a \in \mathbb{R}^{2F'}\) is a trainable attention kernel.
+    Dropout is also applied to \(\alpha\) before computing \(\Z\).
+    Parallel attention heads are computed in parallel and their results are
+    aggregated by concatenation or average.
+
+    **Input**
+
+    - Node features of shape `([batch], N, F)`;
+    - Binary adjacency matrix of shape `([batch], N, N)`;
+
+    **Output**
+
+    - Node features with the same shape as the input, but with the last
+    dimension changed to `channels`;
+    - if `return_attn_coef=True`, a list with the attention coefficients for
+    each attention head. Each attention coefficient matrix has shape
+    `([batch], N, N)`.
+    
+    **Arguments**
+    
+    - `channels`: number of output channels;
+    - `attn_heads`: number of attention heads to use;
+    - `concat_heads`: bool, whether to concatenate the output of the attention
+     heads instead of averaging;
+    - `dropout_rate`: internal dropout rate for attention coefficients;
+    - `return_attn_coef`: if True, return the attention coefficients for
+    the given input (one N x N matrix for each head).
+    - `activation`: activation function to use;
+    - `use_bias`: whether to add a bias to the linear transformation;
+    - `kernel_initializer`: initializer for the kernel matrix;
+    - `attn_kernel_initializer`: initializer for the attention kernels;
+    - `bias_initializer`: initializer for the bias vector;
+    - `kernel_regularizer`: regularization applied to the kernel matrix;
+    - `attn_kernel_regularizer`: regularization applied to the attention kernels;
+    - `bias_regularizer`: regularization applied to the bias vector;
+    - `activity_regularizer`: regularization applied to the output;
+    - `kernel_constraint`: constraint applied to the kernel matrix;
+    - `attn_kernel_constraint`: constraint applied to the attention kernels;
+    - `bias_constraint`: constraint applied to the bias vector.
+
     """
+    def __init__(self,
+                 channels,
+                 attn_heads=1,
+                 concat_heads=True,
+                 dropout_rate=0.5,
+                 return_attn_coef=False,
+                 activation='relu',
+                 use_bias=True,
+                 kernel_initializer='glorot_uniform',
+                 bias_initializer='zeros',
+                 attn_kernel_initializer='glorot_uniform',
+                 kernel_regularizer=None,
+                 bias_regularizer=None,
+                 attn_kernel_regularizer=None,
+                 activity_regularizer=None,
+                 kernel_constraint=None,
+                 bias_constraint=None,
+                 attn_kernel_constraint=None,
+                 **kwargs):
+        super().__init__(channels, **kwargs)
 
-        super().__init__()
-        self.size_per_head = size_per_head
-        self.num_heads = num_heads
-        self.output_size = output_size
+        self.channels = channels
+        self.attn_heads = attn_heads
+        self.concat_heads = concat_heads
+        self.dropout_rate = dropout_rate
+        self.return_attn_coef = return_attn_coef
+        self.activation = activations.get(activation)
+        self.use_bias = use_bias
+        self.kernel_initializer = initializers.get(kernel_initializer)
+        self.bias_initializer = initializers.get(bias_initializer)
+        self.attn_kernel_initializer = initializers.get(attn_kernel_initializer)
+        self.kernel_regularizer = regularizers.get(kernel_regularizer)
+        self.bias_regularizer = regularizers.get(bias_regularizer)
+        self.attn_kernel_regularizer = regularizers.get(attn_kernel_regularizer)
+        self.activity_regularizer = regularizers.get(activity_regularizer)
+        self.kernel_constraint = constraints.get(kernel_constraint)
+        self.bias_constraint = constraints.get(bias_constraint)
+        self.attn_kernel_constraint = constraints.get(attn_kernel_constraint)
+        self.supports_masking = False
+
+        if concat_heads:
+            # Output will have shape (..., attention_heads * channels)
+            self.output_dim = self.channels * self.attn_heads
+        else:
+            # Output will have shape (..., channels)
+            self.output_dim = self.channels
+
 
     def build(self, input_shape):
-        """Builds the layer."""
-        # Layers for linearly projecting the queries, keys, and values.
+        assert len(input_shape) >= 2
+        input_dim = input_shape[0][-1]
 
-        output_size = self.output_size if self.output_size is None else input_shape[-1]
+        # Initialize weights for each attention head
+        for head in range(self.attn_heads):
+            # Layer kernel
+            kernel = self.add_weight(shape=(input_dim, self.channels),
+                                     initializer=self.kernel_initializer,
+                                     regularizer=self.kernel_regularizer,
+                                     constraint=self.kernel_constraint,
+                                     name='kernel_{}'.format(head))
+            self.kernels.append(kernel)
+
+            # Layer bias
+            if self.use_bias:
+                bias = self.add_weight(shape=(self.channels,),
+                                       initializer=self.bias_initializer,
+                                       regularizer=self.bias_regularizer,
+                                       constraint=self.bias_constraint,
+                                       name='bias_{}'.format(head))
+                self.biases.append(bias)
+
+            # Attention kernels
+            attn_kernel_self = self.add_weight(shape=(self.channels, 1),
+                                               initializer=self.attn_kernel_initializer,
+                                               regularizer=self.attn_kernel_regularizer,
+                                               constraint=self.attn_kernel_constraint,
+                                               name='attn_kernel_self_{}'.format(head))
+            attn_kernel_neighs = self.add_weight(shape=(self.channels, 1),
+                                                 initializer=self.attn_kernel_initializer,
+                                                 regularizer=self.attn_kernel_regularizer,
+                                                 constraint=self.attn_kernel_constraint,
+                                                 name='attn_kernel_neigh_{}'.format(head))
+            self.attn_kernels.append([attn_kernel_self, attn_kernel_neighs])
+        self.dropout = Dropout(self.dropout_rate)
+        self.built = True
 
         self.query_dense = DenseMultiHead(
             self.num_heads,
@@ -165,12 +293,7 @@ class GraphAttention(tf.keras.layers.Layer):
 
         super().build(input_shape)
 
-    def get_config(self):
-        return {
-            "size_per_head": self.size_per_head,
-            "num_heads": self.num_heads,
-            "output_size": self.output_size,
-        }
+    
 
     def call(
         self, query, key, value=None, mask=None, training=None,
@@ -197,40 +320,55 @@ class GraphAttention(tf.keras.layers.Layer):
         value = self.value_dense(value)
         projection = self.projection_kernel
 
-        attention_output = multi_head_attention(
-            query, key, value, projection, mask=mask
-        )
+        depth = tf.cast(tf.shape(query)[-1], tf.float32)
+
+        query /= tf.sqrt(depth)
+
+        # Calculate dot product attention
+        logits = tf.einsum("...TNH,...FNH->...NFT", key, query)
+
+        # apply mask
+        if mask is not None:
+            logits += mask
+
+        # Note that softmax internally performs math operations using float32
+        # for numeric stability. When training with float16, we keep the input
+        # and output in float16 for better performance.
+        attention = tf.nn.softmax(logits, name="attention_weights")
+
+        concated_output = tf.einsum("...NFT,...TNH->...FNH", attention, value)
+
+        # Run the outputs through another linear projection layer. Recombining heads
+        # is automatically done --> [batch_size, length, hidden_size]
+        attention_output = tf.einsum("...FNH,NHD->...FD", concated_output, projection)
 
         return attention_output
 
+    def compute_output_shape(self, input_shape):
+        output_shape = input_shape[0][:-1] + (self.output_dim,)
+        return output_shape
 
-################################################################
-# functions
-################################################################
+    def get_config(self):
+        config = {
+            'channels': self.channels,
+            'attn_heads': self.attn_heads,
+            'concat_heads': self.concat_heads,
+            'dropout_rate': self.dropout_rate,
+            'activation': activations.serialize(self.activation),
+            'use_bias': self.use_bias,
+            'kernel_initializer': initializers.serialize(self.kernel_initializer),
+            'bias_initializer': initializers.serialize(self.bias_initializer),
+            'attn_kernel_initializer': initializers.serialize(self.attn_kernel_initializer),
+            'kernel_regularizer': regularizers.serialize(self.kernel_regularizer),
+            'bias_regularizer': regularizers.serialize(self.bias_regularizer),
+            'attn_kernel_regularizer': regularizers.serialize(self.attn_kernel_regularizer),
+            'activity_regularizer': regularizers.serialize(self.activity_regularizer),
+            'kernel_constraint': constraints.serialize(self.kernel_constraint),
+            'bias_constraint': constraints.serialize(self.bias_constraint),
+            'attn_kernel_constraint': constraints.serialize(self.attn_kernel_constraint),
+        }
+        base_config = super().get_config()
+        return dict(list(base_config.items()) + list(config.items()))
 
 
-def multi_head_attention(query, key, value, projection, mask=None):
 
-    depth = tf.cast(tf.shape(query)[-1], tf.float32)
-
-    query /= tf.sqrt(depth)
-
-    # Calculate dot product attention
-    logits = tf.einsum("BTNH,BFNH->BNFT", key, query)
-
-    # apply mask
-    if mask is not None:
-        logits += mask
-
-    # Note that softmax internally performs math operations using float32
-    # for numeric stability. When training with float16, we keep the input
-    # and output in float16 for better performance.
-    attention = tf.nn.softmax(logits, name="attention_weights")
-
-    concated_output = tf.einsum("BNFT,BTNH->BFNH", attention, value)
-
-    # Run the outputs through another linear projection layer. Recombining heads
-    # is automatically done --> [batch_size, length, hidden_size]
-    attention_output = tf.einsum("BFNH,NHD->BFD", concated_output, projection)
-
-    return attention_output
