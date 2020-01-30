@@ -2,6 +2,7 @@ import tensorflow as tf
 from tensorflow.keras import activations, initializers, regularizers, constraints
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Layer, LeakyReLU, Dropout, Dense
+from tensorflow.keras.models import Sequential
 
 from spektral.layers import ops
 from spektral.layers.ops import filter_dot
@@ -47,6 +48,7 @@ class GraphConv(Layer):
     - `kernel_constraint`: constraint applied to the kernel matrix;
     - `bias_constraint`: constraint applied to the bias vector.
     """
+
     def __init__(self,
                  channels,
                  activation=None,
@@ -132,7 +134,6 @@ class GraphConv(Layer):
         return localpooling_filter(A)
 
 
-
 class ChebConv(GraphConv):
     r"""
     A Chebyshev convolutional layer as presented by
@@ -183,6 +184,7 @@ class ChebConv(GraphConv):
     - `bias_constraint`: constraint applied to the bias vector.
 
     """
+
     def __init__(self,
                  channels,
                  activation=None,
@@ -647,6 +649,7 @@ class EdgeConditionedConv(GraphConv):
     - `bias_constraint`: constraint applied to the bias vector.
 
     """
+
     def __init__(self,
                  channels,
                  kernel_network=None,
@@ -836,6 +839,7 @@ class GraphAttention(GraphConv):
     - `bias_constraint`: constraint applied to the bias vector.
 
     """
+
     def __init__(self,
                  channels,
                  attn_heads=1,
@@ -877,8 +881,8 @@ class GraphAttention(GraphConv):
         self.supports_masking = False
 
         # Populated by build()
-        self.kernels = []       # Layer kernels for attention heads
-        self.biases = []        # Layer biases for attention heads
+        self.kernels = []  # Layer kernels for attention heads
+        self.biases = []  # Layer biases for attention heads
         self.attn_kernels = []  # Attention kernels for attention heads
 
         if concat_heads:
@@ -941,7 +945,7 @@ class GraphAttention(GraphConv):
 
             # Compue attention coefficients
             # [[a_1], [a_2]]^T [[Wh_i], [Wh_2]] = [a_1]^T [Wh_i] + [a_2]^T [Wh_j]
-            attn_for_self = K.dot(features, attention_kernel[0])    # [a_1]^T [Wh_i]
+            attn_for_self = K.dot(features, attention_kernel[0])  # [a_1]^T [Wh_i]
             attn_for_neighs = K.dot(features, attention_kernel[1])  # [a_2]^T [Wh_j]
             if len(K.int_shape(features)) == 2:
                 # Single / mixed mode
@@ -1161,7 +1165,7 @@ class APPNP(GraphConv):
     - `alpha`: teleport probability during propagation;
     - `propagations`: number of propagation steps;
     - `mlp_hidden`: list of integers, number of hidden units for each hidden
-    layer in the MLP (if None, the MLP has only one layer);
+    layer in the MLP (if None, the MLP has only the output layer);
     - `mlp_activation`: activation for the MLP layers;
     - `dropout_rate`: dropout rate for Laplacian and MLP layers;
     - `activation`: activation function to use;
@@ -1211,42 +1215,25 @@ class APPNP(GraphConv):
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
-        self.kernels_mlp = []
-        self.biases_mlp = []
-
-        # Hidden layers
-        input_dim = input_shape[0][-1]
+        initializers_kwargs = dict(
+            kernel_initializer=self.kernel_initializer,
+            bias_initializer=self.bias_initializer,
+            kernel_regularizer=self.kernel_regularizer,
+            bias_regularizer=self.bias_regularizer,
+            activity_regularizer=self.activity_regularizer,
+            kernel_constraint=self.kernel_constraint,
+            bias_constraint=self.bias_constraint
+        )
+        mlp_layers = []
         for i, channels in enumerate(self.mlp_hidden):
-            self.kernels_mlp.append(
-                self.add_weight(shape=(input_dim, channels),
-                                initializer=self.kernel_initializer,
-                                name='kernel_mlp_{}'.format(i),
-                                regularizer=self.kernel_regularizer,
-                                constraint=self.kernel_constraint)
-            )
-            if self.use_bias:
-                self.biases_mlp.append(
-                    self.add_weight(shape=(channels,),
-                                    initializer=self.bias_initializer,
-                                    name='bias_mlp_{}'.format(i),
-                                    regularizer=self.bias_regularizer,
-                                    constraint=self.bias_constraint)
-                )
-            input_dim = channels
-
-        # Output layer
-        self.kernel_out = self.add_weight(shape=(input_dim, self.channels),
-                                          initializer=self.kernel_initializer,
-                                          name='kernel_mlp_out',
-                                          regularizer=self.kernel_regularizer,
-                                          constraint=self.kernel_constraint)
-        if self.use_bias:
-            self.bias_out = self.add_weight(shape=(self.channels, ),
-                                            initializer=self.bias_initializer,
-                                            name='bias_mlp_out',
-                                            regularizer=self.bias_regularizer,
-                                            constraint=self.bias_constraint)
-
+            mlp_layers.extend([
+                Dropout(self.dropout_rate),
+                Dense(channels, self.mlp_activation, **initializers_kwargs)
+            ])
+        mlp_layers.append(
+            Dense(self.channels, 'linear', **initializers_kwargs)
+        )
+        self.mlp = Sequential(mlp_layers)
         self.built = True
 
     def call(self, inputs):
@@ -1254,18 +1241,7 @@ class APPNP(GraphConv):
         fltr = inputs[1]
 
         # Compute MLP hidden features
-        for i in range(len(self.kernels_mlp)):
-            features = Dropout(self.dropout_rate)(features)
-            features = K.dot(features, self.kernels_mlp[i])
-            if self.use_bias:
-                features += self.biases_mlp[i]
-            if self.mlp_activation is not None:
-                features = self.mlp_activation(features)
-
-        # Compute MLP output
-        mlp_out = K.dot(features, self.kernel_out)
-        if self.use_bias:
-            mlp_out += self.bias_out
+        mlp_out = self.mlp(features)
 
         # Propagation
         Z = mlp_out
@@ -1328,14 +1304,14 @@ class GINConv(GraphConv):
     **Arguments**
 
     - `channels`: integer, number of output channels;
-    - `mlp_channels`: integer, number of channels in the inner MLP;
-    - `n_hidden_layers`: integer, number of hidden layers in the MLP (default 0)
     - `epsilon`: unnamed parameter, see
     [Xu et al. (2018)](https://arxiv.org/abs/1810.00826), and the equation above.
     This parameter can be learned by setting `epsilon=None`, or it can be set
     to a constant value, which is what happens by default (0). In practice, it
     is safe to leave it to 0.
-    - `mlp_activation`: activation function for the MLP,
+    - `mlp_hidden`: list of integers, number of hidden units for each hidden
+    layer in the MLP (if None, the MLP has only the output layer);
+    - `mlp_activation`: activation for the MLP layers;
     - `activation`: activation function to use;
     - `use_bias`: whether to add a bias to the linear transformation;
     - `kernel_initializer`: initializer for the kernel matrix;
@@ -1349,9 +1325,8 @@ class GINConv(GraphConv):
 
     def __init__(self,
                  channels,
-                 mlp_channels=16,
-                 n_hidden_layers=0,
                  epsilon=None,
+                 mlp_hidden=None,
                  mlp_activation='relu',
                  activation=None,
                  use_bias=True,
@@ -1365,10 +1340,9 @@ class GINConv(GraphConv):
                  **kwargs):
         super().__init__(channels, **kwargs)
         self.channels = channels
-        self.channels_hid = mlp_channels
-        self.extra_hidden_layers = n_hidden_layers
         self.epsilon = epsilon
-        self.hidden_activation = activations.get(mlp_activation)
+        self.mlp_hidden = mlp_hidden if mlp_hidden else []
+        self.mlp_activation = activations.get(mlp_activation)
         self.activation = activations.get(activation)
         self.use_bias = use_bias
         self.kernel_initializer = initializers.get(kernel_initializer)
@@ -1382,56 +1356,31 @@ class GINConv(GraphConv):
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
-        input_dim = input_shape[0][-1]
+        initializers_kwargs = dict(
+            kernel_initializer=self.kernel_initializer,
+            bias_initializer=self.bias_initializer,
+            kernel_regularizer=self.kernel_regularizer,
+            bias_regularizer=self.bias_regularizer,
+            activity_regularizer=self.activity_regularizer,
+            kernel_constraint=self.kernel_constraint,
+            bias_constraint=self.bias_constraint
+        )
+        mlp_layers = []
+        for i, channels in enumerate(self.mlp_hidden):
+            mlp_layers.append(Dense(channels, self.mlp_activation, **initializers_kwargs))
+        mlp_layers.append(
+            Dense(self.channels, self.activation, **initializers_kwargs)
+        )
+        self.mlp = Sequential(mlp_layers)
 
-        self.kernel_in = self.add_weight(shape=(input_dim, self.channels_hid),
-                                         initializer=self.kernel_initializer,
-                                         name='kernel_in',
-                                         regularizer=self.kernel_regularizer,
-                                         constraint=self.kernel_constraint)
-
-        self.kernel_out = self.add_weight(shape=(self.channels_hid, self.channels),
-                                          initializer=self.kernel_initializer,
-                                          name='kernel_out',
-                                          regularizer=self.kernel_regularizer,
-                                          constraint=self.kernel_constraint)
-
-        if self.use_bias:
-            self.bias_in = self.add_weight(shape=(self.channels_hid,),
-                                           initializer=self.bias_initializer,
-                                           name='bias_in',
-                                           regularizer=self.bias_regularizer,
-                                           constraint=self.bias_constraint)
-
-            self.bias_out = self.add_weight(shape=(self.channels,),
-                                            initializer=self.bias_initializer,
-                                            name='bias_out',
-                                            regularizer=self.bias_regularizer,
-                                            constraint=self.bias_constraint)
-
-        if self.epsilon == None:
+        # Parameter for propagating features
+        if self.epsilon is None:
             self.eps = self.add_weight(shape=(1,),
                                        initializer=self.bias_initializer,
                                        name='eps')
         else:
+            # if epsilon is given, keep it constant
             self.eps = K.constant(self.epsilon)
-
-        # Additional hidden layers
-        if self.extra_hidden_layers > 0:
-            self.kernels_hid = []
-            self.biases_hid = []
-            for k in range(self.extra_hidden_layers):
-                self.kernels_hid.append(self.add_weight(shape=(self.channels_hid, self.channels_hid),
-                                                        initializer=self.kernel_initializer,
-                                                        name='kernel_hid_{}'.format(k),
-                                                        regularizer=self.kernel_regularizer,
-                                                        constraint=self.kernel_constraint))
-                if self.use_bias:
-                    self.biases_hid.append(self.add_weight(shape=(self.channels_hid,),
-                                                           initializer=self.bias_initializer,
-                                                           name='bias_hid_{}'.format(k),
-                                                           regularizer=self.bias_regularizer,
-                                                           constraint=self.bias_constraint))
 
         self.built = True
 
@@ -1439,32 +1388,16 @@ class GINConv(GraphConv):
         features = inputs[0]
         fltr = inputs[1]
 
+        # Enforce sparsity
         if not K.is_sparse(fltr):
             fltr = ops.dense_to_sparse(fltr)
 
-        # Input layer
+        # Propagation
         features_neigh = tf.math.segment_sum(tf.gather(features, fltr.indices[:, -1]), fltr.indices[:, -2])
         hidden = (1.0 + self.eps) * features + features_neigh
-        hidden = K.dot(hidden, self.kernel_in)
-        if self.use_bias:
-            hidden = K.bias_add(hidden, self.bias_in)
-        if self.hidden_activation is not None:
-            hidden = self.hidden_activation(hidden)
 
-        # More hidden layers (optional)
-        for k in range(self.extra_hidden_layers):
-            hidden = K.dot(hidden, self.kernels_hid[k])
-            if self.use_bias:
-                hidden = K.bias_add(hidden, self.biases_hid[k])
-            if self.hidden_activation is not None:
-                hidden = self.hidden_activation(hidden)
-
-        # Output layer
-        output = K.dot(hidden, self.kernel_out)
-        if self.use_bias:
-            output = K.bias_add(output, self.bias_out)
-        if self.activation is not None:
-            output = self.activation(output)
+        # MLP
+        output = self.mlp(hidden)
 
         return output
 
