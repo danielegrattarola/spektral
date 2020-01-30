@@ -228,94 +228,88 @@ class GraphAttention(GraphConv):
         assert len(input_shape) >= 2
         input_dim = input_shape[0][-1]
 
-        # Initialize weights for each attention head
-        for head in range(self.attn_heads):
-            # Layer kernel
-            kernel = self.add_weight(shape=(input_dim, self.channels),
-                                     initializer=self.kernel_initializer,
-                                     regularizer=self.kernel_regularizer,
-                                     constraint=self.kernel_constraint,
-                                     name='kernel_{}'.format(head))
-            self.kernels.append(kernel)
 
-            # Layer bias
-            if self.use_bias:
-                bias = self.add_weight(shape=(self.channels,),
-                                       initializer=self.bias_initializer,
-                                       regularizer=self.bias_regularizer,
-                                       constraint=self.bias_constraint,
-                                       name='bias_{}'.format(head))
-                self.biases.append(bias)
-
-            # Attention kernels
-            attn_kernel_self = self.add_weight(shape=(self.channels, 1),
-                                               initializer=self.attn_kernel_initializer,
-                                               regularizer=self.attn_kernel_regularizer,
-                                               constraint=self.attn_kernel_constraint,
-                                               name='attn_kernel_self_{}'.format(head))
-            attn_kernel_neighs = self.add_weight(shape=(self.channels, 1),
-                                                 initializer=self.attn_kernel_initializer,
-                                                 regularizer=self.attn_kernel_regularizer,
-                                                 constraint=self.attn_kernel_constraint,
-                                                 name='attn_kernel_neigh_{}'.format(head))
-            self.attn_kernels.append([attn_kernel_self, attn_kernel_neighs])
-        self.dropout = Dropout(self.dropout_rate)
-        self.built = True
-
-        self.query_dense = DenseMultiHead(
-            self.num_heads,
-            self.size_per_head,
+        self.a = DenseMultiHead(
+            self.attn_heads,
+            self.channels,
             kernel_initializer="glorot_uniform",
             use_bias=False,
             name="query",
         )
-        self.key_dense = DenseMultiHead(
-            self.num_heads,
-            self.size_per_head,
-            kernel_initializer="glorot_uniform",
-            use_bias=False,
-            name="key",
-        )
-        self.value_dense = DenseMultiHead(
-            self.num_heads,
-            self.size_per_head,
-            kernel_initializer="glorot_uniform",
-            use_bias=False,
-            name="value",
-        )
-        self.projection_kernel = self.add_weight(
-            "projection_kernel",
-            shape=[self.num_heads, self.size_per_head, output_size],
-            initializer="glorot_uniform",
-            dtype=self.dtype,
-            trainable=True,
-        )
 
-        super().build(input_shape)
+        # self.key_dense = DenseMultiHead(
+        #     self.num_heads,
+        #     self.size_per_head,
+        #     kernel_initializer="glorot_uniform",
+        #     use_bias=False,
+        #     name="key",
+        # )
+        # self.value_dense = DenseMultiHead(
+        #     self.num_heads,
+        #     self.size_per_head,
+        #     kernel_initializer="glorot_uniform",
+        #     use_bias=False,
+        #     name="value",
+        # )
+        # self.projection_kernel = self.add_weight(
+        #     "projection_kernel",
+        #     shape=[self.num_heads, self.size_per_head, output_size],
+        #     initializer="glorot_uniform",
+        #     dtype=self.dtype,
+        #     trainable=True,
+        # )
+
+        # self.dropout = Dropout(self.dropout_rate)
+
+        self.built = True
+
+        # Initialize weights for each attention head
+        # for head in range(self.attn_heads):
+        #     # Layer kernel
+        #     kernel = self.add_weight(shape=(input_dim, self.channels),
+        #                              initializer=self.kernel_initializer,
+        #                              regularizer=self.kernel_regularizer,
+        #                              constraint=self.kernel_constraint,
+        #                              name='kernel_{}'.format(head))
+        #     self.kernels.append(kernel)
+
+        #     # Layer bias
+        #     if self.use_bias:
+        #         bias = self.add_weight(shape=(self.channels,),
+        #                                initializer=self.bias_initializer,
+        #                                regularizer=self.bias_regularizer,
+        #                                constraint=self.bias_constraint,
+        #                                name='bias_{}'.format(head))
+        #         self.biases.append(bias)
+
+        #     # Attention kernels
+        #     attn_kernel_self = self.add_weight(shape=(self.channels, 1),
+        #                                        initializer=self.attn_kernel_initializer,
+        #                                        regularizer=self.attn_kernel_regularizer,
+        #                                        constraint=self.attn_kernel_constraint,
+        #                                        name='attn_kernel_self_{}'.format(head))
+        #     attn_kernel_neighs = self.add_weight(shape=(self.channels, 1),
+        #                                          initializer=self.attn_kernel_initializer,
+        #                                          regularizer=self.attn_kernel_regularizer,
+        #                                          constraint=self.attn_kernel_constraint,
+        #                                          name='attn_kernel_neigh_{}'.format(head))
+        #     self.attn_kernels.append([attn_kernel_self, attn_kernel_neighs])
 
     
 
-    def call(
-        self, query, key, value=None, mask=None, training=None,
-    ):
-        """Apply attention mechanism to query_input and source_input.
+    def call(self, inputs):
+        X = inputs[0]
+        A = inputs[1]
 
-    Args:
-      query_input: A tensor with shape [batch_size, length_query, hidden_size].
-      source_input: A tensor with shape [batch_size, length_source,
-        hidden_size]
+        features = self.query_dense(query)
 
-    Returns:
-      Attention layer output with shape [batch_size, length_query, hidden_size]
-    """
-        # Linearly project the query, key and value using different learned
-        # projections. Splitting heads is automatically done during the linear
-        # projections --> [batch_size, length, num_heads, dim_per_head].
+        print(features.shape)
+        exit()
 
-        if value is None:
-            value = key
+        ######################
+        # ^^^ code so far ^^^ 
+        ######################
 
-        query = self.query_dense(query)
         key = self.key_dense(key)
         value = self.value_dense(value)
         projection = self.projection_kernel
