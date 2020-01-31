@@ -2,111 +2,6 @@ import tensorflow as tf
 
 from .convolutional import GraphConv
 
-class DenseMultiHead(tf.keras.layers.Layer):
-    """A Dense Layer using multihead kernel with tf.einsum implementation.
-  Attributes:
-    num_attention_heads: An integer, number of attention heads for each
-      multihead attention layer.
-    size_per_head: An integer, hidden size per attention head.
-    kernel_initializer: An initializer for the kernel weight.
-    bias_initializer: An initializer for the bias.
-    activation: An activation function to use. If nothing is specified, no
-      activation is applied.
-    use_bias: A bool, whether the layer uses a bias.
-  """
-
-    def __init__(
-        self,
-        num_attention_heads=12,
-        size_per_head=72,
-        kernel_initializer=None,
-        bias_initializer="zeros",
-        activation=None,
-        use_bias=True,
-        multihead_input=False,
-        **kwargs
-    ):
-        """Inits DenseMultiHead."""
-        super(DenseMultiHead, self).__init__(**kwargs)
-
-        self.num_attention_heads = num_attention_heads
-        self.size_per_head = size_per_head
-        self.kernel_initializer = kernel_initializer
-        self.bias_initializer = bias_initializer
-        self.activation = activation
-        self.use_bias = use_bias
-        self.multihead_input = multihead_input
-
-    def build(self, input_shape):
-        """Implements build() for the layer."""
-        dtype = tf.as_dtype(self.dtype or tf.keras.backend.floatx())
-        if not (dtype.is_floating or dtype.is_complex):
-            raise TypeError(
-                "Unable to build `DenseMultiHead` layer with non-floating "
-                "point (and non-complex) dtype %s" % (dtype,)
-            )
-        input_shape = tf.TensorShape(input_shape)
-        if tf.compat.dimension_value(input_shape[-1]) is None:
-            raise ValueError(
-                "The last dimension of the inputs to `DenseMultiHead` "
-                "should be defined. Found `None`."
-            )
-        self.last_dim = tf.compat.dimension_value(input_shape[-1])
-        self.input_spec = tf.keras.layers.InputSpec(
-            min_ndim=3, axes={-1: self.last_dim}
-        )
-
-
-        self.kernel = self.add_weight(
-            "kernel",
-            shape=[self.last_dim, self.num_attention_heads, self.size_per_head],
-            initializer=self.kernel_initializer,
-            dtype=self.dtype,
-            trainable=True,
-        )
-
-        if self.use_bias:
-            self.bias = self.add_weight(
-                "bias",
-                shape=[self.num_attention_heads, self.size_per_head],
-                initializer=self.bias_initializer,
-                dtype=self.dtype,
-                trainable=True,
-            )
-        else:
-            self.bias = None
-
-        super().build(input_shape)
-
-    def call(self, inputs):
-        """Implements ``call()`` for DenseMultiHead.
-    Args:
-      inputs: A float tensor of shape [batch_size, sequence_length, hidden_size]
-        when output_projection is False, otherwise a float tensor of shape
-        [batch_size, sequence_length, num_heads, dim_per_head].
-    Returns:
-      The projected tensor with shape [batch_size, sequence_length, num_heads,
-        dim_per_head] when output_projection is False, otherwise [batch_size,
-        sequence_length, hidden_size].
-    """
-
-        kernel = self.kernel
-        bias = self.bias
-
-        if self.multihead_input:
-            ret = tf.einsum("...NHD,DHF->...NHF", inputs, kernel)
-        else:
-            ret = tf.einsum("...ND,DHF->...NHF", inputs, kernel)
-
-        if self.use_bias:
-            ret += bias
-
-        if self.activation is not None:
-            return self.activation(ret)
-
-        return ret
-
-
 class GraphAttention(GraphConv):
     r"""
     A graph attention layer (GAT) as presented by
@@ -207,7 +102,7 @@ class GraphAttention(GraphConv):
         self.concat_heads = concat_heads
         self.dropout_rate = dropout_rate
         self.return_attn_coef = return_attn_coef
-        self.activation = activation
+        self.activation = tf.keras.activations.get(activation)
         self.use_bias = use_bias
         self.kernel_initializer = kernel_initializer
         self.bias_initializer = bias_initializer
@@ -234,153 +129,78 @@ class GraphAttention(GraphConv):
         input_dim = input_shape[0][-1]
 
 
-        self.kernel = DenseMultiHead(
-            num_attention_heads=self.attn_heads,
-            size_per_head=self.channels,
-            kernel_initializer=self.kernel_initializer,
-            # constraint=self.kernel_constraint,
-            use_bias=False,
+        self.kernel = self.add_weight(
             name="kernel",
+            shape=[input_dim, self.attn_heads, self.channels],
+            initializer=self.kernel_initializer,
+            constraint=self.kernel_constraint,
         )
 
-        self.attn_kernel_self = DenseMultiHead(
-            num_attention_heads=self.attn_heads,
-            size_per_head=1,
-            kernel_initializer=self.attn_kernel_initializer,
-            # constraint=self.attn_kernel_constraint,
-            multihead_input=True,
+        self.attn_kernel_self = self.add_weight(
             name='attn_kernel_self',
+            shape=[self.channels, self.attn_heads, 1],
+            initializer=self.attn_kernel_initializer,
+            constraint=self.attn_kernel_constraint,
         )
 
-        self.attn_kernel_neighs = DenseMultiHead(
-            num_attention_heads=self.attn_heads,
-            size_per_head=1,
-            kernel_initializer=self.attn_kernel_initializer,
-            multihead_input=True,
-            # constraint=self.attn_kernel_constraint,
+        self.attn_kernel_neighs = self.add_weight(
             name='attn_kernel_neigh',
+            shape=[self.channels, self.attn_heads, 1],
+            initializer=self.attn_kernel_initializer,
+            constraint=self.attn_kernel_constraint,
         )
 
         self.dropout = tf.keras.layers.Dropout(self.dropout_rate)
-        
-        
-        # self.projection_kernel = self.add_weight(
-        #     "projection_kernel",
-        #     shape=[self.num_heads, self.size_per_head, output_size],
-        #     initializer="glorot_uniform",
-        #     dtype=self.dtype,
-        #     trainable=True,
-        # )
 
+        if self.use_bias:
+            self.bias = self.add_weight(
+                shape=[self.channels],
+                initializer=self.bias_initializer,
+                regularizer=self.bias_regularizer,
+                constraint=self.bias_constraint,
+                name='bias'
+            )
 
-        # self.built = True
-
-        # Initialize weights for each attention head
-        # for head in range(self.attn_heads):
-        #     # Layer kernel
-        #     kernel = self.add_weight(shape=(input_dim, self.channels),
-        #                              initializer=self.kernel_initializer,
-        #                              regularizer=self.kernel_regularizer,
-        #                              constraint=self.kernel_constraint,
-        #                              name='kernel_{}'.format(head))
-        #     self.kernels.append(kernel)
-
-        #     # Layer bias
-        #     if self.use_bias:
-        #         bias = self.add_weight(shape=(self.channels,),
-        #                                initializer=self.bias_initializer,
-        #                                regularizer=self.bias_regularizer,
-        #                                constraint=self.bias_constraint,
-        #                                name='bias_{}'.format(head))
-        #         self.biases.append(bias)
-
-        #     # Attention kernels
-        #     attn_kernel_self = self.add_weight(shape=(self.channels, 1),
-        #                                        initializer=self.attn_kernel_initializer,
-        #                                        regularizer=self.attn_kernel_regularizer,
-        #                                        constraint=self.attn_kernel_constraint,
-        #                                        name='attn_kernel_self_{}'.format(head))
-        #     attn_kernel_neighs = self.add_weight(shape=(self.channels, 1),
-        #                                          initializer=self.attn_kernel_initializer,
-        #                                          regularizer=self.attn_kernel_regularizer,
-        #                                          constraint=self.attn_kernel_constraint,
-        #                                          name='attn_kernel_neigh_{}'.format(head))
-        #     self.attn_kernels.append([attn_kernel_self, attn_kernel_neighs])
-
-    
 
     def call(self, inputs, training=None):
         X = inputs[0]
         A = inputs[1]
 
-        print("X", X.shape)
+        features = tf.einsum("...NI , IHO -> ...NHO", X, self.kernel)
 
-        features = self.kernel(X)
-        print("features", features.shape)
-
-        attn_for_self = self.attn_kernel_self(features)
-        print("attn_for_self", attn_for_self.shape)
-
-        attn_for_neighs = self.attn_kernel_neighs(features)
-        attn_for_neighs = tf.transpose(
-            attn_for_neighs,
-            attn_for_neighs.shape.as_list()[:-3] + [-1, -2, -3]
-        )
-        print("attn_for_neighs", attn_for_neighs.shape)
+        attn_for_self = tf.einsum("...NHI , IHO -> ...NHO", features, self.attn_kernel_self)
+        attn_for_neighs = tf.einsum("...NHI , IHO -> ...NHO", features, self.attn_kernel_neighs)
+        attn_for_neighs = tf.einsum("...ABC -> ...CBA", attn_for_neighs) #transpose
 
         attn_coef = attn_for_self + attn_for_neighs
         attn_coef = tf.nn.leaky_relu(attn_coef, alpha=0.2)
-        print("attn_coef", attn_coef.shape)
 
         mask = -10e9 * (1.0 - A)
-        mask = mask[..., None, :]
-        print("mask", mask.shape)
 
-        attn_coef += mask
+        attn_coef += mask[..., None, :]
         attn_coef = tf.nn.softmax(attn_coef, axis=-1)
-        print("attn_coef", attn_coef.shape)
 
         attn_coef_drop = self.dropout(attn_coef, training=training)
-        print("attn_coef_drop", attn_coef_drop.shape)
 
-        features = tf.einsum("...NHM,...MHD->...NHD", attn_coef_drop, features)
-        
-        print("features", features.shape)
+        features = tf.einsum("...NHM , ...MHI -> ...NHI", attn_coef_drop, features)
         
 
-        exit()
+        if self.concat_heads:
+            shape = features.shape[:-2] + [features.shape[-1] * features.shape[-2]]
+            shape = [ d if d is not None else -1 for d in shape ]
+            output = tf.reshape(features, shape)
+        else:
+            output = tf.reduce_mean(features, axis=-2)
+        
+        if self.activation:
+            output = self.activation(output)
 
-        ######################
-        # ^^^ code so far ^^^ 
-        ######################
+        if self.return_attn_coef:
+            return output, attn_coef
+        else:
+            return output
 
-        key = self.key_dense(key)
-        value = self.value_dense(value)
-        projection = self.projection_kernel
-
-        depth = tf.cast(tf.shape(query)[-1], tf.float32)
-
-        query /= tf.sqrt(depth)
-
-        # Calculate dot product attention
-        logits = tf.einsum("...TNH,...FNH->...NFT", key, query)
-
-        # apply mask
-        if mask is not None:
-            logits += mask
-
-        # Note that softmax internally performs math operations using float32
-        # for numeric stability. When training with float16, we keep the input
-        # and output in float16 for better performance.
-        attention = tf.nn.softmax(logits, name="attention_weights")
-
-        concated_output = tf.einsum("...NFT,...TNH->...FNH", attention, value)
-
-        # Run the outputs through another linear projection layer. Recombining heads
-        # is automatically done --> [batch_size, length, hidden_size]
-        attention_output = tf.einsum("...FNH,NHD->...FD", concated_output, projection)
-
-        return attention_output
+        
 
     def compute_output_shape(self, input_shape):
         output_shape = input_shape[0][:-1] + (self.output_dim,)
