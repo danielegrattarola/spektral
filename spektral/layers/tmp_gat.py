@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+from .convolutional import GraphConv
 
 class DenseMultiHead(tf.keras.layers.Layer):
     """A Dense Layer using multihead kernel with tf.einsum implementation.
@@ -7,7 +8,6 @@ class DenseMultiHead(tf.keras.layers.Layer):
     num_attention_heads: An integer, number of attention heads for each
       multihead attention layer.
     size_per_head: An integer, hidden size per attention head.
-    hidden_size: An integer, dimension of the hidden layer.
     kernel_initializer: An initializer for the kernel weight.
     bias_initializer: An initializer for the bias.
     activation: An activation function to use. If nothing is specified, no
@@ -23,6 +23,7 @@ class DenseMultiHead(tf.keras.layers.Layer):
         bias_initializer="zeros",
         activation=None,
         use_bias=True,
+        multihead_input=False,
         **kwargs
     ):
         """Inits DenseMultiHead."""
@@ -30,11 +31,11 @@ class DenseMultiHead(tf.keras.layers.Layer):
 
         self.num_attention_heads = num_attention_heads
         self.size_per_head = size_per_head
-        self.hidden_size = num_attention_heads * size_per_head
         self.kernel_initializer = kernel_initializer
         self.bias_initializer = bias_initializer
         self.activation = activation
         self.use_bias = use_bias
+        self.multihead_input = multihead_input
 
     def build(self, input_shape):
         """Implements build() for the layer."""
@@ -63,6 +64,7 @@ class DenseMultiHead(tf.keras.layers.Layer):
             dtype=self.dtype,
             trainable=True,
         )
+
         if self.use_bias:
             self.bias = self.add_weight(
                 "bias",
@@ -91,7 +93,10 @@ class DenseMultiHead(tf.keras.layers.Layer):
         kernel = self.kernel
         bias = self.bias
 
-        ret = tf.einsum("...ND,DHF->...NHF", inputs, kernel)
+        if self.multihead_input:
+            ret = tf.einsum("...NHD,DHF->...NHF", inputs, kernel)
+        else:
+            ret = tf.einsum("...ND,DHF->...NHF", inputs, kernel)
 
         if self.use_bias:
             ret += bias
@@ -202,18 +207,18 @@ class GraphAttention(GraphConv):
         self.concat_heads = concat_heads
         self.dropout_rate = dropout_rate
         self.return_attn_coef = return_attn_coef
-        self.activation = activations.get(activation)
+        self.activation = activation
         self.use_bias = use_bias
-        self.kernel_initializer = initializers.get(kernel_initializer)
-        self.bias_initializer = initializers.get(bias_initializer)
-        self.attn_kernel_initializer = initializers.get(attn_kernel_initializer)
-        self.kernel_regularizer = regularizers.get(kernel_regularizer)
-        self.bias_regularizer = regularizers.get(bias_regularizer)
-        self.attn_kernel_regularizer = regularizers.get(attn_kernel_regularizer)
-        self.activity_regularizer = regularizers.get(activity_regularizer)
-        self.kernel_constraint = constraints.get(kernel_constraint)
-        self.bias_constraint = constraints.get(bias_constraint)
-        self.attn_kernel_constraint = constraints.get(attn_kernel_constraint)
+        self.kernel_initializer = kernel_initializer
+        self.bias_initializer = bias_initializer
+        self.attn_kernel_initializer = attn_kernel_initializer
+        self.kernel_regularizer = kernel_regularizer
+        self.bias_regularizer = bias_regularizer
+        self.attn_kernel_regularizer = attn_kernel_regularizer
+        self.activity_regularizer = activity_regularizer
+        self.kernel_constraint = kernel_constraint
+        self.bias_constraint = bias_constraint
+        self.attn_kernel_constraint = attn_kernel_constraint
         self.supports_masking = False
 
         if concat_heads:
@@ -229,28 +234,36 @@ class GraphAttention(GraphConv):
         input_dim = input_shape[0][-1]
 
 
-        self.Wh_dense = DenseMultiHead(
-            self.attn_heads,
-            self.channels,
-            kernel_initializer="glorot_uniform",
+        self.kernel = DenseMultiHead(
+            num_attention_heads=self.attn_heads,
+            size_per_head=self.channels,
+            kernel_initializer=self.kernel_initializer,
+            # constraint=self.kernel_constraint,
             use_bias=False,
-            name="query",
+            name="kernel",
         )
 
-        # self.key_dense = DenseMultiHead(
-        #     self.num_heads,
-        #     self.size_per_head,
-        #     kernel_initializer="glorot_uniform",
-        #     use_bias=False,
-        #     name="key",
-        # )
-        # self.value_dense = DenseMultiHead(
-        #     self.num_heads,
-        #     self.size_per_head,
-        #     kernel_initializer="glorot_uniform",
-        #     use_bias=False,
-        #     name="value",
-        # )
+        self.attn_kernel_self = DenseMultiHead(
+            num_attention_heads=self.attn_heads,
+            size_per_head=1,
+            kernel_initializer=self.attn_kernel_initializer,
+            # constraint=self.attn_kernel_constraint,
+            multihead_input=True,
+            name='attn_kernel_self',
+        )
+
+        self.attn_kernel_neighs = DenseMultiHead(
+            num_attention_heads=self.attn_heads,
+            size_per_head=1,
+            kernel_initializer=self.attn_kernel_initializer,
+            multihead_input=True,
+            # constraint=self.attn_kernel_constraint,
+            name='attn_kernel_neigh',
+        )
+
+        self.dropout = tf.keras.layers.Dropout(self.dropout_rate)
+        
+        
         # self.projection_kernel = self.add_weight(
         #     "projection_kernel",
         #     shape=[self.num_heads, self.size_per_head, output_size],
@@ -259,9 +272,8 @@ class GraphAttention(GraphConv):
         #     trainable=True,
         # )
 
-        # self.dropout = Dropout(self.dropout_rate)
 
-        self.built = True
+        # self.built = True
 
         # Initialize weights for each attention head
         # for head in range(self.attn_heads):
@@ -297,13 +309,45 @@ class GraphAttention(GraphConv):
 
     
 
-    def call(self, inputs):
+    def call(self, inputs, training=None):
         X = inputs[0]
         A = inputs[1]
 
-        features = self.Wh_dense(query)
+        print("X", X.shape)
 
-        print(features.shape)
+        features = self.kernel(X)
+        print("features", features.shape)
+
+        attn_for_self = self.attn_kernel_self(features)
+        print("attn_for_self", attn_for_self.shape)
+
+        attn_for_neighs = self.attn_kernel_neighs(features)
+        attn_for_neighs = tf.transpose(
+            attn_for_neighs,
+            attn_for_neighs.shape.as_list()[:-3] + [-1, -2, -3]
+        )
+        print("attn_for_neighs", attn_for_neighs.shape)
+
+        attn_coef = attn_for_self + attn_for_neighs
+        attn_coef = tf.nn.leaky_relu(attn_coef, alpha=0.2)
+        print("attn_coef", attn_coef.shape)
+
+        mask = -10e9 * (1.0 - A)
+        mask = mask[..., None, :]
+        print("mask", mask.shape)
+
+        attn_coef += mask
+        attn_coef = tf.nn.softmax(attn_coef, axis=-1)
+        print("attn_coef", attn_coef.shape)
+
+        attn_coef_drop = self.dropout(attn_coef, training=training)
+        print("attn_coef_drop", attn_coef_drop.shape)
+
+        features = tf.einsum("...NHM,...MHD->...NHD", attn_coef_drop, features)
+        
+        print("features", features.shape)
+        
+
         exit()
 
         ######################
@@ -348,18 +392,18 @@ class GraphAttention(GraphConv):
             'attn_heads': self.attn_heads,
             'concat_heads': self.concat_heads,
             'dropout_rate': self.dropout_rate,
-            'activation': activations.serialize(self.activation),
+            'activation': tf.keras.activations.serialize(self.activation),
             'use_bias': self.use_bias,
-            'kernel_initializer': initializers.serialize(self.kernel_initializer),
-            'bias_initializer': initializers.serialize(self.bias_initializer),
-            'attn_kernel_initializer': initializers.serialize(self.attn_kernel_initializer),
-            'kernel_regularizer': regularizers.serialize(self.kernel_regularizer),
-            'bias_regularizer': regularizers.serialize(self.bias_regularizer),
-            'attn_kernel_regularizer': regularizers.serialize(self.attn_kernel_regularizer),
-            'activity_regularizer': regularizers.serialize(self.activity_regularizer),
-            'kernel_constraint': constraints.serialize(self.kernel_constraint),
-            'bias_constraint': constraints.serialize(self.bias_constraint),
-            'attn_kernel_constraint': constraints.serialize(self.attn_kernel_constraint),
+            'kernel_initializer': tf.keras.initializers.serialize(self.kernel_initializer),
+            'bias_initializer': tf.keras.initializers.serialize(self.bias_initializer),
+            'attn_kernel_initializer': tf.keras.initializers.serialize(self.attn_kernel_initializer),
+            'kernel_regularizer': tf.keras.regularizers.serialize(self.kernel_regularizer),
+            'bias_regularizer': tf.keras.regularizers.serialize(self.bias_regularizer),
+            'attn_kernel_regularizer': tf.keras.regularizers.serialize(self.attn_kernel_regularizer),
+            'activity_regularizer': tf.keras.regularizers.serialize(self.activity_regularizer),
+            'kernel_constraint': tf.keras.constraints.serialize(self.kernel_constraint),
+            'bias_constraint': tf.keras.constraints.serialize(self.bias_constraint),
+            'attn_kernel_constraint': tf.keras.constraints.serialize(self.attn_kernel_constraint),
         }
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
