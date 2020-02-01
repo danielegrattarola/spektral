@@ -330,9 +330,9 @@ dimension changed to <code>channels</code>.</li>
 <p><strong>Mode</strong>: single, mixed, batch.</p>
 <p>This layer computes:
 <script type="math/tex; mode=display">
-\Z = \sum \limits_{k=1}^{K} \T^{(k)} \X \W^{(k)}  + \b^{(k)},
+\Z = \sum \limits_{k=0}^{K - 1} \T^{(k)} \X \W^{(k)}  + \b^{(k)},
 </script>
-where <script type="math/tex"> \T^{(1)}, ..., \T^{(K)} </script> are Chebyshev polynomials of <script type="math/tex">\tilde \L</script>
+where <script type="math/tex"> \T^{(0)}, ..., \T^{(K - 1)} </script> are Chebyshev polynomials of <script type="math/tex">\tilde \L</script>
 defined as
 <script type="math/tex; mode=display">
 \T^{(0)} = \I \\
