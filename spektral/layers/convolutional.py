@@ -143,14 +143,14 @@ class ChebConv(GraphConv):
 
     This layer computes:
     $$
-        \Z = \sum \limits_{k=1}^{K} \T_{k} \X \W  + \b,
+        \Z = \sum \limits_{k=0}^{K - 1} \T^{(k)} \X \W^{(k)}  + \b^{(k)},
     $$
-    where \( \T = [ \T_{1}, ..., \T_{K}] \) is a list of Chebyshev polynomials
+    where \( \T^{(0)}, ..., \T^{(K - 1)} \) are Chebyshev polynomials of \(\tilde \L\)
     defined as
     $$
-        \T_0 = \X \\
-        \T_1 = \tilde \L \X \\
-        \T_{k \ge 2} = 2 \cdot \tilde \L \T_{k-1} - \T_{k-2},
+        \T^{(0)} = \I \\
+        \T^{(1)} = \tilde \L \\
+        \T^{(k \ge 2)} = 2 \cdot \tilde \L \T^{(k - 1)} - \T^{(k - 2)},
     $$
     where
     $$
