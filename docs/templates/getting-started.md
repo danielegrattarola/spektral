@@ -1,25 +1,22 @@
 # Getting started
 
-Spektral is designed according to the Keras API principles, in order to make things extremely simple for beginners, while maintaining flexibility for experts and researchers.  
+Spektral is designed according to the guiding principles of the Keras API to make things extremely simple for beginners while maintaining flexibility for experts and researchers.  
 
-The most important features of Spektral are the `layers.convolutional` and `layers.pooling` modules, which offer a number of popular layers to start building graph neural networks (GNNs) right away.     
+The most important modules of Spektral are `layers.convolutional` and `layers.pooling`, which offer a number of popular layers to start building graph neural networks (GNNs) right away.     
 Because Spektral is designed as an extension of Keras, you can plug any Spektral layer into an existing Keras `Model` without modifications. 
-
-A good starting point is the collection of examples which can be found [on Github](https://github.com/danielegrattarola/spektral/tree/master/examples), and it is also a good idea to read the section on [how to represent graphs](https://danielegrattarola.github.io/spektral/data/) before starting this tutorial. 
-
 
 ## Node classification on citation networks
 
-In this example, we will build a simple [Graph Convolutional Network for semi-supervised node classification](https://arxiv.org/abs/1609.02907).
+In this example, we will build a simple [Graph Convolutional Network](https://arxiv.org/abs/1609.02907) for semi-supervised classification of nodes.
 
-This is a simple but challenging task that has caused GNN's recent rise to popularity, and consists in classifying documents in a **citation network**.   
-In this network, each node represents a document, and node attributes are bag-of-words binary features. 
-A link between two nodes means that one of the two documents cites the other.   
-Finally, each node has a class label.
+This is a simple but challenging task that consists of classifying text documents in a **citation network**.   
+In this type of graph, each node represents a document and is associated to a binary bag-of-words attribute (1 if a given word appears in the text, 0 otherwise). 
+If a document cites another, then there exist an undirected edge between the two corresponding nodes. 
+Finally, each node has a class label that we want to predict. 
 
 This is a **transductive** learning setting, where we observe all of the nodes and edges at training time, but only a fraction of the labels. The goal is to learn to predict the missing labels.
 
-The `datasets.citation` module of Spektral allows you to download and load three popular citation datasets (Cora, Citeseer and Pubmed) in one line of code. For instance, loading the Cora dataset is as simple as: 
+The `datasets.citation` module of Spektral lets you to download and load three popular citation datasets (Cora, Citeseer and Pubmed) in one line of code. For instance, loading the Cora dataset is as simple as: 
 
 ```python
 from spektral.datasets import citation
@@ -31,14 +28,12 @@ F = X.shape[-1]
 n_classes = y.shape[-1]
 ```
 
-This will load the network's adjacency matrix (`A`) in a Scipy sparse format, the node features (`X`), and the labels (`y`). The loader will also return some boolean masks to know which nodes belong to the training, validation and test sets (`train_mask, val_mask, test_mask`).
-
-We also saved a couple of values that will be useful later: the number of nodes in the graph (`N`), the size of the node attributes (`F`), and the number of classes in the labels (`n_classes`).
+This will load the network's adjacency matrix `A` as a Scipy sparse matrix of shape `(N, N)`, the node features `X` of shape `(N, F)`, and the labels `y` of shape `(N, n_classes)`. The loader will also return some boolean masks to know which nodes belong to the training, validation and test sets (`train_mask, val_mask, test_mask`).
 
 
 ## Creating a GNN
 
-To create a GCN similar to the one in the paper, we will use the `GraphConv` layer and the functional API of Keras:
+To create a GCN, we will use the `GraphConv` layer and the functional API of Keras:
 
 ```python
 from spektral.layers import GraphConv
@@ -63,25 +58,28 @@ model = Model(inputs=[X_in, A_in], outputs=graph_conv_2)
 
 And that's it. We just built our first GNN in Spektral and Keras. 
 
-Note how we used the same familiar API of Keras for creating the GCN layers, as well as the standard `Dropout` layer to regularize our model. If we wanted, we could choose our own regularizers and initializers for the weights of `GraphConv` as well.
+Note how we used the familiar API of Keras to create the GCN layers, as well as the standard `Dropout` layer to regularize our model. All features of Keras are also supported by Spektral (including initializers, regularizers, etc.).
 
-An important thing to keep in mind is that in this **single mode** (see the [data representation section](https://danielegrattarola.github.io/spektral/data/)), there is no batch dimension. The "elements" of our dataset are, in a sense, the node themselves. This is why we omitted the first dimension of `X` and `A` in the `Input` layers (`shape=(F, )` instead of `(N, F)`, and `shape=(N, )` instead of `(N, N)`). 
+An important thing to notice at this point is how we defined the `Input` layers of our model. Because the "elements" of our dataset are the node themselves, we are telling Keras to consider each node as a separate sample, so that the "batch" axis is implicitly defined as `None`.  
+In other words, a sample of the node attributes will be a vector of shape `(F, )` and a sample of the adjacency matrix will be one of its rows of shape `(N, )`. 
 
-This will become clearer later. 
+Keep this detail in mind for later. 
+
 
 ## Training the GNN
 
-Before training the model, we have to do a simple pre-processing of the adjacency matrix, in order to scale the weight (i.e., the importance) of a node's connections according to the node's degree. In other words, the more a node is connected, the less relative importance those connections have (plus some other minor considerations that you can find in the [original GCN paper](https://arxiv.org/abs/1609.02907)).  
+Before training the model, we have to pre-process the adjacency matrix to scale the weights of a node's connections according to its degree. In other words, the more a node is connected to others, the less relative importance those connections have. 
+Most GNN layers available in Spektral require their own type of pre-processing in order to work correctly. You can find all necessary tools for pre-processing `A` in 
+`spektral.utils`.
 
-This is simply achieved by doing:
+In our example, the pre-processing required by GCN is: 
 
 ```python
 from spektral import utils
 A = utils.localpooling_filter(A)
 ```
 
-which will give us a normalized adjacency matrix that we can use to train the GCN. 
-
+And that's all! 
 What's left now for us is to compile and train our model: 
 
 ```python
@@ -93,7 +91,7 @@ model.summary()
 
 Note that we used the `weighted_metrics` argument instead of the usual `metrics`. This is due to the particular semi-supervised problem that we are dealing with, and has to do with the boolean masks that we loaded earlier (more on that later).
 
-We are now ready to train the model:
+We can now train the model using the native `fit()` method of Keras, no modifications needed:
 
 ```python
 # Train model
@@ -109,19 +107,18 @@ model.fit([X, A],
 
 There are a couple of things to note here.
 
-First, we trained our model using the native `fit()` method of Keras. No modifications needed.
-
-Second, we have set `batch_size=N` and `shuffle=False`. This is because we are working in **single mode**, meaning that Keras will interpret the first dimension of our adjacency and node attributes matrices as the "batch" dimension.    
-If left to its own devices, Keras will automatically try to split our graph into batches of 32, and shuffle the batches at each epoch. For us, that means that the graph would get mixed and cut beyond repair, and the model would not be able to learn. This is why we tell Keras to use a batch size of `N` (the whole graph) and to not shuffle the nodes between epochs.  
-This would not be necessary if we were working in **batch mode** instead, with many different graphs in our dataset. 
+We have set `batch_size=N` and `shuffle=False`. This is because, since we are considering our nodes as samples in a dataset, the default behaviour of Keras will be to split our graph into batches of 32, and shuffle the batches at each epoch. 
+However, shuffling the adjacency matrix along one axis and not the other means that row `i` will represent a different node than column `i`. 
+At the same time, if we split the graph in batches, we can easily end up in a situation where we need to use a node attribute that is not part of the batch. The only solution is to take all the node features at the same time, hence `batch_size=N`.
 
 Finally, we used `train_mask` and `val_mask` as `sample_weight`.   
-This results in the training nodes being assigned a weight of 1 during training, and the nodes outside the training set being assigned a weight of 0. The same holds for the validation and test sets.    
-This is all that we need to do to differentiate between training and test data. See how the model takes as input the full `X`, `A`, and `y` for both phases? The only thing that changes are the masks. This is also why we used the `weighted_metrics` flag when compiling the model. 
+This means that, during training, the training nodes will have a weight of 1 and the validation nodes will have a weight of 0. Then, in validation, we will set the training nodes to have a weight of 0 and the validation nodes to have a weight of 1. 
+
+This is all that we need to do to differentiate between training and test data. See how the model takes as input the full `X`, `A`, and `y` for both training and valdation? The only thing that changes is the mask. This is also why we used the `weighted_metrics` keyword when compiling the model, so that our accuracy is calculated only on the correct nodes at each phase. 
 
 ## Evaluating the model
 
-Again, this is done in vanilla Keras. We just have to keep in mind the same considerations about batching that we did for training (`shuffle` is `False` by default in `evaluate()`): 
+Once again, evaluation is done in vanilla Keras. We just have to keep in mind the same considerations about batching that we did for training (note that in `model.evaluate()`, by default, `shuffle=False`): 
 
 ```python
 # Evaluate model
@@ -138,10 +135,10 @@ Done! Our model has been defined, trained, and evaluated.
 
 ## Go create!
 
-If you made it to this point, you are ready to use Spektral to create your own models. 
+You are now ready to use Spektral to create your own models. 
 
 If you want to build a GNN for a specific task, chances are that the things you need to define the model and pre-process the data are already part of Spektral. Check the [examples](https://github.com/danielegrattarola/spektral/tree/master/examples) for some ideas and practical tips.
 
-Remember to read the [data representation section](https://danielegrattarola.github.io/spektral/data/) to learn about how GNNs can be used to solve different problems. 
+Remember to read the [data representation section](https://danielegrattarola.github.io/spektral/data/) to learn about how GNNs can be used to solve different machine learning problems on graphs. 
 
 Make sure to check the documentation, and leave a comment [on Github](https://github.com/danielegrattarola/spektral) if you have a feature that you want to see implemented. 
