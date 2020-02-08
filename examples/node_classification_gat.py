@@ -23,17 +23,17 @@ A, X, y, train_mask, val_mask, test_mask = citation.load_data(dataset)
 channels = 8            # Number of channel in each head of the first GAT layer
 n_attn_heads = 8        # Number of attention heads in first GAT layer
 N = X.shape[0]          # Number of nodes in the graph
-F = X.shape[1]          # Original feature dimensionality
+F = X.shape[1]          # Original size of node features
 n_classes = y.shape[1]  # Number of classes
-dropout = 0.6           # Dropout rate applied to the features and adjacency matrix
-l2_reg = 5e-4           # Regularization rate for l2
-learning_rate = 5e-3    # Learning rate for SGD
+dropout = 0.6           # Dropout rate for the features and adjacency matrix
+l2_reg = 5e-6           # L2 regularization rate
+learning_rate = 5e-3    # Learning rate
 epochs = 20000          # Number of training epochs
 es_patience = 100       # Patience for early stopping
 
 # Preprocessing operations
-X = X.toarray()
 A = add_eye(A).toarray()  # Add self-loops
+X = X.toarray()
 
 # Model definition
 X_in = Input(shape=(F, ))
@@ -46,8 +46,8 @@ graph_attention_1 = GraphAttention(channels,
                                    dropout_rate=dropout,
                                    activation='elu',
                                    kernel_regularizer=l2(l2_reg),
-                                   attn_kernel_regularizer=l2(l2_reg),
-                                   use_bias=False)([dropout_1, A_in])
+                                   attn_kernel_regularizer=l2(l2_reg)
+                                   )([dropout_1, A_in])
 dropout_2 = Dropout(dropout)(graph_attention_1)
 graph_attention_2 = GraphAttention(n_classes,
                                    attn_heads=1,
@@ -55,8 +55,8 @@ graph_attention_2 = GraphAttention(n_classes,
                                    dropout_rate=dropout,
                                    activation='softmax',
                                    kernel_regularizer=l2(l2_reg),
-                                   attn_kernel_regularizer=l2(l2_reg),
-                                   use_bias=False)([dropout_2, A_in])
+                                   attn_kernel_regularizer=l2(l2_reg)
+                                   )([dropout_2, A_in])
 
 # Build model
 model = Model(inputs=[X_in, A_in], outputs=graph_attention_2)
@@ -76,7 +76,7 @@ model.fit([X, A],
           validation_data=validation_data,
           shuffle=False,  # Shuffling data means shuffling the whole graph
           callbacks=[
-              EarlyStopping(patience=es_patience,  restore_best_weights=True)
+              EarlyStopping(patience=es_patience, restore_best_weights=True)
           ])
 
 # Evaluate model
