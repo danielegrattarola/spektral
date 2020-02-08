@@ -13,7 +13,6 @@ from tensorflow.keras.regularizers import l2
 
 from spektral.datasets import citation
 from spektral.layers import GraphConv
-from spektral.utils import localpooling_filter
 
 # Load data
 dataset = 'cora'
@@ -22,17 +21,17 @@ A, X, y, train_mask, val_mask, test_mask = citation.load_data(dataset)
 # Parameters
 channels = 16           # Number of channels in the first layer
 N = X.shape[0]          # Number of nodes in the graph
-F = X.shape[1]          # Original feature dimensionality
+F = X.shape[1]          # Original size of node features
 n_classes = y.shape[1]  # Number of classes
-dropout = 0.5           # Dropout rate applied to the features
-l2_reg = 5e-4           # Regularization rate for l2
-learning_rate = 1e-2    # Learning rate for SGD
+dropout = 0.5           # Dropout rate for the features
+l2_reg = 5e-4           # L2 regularization rate
+learning_rate = 1e-2    # Learning rate
 epochs = 20000          # Number of training epochs
 es_patience = 200       # Patience for early stopping
 
 # Preprocessing operations
+fltr = GraphConv.preprocess(A).astype('f4')
 X = X.toarray()
-fltr = localpooling_filter(A).astype('f4')
 
 # Model definition
 X_in = Input(shape=(F, ))

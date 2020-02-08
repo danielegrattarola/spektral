@@ -13,7 +13,6 @@ from tensorflow.keras.regularizers import l2
 
 from spektral.datasets import citation
 from spektral.layers import ARMAConv
-from spektral.utils import normalized_laplacian, rescale_laplacian
 
 # Load data
 dataset = 'cora'
@@ -29,15 +28,14 @@ F = X.shape[1]          # Original feature dimensionality
 n_classes = y.shape[1]  # Number of classes
 dropout = 0.5           # Dropout rate applied between layers
 dropout_skip = 0.75     # Dropout rate for the internal skip connection of ARMA
-l2_reg = 5e-5           # Regularization rate for l2
-learning_rate = 1e-2    # Learning rate for SGD
+l2_reg = 5e-5           # L2 regularization rate
+learning_rate = 1e-2    # Learning rate
 epochs = 20000          # Number of training epochs
 es_patience = 100       # Patience for early stopping
 
 # Preprocessing operations
+fltr = ARMAConv.preprocess(A).astype('f4')
 X = X.toarray()
-fltr = normalized_laplacian(A, symmetric=True)
-fltr = rescale_laplacian(fltr, lmax=2).astype('f4')
 
 # Model definition
 X_in = Input(shape=(F, ))
