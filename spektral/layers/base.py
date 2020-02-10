@@ -1,7 +1,82 @@
 import numpy as np
+import tensorflow as tf
 from tensorflow.keras import activations, initializers, regularizers, constraints
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Layer
+from tensorflow_core.python.keras.utils import tf_utils
+
+
+class SparseDropout(Layer):
+    """Applies Dropout to the input.
+
+    Dropout consists in randomly setting
+    a fraction `rate` of input units to 0 at each update during training time,
+    which helps prevent overfitting.
+
+    Arguments:
+    rate: Float between 0 and 1. Fraction of the input units to drop.
+    noise_shape: 1D integer tensor representing the shape of the
+      binary dropout mask that will be multiplied with the input.
+      For instance, if your inputs have shape
+      `(batch_size, timesteps, features)` and
+      you want the dropout mask to be the same for all timesteps,
+      you can use `noise_shape=(batch_size, 1, features)`.
+    seed: A Python integer to use as random seed.
+
+    Call arguments:
+    inputs: Input tensor (of any rank).
+    training: Python boolean indicating whether the layer should behave in
+      training mode (adding dropout) or in inference mode (doing nothing).
+    """
+
+    def __init__(self, rate, noise_shape=None, seed=None, **kwargs):
+        super(SparseDropout, self).__init__(**kwargs)
+        self.rate = rate
+        self.noise_shape = noise_shape
+        self.seed = seed
+        self.supports_masking = True
+
+    def _get_noise_shape(self, inputs):
+        return tf.shape(inputs.values)
+
+    def call(self, inputs, training=None):
+        if training is None:
+            training = K.learning_phase()
+
+        def dropped_inputs():
+            return self.sparse_dropout(
+              inputs,
+              noise_shape=self._get_noise_shape(inputs),
+              seed=self.seed,
+              rate=self.rate
+            )
+
+        output = tf_utils.smart_cond(training,
+                                     dropped_inputs,
+                                     lambda: inputs)
+        return output
+
+    def compute_output_shape(self, input_shape):
+        return input_shape
+
+    def get_config(self):
+        config = {
+            'rate': self.rate,
+            'noise_shape': self.noise_shape,
+            'seed': self.seed
+        }
+        base_config = super(SparseDropout, self).get_config()
+        return dict(list(base_config.items()) + list(config.items()))
+
+    @staticmethod
+    def sparse_dropout(x, rate, noise_shape=None, seed=None):
+        random_tensor = tf.random.uniform(noise_shape, seed=seed, dtype=x.dtype)
+        keep_prob = 1 - rate
+        scale = 1 / keep_prob
+        keep_mask = random_tensor >= rate
+        output = tf.sparse.retain(x, keep_mask) * scale
+
+        return output
 
 
 class InnerProduct(Layer):

@@ -2,6 +2,8 @@ import numpy as np
 import scipy.sparse as sp
 import tensorflow as tf
 from tensorflow.keras import backend as K
+from tensorflow.python.ops.linalg.sparse import sparse as tfsp
+from tensorflow_core.python.ops.linalg.sparse.sparse_csr_matrix_ops import SparseMatrix
 
 modes = {
     'S': 1,    # Single (rank(A)=2, rank(B)=2)
@@ -25,16 +27,26 @@ def filter_dot(fltr, features):
     mixed and batch mode).
     :return: the filtered features.
     """
-    if len(K.int_shape(features)) == 2:
-        # Single mode
-        return K.dot(fltr, features)
+    mode = autodetect_mode(fltr, features)
+    if mode == modes['S'] or mode == modes['B']:
+        return dot(fltr, features)
     else:
-        if len(K.int_shape(fltr)) == 3:
-            # Batch mode
-            return K.batch_dot(fltr, features)
-        else:
-            # Mixed mode
-            return mixed_mode_dot(fltr, features)
+        # Mixed mode
+        return mixed_mode_dot(fltr, features)
+
+
+def dot(a, b):
+    a_is_sparse_tensor = isinstance(a, tf.SparseTensor)
+    b_is_sparse_tensor = isinstance(b, tf.SparseTensor)
+    if a_is_sparse_tensor:
+        a = tfsp.CSRSparseMatrix(a)
+    if b_is_sparse_tensor:
+        b = tfsp.CSRSparseMatrix(b)
+    out = tfsp.matmul(a, b)
+    if isinstance(out, SparseMatrix):
+        return out.to_sparse_tensor()
+
+    return out
 
 
 def normalize_A(A):
@@ -107,28 +119,8 @@ def degree_matrix(A, return_sparse_batch=False):
 
 
 ################################################################################
-# Scipy to tf.sparse conversion
+# Sparse utils
 ################################################################################
-def sp_matrix_to_sp_tensor_value(x):
-    """
-    Converts a Scipy sparse matrix to a tf.SparseTensorValue
-    :param x: a Scipy sparse matrix
-    :return: tf.SparseTensorValue
-    """
-    if not hasattr(x, 'tocoo'):
-        try:
-            x = sp.coo_matrix(x)
-        except:
-            raise TypeError('x must be convertible to scipy.coo_matrix')
-    else:
-        x = x.tocoo()
-    return tf.SparseTensorValue(
-        indices=np.array([x.row, x.col]).T,
-        values=x.data,
-        dense_shape=x.shape
-    )
-
-
 def sp_matrix_to_sp_tensor(x):
     """
     Converts a Scipy sparse matrix to a tf.SparseTensor
@@ -142,11 +134,31 @@ def sp_matrix_to_sp_tensor(x):
             raise TypeError('x must be convertible to scipy.coo_matrix')
     else:
         x = x.tocoo()
-    return tf.SparseTensor(
+    out = tf.SparseTensor(
         indices=np.array([x.row, x.col]).T,
         values=x.data,
         dense_shape=x.shape
     )
+    return tf.sparse.reorder(out)
+
+
+def sp_batch_to_sp_tensor(a_list):
+    tensor_data = []
+    for i, a in enumerate(a_list):
+        values = a.tocoo().data
+        row = a.row
+        col = a.col
+        batch = np.ones_like(col) * i
+        tensor_data.append((values, batch, row, col))
+    tensor_data = list(map(np.concatenate, zip(*tensor_data)))
+
+    out = tf.SparseTensor(
+        indices=np.array(tensor_data[1:]).T,
+        values=tensor_data[0],
+        dense_shape=(len(a_list), ) + a_list[0].shape
+    )
+
+    return out
 
 
 def dense_to_sparse(x):
@@ -171,7 +183,7 @@ def matmul_A_B(A, B):
     mode = autodetect_mode(A, B)
     if mode == modes['S']:
         # Single mode
-        output = single_mode_dot(A, B)
+        output = dot(A, B)
     elif mode == modes['M']:
         # Mixed mode
         output = mixed_mode_dot(A, B)
@@ -201,7 +213,7 @@ def matmul_AT_B_A(A, B):
     mode = autodetect_mode(A, B)
     if mode == modes['S']:
         # Single (rank(A)=2, rank(B)=2)
-        output = single_mode_dot(single_mode_dot(transpose(A), B), A)
+        output = dot(dot(transpose(A), B), A)
     elif mode == modes['M']:
         # Mixed (rank(A)=2, rank(B)=3)
         output = mixed_mode_dot(transpose(A), B)
@@ -245,7 +257,7 @@ def matmul_AT_B(A, B):
     mode = autodetect_mode(A, B)
     if mode == modes['S']:
         # Single (rank(A)=2, rank(B)=2)
-        output = single_mode_dot(transpose(A), B)
+        output = dot(transpose(A), B)
     elif mode == modes['M']:
         # Mixed (rank(A)=2, rank(B)=3)
         output = mixed_mode_dot(transpose(A), B)
@@ -275,7 +287,7 @@ def matmul_A_BT(A, B):
     mode = autodetect_mode(A, B)
     if mode == modes['S']:
         # Single (rank(A)=2, rank(B)=2)
-        output = single_mode_dot(A, transpose(B))
+        output = dot(A, transpose(B))
     elif mode == modes['M']:
         # Mixed (rank(A)=2, rank(B)=3)
         output = mixed_mode_dot(A, transpose(B, (0, 2, 1)))
@@ -322,32 +334,6 @@ def autodetect_mode(A, X):
         return modes['UNK']
 
 
-def single_mode_dot(A, B):
-    """
-    Dot product between two rank 2 matrices. Deals automatically with either A
-    or B being sparse.
-    :param A: rank 2 Tensor or SparseTensor.
-    :param B: rank 2 Tensor or SparseTensor.
-    :return: rank 2 Tensor or SparseTensor.
-    """
-    a_sparse = K.is_sparse(A)
-    b_sparse = K.is_sparse(B)
-    if a_sparse and b_sparse:
-        raise ValueError('Sparse x Sparse matmul is not implemented yet.')
-    elif a_sparse:
-        output = tf.sparse.sparse_dense_matmul(A, B)
-    elif b_sparse:
-        output = transpose(
-            tf.sparse.sparse_dense_matmul(
-                transpose(B), transpose(A)
-            )
-        )
-    else:
-        output = tf.matmul(A, B)
-
-    return output
-
-
 def mixed_mode_dot(A, B):
     """
     Computes the equivalent of `tf.einsum('ij,bjk->bik', fltr, output)`, but
@@ -359,7 +345,7 @@ def mixed_mode_dot(A, B):
     s_0_, s_1_, s_2_ = K.int_shape(B)
     B_T = transpose(B, (1, 2, 0))
     B_T = reshape(B_T, (s_1_, -1))
-    output = single_mode_dot(A, B_T)
+    output = dot(A, B_T)
     output = reshape(output, (s_1_, s_2_, -1))
     output = transpose(output, (2, 0, 1))
 
@@ -417,13 +403,12 @@ def matrix_power(x, k):
         raise ValueError('x must have rank 2.')
     sparse = K.is_sparse(x)
     if sparse:
-        x_dense = tf.sparse.to_dense(x)
+        x_k = tf.sparse.to_dense(x)
     else:
-        x_dense = x
+        x_k = x
 
-    x_k = x_dense
     for _ in range(k - 1):
-        x_k = K.dot(x_k, x_dense)
+        x_k = K.dot(x, x_k)
 
     if sparse:
         return dense_to_sparse(x_k)
