@@ -99,8 +99,8 @@ class GraphConv(Layer):
         fltr = inputs[1]
 
         # Convolution
-        output = K.dot(features, self.kernel)
-        output = filter_dot(fltr, output)
+        output = ops.dot(features, self.kernel)
+        output = ops.filter_dot(fltr, output)
 
         if self.use_bias:
             output = K.bias_add(output, self.bias)
