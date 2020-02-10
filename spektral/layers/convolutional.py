@@ -765,6 +765,7 @@ class EdgeConditionedConv(GraphConv):
         return A
 
 
+
 class GraphAttention(GraphConv):
     r"""
     A graph attention layer (GAT) as presented by
@@ -839,7 +840,6 @@ class GraphAttention(GraphConv):
     - `bias_constraint`: constraint applied to the bias vector.
 
     """
-
     def __init__(self,
                  channels,
                  attn_heads=1,
@@ -880,11 +880,6 @@ class GraphAttention(GraphConv):
         self.attn_kernel_constraint = constraints.get(attn_kernel_constraint)
         self.supports_masking = False
 
-        # Populated by build()
-        self.kernels = []  # Layer kernels for attention heads
-        self.biases = []  # Layer biases for attention heads
-        self.attn_kernels = []  # Attention kernels for attention heads
-
         if concat_heads:
             # Output will have shape (..., attention_heads * channels)
             self.output_dim = self.channels * self.attn_heads
@@ -896,37 +891,36 @@ class GraphAttention(GraphConv):
         assert len(input_shape) >= 2
         input_dim = input_shape[0][-1]
 
-        # Initialize weights for each attention head
-        for head in range(self.attn_heads):
-            # Layer kernel
-            kernel = self.add_weight(shape=(input_dim, self.channels),
-                                     initializer=self.kernel_initializer,
-                                     regularizer=self.kernel_regularizer,
-                                     constraint=self.kernel_constraint,
-                                     name='kernel_{}'.format(head))
-            self.kernels.append(kernel)
+        self.kernel = self.add_weight(
+            name='kernel',
+            shape=[input_dim, self.attn_heads, self.channels],
+            initializer=self.kernel_initializer,
+            regularizer=self.kernel_regularizer,
+            constraint=self.kernel_constraint,
+        )
+        self.attn_kernel_self = self.add_weight(
+            name='attn_kernel_self',
+            shape=[self.channels, self.attn_heads, 1],
+            initializer=self.attn_kernel_initializer,
+            regularizer=self.attn_kernel_regularizer,
+            constraint=self.attn_kernel_constraint,
+        )
+        self.attn_kernel_neighs = self.add_weight(
+            name='attn_kernel_neigh',
+            shape=[self.channels, self.attn_heads, 1],
+            initializer=self.attn_kernel_initializer,
+            regularizer=self.attn_kernel_regularizer,
+            constraint=self.attn_kernel_constraint,
+        )
+        if self.use_bias:
+            self.bias = self.add_weight(
+                shape=[self.channels],
+                initializer=self.bias_initializer,
+                regularizer=self.bias_regularizer,
+                constraint=self.bias_constraint,
+                name='bias'
+            )
 
-            # Layer bias
-            if self.use_bias:
-                bias = self.add_weight(shape=(self.channels,),
-                                       initializer=self.bias_initializer,
-                                       regularizer=self.bias_regularizer,
-                                       constraint=self.bias_constraint,
-                                       name='bias_{}'.format(head))
-                self.biases.append(bias)
-
-            # Attention kernels
-            attn_kernel_self = self.add_weight(shape=(self.channels, 1),
-                                               initializer=self.attn_kernel_initializer,
-                                               regularizer=self.attn_kernel_regularizer,
-                                               constraint=self.attn_kernel_constraint,
-                                               name='attn_kernel_self_{}'.format(head))
-            attn_kernel_neighs = self.add_weight(shape=(self.channels, 1),
-                                                 initializer=self.attn_kernel_initializer,
-                                                 regularizer=self.attn_kernel_regularizer,
-                                                 constraint=self.attn_kernel_constraint,
-                                                 name='attn_kernel_neigh_{}'.format(head))
-            self.attn_kernels.append([attn_kernel_self, attn_kernel_neighs])
         self.dropout = Dropout(self.dropout_rate)
         self.built = True
 
@@ -934,57 +928,34 @@ class GraphAttention(GraphConv):
         X = inputs[0]
         A = inputs[1]
 
-        outputs = []
-        output_attn = []
-        for head in range(self.attn_heads):
-            kernel = self.kernels[head]
-            attention_kernel = self.attn_kernels[head]  # Attention kernel a in the paper (2F' x 1)
+        features = tf.einsum("...NI , IHO -> ...NHO", X, self.kernel)
+        attn_for_self = tf.einsum("...NHI , IHO -> ...NHO", features, self.attn_kernel_self)
+        attn_for_neighs = tf.einsum("...NHI , IHO -> ...NHO", features, self.attn_kernel_neighs)
+        attn_for_neighs = tf.einsum("...ABC -> ...CBA", attn_for_neighs)
 
-            # Compute inputs to attention network
-            features = K.dot(X, kernel)
+        attn_coef = attn_for_self + attn_for_neighs
+        attn_coef = tf.nn.leaky_relu(attn_coef, alpha=0.2)
 
-            # Compue attention coefficients
-            # [[a_1], [a_2]]^T [[Wh_i], [Wh_2]] = [a_1]^T [Wh_i] + [a_2]^T [Wh_j]
-            attn_for_self = K.dot(features, attention_kernel[0])  # [a_1]^T [Wh_i]
-            attn_for_neighs = K.dot(features, attention_kernel[1])  # [a_2]^T [Wh_j]
-            if len(K.int_shape(features)) == 2:
-                # Single / mixed mode
-                attn_for_neighs_T = K.transpose(attn_for_neighs)
-            else:
-                # Batch mode
-                attn_for_neighs_T = K.permute_dimensions(attn_for_neighs, (0, 2, 1))
-            attn_coef = attn_for_self + attn_for_neighs_T
-            attn_coef = LeakyReLU(alpha=0.2)(attn_coef)
+        mask = -10e9 * (1.0 - A)
+        attn_coef += mask[..., None, :]
+        attn_coef = tf.nn.softmax(attn_coef, axis=-1)
+        attn_coef_drop = self.dropout(attn_coef)
 
-            # Mask values before activation (Vaswani et al., 2017)
-            mask = -10e9 * (1.0 - A)
-            attn_coef += mask
+        features = tf.einsum("...NHM , ...MHI -> ...NHI", attn_coef_drop, features)
+        if self.use_bias:
+            features += self.bias
 
-            # Apply softmax to get attention coefficients
-            attn_coef = K.softmax(attn_coef)
-            output_attn.append(attn_coef)
-
-            # Apply dropout to attention coefficients
-            attn_coef_drop = self.dropout(attn_coef)
-
-            # Convolution
-            features = filter_dot(attn_coef_drop, features)
-            if self.use_bias:
-                features = K.bias_add(features, self.biases[head])
-
-            # Add output of attention head to final output
-            outputs.append(features)
-
-        # Aggregate the heads' output according to the reduction method
         if self.concat_heads:
-            output = K.concatenate(outputs)
+            shape = features.shape[:-2] + [features.shape[-1] * features.shape[-2]]
+            shape = [d if d is not None else -1 for d in shape]
+            output = tf.reshape(features, shape)
         else:
-            output = K.mean(K.stack(outputs), axis=0)
+            output = tf.reduce_mean(features, axis=-2)
 
         output = self.activation(output)
 
         if self.return_attn_coef:
-            return output, output_attn
+            return output, attn_coef
         else:
             return output
 
