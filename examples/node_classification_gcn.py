@@ -26,8 +26,8 @@ n_classes = y.shape[1]  # Number of classes
 dropout = 0.5           # Dropout rate for the features
 l2_reg = 5e-4 / 2       # L2 regularization rate
 learning_rate = 1e-2    # Learning rate
-epochs = 20000          # Number of training epochs
-es_patience = 200       # Patience for early stopping
+epochs = 200            # Number of training epochs
+es_patience = 10        # Patience for early stopping
 
 # Preprocessing operations
 fltr = GraphConv.preprocess(A).astype('f4')
