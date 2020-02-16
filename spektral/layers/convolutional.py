@@ -143,13 +143,13 @@ class ChebConv(GraphConv):
 
     This layer computes:
     $$
-        \Z = \sum \limits_{k=0}^{K - 1} \T^{(k)} \X \W^{(k)}  + \b^{(k)},
+        \Z = \sum \limits_{k=0}^{K - 1} \T^{(k)} \W^{(k)}  + \b^{(k)},
     $$
     where \( \T^{(0)}, ..., \T^{(K - 1)} \) are Chebyshev polynomials of \(\tilde \L\)
     defined as
     $$
-        \T^{(0)} = \I \\
-        \T^{(1)} = \tilde \L \\
+        \T^{(0)} = \X \\
+        \T^{(1)} = \tilde \L \X \\
         \T^{(k \ge 2)} = 2 \cdot \tilde \L \T^{(k - 1)} - \T^{(k - 2)},
     $$
     where
@@ -187,6 +187,7 @@ class ChebConv(GraphConv):
 
     def __init__(self,
                  channels,
+                 K=1,
                  activation=None,
                  use_bias=True,
                  kernel_initializer='glorot_uniform',
@@ -199,6 +200,7 @@ class ChebConv(GraphConv):
                  **kwargs):
         super().__init__(channels, **kwargs)
         self.channels = channels
+        self.K = K
         self.activation = activations.get(activation)
         self.use_bias = use_bias
         self.kernel_initializer = initializers.get(kernel_initializer)
@@ -213,8 +215,7 @@ class ChebConv(GraphConv):
     def build(self, input_shape):
         assert len(input_shape) >= 2
         input_dim = input_shape[0][-1]
-        support_len = len(input_shape) - 1
-        self.kernel = self.add_weight(shape=(input_dim * support_len, self.channels),
+        self.kernel = self.add_weight(shape=(self.K, input_dim, self.channels),
                                       initializer=self.kernel_initializer,
                                       name='kernel',
                                       regularizer=self.kernel_regularizer,
@@ -231,15 +232,20 @@ class ChebConv(GraphConv):
 
     def call(self, inputs):
         features = inputs[0]
-        fltr_list = inputs[1:]
+        laplacian = inputs[1]
 
         # Convolution
-        supports = list()
-        for fltr in fltr_list:
-            s = filter_dot(fltr, features)
-            supports.append(s)
-        supports = K.concatenate(supports, axis=-1)
-        output = K.dot(supports, self.kernel)
+        T_0 = features
+        output = ops.dot(T_0, self.kernel[0])
+
+        if self.K > 1:
+            T_1 = ops.filter_dot(laplacian, features)
+            output += ops.dot(T_1, self.kernel[1])
+
+        for k in range(2, self.K):
+            T_2 = 2 * ops.filter_dot(laplacian, T_1) - T_0
+            output += ops.dot(T_2, self.kernel[k])
+            T_0, T_1 = T_1, T_2
 
         if self.use_bias:
             output = K.bias_add(output, self.bias)
@@ -248,8 +254,10 @@ class ChebConv(GraphConv):
         return output
 
     @staticmethod
-    def preprocess(A, k=1):
-        return chebyshev_filter(A, k)
+    def preprocess(A):
+        L = normalized_laplacian(A)
+        L = rescale_laplacian(L)
+        return L
 
 
 class GraphSageConv(GraphConv):
@@ -763,7 +771,6 @@ class EdgeConditionedConv(GraphConv):
     @staticmethod
     def preprocess(A):
         return A
-
 
 
 class GraphAttention(GraphConv):
