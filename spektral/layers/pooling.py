@@ -501,7 +501,10 @@ class TopKPool(Layer):
                                       initializer=self.kernel_initializer,
                                       regularizer=self.kernel_regularizer,
                                       constraint=self.kernel_constraint)
-        self.top_k_var = tf.Variable(0.0, validate_shape=False, shape=tf.TensorShape(None))
+        self.top_k_var = tf.Variable(0.0,
+                                     trainable=False,
+                                     validate_shape=False,
+                                     shape=tf.TensorShape(None))
         super().build(input_shape)
 
     def call(self, inputs):
@@ -657,7 +660,10 @@ class SAGPool(Layer):
                                       initializer=self.kernel_initializer,
                                       regularizer=self.kernel_regularizer,
                                       constraint=self.kernel_constraint)
-        self.top_k_var = tf.Variable(0.0, validate_shape=False, shape=tf.TensorShape(None))
+        self.top_k_var = tf.Variable(0.0,
+                                     trainable=False,
+                                     validate_shape=False,
+                                     shape=tf.TensorShape(None))
         super().build(input_shape)
 
     def call(self, inputs):
