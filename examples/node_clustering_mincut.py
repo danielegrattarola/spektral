@@ -25,14 +25,12 @@ from spektral.layers.pooling import MinCutPool
 from spektral.utils.convolution import normalized_adjacency
 
 
+@tf.function
 def train_step(inputs):
-    # Define the GradientTape context
     with tf.GradientTape() as tape:
-        _, S_pool = model(inputs)
+        _, S_pool = model(inputs, training=True)
         losses = sum(model.losses)
-    # Get the gradients
     gradients = tape.gradient(losses, model.trainable_variables)
-    # Update the weights
     opt.apply_gradients(zip(gradients, model.trainable_variables))
     return model.losses[0], model.losses[1], S_pool
 
@@ -41,7 +39,6 @@ np.random.seed(1)
 
 epochs = 5000        # Training iterations
 gnn_channels = 16    # Units in the GNN layer
-mlp_channels = None  # Units in the MLP of MinCutPool Layer (if None, the MLP has no hidden layers)
 gnn_activ = 'elu'    # Activation for the GNN layer
 mlp_activ = None     # Activation for the hidden layers of MinCutPool
 lr = 5e-4            # Learning rate
@@ -66,7 +63,7 @@ X_1 = GraphConvSkip(gnn_channels,
                     kernel_initializer='he_normal',
                     activation=gnn_activ)([X_in, A_in])
 pool1, adj1, S = MinCutPool(n_clust,
-                            h=mlp_channels,
+                            return_mask=True,
                             activation=mlp_activ)([X_1, A_in])
 
 model = Model([X_in, A_in], [pool1, S])
