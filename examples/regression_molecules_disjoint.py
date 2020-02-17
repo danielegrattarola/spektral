@@ -60,7 +60,6 @@ X_in = Input(shape=(F,), name='X_in')
 A_in = Input(shape=(None,), name='A_in')
 E_in = Input(shape=(None, S), name='E_in')
 I_in = Input(shape=(), name='segment_ids_in', dtype=tf.int32)
-target = Input(shape=(n_out,), name='target')
 
 X_1 = EdgeConditionedConv(32, activation='relu')([X_in, A_in, E_in])
 X_2 = EdgeConditionedConv(32, activation='relu')([X_1, A_in, E_in])
@@ -70,8 +69,7 @@ output = Dense(n_out)(X_3)
 # Build model
 model = Model(inputs=[X_in, A_in, E_in, I_in], outputs=output)
 model.compile(optimizer='adam',  # Doesn't matter, won't be used
-              loss='mse',
-              target_tensors=[target])
+              loss='mse')
 model.summary()
 
 # Training setup
@@ -79,18 +77,15 @@ opt = tf.keras.optimizers.Adam(learning_rate=learning_rate)
 loss_fn = model.loss_functions[0]
 
 
+@tf.function(experimental_relax_shapes=True)
 def train_loop(inputs, targets):
-    # Define the GradientTape context
     with tf.GradientTape() as tape:
-        # Get the probabilities
-        predictions = model(inputs)
-        # Calculate the loss
+        predictions = model(inputs, training=True)
         loss = loss_fn(targets, predictions)
-    # Get the gradients
     gradients = tape.gradient(loss, model.trainable_variables)
-    # Update the weights
     opt.apply_gradients(zip(gradients, model.trainable_variables))
     return loss
+
 
 ################################################################################
 # FIT MODEL
@@ -128,7 +123,7 @@ for b in batches_test:
     A_ = A_.toarray()
     y_ = b[3]
 
-    predictions = model([X_, A_, E_, I_])
+    predictions = model([X_, A_, E_, I_], training=False)
     model_loss += loss_fn(y_, predictions)
 
 print('Done.\n'

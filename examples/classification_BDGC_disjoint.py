@@ -30,7 +30,7 @@ def evaluate(A_list, X_list, y_list, ops, batch_size):
         X, A, I = Batch(b[0], b[1]).get('XAI')
         A = sp_matrix_to_sp_tensor(A)
         y = b[2]
-        pred = model([X, A, I])
+        pred = model([X, A, I], training=False)
         outs = [o(pred, y) for o in ops]
         output.append(outs)
     return np.mean(output, 0)
@@ -117,9 +117,10 @@ loss_fn = model.loss_functions[0]
 acc_fn = lambda x, y: K.mean(categorical_accuracy(x, y))
 
 
-def train_loop(inputs, targets):
+@tf.function(experimental_relax_shapes=True)
+def train_step(inputs, targets):
     with tf.GradientTape() as tape:
-        predictions = model(inputs)
+        predictions = model(inputs, training=True)
         loss = loss_fn(targets, predictions)
     gradients = tape.gradient(loss, model.trainable_variables)
     opt.apply_gradients(zip(gradients, model.trainable_variables))
@@ -142,7 +143,7 @@ for b in batches:
     X_, A_, I_ = Batch(b[0], b[1]).get('XAI')
     A_ = sp_matrix_to_sp_tensor(A_)
     y_ = b[2]
-    outs = train_loop([X_, A_, I_], y_)
+    outs = train_step([X_, A_, I_], y_)
 
     model_loss += outs[0]
     model_acc += outs[1]
