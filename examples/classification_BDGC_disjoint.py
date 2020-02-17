@@ -2,9 +2,6 @@
 This example shows how to perform graph classification with a synthetic
 benchmark dataset created by F. M. Bianchi (https://github.com/FilippoMB/Benchmark_dataset_for_graph_classification),
 using a GNN with convolutional and pooling blocks in disjoint mode.
-Note that the main training loop is written in TensorFlow, because we need to
-avoid the restriction imposed by Keras that the input and the output have the
-same first dimension.
 """
 
 import os
@@ -25,9 +22,6 @@ from spektral.utils import batch_iterator
 from spektral.utils.convolution import normalized_adjacency
 from spektral.utils.data import Batch
 
-np.random.seed(0)
-SW_KEY = 'dense_1_sample_weights:0'  # Keras automatically creates a placeholder for sample weights, which must be fed
-
 
 def evaluate(A_list, X_list, y_list, ops, batch_size):
     batches = batch_iterator([A_list, X_list, y_list], batch_size=batch_size)
@@ -46,8 +40,7 @@ def evaluate(A_list, X_list, y_list, ops, batch_size):
 # PARAMETERS
 ################################################################################
 n_channels = 32            # Channels per layer
-activ = 'elu'              # Activation in GNN and maxcut / mincut
-mincut_H = 16              # Dimension of hidden state in mincut
+activ = 'elu'              # Activation in GNN and mincut
 GNN_l2 = 1e-4              # l2 regularisation of GNN
 pool_l2 = 1e-4             # l2 regularisation for mincut
 epochs = 500               # Number of training epochs
@@ -89,27 +82,21 @@ average_N = np.ceil(np.mean([a.shape[-1] for a in A_train]))  # Average number o
 X_in = Input(shape=(F, ), name='X_in', dtype=tf.float64)
 A_in = Input(shape=(None,), sparse=True, dtype=tf.float64)
 I_in = Input(shape=(), name='segment_ids_in', dtype=tf.int32)
-target = Input(shape=(n_out,), name='target', dtype=tf.float64)
 
-# Block 1
 X_1 = GraphConvSkip(n_channels,
                     activation=activ,
                     kernel_regularizer=l2(GNN_l2))([X_in, A_in])
-X_1, A_1, I_1, M_1 = MinCutPool(k=int(average_N // 2),
-                                h=mincut_H,
-                                activation=activ,
-                                kernel_regularizer=l2(pool_l2))([X_1, A_in, I_in])
+X_1, A_1, I_1 = MinCutPool(k=int(average_N // 2),
+                           activation=activ,
+                           kernel_regularizer=l2(pool_l2))([X_1, A_in, I_in])
 
-# Block 2
 X_2 = GraphConvSkip(n_channels,
                     activation=activ,
                     kernel_regularizer=l2(GNN_l2))([X_1, A_1])
-X_2, A_2, I_2, M_2 = MinCutPool(k=int(average_N // 4),
-                                h=mincut_H,
-                                activation=activ,
-                                kernel_regularizer=l2(pool_l2))([X_2, A_1, I_1])
+X_2, A_2, I_2 = MinCutPool(k=int(average_N // 4),
+                           activation=activ,
+                           kernel_regularizer=l2(pool_l2))([X_2, A_1, I_1])
 
-# Block 3
 X_3 = GraphConvSkip(n_channels,
                     activation=activ,
                     kernel_regularizer=l2(GNN_l2))([X_2, A_2])
@@ -121,8 +108,7 @@ output = Dense(n_out, activation='softmax')(avgpool)
 # Build model
 model = Model([X_in, A_in, I_in], output)
 model.compile(optimizer='adam',  # Doesn't matter, won't be used
-              loss='categorical_crossentropy',
-              target_tensors=[target])
+              loss='categorical_crossentropy')
 model.summary()
 
 # Training setup
@@ -132,15 +118,10 @@ acc_fn = lambda x, y: K.mean(categorical_accuracy(x, y))
 
 
 def train_loop(inputs, targets):
-    # Define the GradientTape context
     with tf.GradientTape() as tape:
-        # Get the probabilities
         predictions = model(inputs)
-        # Calculate the loss
         loss = loss_fn(targets, predictions)
-    # Get the gradients
     gradients = tape.gradient(loss, model.trainable_variables)
-    # Update the weights
     opt.apply_gradients(zip(gradients, model.trainable_variables))
     return loss, acc_fn(targets, predictions)
 
