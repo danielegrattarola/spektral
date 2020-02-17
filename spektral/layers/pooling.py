@@ -263,6 +263,10 @@ class MinCutPool(Layer):
     - `channels`: number of output channels (if None, the number of output
     channels is assumed to be the same as the input);
     - `return_mask`: boolean, whether to return the cluster assignment matrix,
+    - `mlp_hidden`: list of integers, number of hidden units for each hidden
+    layer in the MLP used to compute cluster assignments (if None, the MLP has
+    only the output layer);
+    - `mlp_activation`: activation for the MLP layers;
     - `kernel_initializer`: initializer for the kernel matrix;
     - `kernel_regularizer`: regularization applied to the kernel matrix;
     - `activity_regularizer`: regularization applied to the output;
@@ -317,7 +321,7 @@ class MinCutPool(Layer):
                 Dense(channels, self.mlp_activation, **initializers_kwargs)
             )
         mlp_layers.append(
-            Dense(self.channels, 'softmax', **initializers_kwargs)
+            Dense(self.k, 'softmax', **initializers_kwargs)
         )
         self.mlp = Sequential(mlp_layers)
 
