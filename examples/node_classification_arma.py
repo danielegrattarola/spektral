@@ -21,7 +21,7 @@ A, X, y, train_mask, val_mask, test_mask = citation.load_data(dataset)
 # Parameters
 channels = 16           # Number of channels in the first layer
 iterations = 1          # Number of iterations to approximate each ARMA(1)
-order = 3               # Order of the ARMA filter (number of parallel stacks)
+order = 2               # Order of the ARMA filter (number of parallel stacks)
 share_weights = True    # Share weights in each ARMA stack
 N = X.shape[0]          # Number of nodes in the graph
 F = X.shape[1]          # Original feature dimensionality
@@ -41,27 +41,27 @@ X = X.toarray()
 X_in = Input(shape=(F, ))
 fltr_in = Input((N, ), sparse=True)
 
-graph_conv_1 = ARMAConv(channels,
-                        order=order,
-                        iterations=iterations,
-                        share_weights=share_weights,
-                        gcn_activation='elu',
-                        dropout_rate=dropout_skip,
-                        activation='elu',
-                        kernel_regularizer=l2(l2_reg))([X_in, fltr_in])
-dropout_2 = Dropout(dropout_skip)(graph_conv_1)
-graph_conv_2 = ARMAConv(n_classes,
-                        order=1,
-                        iterations=1,
-                        share_weights=share_weights,
-                        gcn_activation=None,
-                        dropout_rate=dropout_skip,
-                        activation='softmax',
-                        kernel_regularizer=l2(l2_reg))([dropout_2, fltr_in])
+gc_1 = ARMAConv(channels,
+                iterations=iterations,
+                order=order,
+                share_weights=share_weights,
+                dropout_rate=dropout_skip,
+                activation='elu',
+                gcn_activation='elu',
+                kernel_regularizer=l2(l2_reg))([X_in, fltr_in])
+gc_2 = Dropout(dropout)(gc_1)
+gc_2 = ARMAConv(n_classes,
+                iterations=1,
+                order=1,
+                share_weights=share_weights,
+                dropout_rate=dropout_skip,
+                activation='softmax',
+                gcn_activation=None,
+                kernel_regularizer=l2(l2_reg))([gc_2, fltr_in])
 
 # Build model
-model = Model(inputs=[X_in, fltr_in], outputs=graph_conv_2)
-optimizer = Adam(lr=learning_rate)
+model = Model(inputs=[X_in, fltr_in], outputs=gc_2)
+optimizer = Adam(learning_rate=learning_rate)
 model.compile(optimizer=optimizer,
               loss='categorical_crossentropy',
               weighted_metrics=['acc'])

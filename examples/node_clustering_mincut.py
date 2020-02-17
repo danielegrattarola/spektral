@@ -29,8 +29,8 @@ from spektral.utils.convolution import normalized_adjacency
 def train_step(inputs):
     with tf.GradientTape() as tape:
         _, S_pool = model(inputs, training=True)
-        losses = sum(model.losses)
-    gradients = tape.gradient(losses, model.trainable_variables)
+        loss = sum(model.losses)
+    gradients = tape.gradient(loss, model.trainable_variables)
     opt.apply_gradients(zip(gradients, model.trainable_variables))
     return model.losses[0], model.losses[1], S_pool
 
@@ -93,7 +93,7 @@ loss_history = np.array(loss_history)
 ################################################################################
 # RESULTS
 ################################################################################
-_, S_ = model(inputs)
+_, S_ = model(inputs, training=False)
 s = np.argmax(S_, axis=-1)
 hs = homogeneity_score(y, s)
 cs = completeness_score(y, s)

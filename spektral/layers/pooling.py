@@ -58,7 +58,7 @@ class DiffPool(Layer):
     - `k`: number of nodes to keep;
     - `channels`: number of output channels (if None, the number of output
     channels is assumed to be the same as the input);
-    - `return_mask`: boolean, whether to return the cluster assignment matrix,
+    - `return_mask`: boolean, whether to return the cluster assignment matrix;
     - `kernel_initializer`: initializer for the kernel matrix;
     - `kernel_regularizer`: regularization applied to the kernel matrix;
     - `activity_regularizer`: regularization applied to the output;
@@ -109,8 +109,8 @@ class DiffPool(Layer):
         super().build(input_shape)
 
     def call(self, inputs):
-        # Note that I is useless, because thee layer cannot be used in graph
-        # batch mode.
+        # Note that I is useless, because thee layer cannot be used in disjoint
+        # mode.
         if len(inputs) == 3:
             X, A, I = inputs
             if K.ndim(I) == 2:
@@ -401,7 +401,8 @@ class MinCutPool(Layer):
     def get_config(self):
         config = {
             'k': self.k,
-            'h': self.h,
+            'mlp_hidden': self.mlp_hidden,
+            'mlp_activation': self.mlp_activation,
             'return_mask': self.return_mask,
             'kernel_initializer': initializers.serialize(self.kernel_initializer),
             'bias_initializer': initializers.serialize(self.bias_initializer),
