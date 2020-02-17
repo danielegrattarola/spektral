@@ -1,7 +1,8 @@
 import tensorflow as tf
 from tensorflow.keras import backend as K, activations
 from tensorflow.keras import regularizers, constraints, initializers
-from tensorflow.keras.layers import Layer
+from tensorflow.keras.layers import Layer, Dense
+from tensorflow.keras.models import Sequential
 
 from spektral.layers import ops, filter_dot
 
@@ -119,7 +120,7 @@ class DiffPool(Layer):
             I = None
 
         N = K.shape(A)[-1]
-        # Check if the layer is operating in batch mode (X and A have rank 3)
+        # Check if the layer is operating in mixed or batch mode
         mode = ops.autodetect_mode(A, X)
         self.reduce_loss = mode in (ops.modes['M'], ops.modes['B'])
 
@@ -269,8 +270,9 @@ class MinCutPool(Layer):
     """
     def __init__(self,
                  k,
-                 h=None,
-                 return_mask=True,
+                 return_mask=False,
+                 mlp_hidden=None,
+                 mlp_activation='relu',
                  activation=None,
                  use_bias=True,
                  kernel_initializer='glorot_uniform',
@@ -285,7 +287,8 @@ class MinCutPool(Layer):
             kwargs['input_shape'] = (kwargs.pop('input_dim'),)
         super().__init__(**kwargs)
         self.k = k
-        self.h = h
+        self.mlp_hidden = mlp_hidden if mlp_hidden else []
+        self.mlp_activation = mlp_activation
         self.return_mask = return_mask
         self.activation = activations.get(activation)
         self.use_bias = use_bias
@@ -299,44 +302,28 @@ class MinCutPool(Layer):
 
     def build(self, input_shape):
         assert isinstance(input_shape, list)
-        F = input_shape[0][-1]
-
-        # Optional hidden layer
-        if self.h is None:
-            H_ = F
-        else:
-            H_ = self.h
-            self.kernel_in = self.add_weight(shape=(F, H_),
-                                             name='kernel_in',
-                                             initializer=self.kernel_initializer,
-                                             regularizer=self.kernel_regularizer,
-                                             constraint=self.kernel_constraint)
-
-            if self.use_bias:
-                self.bias_in = self.add_weight(shape=(H_,),
-                                               name='bias_in',
-                                               initializer=self.bias_initializer,
-                                               regularizer=self.bias_regularizer,
-                                               constraint=self.bias_constraint)
-
-        # Output layer
-        self.kernel_out = self.add_weight(shape=(H_, self.k),
-                                          name='kernel_out',
-                                          initializer=self.kernel_initializer,
-                                          regularizer=self.kernel_regularizer,
-                                          constraint=self.kernel_constraint)
-        if self.use_bias:
-            self.bias_out = self.add_weight(shape=(self.k,),
-                                            name='bias_out',
-                                            initializer=self.bias_initializer,
-                                            regularizer=self.bias_regularizer,
-                                            constraint=self.bias_constraint)
+        initializers_kwargs = dict(
+            kernel_initializer=self.kernel_initializer,
+            bias_initializer=self.bias_initializer,
+            kernel_regularizer=self.kernel_regularizer,
+            bias_regularizer=self.bias_regularizer,
+            activity_regularizer=self.activity_regularizer,
+            kernel_constraint=self.kernel_constraint,
+            bias_constraint=self.bias_constraint
+        )
+        mlp_layers = []
+        for i, channels in enumerate(self.mlp_hidden):
+            mlp_layers.append(
+                Dense(channels, self.mlp_activation, **initializers_kwargs)
+            )
+        mlp_layers.append(
+            Dense(self.channels, 'softmax', **initializers_kwargs)
+        )
+        self.mlp = Sequential(mlp_layers)
 
         super().build(input_shape)
 
     def call(self, inputs):
-        # Note that I is useless, because thee layer cannot be used in graph
-        # batch mode.
         if len(inputs) == 3:
             X, A, I = inputs
             if K.ndim(I) == 2:
@@ -348,26 +335,12 @@ class MinCutPool(Layer):
         # Check if the layer is operating in batch mode (X and A have rank 3)
         batch_mode = K.ndim(A) == 3
 
-        # Optionally compute hidden layer
-        if self.h is None:
-            Hid = X
-        else:
-            Hid = K.dot(X, self.kernel_in)
-            if self.use_bias:
-                Hid = K.bias_add(Hid, self.bias_in)
-            if self.activation is not None:
-                Hid = self.activation(Hid)
-
         # Compute cluster assignment matrix
-        S = K.dot(Hid, self.kernel_out)
-        if self.use_bias:
-            S = K.bias_add(S, self.bias_out)
-        S = activations.softmax(S, axis=-1)  # Apply softmax to get cluster assignments
+        S = self.mlp(X)
 
         # MinCut regularization
         A_pooled = ops.matmul_AT_B_A(S, A)
         num = tf.linalg.trace(A_pooled)
-
         D = ops.degree_matrix(A)
         den = tf.linalg.trace(ops.matmul_AT_B_A(S, D))
         cut_loss = -(num / den)
