@@ -82,6 +82,7 @@ def train_loop(inputs, targets):
     with tf.GradientTape() as tape:
         predictions = model(inputs, training=True)
         loss = loss_fn(targets, predictions)
+        loss += sum(model.losses)
     gradients = tape.gradient(loss, model.trainable_variables)
     opt.apply_gradients(zip(gradients, model.trainable_variables))
     return loss
