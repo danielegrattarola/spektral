@@ -9,7 +9,6 @@ import shutil
 import sys
 
 from spektral import chem
-from spektral import brain
 from spektral import datasets
 from spektral import layers
 from spektral import utils
@@ -33,6 +32,7 @@ EXCLUDE = {}
 # [classA, (classB, [module.classB.method1, module.classB.method2, ...]), ...]
 
 PAGES = [
+    # Layers ###################################################################
     {
         'page': 'layers/convolution.md',
         'classes': [
@@ -48,22 +48,13 @@ PAGES = [
         ]
     },
     {
-        'page': 'layers/base.md',
-        'functions': [],
-        'methods': [],
-        'classes': [
-            layers.InnerProduct,
-            layers.MinkowskiProduct
-        ]
-    },
-    {
         'page': 'layers/pooling.md',
         'functions': [],
         'methods': [],
         'classes': [
-            layers.TopKPool,
-            layers.MinCutPool,
             layers.DiffPool,
+            layers.MinCutPool,
+            layers.TopKPool,
             layers.SAGPool,
             layers.GlobalSumPool,
             layers.GlobalAvgPool,
@@ -72,6 +63,16 @@ PAGES = [
             layers.GlobalAttnSumPool
         ]
     },
+    {
+        'page': 'layers/base.md',
+        'functions': [],
+        'methods': [],
+        'classes': [
+            layers.InnerProduct,
+            layers.MinkowskiProduct
+        ]
+    },
+    # Datasets #################################################################
     {
         'page': 'datasets/citation.md',
         'functions': [
@@ -112,7 +113,7 @@ PAGES = [
         'methods': [],
         'classes': []
     },
-{
+    {
         'page': 'datasets/mnist.md',
         'functions': [
             datasets.mnist.load_data
@@ -120,14 +121,68 @@ PAGES = [
         'methods': [],
         'classes': []
     },
+    # Utils ####################################################################
     {
-        'page': 'brain.md',
+        'page': 'utils/data.md',
         'functions': [
-            brain.get_fc_graphs
+            utils.data.batch_iterator
+        ],
+        'classes': [
+            (utils.data.Batch, ['get'])
+        ]
+    },
+    {
+        'page': 'utils/convolution.md',
+        'functions': [
+            utils.convolution.degree_matrix,
+            utils.convolution.degree_power,
+            utils.convolution.normalized_adjacency,
+            utils.convolution.laplacian,
+            utils.convolution.normalized_laplacian,
+            utils.convolution.rescale_laplacian,
+            utils.convolution.localpooling_filter,
+            utils.convolution.chebyshev_polynomial,
+            utils.convolution.chebyshev_filter
         ],
         'methods': [],
         'classes': []
     },
+    {
+        'page': 'utils/misc.md',
+        'functions': [
+            utils.misc.pad_jagged_array,
+            utils.misc.add_eye,
+            utils.misc.sub_eye,
+            utils.misc.add_eye_batch,
+            utils.misc.sub_eye_batch,
+            utils.misc.add_eye_jagged,
+            utils.misc.sub_eye_jagged,
+        ],
+        'methods': [],
+        'classes': []
+    },
+    {
+        'page': 'utils/plotting.md',
+        'functions': [
+            plotting.plot_numpy,
+            plotting.plot_nx
+        ],
+        'methods': [],
+        'classes': []
+    },
+    {
+        'page': 'utils/conversion.md',
+        'functions': [
+            utils.conversion.nx_to_adj,
+            utils.conversion.nx_to_node_features,
+            utils.conversion.nx_to_edge_features,
+            utils.conversion.nx_to_numpy,
+            utils.conversion.numpy_to_nx
+        ],
+        'methods': [],
+        'classes': []
+    },
+    # Chem #####################################################################
     {
         'page': 'chem.md',
         'functions': [
@@ -148,89 +203,10 @@ PAGES = [
         ],
         'methods': [],
         'classes': []
-    },
-    {
-        'page': 'utils/data.md',
-        'classes': [
-            utils.data.Batch
-        ],
-        'methods': [
-            utils.data.Batch.get
-        ]
-    },
-    {
-        'page': 'utils/io.md',
-        'functions': [
-            utils.io.load_binary,
-            utils.io.dump_binary,
-            utils.io.load_csv,
-            utils.io.dump_csv,
-            utils.io.load_dot,
-            utils.io.dump_dot,
-            utils.io.load_npy,
-            utils.io.dump_npy,
-            utils.io.load_txt,
-            utils.io.dump_txt,
-            utils.io.load_sdf,
-        ],
-        'methods': [],
-        'classes': []
-    },
-    {
-        'page': 'utils/conversion.md',
-        'functions': [
-            utils.conversion.nx_to_adj,
-            utils.conversion.nx_to_node_features,
-            utils.conversion.nx_to_edge_features,
-            utils.conversion.nx_to_numpy,
-            utils.conversion.numpy_to_nx
-        ],
-        'methods': [],
-        'classes': []
-    },
-    {
-        'page': 'utils/convolution.md',
-        'functions': [
-            utils.convolution.degree,
-            utils.convolution.degree_power,
-            utils.convolution.normalized_adjacency,
-            utils.convolution.laplacian,
-            utils.convolution.normalized_laplacian,
-            utils.convolution.rescale_laplacian,
-            utils.convolution.localpooling_filter,
-            utils.convolution.chebyshev_polynomial,
-            utils.convolution.chebyshev_filter
-        ],
-        'methods': [],
-        'classes': []
-    },
-    {
-        'page': 'utils/misc.md',
-        'functions': [
-            utils.misc.batch_iterator,
-            utils.misc.pad_jagged_array,
-            utils.misc.add_eye,
-            utils.misc.sub_eye,
-            utils.misc.add_eye_batch,
-            utils.misc.sub_eye_batch,
-            utils.misc.add_eye_jagged,
-            utils.misc.sub_eye_jagged,
-        ],
-        'methods': [],
-        'classes': []
-    },
-    {
-        'page': 'utils/plotting.md',
-        'functions': [
-            plotting.plot_numpy,
-            plotting.plot_nx
-        ],
-        'methods': [],
-        'classes': []
     }
 ]
 
-ROOT = 'https://danielegrattarola.github.io/spektral/'
+ROOT = 'https://spektral.graphneural.network/'
 
 
 def get_function_signature(function, method=True):
@@ -594,6 +570,9 @@ if __name__ == '__main__':
         if not os.path.exists('sources/stylesheets/'):
             os.makedirs('sources/stylesheets/')
 
+        if not os.path.exists('sources/js/'):
+            os.makedirs('sources/js/')
+
         if not os.path.exists('sources/img/'):
             os.makedirs('sources/img/')
 
@@ -601,6 +580,7 @@ if __name__ == '__main__':
             os.makedirs('sources/custom_theme/img/')
 
         shutil.copy('./stylesheets/extra.css', './sources/stylesheets/extra.css')
+        shutil.copy('./js/macros.js', './sources/js/macros.js')
         for file in glob.glob(r'./img/*.svg'):
             shutil.copy(file, './sources/img/')
         shutil.copy('./img/favicon.ico', './sources/custom_theme/img/favicon.ico')

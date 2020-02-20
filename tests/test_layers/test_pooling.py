@@ -1,8 +1,7 @@
 import numpy as np
 import scipy.sparse as sp
 import tensorflow as tf
-from keras import Input, Model
-from keras import backend as K
+from tensorflow.keras import Input, Model
 
 from spektral.layers import TopKPool, MinCutPool, DiffPool, SAGPool
 
@@ -32,7 +31,6 @@ TESTS = [
 
 ]
 
-sess = K.get_session()
 batch_size = 3
 N1, N2, N3 = 4, 5, 2
 N = N1 + N2 + N3
@@ -62,8 +60,7 @@ def _test_single_mode(layer, **kwargs):
     layer_instance = layer(**kwargs)
     output = layer_instance([X_in, A_in])
     model = Model([X_in, A_in], output)
-    sess.run(tf.global_variables_initializer())
-    output = sess.run(model.output, feed_dict={X_in: X, A_in: A})
+    output = model([X, A])
     X_pool, A_pool, mask = output
 
     if 'ratio' in kwargs.keys():
@@ -72,7 +69,7 @@ def _test_single_mode(layer, **kwargs):
         N_exp = kwargs['k']
     else:
         raise ValueError('Need k or ratio.')
-    N_pool_expected = np.ceil(N_exp)
+    N_pool_expected = int(np.ceil(N_exp))
     N_pool_true = A_pool.shape[-1]
 
     _check_number_of_nodes(N_pool_expected, N_pool_true)
@@ -94,8 +91,7 @@ def _test_batch_mode(layer, **kwargs):
     layer_instance = layer(**kwargs)
     output = layer_instance([X_in, A_in])
     model = Model([X_in, A_in], output)
-    sess.run(tf.global_variables_initializer())
-    output = sess.run(model.output, feed_dict={X_in: X, A_in: A})
+    output = model([X, A])
     X_pool, A_pool, mask = output
 
     if 'ratio' in kwargs.keys():
@@ -104,7 +100,7 @@ def _test_batch_mode(layer, **kwargs):
         N_exp = kwargs['k']
     else:
         raise ValueError('Need k or ratio.')
-    N_pool_expected = np.ceil(N_exp)
+    N_pool_expected = int(np.ceil(N_exp))
     N_pool_true = A_pool.shape[-1]
 
     _check_number_of_nodes(N_pool_expected, N_pool_true)
@@ -128,13 +124,13 @@ def _test_disjoint_mode(layer, **kwargs):
     layer_instance = layer(**kwargs)
     output = layer_instance([X_in, A_in, I_in])
     model = Model([X_in, A_in, I_in], output)
-    sess.run(tf.global_variables_initializer())
-    output = sess.run(model.output, feed_dict={X_in: X, A_in: A, I_in: I})
+    output = model([X, A, I])
     X_pool, A_pool, I_pool, mask = output
 
     N_pool_expected = np.ceil(kwargs['ratio'] * N1) + \
                       np.ceil(kwargs['ratio'] * N2) + \
                       np.ceil(kwargs['ratio'] * N3)
+    N_pool_expected = int(N_pool_expected)
     N_pool_true = A_pool.shape[0]
 
     _check_number_of_nodes(N_pool_expected, N_pool_true)

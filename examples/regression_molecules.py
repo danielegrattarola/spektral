@@ -6,11 +6,11 @@ QM9 database, using a GNN based on edge-conditioned convolutions in batch mode.
 
 import matplotlib.pyplot as plt
 import numpy as np
-from keras.callbacks import EarlyStopping
-from keras.layers import Input, Dense
-from keras.models import Model
-from keras.optimizers import Adam
 from sklearn.model_selection import train_test_split
+from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.layers import Input, Dense
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
 
 from spektral.datasets import qm9
 from spektral.layers import EdgeConditionedConv, GlobalAvgPool

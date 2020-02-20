@@ -42,7 +42,7 @@ def log(message, print_string=True):
 
 def tic(message=None, print_string=True):
     """
-    Start counting.
+    Start counting time.
     :param message: additional message to print;
     :param print_string: whether to print the string to stdout;
     """
@@ -53,7 +53,7 @@ def tic(message=None, print_string=True):
 
 def toc(message=None, print_string=True):
     """
-    Stop counting-
+    Stop counting time.
     :param message: additional message to print;
     :param print_string: whether to print the string to stdout;
     """

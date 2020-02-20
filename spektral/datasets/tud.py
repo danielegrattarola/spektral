@@ -1,6 +1,7 @@
 import os
 import shutil
 import zipfile
+from urllib.error import URLError
 
 import networkx as nx
 import numpy as np
@@ -13,10 +14,14 @@ from spektral.utils import nx_to_numpy
 DATASET_URL = 'https://ls11-www.cs.tu-dortmund.de/people/morris/graphkerneldatasets'
 DATASET_CLEAN_URL = 'https://raw.githubusercontent.com/nd7141/graph_datasets/master/datasets'
 DATA_PATH = os.path.expanduser('~/.spektral/datasets/')
-AVAILABLE_DATASETS = [
-    d[:-4]
-    for d in pd.read_html(DATASET_URL)[0].Name[2:-1].values.tolist()
-]
+try:
+    AVAILABLE_DATASETS = [
+        d[:-4]
+        for d in pd.read_html(DATASET_URL)[0].Name[2:-1].values.tolist()
+    ]
+except URLError:
+    # No internet, don't panic
+    AVAILABLE_DATASETS = []
 
 
 def load_data(dataset_name, normalize_features=None, clean=False):
@@ -40,7 +45,7 @@ def load_data(dataset_name, normalize_features=None, clean=False):
     - a list of node feature matrices;
     - a numpy array containing the one-hot encoded targets.
     """
-    if dataset_name not in AVAILABLE_DATASETS:
+    if AVAILABLE_DATASETS and dataset_name not in AVAILABLE_DATASETS:
         raise ValueError('Available datasets: {}'.format(AVAILABLE_DATASETS))
 
     if clean:
