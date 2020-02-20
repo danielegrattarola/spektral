@@ -8,7 +8,6 @@ import re
 import shutil
 import sys
 
-import spektral.utils.data
 from spektral import chem
 from spektral import datasets
 from spektral import layers
@@ -33,6 +32,7 @@ EXCLUDE = {}
 # [classA, (classB, [module.classB.method1, module.classB.method2, ...]), ...]
 
 PAGES = [
+    # Layers ###################################################################
     {
         'page': 'layers/convolution.md',
         'classes': [
@@ -45,15 +45,6 @@ PAGES = [
             layers.GraphConvSkip,
             layers.APPNP,
             layers.GINConv
-        ]
-    },
-    {
-        'page': 'layers/base.md',
-        'functions': [],
-        'methods': [],
-        'classes': [
-            layers.InnerProduct,
-            layers.MinkowskiProduct
         ]
     },
     {
@@ -72,6 +63,16 @@ PAGES = [
             layers.GlobalAttnSumPool
         ]
     },
+    {
+        'page': 'layers/base.md',
+        'functions': [],
+        'methods': [],
+        'classes': [
+            layers.InnerProduct,
+            layers.MinkowskiProduct
+        ]
+    },
+    # Datasets #################################################################
     {
         'page': 'datasets/citation.md',
         'functions': [
@@ -112,7 +113,7 @@ PAGES = [
         'methods': [],
         'classes': []
     },
-{
+    {
         'page': 'datasets/mnist.md',
         'functions': [
             datasets.mnist.load_data
@@ -120,65 +121,15 @@ PAGES = [
         'methods': [],
         'classes': []
     },
-    {
-        'page': 'chem.md',
-        'functions': [
-            chem.numpy_to_rdkit,
-            chem.numpy_to_smiles,
-            chem.rdkit_to_smiles,
-            chem.sdf_to_nx,
-            chem.nx_to_sdf,
-            chem.validate_rdkit,
-            chem.get_atomic_symbol,
-            chem.get_atomic_num,
-            chem.valid_score,
-            chem.novel_score,
-            chem.unique_score,
-            chem.enable_rdkit_log,
-            chem.plot_rdkit,
-            chem.plot_rdkit_svg_grid
-        ],
-        'methods': [],
-        'classes': []
-    },
+    # Utils ####################################################################
     {
         'page': 'utils/data.md',
+        'functions': [
+            utils.data.batch_iterator
+        ],
         'classes': [
-            utils.data.Batch
-        ],
-        'methods': [
-            utils.data.Batch.get
+            (utils.data.Batch, ['get'])
         ]
-    },
-    {
-        'page': 'utils/io.md',
-        'functions': [
-            utils.io.load_binary,
-            utils.io.dump_binary,
-            utils.io.load_csv,
-            utils.io.dump_csv,
-            utils.io.load_dot,
-            utils.io.dump_dot,
-            utils.io.load_npy,
-            utils.io.dump_npy,
-            utils.io.load_txt,
-            utils.io.dump_txt,
-            utils.io.load_sdf,
-        ],
-        'methods': [],
-        'classes': []
-    },
-    {
-        'page': 'utils/conversion.md',
-        'functions': [
-            utils.conversion.nx_to_adj,
-            utils.conversion.nx_to_node_features,
-            utils.conversion.nx_to_edge_features,
-            utils.conversion.nx_to_numpy,
-            utils.conversion.numpy_to_nx
-        ],
-        'methods': [],
-        'classes': []
     },
     {
         'page': 'utils/convolution.md',
@@ -199,7 +150,6 @@ PAGES = [
     {
         'page': 'utils/misc.md',
         'functions': [
-            spektral.utils.data.batch_iterator,
             utils.misc.pad_jagged_array,
             utils.misc.add_eye,
             utils.misc.sub_eye,
@@ -219,10 +169,44 @@ PAGES = [
         ],
         'methods': [],
         'classes': []
+    },
+    {
+        'page': 'utils/conversion.md',
+        'functions': [
+            utils.conversion.nx_to_adj,
+            utils.conversion.nx_to_node_features,
+            utils.conversion.nx_to_edge_features,
+            utils.conversion.nx_to_numpy,
+            utils.conversion.numpy_to_nx
+        ],
+        'methods': [],
+        'classes': []
+    },
+    # Chem #####################################################################
+    {
+        'page': 'chem.md',
+        'functions': [
+            chem.numpy_to_rdkit,
+            chem.numpy_to_smiles,
+            chem.rdkit_to_smiles,
+            chem.sdf_to_nx,
+            chem.nx_to_sdf,
+            chem.validate_rdkit,
+            chem.get_atomic_symbol,
+            chem.get_atomic_num,
+            chem.valid_score,
+            chem.novel_score,
+            chem.unique_score,
+            chem.enable_rdkit_log,
+            chem.plot_rdkit,
+            chem.plot_rdkit_svg_grid
+        ],
+        'methods': [],
+        'classes': []
     }
 ]
 
-ROOT = 'https://danielegrattarola.github.io/spektral/'
+ROOT = 'https://spektral.graphneural.network/'
 
 
 def get_function_signature(function, method=True):

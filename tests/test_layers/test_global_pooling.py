@@ -1,8 +1,10 @@
 import numpy as np
+import tensorflow as tf
 from tensorflow.keras import Input, Model
 
 from spektral.layers import GlobalSumPool, GlobalAttnSumPool, GlobalAttentionPool, GlobalAvgPool, GlobalMaxPool
 
+tf.keras.backend.set_floatx('float64')
 batch_size = 32
 N = 11
 F = 7
