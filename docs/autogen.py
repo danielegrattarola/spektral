@@ -8,6 +8,7 @@ import re
 import shutil
 import sys
 
+import spektral.utils.data
 from spektral import chem
 from spektral import brain
 from spektral import datasets
@@ -191,7 +192,7 @@ PAGES = [
     {
         'page': 'utils/convolution.md',
         'functions': [
-            utils.convolution.degree,
+            utils.convolution.degree_matrix,
             utils.convolution.degree_power,
             utils.convolution.normalized_adjacency,
             utils.convolution.laplacian,
@@ -207,7 +208,7 @@ PAGES = [
     {
         'page': 'utils/misc.md',
         'functions': [
-            utils.misc.batch_iterator,
+            spektral.utils.data.batch_iterator,
             utils.misc.pad_jagged_array,
             utils.misc.add_eye,
             utils.misc.sub_eye,

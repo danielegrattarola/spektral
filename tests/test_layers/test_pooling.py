@@ -2,7 +2,6 @@ import numpy as np
 import scipy.sparse as sp
 import tensorflow as tf
 from tensorflow.keras import Input, Model
-from tensorflow.keras import backend as K
 
 from spektral.layers import TopKPool, MinCutPool, DiffPool, SAGPool
 

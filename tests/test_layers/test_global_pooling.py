@@ -1,7 +1,5 @@
 import numpy as np
-import tensorflow as tf
 from tensorflow.keras import Input, Model
-from tensorflow.keras import backend as K
 
 from spektral.layers import GlobalSumPool, GlobalAttnSumPool, GlobalAttentionPool, GlobalAvgPool, GlobalMaxPool
 
