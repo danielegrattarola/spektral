@@ -5,15 +5,14 @@ Graph Neural Networks with convolutional ARMA filters (https://arxiv.org/abs/190
 Filippo Maria Bianchi, Daniele Grattarola, Cesare Alippi, Lorenzo Livi
 """
 
-from keras.callbacks import EarlyStopping
-from keras.layers import Input, Dropout
-from keras.models import Model
-from keras.optimizers import Adam
-from keras.regularizers import l2
+from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.layers import Input, Dropout
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.regularizers import l2
 
 from spektral.datasets import citation
 from spektral.layers import ARMAConv
-from spektral.utils import normalized_laplacian, rescale_laplacian
 
 # Load data
 dataset = 'cora'
@@ -29,41 +28,40 @@ F = X.shape[1]          # Original feature dimensionality
 n_classes = y.shape[1]  # Number of classes
 dropout = 0.5           # Dropout rate applied between layers
 dropout_skip = 0.75     # Dropout rate for the internal skip connection of ARMA
-l2_reg = 5e-4           # Regularization rate for l2
-learning_rate = 1e-2    # Learning rate for SGD
+l2_reg = 5e-5           # L2 regularization rate
+learning_rate = 1e-2    # Learning rate
 epochs = 20000          # Number of training epochs
-es_patience = 200       # Patience for early stopping
+es_patience = 100       # Patience for early stopping
 
 # Preprocessing operations
-fltr = normalized_laplacian(A, symmetric=True)
-fltr = rescale_laplacian(fltr, lmax=2)
+fltr = ARMAConv.preprocess(A).astype('f4')
+X = X.toarray()
 
 # Model definition
 X_in = Input(shape=(F, ))
 fltr_in = Input((N, ), sparse=True)
 
-dropout_1 = Dropout(dropout)(X_in)
-graph_conv_1 = ARMAConv(channels,
-                        order=order,
-                        iterations=iterations,
-                        share_weights=share_weights,
-                        gcn_activation='elu',
-                        dropout_rate=dropout_skip,
-                        activation='elu',
-                        kernel_regularizer=l2(l2_reg))([dropout_1, fltr_in])
-dropout_2 = Dropout(dropout_skip)(graph_conv_1)
-graph_conv_2 = ARMAConv(n_classes,
-                        order=1,
-                        iterations=1,
-                        share_weights=share_weights,
-                        gcn_activation=None,
-                        dropout_rate=dropout_skip,
-                        activation='softmax',
-                        kernel_regularizer=l2(l2_reg))([dropout_2, fltr_in])
+gc_1 = ARMAConv(channels,
+                iterations=iterations,
+                order=order,
+                share_weights=share_weights,
+                dropout_rate=dropout_skip,
+                activation='elu',
+                gcn_activation='elu',
+                kernel_regularizer=l2(l2_reg))([X_in, fltr_in])
+gc_2 = Dropout(dropout)(gc_1)
+gc_2 = ARMAConv(n_classes,
+                iterations=1,
+                order=1,
+                share_weights=share_weights,
+                dropout_rate=dropout_skip,
+                activation='softmax',
+                gcn_activation=None,
+                kernel_regularizer=l2(l2_reg))([gc_2, fltr_in])
 
 # Build model
-model = Model(inputs=[X_in, fltr_in], outputs=graph_conv_2)
-optimizer = Adam(lr=learning_rate)
+model = Model(inputs=[X_in, fltr_in], outputs=gc_2)
+optimizer = Adam(learning_rate=learning_rate)
 model.compile(optimizer=optimizer,
               loss='categorical_crossentropy',
               weighted_metrics=['acc'])

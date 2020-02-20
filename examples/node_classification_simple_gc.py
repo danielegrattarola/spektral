@@ -5,11 +5,11 @@ Simplifying Graph Convolutional Networks (https://arxiv.org/abs/1902.07153)
 Felix Wu, Tianyi Zhang, Amauri Holanda de Souza Jr., Christopher Fifty, Tao Yu, Kilian Q. Weinberger
 """
 
-from keras.callbacks import EarlyStopping
-from keras.layers import Input
-from keras.models import Model
-from keras.optimizers import Adam
-from keras.regularizers import l2
+from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.layers import Input
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.regularizers import l2
 
 from spektral.datasets import citation
 from spektral.layers import GraphConv
@@ -22,19 +22,21 @@ A, X, y, train_mask, val_mask, test_mask = citation.load_data(dataset)
 # Parameters
 K = 2                   # Degree of propagation
 N = X.shape[0]          # Number of nodes in the graph
-F = X.shape[1]          # Original feature dimensionality
+F = X.shape[1]          # Original size of node features
 n_classes = y.shape[1]  # Number of classes
-l2_reg = 5e-6           # Regularization rate for l2
-learning_rate = 0.2     # Learning rate for SGD
+l2_reg = 5e-6           # L2 regularization rate
+learning_rate = 0.2     # Learning rate
 epochs = 20000          # Number of training epochs
 es_patience = 200       # Patience for early stopping
 
 # Preprocessing operations
-fltr = localpooling_filter(A)
+fltr = localpooling_filter(A).astype('f4')
+X = X.toarray()
 
 # Pre-compute propagation
 for i in range(K - 1):
     fltr = fltr.dot(fltr)
+fltr.sort_indices()
 
 # Model definition
 X_in = Input(shape=(F, ))

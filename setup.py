@@ -5,10 +5,10 @@ with open("README.md", "r") as fh:
 
 setup(
     name='spektral',
-    version='0.1.2',
+    version='0.3.0',
     packages=find_packages(),
-    install_requires=['keras<2.3',
-                      'tensorflow<2.0.0',
+    install_requires=['keras',
+                      'tensorflow>=2.1.0',
                       'networkx',
                       'pandas',
                       'lxml',
@@ -26,8 +26,6 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     classifiers=[
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.5"
     ],
 )

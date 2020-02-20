@@ -2,32 +2,25 @@
 This example shows how to perform graph classification with a synthetic
 benchmark dataset created by F. M. Bianchi (https://github.com/FilippoMB/Benchmark_dataset_for_graph_classification),
 using a GNN with convolutional and pooling blocks in disjoint mode.
-Note that the main training loop is written in TensorFlow, because we need to
-avoid the restriction imposed by Keras that the input and the output have the
-same first dimension. This is the most efficient way of training a GNN in
-disjoint mode.
 """
 
 import os
 
-import keras.backend as K
 import numpy as np
 import requests
 import tensorflow as tf
-from keras.layers import Input, Dense
-from keras.metrics import categorical_accuracy
-from keras.models import Model
-from keras.regularizers import l2
+from tensorflow.keras import backend as K
+from tensorflow.keras.layers import Input, Dense
+from tensorflow.keras.metrics import categorical_accuracy
+from tensorflow.keras.models import Model
+from tensorflow.keras.regularizers import l2
 
 from spektral.layers import GraphConvSkip, GlobalAvgPool
-from spektral.layers.ops import sp_matrix_to_sp_tensor_value
+from spektral.layers.ops import sp_matrix_to_sp_tensor
 from spektral.layers.pooling import MinCutPool
 from spektral.utils import batch_iterator
 from spektral.utils.convolution import normalized_adjacency
 from spektral.utils.data import Batch
-
-np.random.seed(0)
-SW_KEY = 'dense_1_sample_weights:0'  # Keras automatically creates a placeholder for sample weights, which must be fed
 
 
 def evaluate(A_list, X_list, y_list, ops, batch_size):
@@ -35,14 +28,10 @@ def evaluate(A_list, X_list, y_list, ops, batch_size):
     output = []
     for b in batches:
         X, A, I = Batch(b[0], b[1]).get('XAI')
+        A = sp_matrix_to_sp_tensor(A)
         y = b[2]
-        feed_dict = {X_in: X,
-                     A_in: sp_matrix_to_sp_tensor_value(A),
-                     I_in: I,
-                     target: y,
-                     SW_KEY: np.ones((1,))}
-
-        outs = sess.run(ops, feed_dict=feed_dict)
+        pred = model([X, A, I], training=False)
+        outs = [o(pred, y) for o in ops]
         output.append(outs)
     return np.mean(output, 0)
 
@@ -51,8 +40,7 @@ def evaluate(A_list, X_list, y_list, ops, batch_size):
 # PARAMETERS
 ################################################################################
 n_channels = 32            # Channels per layer
-activ = 'elu'              # Activation in GNN and maxcut / mincut
-mincut_H = 16              # Dimension of hidden state in mincut
+activ = 'elu'              # Activation in GNN and mincut
 GNN_l2 = 1e-4              # l2 regularisation of GNN
 pool_l2 = 1e-4             # l2 regularisation for mincut
 epochs = 500               # Number of training epochs
@@ -91,30 +79,24 @@ average_N = np.ceil(np.mean([a.shape[-1] for a in A_train]))  # Average number o
 ################################################################################
 # BUILD MODEL
 ################################################################################
-X_in = Input(tensor=tf.placeholder(tf.float32, shape=(None, F), name='X_in'))
-A_in = Input(tensor=tf.sparse_placeholder(tf.float32, shape=(None, None)), sparse=True)
-I_in = Input(tensor=tf.placeholder(tf.int32, shape=(None,), name='segment_ids_in'))
-target = Input(tensor=tf.placeholder(tf.float32, shape=(None, n_out), name='target'))
+X_in = Input(shape=(F, ), name='X_in', dtype=tf.float64)
+A_in = Input(shape=(None,), sparse=True, dtype=tf.float64)
+I_in = Input(shape=(), name='segment_ids_in', dtype=tf.int32)
 
-# Block 1
-gc1 = GraphConvSkip(n_channels,
+X_1 = GraphConvSkip(n_channels,
                     activation=activ,
                     kernel_regularizer=l2(GNN_l2))([X_in, A_in])
-X_1, A_1, I_1, M_1 = MinCutPool(k=int(average_N // 2),
-                                h=mincut_H,
-                                activation=activ,
-                                kernel_regularizer=l2(pool_l2))([gc1, A_in, I_in])
+X_1, A_1, I_1 = MinCutPool(k=int(average_N // 2),
+                           activation=activ,
+                           kernel_regularizer=l2(pool_l2))([X_1, A_in, I_in])
 
-# Block 2
-gc2 = GraphConvSkip(n_channels,
+X_2 = GraphConvSkip(n_channels,
                     activation=activ,
                     kernel_regularizer=l2(GNN_l2))([X_1, A_1])
-X_2, A_2, I_2, M_2 = MinCutPool(k=int(average_N // 4),
-                                h=mincut_H,
-                                activation=activ,
-                                kernel_regularizer=l2(pool_l2))([gc2, A_1, I_1])
+X_2, A_2, I_2 = MinCutPool(k=int(average_N // 4),
+                           activation=activ,
+                           kernel_regularizer=l2(pool_l2))([X_2, A_1, I_1])
 
-# Block 3
 X_3 = GraphConvSkip(n_channels,
                     activation=activ,
                     kernel_regularizer=l2(GNN_l2))([X_2, A_2])
@@ -126,23 +108,27 @@ output = Dense(n_out, activation='softmax')(avgpool)
 # Build model
 model = Model([X_in, A_in, I_in], output)
 model.compile(optimizer='adam',  # Doesn't matter, won't be used
-              loss='categorical_crossentropy',
-              target_tensors=[target])
+              loss='categorical_crossentropy')
 model.summary()
 
 # Training setup
-sess = K.get_session()
-loss = model.total_loss
-acc = K.mean(categorical_accuracy(target, model.output))
-opt = tf.train.AdamOptimizer(learning_rate=learning_rate)
-train_step = opt.minimize(loss)
-init_op = tf.global_variables_initializer()
-sess.run(init_op)
+opt = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+loss_fn = model.loss_functions[0]
+acc_fn = lambda x, y: K.mean(categorical_accuracy(x, y))
+
+
+@tf.function(experimental_relax_shapes=True)
+def train_step(inputs, targets):
+    with tf.GradientTape() as tape:
+        predictions = model(inputs, training=True)
+        loss = loss_fn(targets, predictions)
+    gradients = tape.gradient(loss, model.trainable_variables)
+    opt.apply_gradients(zip(gradients, model.trainable_variables))
+    return loss, acc_fn(targets, predictions)
 
 ################################################################################
 # FIT MODEL
 ################################################################################
-# Run training loop
 current_batch = 0
 model_loss = 0
 model_acc = 0
@@ -155,23 +141,19 @@ print('Fitting model')
 batches = batch_iterator([A_train, X_train, y_train], batch_size=batch_size, epochs=epochs)
 for b in batches:
     X_, A_, I_ = Batch(b[0], b[1]).get('XAI')
+    A_ = sp_matrix_to_sp_tensor(A_)
     y_ = b[2]
-    tr_feed_dict = {X_in: X_,
-                    A_in: sp_matrix_to_sp_tensor_value(A_),
-                    I_in: I_,
-                    target: y_,
-                    SW_KEY: np.ones((1,))}
-    outs = sess.run([train_step, loss, acc], feed_dict=tr_feed_dict)
+    outs = train_step([X_, A_, I_], y_)
 
-    model_loss += outs[1]
-    model_acc += outs[2]
+    model_loss += outs[0]
+    model_acc += outs[1]
     current_batch += 1
     if current_batch % batches_in_epoch == 0:
         model_loss /= batches_in_epoch
         model_acc /= batches_in_epoch
 
         # Compute validation loss and accuracy
-        val_loss, val_acc = evaluate(A_val, X_val, y_val, [loss, acc], batch_size=batch_size)
+        val_loss, val_acc = evaluate(A_val, X_val, y_val, [loss_fn, acc_fn], batch_size=batch_size)
         print('Ep. {} - Loss: {:.2f} - Acc: {:.2f} - Val loss: {:.2f} - Val acc: {:.2f}'
               .format(current_batch // batches_in_epoch, model_loss, model_acc, val_loss, val_acc))
 
@@ -197,7 +179,7 @@ model.set_weights(best_weights)
 
 # Test model
 print('Testing model')
-test_loss, test_acc = evaluate(A_test, X_test, y_test, [loss, acc], batch_size=batch_size)
+test_loss, test_acc = evaluate(A_test, X_test, y_test, [loss_fn, acc_fn], batch_size=batch_size)
 print('Done.\n'
       'Test loss: {:.2f}\n'
       'Test acc: {:.2f}'

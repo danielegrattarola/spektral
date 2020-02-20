@@ -1,7 +1,10 @@
-from keras import Input, Model
-from keras.callbacks import EarlyStopping
-from keras.layers import Dense, Flatten
-from keras.optimizers import Adam
+import tensorflow as tf
+
+tf.compat.v1.disable_eager_execution()
+from tensorflow.keras import Input, Model
+from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.layers import Dense, Flatten
+from tensorflow.keras.optimizers import Adam
 from keras.regularizers import l2
 
 from spektral.datasets import mnist
@@ -14,7 +17,7 @@ l2_reg = 5e-4         # Regularization rate for l2
 learning_rate = 1e-3  # Learning rate for SGD
 batch_size = 32       # Batch size
 epochs = 1000         # Number of training epochs
-es_patience = 10     # Patience fot early stopping
+es_patience = 10      # Patience fot early stopping
 
 # Load data
 X_train, y_train, X_val, y_val, X_test, y_test, adj = mnist.load_data()

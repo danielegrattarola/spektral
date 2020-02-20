@@ -1,8 +1,9 @@
-from spektral.layers.ops import matmul_A_B, matmul_AT_B, matmul_A_BT, matmul_AT_B_A, sp_matrix_to_sp_tensor, reshape
 import numpy as np
-from keras import backend as K
+import tensorflow as tf
 
-sess = K.get_session()
+from spektral.layers import ops
+from spektral.utils import convolution
+
 batch_size = 10
 N = 3
 tol = 5.e-7
@@ -24,21 +25,21 @@ def _assert_all_close(output, expected_output):
 
 def _convert_to_sparse_tensor(x):
     if x.ndim == 2:
-        return sp_matrix_to_sp_tensor(x)
+        return ops.sp_matrix_to_sp_tensor(x)
     elif x.ndim == 3:
         s1_, s2_, s3_ = x.shape
-        return reshape(
-            sp_matrix_to_sp_tensor(x.reshape(s1_ * s2_, s3_)),
+        return ops.reshape(
+            ops.sp_matrix_to_sp_tensor(x.reshape(s1_ * s2_, s3_)),
             (s1_, s2_, s3_)
         )
 
 
 def _cast_all_to_dtype(values, dtype):
-    return [K.cast(v, dtype) for v in values]
+    return [tf.cast(v, dtype) for v in values]
 
 
-def _check_op(op, numpy_inputs, expected_output, convert_to_sparse=None):
-    output = _check_op_dense(op, numpy_inputs)
+def _check_op(op, numpy_inputs, expected_output, convert_to_sparse=None, **kwargs):
+    output = _check_op_dense(op, numpy_inputs, **kwargs)
     _assert_all_close(output, expected_output)
 
     if convert_to_sparse:
@@ -48,21 +49,22 @@ def _check_op(op, numpy_inputs, expected_output, convert_to_sparse=None):
                 convert_to_sparse = [convert_to_sparse]
 
         for c_t_s in convert_to_sparse:
-            output = _check_op_sparse(op, numpy_inputs, c_t_s)
+            output = _check_op_sparse(op, numpy_inputs, c_t_s, **kwargs)
             _assert_all_close(output, expected_output)
 
 
-def _check_op_dense(op, numpy_inputs):
-    tf_inputs = [K.constant(x) for x in numpy_inputs]
+def _check_op_dense(op, numpy_inputs, **kwargs):
+    tf_inputs = [tf.convert_to_tensor(x) for x in numpy_inputs]
     tf_inputs = _cast_all_to_dtype(tf_inputs, np.float32)
 
-    op_result = op(*tf_inputs)
-    output = sess.run(op_result)
-
+    output = op(*tf_inputs, **kwargs)
+    if isinstance(output, tf.SparseTensor):
+        # Sometimes ops with dense inputs return sparse tensors
+        return tf.sparse.to_dense(output).numpy()
     return np.asarray(output)
 
 
-def _check_op_sparse(op, numpy_inputs, convert_to_sparse):
+def _check_op_sparse(op, numpy_inputs, convert_to_sparse, **kwargs):
     tf_inputs = []
     for i in range(len(numpy_inputs)):
         if convert_to_sparse[i]:
@@ -71,15 +73,18 @@ def _check_op_sparse(op, numpy_inputs, convert_to_sparse):
             )
         else:
             tf_inputs.append(
-                K.constant(numpy_inputs[i])
+                tf.convert_to_tensor(numpy_inputs[i])
             )
     tf_inputs = _cast_all_to_dtype(tf_inputs, np.float32)
 
-    op_result = op(*tf_inputs)
-    output = sess.run(op_result)
+    output = op(*tf_inputs, **kwargs)
 
     if hasattr(output, 'toarray'):
         return output.toarray()
+    elif hasattr(output, 'numpy'):
+        return output.numpy()
+    elif isinstance(output, tf.SparseTensor):
+        return tf.sparse.to_dense(output).numpy()
     else:
         return np.asarray(output)
 
@@ -87,72 +92,116 @@ def _check_op_sparse(op, numpy_inputs, convert_to_sparse):
 def test_matmul_ops_single_mode():
     A = np.random.randn(N, N)
     B = np.random.randn(N, N)
-    convert_to_sparse = [[True, False], [False, True]]
-    _check_op(matmul_A_B, [A, B], A.dot(B), convert_to_sparse)
-    _check_op(matmul_AT_B_A, [A, B], A.T.dot(B).dot(A), convert_to_sparse)
-    _check_op(matmul_AT_B, [A, B], A.T.dot(B), convert_to_sparse)
-    _check_op(matmul_A_BT, [A, B], A.dot(B.T), convert_to_sparse)
+    convert_to_sparse = [[True, False], [False, True], [True, True]]
+
+    _check_op(ops.matmul_A_B, [A, B], A.dot(B), convert_to_sparse)
+    _check_op(ops.matmul_AT_B_A, [A, B], A.T.dot(B).dot(A), convert_to_sparse)
+    _check_op(ops.matmul_AT_B, [A, B], A.T.dot(B), convert_to_sparse)
+    _check_op(ops.matmul_A_BT, [A, B], A.dot(B.T), convert_to_sparse)
 
 
 def test_matmul_ops_mixed_mode():
     A = np.random.randn(N, N)
     B = np.random.randn(batch_size, N, N)
-    convert_to_sparse = [[True, False], [False, True]]
+    convert_to_sparse = [[True, False], [False, True], [True, True]]
 
     # A * B
     expected_output = np.array([A.dot(B[i]) for i in range(batch_size)])
-    _check_op(matmul_A_B, [A, B], expected_output, convert_to_sparse)
+    _check_op(ops.matmul_A_B, [A, B], expected_output, convert_to_sparse)
 
     # A.T * B * A
     expected_output = np.array([A.T.dot(B[i]).dot(A) for i in range(batch_size)])
-    _check_op(matmul_AT_B_A, [A, B], expected_output, convert_to_sparse)
+    _check_op(ops.matmul_AT_B_A, [A, B], expected_output, convert_to_sparse)
 
     # A.T * B
     expected_output = np.array([A.T.dot(B[i]) for i in range(batch_size)])
-    _check_op(matmul_AT_B, [A, B], expected_output, convert_to_sparse)
+    _check_op(ops.matmul_AT_B, [A, B], expected_output, convert_to_sparse)
 
     # A * B.T
     expected_output = np.array([A.dot(B[i].T) for i in range(batch_size)])
-    _check_op(matmul_A_BT, [A, B], expected_output, convert_to_sparse)
+    _check_op(ops.matmul_A_BT, [A, B], expected_output, convert_to_sparse)
 
 
 def test_matmul_ops_inv_mixed_mode():
     A = np.random.randn(batch_size, N, N)
     B = np.random.randn(N, N)
+    convert_to_sparse = [[True, False], [False, True], [True, True]]
 
     # A * B
     expected_output = np.array([A[i].dot(B) for i in range(batch_size)])
-    _check_op(matmul_A_B, [A, B], expected_output)
+    _check_op(ops.matmul_A_B, [A, B], expected_output, convert_to_sparse)
 
     # A.T * B * A
     expected_output = np.array([A[i].T.dot(B).dot(A[i]) for i in range(batch_size)])
-    _check_op(matmul_AT_B_A, [A, B], expected_output)
+    _check_op(ops.matmul_AT_B_A, [A, B], expected_output, convert_to_sparse)
 
     # A.T * B
     expected_output = np.array([A[i].T.dot(B) for i in range(batch_size)])
-    _check_op(matmul_AT_B, [A, B], expected_output)
+    _check_op(ops.matmul_AT_B, [A, B], expected_output, convert_to_sparse)
 
     # A * B.T
     expected_output = np.array([A[i].dot(B.T) for i in range(batch_size)])
-    _check_op(matmul_A_BT, [A, B], expected_output)
+    _check_op(ops.matmul_A_BT, [A, B], expected_output, convert_to_sparse)
 
 
 def test_matmul_ops_batch_mode():
     A = np.random.randn(batch_size, N, N)
     B = np.random.randn(batch_size, N, N)
+    convert_to_sparse = [[True, False], [False, True], [True, True]]
 
     # A * B
     expected_output = np.array([A[i].dot(B[i]) for i in range(batch_size)])
-    _check_op(matmul_A_B, [A, B], expected_output)
+    _check_op(ops.matmul_A_B, [A, B], expected_output, convert_to_sparse)
 
     # A.T * B * A
     expected_output = np.array([A[i].T.dot(B[i]).dot(A[i]) for i in range(batch_size)])
-    _check_op(matmul_AT_B_A, [A, B], expected_output)
+    _check_op(ops.matmul_AT_B_A, [A, B], expected_output, convert_to_sparse)
 
     # A.T * B
     expected_output = np.array([A[i].T.dot(B[i]) for i in range(batch_size)])
-    _check_op(matmul_AT_B, [A, B], expected_output)
+    _check_op(ops.matmul_AT_B, [A, B], expected_output, convert_to_sparse)
 
     # A * B.T
     expected_output = np.array([A[i].dot(B[i].T) for i in range(batch_size)])
-    _check_op(matmul_A_BT, [A, B], expected_output)
+    _check_op(ops.matmul_A_BT, [A, B], expected_output, convert_to_sparse)
+
+
+def test_graph_ops():
+    A = np.ones((N, N))
+    convert_to_sparse = [[True]]
+
+    expected_output = convolution.normalized_adjacency(A)
+    _check_op(ops.normalize_A, [A], expected_output, convert_to_sparse)
+
+    expected_output = convolution.degree_matrix(A).sum(-1)
+    _check_op(ops.degrees, [A], expected_output, convert_to_sparse)
+
+    expected_output = convolution.degree_matrix(A)
+    _check_op(ops.degree_matrix, [A], expected_output, convert_to_sparse)
+
+
+def test_misc_ops():
+    convert_to_sparse = [[True]]
+
+    # Transpose
+    for perm in [(1, 0), (0, 2, 1), (2, 1, 0)]:
+        A = np.random.randn(*[N] * len(perm))
+        expected_output = np.transpose(A, axes=perm)
+        _check_op(ops.transpose, [A], expected_output, convert_to_sparse, perm=perm)
+
+    # Reshape
+    A = np.random.randn(4, 5)
+    for shape in [(-1, 4), (5, -1)]:
+        expected_output = np.reshape(A, shape)
+        _check_op(ops.reshape, [A], expected_output, convert_to_sparse, shape=shape)
+
+    # Matrix power
+    A = np.random.randn(N, N)
+    k = 4
+    expected_output = np.linalg.matrix_power(A, k)
+    _check_op(ops.matrix_power, [A], expected_output, convert_to_sparse, k=k)
+
+    A = np.random.randn(batch_size, N, N)
+    k = 4
+    expected_output = np.array([np.linalg.matrix_power(a, k) for a in A])
+    _check_op(ops.matrix_power, [A], expected_output, convert_to_sparse, k=k)

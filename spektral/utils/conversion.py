@@ -16,7 +16,7 @@ def nx_to_adj(graphs):
     """
     if isinstance(graphs, nx.Graph):
         graphs = [graphs]
-    return np.array([np.array(nx.attr_matrix(g)[0]) for g in graphs])
+    return np.array([nx.attr_sparse_matrix(g)[0].toarray() for g in graphs])
 
 
 def nx_to_node_features(graphs, keys, post_processing=None):
@@ -83,7 +83,7 @@ def nx_to_edge_features(graphs, keys, post_processing=None):
     for g in graphs:
         edge_features = []
         for key in keys:
-            ef = np.array(nx.attr_matrix(g, edge_attr=key)[0])
+            ef = nx.attr_sparse_matrix(g, edge_attr=key)[0].toarray()
             if ef.ndim == 2:
                 ef = ef[..., None]  # Make it three dimensional to concatenate
             edge_features.append(ef)

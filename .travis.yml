@@ -8,8 +8,8 @@ script:
   - pip install pytest-cov
   - pip install coverage
   - pip install codecov
-  - pip install "tensorflow<2.0.0"
-  - pip install "keras<2.3"
+  - pip install "tensorflow>=2.0.0"
+  - pip install "keras"
   - pip install networkx
   - pip install pandas
   - pip install lxml

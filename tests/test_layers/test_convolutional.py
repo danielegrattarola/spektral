@@ -1,10 +1,11 @@
 import numpy as np
 import tensorflow as tf
-from keras import backend as K, Model, Input
+from tensorflow.keras import Model, Input
 
 from spektral.layers import GraphConv, ChebConv, EdgeConditionedConv, GraphAttention, GraphConvSkip, ARMAConv, APPNP, \
     GraphSageConv, GINConv
 
+tf.keras.backend.set_floatx('float64')
 SINGLE, BATCH, MIXED = 1, 2, 3  # Single, batch, mixed
 LAYER_K_, MODES_K_, KWARGS_K_ = 'layer', 'modes', 'kwargs'
 TESTS = [
@@ -16,7 +17,7 @@ TESTS = [
     {
         LAYER_K_: ChebConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
-        KWARGS_K_: {'channels': 8, 'activation': 'relu'}
+        KWARGS_K_: {'K': 3, 'channels': 8, 'activation': 'relu'}
     },
     {
         LAYER_K_: GraphSageConv,
@@ -26,7 +27,7 @@ TESTS = [
     {
         LAYER_K_: EdgeConditionedConv,
         MODES_K_: [SINGLE, BATCH],
-        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'edges': True}
+        KWARGS_K_: {'kernel_network': [8], 'channels': 8, 'activation': 'relu', 'edges': True}
     },
     {
         LAYER_K_: GraphAttention,
@@ -51,11 +52,10 @@ TESTS = [
     {
         LAYER_K_: GINConv,
         MODES_K_: [SINGLE],
-        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'n_hidden_layers': 1}
+        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'mlp_hidden': [16]}
     }
 ]
 
-sess = K.get_session()
 batch_size = 32
 N = 11
 F = 7
@@ -70,20 +70,19 @@ def _test_single_mode(layer, **kwargs):
     A_in = Input(shape=(None,))
     X_in = Input(shape=(F,))
     inputs = [X_in, A_in]
-    feed_dict = {X_in: X, A_in: A}
+    input_data = [X, A]
 
     if kwargs.get('edges'):
         kwargs.pop('edges')
         E_in = Input(shape=(None, S))
         inputs.append(E_in)
-        feed_dict[E_in] = E
+        input_data.append(E)
 
     layer_instance = layer(**kwargs)
     output = layer_instance(inputs)
     model = Model(inputs, output)
 
-    sess.run(tf.global_variables_initializer())
-    output = sess.run(model.output, feed_dict=feed_dict)
+    output = model(input_data)
 
     assert output.shape == (N, kwargs['channels'])
 
@@ -95,21 +94,20 @@ def _test_batch_mode(layer, **kwargs):
     A_in = Input(shape=(N, N))
     X_in = Input(shape=(N, F))
     inputs = [X_in, A_in]
-    feed_dict = {X_in: X_batch, A_in: A_batch}
+    input_data = [X_batch, A_batch]
 
     if kwargs.get('edges'):
         kwargs.pop('edges')
         E_batch = np.stack([E] * batch_size)
         E_in = Input(shape=(N, N, S))
         inputs.append(E_in)
-        feed_dict[E_in] = E_batch
+        input_data.append(E_batch)
 
     layer_instance = layer(**kwargs)
     output = layer_instance(inputs)
     model = Model(inputs, output)
 
-    sess.run(tf.global_variables_initializer())
-    output = sess.run(model.output, feed_dict=feed_dict)
+    output = model(input_data)
 
     assert output.shape == (batch_size, N, kwargs['channels'])
 
@@ -120,14 +118,13 @@ def _test_mixed_mode(layer, **kwargs):
     A_in = Input(shape=(N,))
     X_in = Input(shape=(N, F))
     inputs = [X_in, A_in]
-    feed_dict = {X_in: X_batch, A_in: A}
+    input_data = [X_batch, A]
 
     layer_instance = layer(**kwargs)
     output = layer_instance(inputs)
     model = Model(inputs, output)
 
-    sess.run(tf.global_variables_initializer())
-    output = sess.run(model.output, feed_dict=feed_dict)
+    output = model(input_data)
 
     assert output.shape == (batch_size, N, kwargs['channels'])
 
