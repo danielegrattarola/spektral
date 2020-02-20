@@ -62,10 +62,9 @@ To install the required dependencies on Ubuntu run:
 sudo apt install graphviz libgraphviz-dev libcgraph6
 ```
 
-Some features of Spektral also require the following optional dependencies:
-
- - [RDKit](http://www.rdkit.org/docs/index.html), a library for cheminformatics and molecule manipulation (available through Anaconda);
- - [dyconnmap](https://github.com/makism/dyconnmap), a library to build functional connectivity networks (available through PyPi);
+Some optional features of Spektral also depend on [RDKit](http://www.rdkit.org/docs/index.html), 
+a library for cheminformatics and molecule manipulation (available through 
+Anaconda);
 
 The simplest way to install Spektral is from PyPi: 
 
@@ -93,10 +92,10 @@ Starting from version 0.2, Spektral will only support TensorFlow 2 and tf.keras.
 The migration is happening on the `develop` branch, and TF2 users can already use the library (including examples) by installing from source:
 
 ```bash
-$ git clone https://github.com/danielegrattarola/spektral.git
-$ cd spektral
-$ git checkout develop
-$ python setup.py install  # Or 'pip install .'
+git clone https://github.com/danielegrattarola/spektral.git
+cd spektral
+git checkout develop
+python setup.py install  # Or 'pip install .'
 ```
 
 In the future, the TF1-compatible version of Spektral (<0.2) will gradually be discontinued.  

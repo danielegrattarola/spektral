@@ -5,7 +5,6 @@ theme:
     custom_dir: 'sources/custom_theme/'
     highlightjs: true
 
-
 docs_dir: sources
 repo_url: 'https://github.com/danielegrattarola/spektral/'
 edit_uri: 'edit/master/docs/sources'
@@ -27,9 +26,10 @@ markdown_extensions:
 
 nav:
 - Home: index.md
-- Getting started: getting-started.md
-- Data representation: data.md
-- Examples: examples.md
+- Tutorials:
+    - Getting started: getting-started.md
+    - Data representation: data.md
+    - Examples: examples.md
 - Layers:
     - Convolutional Layers: layers/convolution.md
     - Pooling Layers: layers/pooling.md
@@ -41,13 +41,11 @@ nav:
     - QM9: datasets/qm9.md
     - MNIST: datasets/mnist.md
     - TU Dortmund: datasets/tud.md
-- Chemistry: chem.md
-- Brain: brain.md
 - Utils:
     - Data: utils/data.md
-    - Input/Ouput: utils/io.md
-    - Conversion: utils/conversion.md
     - Convolution: utils/convolution.md
     - Miscellaneous: utils/misc.md
     - Plotting: utils/plotting.md
+    - Conversion: utils/conversion.md
+- Chemistry: chem.md
 - About: about.md

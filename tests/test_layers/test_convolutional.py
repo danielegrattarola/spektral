@@ -1,9 +1,11 @@
 import numpy as np
+import tensorflow as tf
 from tensorflow.keras import Model, Input
 
 from spektral.layers import GraphConv, ChebConv, EdgeConditionedConv, GraphAttention, GraphConvSkip, ARMAConv, APPNP, \
     GraphSageConv, GINConv
 
+tf.keras.backend.set_floatx('float64')
 SINGLE, BATCH, MIXED = 1, 2, 3  # Single, batch, mixed
 LAYER_K_, MODES_K_, KWARGS_K_ = 'layer', 'modes', 'kwargs'
 TESTS = [
