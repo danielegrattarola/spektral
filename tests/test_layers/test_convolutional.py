@@ -1,6 +1,5 @@
 import numpy as np
-import tensorflow as tf
-from tensorflow.keras import backend as K, Model, Input
+from tensorflow.keras import Model, Input
 
 from spektral.layers import GraphConv, ChebConv, EdgeConditionedConv, GraphAttention, GraphConvSkip, ARMAConv, APPNP, \
     GraphSageConv, GINConv
@@ -16,7 +15,7 @@ TESTS = [
     {
         LAYER_K_: ChebConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
-        KWARGS_K_: {'channels': 8, 'activation': 'relu'}
+        KWARGS_K_: {'K': 3, 'channels': 8, 'activation': 'relu'}
     },
     {
         LAYER_K_: GraphSageConv,
@@ -26,7 +25,7 @@ TESTS = [
     {
         LAYER_K_: EdgeConditionedConv,
         MODES_K_: [SINGLE, BATCH],
-        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'edges': True}
+        KWARGS_K_: {'kernel_network': [8], 'channels': 8, 'activation': 'relu', 'edges': True}
     },
     {
         LAYER_K_: GraphAttention,
@@ -51,7 +50,7 @@ TESTS = [
     {
         LAYER_K_: GINConv,
         MODES_K_: [SINGLE],
-        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'n_hidden_layers': 1}
+        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'mlp_hidden': [16]}
     }
 ]
 
