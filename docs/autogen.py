@@ -10,7 +10,6 @@ import sys
 
 import spektral.utils.data
 from spektral import chem
-from spektral import brain
 from spektral import datasets
 from spektral import layers
 from spektral import utils
@@ -117,14 +116,6 @@ PAGES = [
         'page': 'datasets/mnist.md',
         'functions': [
             datasets.mnist.load_data
-        ],
-        'methods': [],
-        'classes': []
-    },
-    {
-        'page': 'brain.md',
-        'functions': [
-            brain.get_fc_graphs
         ],
         'methods': [],
         'classes': []
