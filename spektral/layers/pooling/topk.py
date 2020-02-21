@@ -93,6 +93,7 @@ class TopKPool(Layer):
         self.top_k_var = tf.Variable(0.0,
                                      trainable=False,
                                      validate_shape=False,
+                                     dtype=tf.keras.backend.floatx(),
                                      shape=tf.TensorShape(None))
         super().build(input_shape)
 
