@@ -66,17 +66,21 @@
           
             <li class="toctree-l1">
 		
+    <span class="caption-text">Tutorials</span>
+    <ul class="subnav">
+                <li class="">
+                    
     <a class="" href="../../getting-started/">Getting started</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
+                </li>
+                <li class="">
+                    
     <a class="" href="../../data/">Data representation</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
+                </li>
+                <li class="">
+                    
     <a class="" href="../../examples/">Examples</a>
+                </li>
+    </ul>
 	    </li>
           
             <li class="toctree-l1">
@@ -131,36 +135,18 @@
           
             <li class="toctree-l1">
 		
-    <a class="" href="../../chem/">Chemistry</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../brain/">Brain</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
     <span class="caption-text">Utils</span>
     <ul class="subnav">
                 <li class="">
                     
     <a class="" href="../data/">Data</a>
                 </li>
-                <li class="">
-                    
-    <a class="" href="../io/">Input/Ouput</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../conversion/">Conversion</a>
-                </li>
                 <li class=" current">
                     
     <a class="current" href="./">Convolution</a>
     <ul class="subnav">
             
-    <li class="toctree-l3"><a href="#degree">degree</a></li>
+    <li class="toctree-l3"><a href="#degree_matrix">degree_matrix</a></li>
     
 
     <li class="toctree-l3"><a href="#degree_power">degree_power</a></li>
@@ -197,7 +183,16 @@
                     
     <a class="" href="../plotting/">Plotting</a>
                 </li>
+                <li class="">
+                    
+    <a class="" href="../conversion/">Conversion</a>
+                </li>
     </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../chem/">Chemistry</a>
 	    </li>
           
             <li class="toctree-l1">
@@ -244,38 +239,40 @@
           <div role="main">
             <div class="section">
               
-                <h3 id="degree">degree</h3>
-<pre><code class="python">spektral.utils.degree(adj)
+                <h3 id="degree_matrix">degree_matrix</h3>
+<pre><code class="python">spektral.utils.degree_matrix(A)
 </code></pre>
 
 <p>Computes the degree matrix of the given adjacency matrix.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
-<li><code>adj</code>: rank 2 array or sparse matrix</li>
+<li><code>A</code>: rank 2 array or sparse matrix.</li>
 </ul>
 <p><strong>Return</strong><br />
- The degree matrix in sparse DIA format</p>
+ If A is a dense array, a dense array; if A is sparse, a sparse
+matrix in DIA format.</p>
 <hr />
 <h3 id="degree_power">degree_power</h3>
-<pre><code class="python">spektral.utils.degree_power(adj, pow)
+<pre><code class="python">spektral.utils.degree_power(A, k)
 </code></pre>
 
-<p>Computes <script type="math/tex">\D^{p}</script> from the given adjacency matrix. Useful for computing
-normalised Laplacians.</p>
+<p>Computes <script type="math/tex">\D^{k}</script> from the given adjacency matrix. Useful for computing
+normalised Laplacian.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
 <li>
-<p><code>adj</code>: rank 2 array or sparse matrix</p>
+<p><code>A</code>: rank 2 array or sparse matrix.</p>
 </li>
 <li>
-<p><code>pow</code>: exponent to which elevate the degree matrix</p>
+<p><code>k</code>: exponent to which elevate the degree matrix.</p>
 </li>
 </ul>
 <p><strong>Return</strong><br />
- The exponentiated degree matrix in sparse DIA format</p>
+ If A is a dense array, a dense array; if A is sparse, a sparse
+matrix in DIA format.</p>
 <hr />
 <h3 id="normalized_adjacency">normalized_adjacency</h3>
-<pre><code class="python">spektral.utils.normalized_adjacency(adj, symmetric=True)
+<pre><code class="python">spektral.utils.normalized_adjacency(A, symmetric=True)
 </code></pre>
 
 <p>Normalizes the given adjacency matrix using the degree matrix as either
@@ -283,7 +280,7 @@ normalised Laplacians.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
 <li>
-<p><code>adj</code>: rank 2 array or sparse matrix;</p>
+<p><code>A</code>: rank 2 array or sparse matrix;</p>
 </li>
 <li>
 <p><code>symmetric</code>: boolean, compute symmetric normalization;</p>
@@ -293,19 +290,19 @@ normalised Laplacians.</p>
  The normalized adjacency matrix.</p>
 <hr />
 <h3 id="laplacian">laplacian</h3>
-<pre><code class="python">spektral.utils.laplacian(adj)
+<pre><code class="python">spektral.utils.laplacian(A)
 </code></pre>
 
 <p>Computes the Laplacian of the given adjacency matrix as <script type="math/tex">\D - \A</script>.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
-<li><code>adj</code>: rank 2 array or sparse matrix;</li>
+<li><code>A</code>: rank 2 array or sparse matrix;</li>
 </ul>
 <p><strong>Return</strong><br />
  The Laplacian.</p>
 <hr />
 <h3 id="normalized_laplacian">normalized_laplacian</h3>
-<pre><code class="python">spektral.utils.normalized_laplacian(adj, symmetric=True)
+<pre><code class="python">spektral.utils.normalized_laplacian(A, symmetric=True)
 </code></pre>
 
 <p>Computes a  normalized Laplacian of the given adjacency matrix as
@@ -313,7 +310,7 @@ normalised Laplacians.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
 <li>
-<p><code>adj</code>: rank 2 array or sparse matrix;</p>
+<p><code>A</code>: rank 2 array or sparse matrix;</p>
 </li>
 <li>
 <p><code>symmetric</code>: boolean, compute symmetric normalization;</p>
@@ -330,7 +327,7 @@ normalised Laplacians.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
 <li>
-<p><code>L</code>: rank 2 array or sparse matrix</p>
+<p><code>L</code>: rank 2 array or sparse matrix;</p>
 </li>
 <li>
 <p><code>lmax</code>: if None, compute largest eigenvalue with scipy.linalg.eisgh.
@@ -341,23 +338,23 @@ If scalar, use this value as largest eignevalue when rescaling.</p>
 <p><strong>Return</strong>  </p>
 <hr />
 <h3 id="localpooling_filter">localpooling_filter</h3>
-<pre><code class="python">spektral.utils.localpooling_filter(adj, symmetric=True)
+<pre><code class="python">spektral.utils.localpooling_filter(A, symmetric=True)
 </code></pre>
 
-<p>Computes the local pooling filter from the given adjacency matrix, as 
-described by Kipf &amp; Welling (2017).</p>
+<p>Computes the graph filter described in
+<a href="https://arxiv.org/abs/1609.02907">Kipf &amp; Welling (2017)</a>.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
 <li>
-<p><code>adj</code>: a np.array or scipy.sparse matrix of rank 2 or 3;</p>
+<p><code>A</code>: array or sparse matrix with rank 2 or 3;</p>
 </li>
 <li>
 <p><code>symmetric</code>: boolean, whether to normalize the matrix as
-<script type="math/tex">D^{-\frac{1}{2}}AD^{-\frac{1}{2}}</script> or as <script type="math/tex">D^{-1}A</script>;</p>
+<script type="math/tex">\D^{-\frac{1}{2}}\A\D^{-\frac{1}{2}}</script> or as <script type="math/tex">\D^{-1}\A</script>;</p>
 </li>
 </ul>
 <p><strong>Return</strong><br />
- The filter matrix, as dense np.array.</p>
+ Array or sparse matrix with rank 2 or 3, same as A;</p>
 <hr />
 <h3 id="chebyshev_polynomial">chebyshev_polynomial</h3>
 <pre><code class="python">spektral.utils.chebyshev_polynomial(X, k)
@@ -367,37 +364,38 @@ described by Kipf &amp; Welling (2017).</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
 <li>
-<p><code>X</code>: a np.array or scipy.sparse matrix;</p>
+<p><code>X</code>: rank 2 array or sparse matrix;</p>
 </li>
 <li>
 <p><code>k</code>: the order up to which compute the polynomials,</p>
 </li>
 </ul>
 <p><strong>Return</strong><br />
- A list of k + 1 sparse matrices with one element for each degree of 
-the approximation.</p>
+ A list of k + 1 arrays or sparse matrices with one element for each
+degree of the polynomial.</p>
 <hr />
 <h3 id="chebyshev_filter">chebyshev_filter</h3>
-<pre><code class="python">spektral.utils.chebyshev_filter(adj, k, symmetric=True)
+<pre><code class="python">spektral.utils.chebyshev_filter(A, k, symmetric=True)
 </code></pre>
 
 <p>Computes the Chebyshev filter from the given adjacency matrix, as described
-in Defferrard et at. (2016).</p>
+in <a href="https://arxiv.org/abs/1606.09375">Defferrard et at. (2016)</a>.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
 <li>
-<p><code>adj</code>: a np.array or scipy.sparse matrix;</p>
+<p><code>A</code>: rank 2 array or sparse matrix;</p>
 </li>
 <li>
-<p><code>k</code>: integer, the order up to which to compute the Chebyshev polynomials;</p>
+<p><code>k</code>: integer, the order of the Chebyshev polynomial;</p>
 </li>
 <li>
-<p><code>symmetric</code>: boolean, whether to normalize the matrix as
-<script type="math/tex">D^{-\frac{1}{2}}AD^{-\frac{1}{2}}</script> or as <script type="math/tex">D^{-1}A</script>;</p>
+<p><code>symmetric</code>: boolean, whether to normalize the adjacency matrix as
+<script type="math/tex">\D^{-\frac{1}{2}}\A\D^{-\frac{1}{2}}</script> or as <script type="math/tex">\D^{-1}\A</script>;</p>
 </li>
 </ul>
 <p><strong>Return</strong><br />
- A list of k+1 filter matrices, as np.arrays.</p>
+ A list of k + 1 arrays or sparse matrices with one element for each
+degree of the polynomial.</p>
               
             </div>
           </div>
@@ -408,7 +406,7 @@ in Defferrard et at. (2016).</p>
         <a href="../misc/" class="btn btn-neutral float-right" title="Miscellaneous">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../conversion/" class="btn btn-neutral" title="Conversion"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../data/" class="btn btn-neutral" title="Data"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -436,7 +434,7 @@ in Defferrard et at. (2016).</p>
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../conversion/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../data/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
         <span style="margin-left: 15px"><a href="../misc/" style="color: #fcfcfc">Next &raquo;</a></span>

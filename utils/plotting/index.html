@@ -66,17 +66,21 @@
           
             <li class="toctree-l1">
 		
+    <span class="caption-text">Tutorials</span>
+    <ul class="subnav">
+                <li class="">
+                    
     <a class="" href="../../getting-started/">Getting started</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
+                </li>
+                <li class="">
+                    
     <a class="" href="../../data/">Data representation</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
+                </li>
+                <li class="">
+                    
     <a class="" href="../../examples/">Examples</a>
+                </li>
+    </ul>
 	    </li>
           
             <li class="toctree-l1">
@@ -131,29 +135,11 @@
           
             <li class="toctree-l1">
 		
-    <a class="" href="../../chem/">Chemistry</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../brain/">Brain</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
     <span class="caption-text">Utils</span>
     <ul class="subnav">
                 <li class="">
                     
     <a class="" href="../data/">Data</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../io/">Input/Ouput</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../conversion/">Conversion</a>
                 </li>
                 <li class="">
                     
@@ -176,7 +162,16 @@
 
     </ul>
                 </li>
+                <li class="">
+                    
+    <a class="" href="../conversion/">Conversion</a>
+                </li>
     </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../chem/">Chemistry</a>
 	    </li>
           
             <li class="toctree-l1">
@@ -224,72 +219,65 @@
             <div class="section">
               
                 <h3 id="plot_numpy">plot_numpy</h3>
-<pre><code class="python">spektral.utils.plot_numpy(adj, node_features=None, edge_features=None, nf_name=None, ef_name=None, layout='spring_layout', labels=True, node_color='r', node_size=300)
+<pre><code class="python">spektral.utils.plot_numpy(A, X=None, E=None, nf_name=None, ef_name=None, layout='spring_layout', labels=True)
 </code></pre>
 
-<p>Converts a graph in matrix format (i.e. with adjacency matrix, node features
-matrix, and edge features matrix) to the Networkx format, then plots it with
-plot_nx().</p>
+<p>Plots a graph in matrix format (adjacency matrix, node features matrix, and
+edge features matrix).</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
 <li>
-<p><code>adj</code>: np.array, adjacency matrix of the graph </p>
+<p><code>A</code>: np.array, adjacency matrix of the graph;</p>
 </li>
 <li>
-<p><code>node_features</code>: np.array, node features matrix of the graph</p>
+<p><code>X</code>: np.array, node features matrix of the graph;</p>
 </li>
 <li>
-<p><code>edge_features</code>: np.array, edge features matrix of the graph</p>
+<p><code>E</code>: np.array, edge features matrix of the graph;</p>
 </li>
 <li>
-<p><code>nf_name</code>: name to assign to the node features</p>
+<p><code>nf_name</code>: string, name of the node features to plot;</p>
 </li>
 <li>
-<p><code>ef_name</code>: name to assign to the edge features</p>
+<p><code>ef_name</code>: string, name of the edge features to plot;</p>
 </li>
 <li>
-<p><code>layout</code>: type of layout for networkx</p>
+<p><code>layout</code>: string, type of layout for networkx (see <code>nx.layout.__all__</code>);</p>
 </li>
 <li>
-<p><code>labels</code>: plot labels</p>
+<p><code>labels</code>: bool, plot node and edge labels;</p>
 </li>
 <li>
-<p><code>node_color</code>: color for the plotted nodes</p>
-</li>
-<li>
-<p><code>node_size</code>: size of the plotted nodes</p>
+<p><code>kwargs</code>: extra arguments for nx.draw;</p>
 </li>
 </ul>
 <p><strong>Return</strong><br />
  None</p>
 <hr />
 <h3 id="plot_nx">plot_nx</h3>
-<pre><code class="python">spektral.utils.plot_nx(nx_graph, nf_name=None, ef_name=None, layout='spring_layout', labels=True, node_color='r', node_size=300)
+<pre><code class="python">spektral.utils.plot_nx(nx_graph, nf_name=None, ef_name=None, layout='spring_layout', labels=True)
 </code></pre>
 
-<p>Plot the given Networkx graph.</p>
+<p>Plot a Networkx graph.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
 <li>
-<p><code>nx_graph</code>: a Networkx graph</p>
+<p><code>nx_graph</code>: a Networkx graph;</p>
 </li>
 <li>
-<p><code>nf_name</code>: name of the relevant node feature to plot</p>
+<p><code>nf_name</code>: string, name of the node features to plot;</p>
 </li>
 <li>
-<p><code>ef_name</code>: name of the relevant edgee feature to plot</p>
+<p><code>ef_name</code>: string, name of the edge features to plot;</p>
 </li>
 <li>
-<p><code>layout</code>: type of layout for networkx</p>
+<p><code>layout</code>: string, type of layout for networkx (see <code>nx.layout.__all__</code>);</p>
 </li>
 <li>
-<p><code>labels</code>: plot labels</p>
+<p><code>labels</code>: bool, plot node and edge labels;</p>
 </li>
 <li>
-<p><code>node_color</code>: color for the plotted nodes</p>
-</li>
-<li>
-<p><code>node_size</code>: size of the plotted nodes</p>
+<p><code>kwargs</code>: extra arguments for nx.draw;</p>
 </li>
 </ul>
 <p><strong>Return</strong><br />
@@ -301,7 +289,7 @@ plot_nx().</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../../about/" class="btn btn-neutral float-right" title="About">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../conversion/" class="btn btn-neutral float-right" title="Conversion">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../misc/" class="btn btn-neutral" title="Miscellaneous"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -335,7 +323,7 @@ plot_nx().</p>
         <span><a href="../misc/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../../about/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../conversion/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

@@ -66,17 +66,21 @@
           
             <li class="toctree-l1">
 		
+    <span class="caption-text">Tutorials</span>
+    <ul class="subnav">
+                <li class="">
+                    
     <a class="" href="../../getting-started/">Getting started</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
+                </li>
+                <li class="">
+                    
     <a class="" href="../../data/">Data representation</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
+                </li>
+                <li class="">
+                    
     <a class="" href="../../examples/">Examples</a>
+                </li>
+    </ul>
 	    </li>
           
             <li class="toctree-l1">
@@ -131,29 +135,11 @@
           
             <li class="toctree-l1">
 		
-    <a class="" href="../../chem/">Chemistry</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../brain/">Brain</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
     <span class="caption-text">Utils</span>
     <ul class="subnav">
                 <li class="">
                     
     <a class="" href="../data/">Data</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../io/">Input/Ouput</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../conversion/">Conversion</a>
                 </li>
                 <li class="">
                     
@@ -164,9 +150,6 @@
     <a class="current" href="./">Miscellaneous</a>
     <ul class="subnav">
             
-    <li class="toctree-l3"><a href="#batch_iterator">batch_iterator</a></li>
-    
-
     <li class="toctree-l3"><a href="#pad_jagged_array">pad_jagged_array</a></li>
     
 
@@ -194,7 +177,16 @@
                     
     <a class="" href="../plotting/">Plotting</a>
                 </li>
+                <li class="">
+                    
+    <a class="" href="../conversion/">Conversion</a>
+                </li>
     </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../chem/">Chemistry</a>
 	    </li>
           
             <li class="toctree-l1">
@@ -241,31 +233,7 @@
           <div role="main">
             <div class="section">
               
-                <h3 id="batch_iterator">batch_iterator</h3>
-<pre><code class="python">spektral.utils.batch_iterator(data, batch_size=32, epochs=1, shuffle=True)
-</code></pre>
-
-<p>Iterates over the data for the given number of epochs, yielding batches of
-size <code>batch_size</code>.</p>
-<p><strong>Arguments</strong>  </p>
-<ul>
-<li>
-<p><code>data</code>: np.array or list of np.arrays with equal first dimension.</p>
-</li>
-<li>
-<p><code>batch_size</code>: number of samples in a batch</p>
-</li>
-<li>
-<p><code>epochs</code>: number of times to iterate over the data</p>
-</li>
-<li>
-<p><code>shuffle</code>: whether to shuffle the data at the beginning of each epoch
-:yield: a batch of samples (or tuple of batches if X had more than one 
-array). </p>
-</li>
-</ul>
-<hr />
-<h3 id="pad_jagged_array">pad_jagged_array</h3>
+                <h3 id="pad_jagged_array">pad_jagged_array</h3>
 <pre><code class="python">spektral.utils.pad_jagged_array(x, target_shape, dtype=&lt;class 'float'&gt;)
 </code></pre>
 

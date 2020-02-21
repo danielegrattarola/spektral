@@ -71,7 +71,7 @@
     
         <ul>
         
-            <li><a class="toctree-l3" href="#tensorflow-2-tfkeras-and-future-development">TensorFlow 2, tf.keras, and future development</a></li>
+            <li><a class="toctree-l3" href="#tensorflow-1-and-keras">TensorFlow 1 and Keras</a></li>
         
         </ul>
     
@@ -84,17 +84,21 @@
           
             <li class="toctree-l1">
 		
+    <span class="caption-text">Tutorials</span>
+    <ul class="subnav">
+                <li class="">
+                    
     <a class="" href="getting-started/">Getting started</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
+                </li>
+                <li class="">
+                    
     <a class="" href="data/">Data representation</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
+                </li>
+                <li class="">
+                    
     <a class="" href="examples/">Examples</a>
+                </li>
+    </ul>
 	    </li>
           
             <li class="toctree-l1">
@@ -149,29 +153,11 @@
           
             <li class="toctree-l1">
 		
-    <a class="" href="chem/">Chemistry</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="brain/">Brain</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
     <span class="caption-text">Utils</span>
     <ul class="subnav">
                 <li class="">
                     
     <a class="" href="utils/data/">Data</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="utils/io/">Input/Ouput</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="utils/conversion/">Conversion</a>
                 </li>
                 <li class="">
                     
@@ -185,7 +171,16 @@
                     
     <a class="" href="utils/plotting/">Plotting</a>
                 </li>
+                <li class="">
+                    
+    <a class="" href="utils/conversion/">Conversion</a>
+                </li>
     </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="chem/">Chemistry</a>
 	    </li>
           
             <li class="toctree-l1">
@@ -249,7 +244,7 @@
     <img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat" style="width: auto !important" />
 </a></p>
 <h2 id="welcome-to-spektral">Welcome to Spektral</h2>
-<p>Spektral is a Python library for graph deep learning, based on Keras and TensorFlow.
+<p>Spektral is a Python library for graph deep learning, based on the Keras API and TensorFlow 2.
 The main goal of this project is to provide a simple but flexible framework for creating graph neural networks (GNNs).</p>
 <p>You can use Spektral for classifying the nodes of a network, predicting molecular properties, generating new graphs with GANs, clustering nodes, predicting links, and any other task where data is described by graphs. </p>
 <p>Spektral implements some of the most popular layers for graph deep learning, including: </p>
@@ -283,11 +278,9 @@ Other Linux distros should work as well, but Windows is not supported for now. <
 <pre><code class="bash">sudo apt install graphviz libgraphviz-dev libcgraph6
 </code></pre>
 
-<p>Some features of Spektral also require the following optional dependencies:</p>
-<ul>
-<li><a href="http://www.rdkit.org/docs/index.html">RDKit</a>, a library for cheminformatics and molecule manipulation (available through Anaconda);</li>
-<li><a href="https://github.com/makism/dyconnmap">dyconnmap</a>, a library to build functional connectivity networks (available through PyPi);</li>
-</ul>
+<p>Some optional features of Spektral also depend on <a href="http://www.rdkit.org/docs/index.html">RDKit</a>, 
+a library for cheminformatics and molecule manipulation (available through 
+Anaconda);</p>
 <p>The simplest way to install Spektral is from PyPi: </p>
 <pre><code class="bash">pip install spektral
 </code></pre>
@@ -303,16 +296,16 @@ python setup.py install  # Or 'pip install .'
 ! pip install spektral
 </code></pre>
 
-<h3 id="tensorflow-2-tfkeras-and-future-development">TensorFlow 2, tf.keras, and future development</h3>
-<p>Starting from version 0.2, Spektral will only support TensorFlow 2 and tf.keras.<br />
-The migration is happening on the <code>develop</code> branch, and TF2 users can already use the library (including examples) by installing from source:</p>
-<pre><code class="bash">$ git clone https://github.com/danielegrattarola/spektral.git
-$ cd spektral
-$ git checkout develop
-$ python setup.py install  # Or 'pip install .'
+<h3 id="tensorflow-1-and-keras">TensorFlow 1 and Keras</h3>
+<p>Starting from version 0.3, Spektral only supports TensorFlow 2 and <code>tf.keras</code>.
+The old version of Spektral, which is based on TensorFlow 1 and the stand-alone Keras library, is still available on the <code>tf1</code> branch on GitHub and can be installed from source:</p>
+<pre><code class="bash">git clone https://github.com/danielegrattarola/spektral.git
+cd spektral
+git checkout tf1
+python setup.py install  # Or 'pip install .'
 </code></pre>
 
-<p>In the future, the TF1-compatible version of Spektral (&lt;0.2) will gradually be discontinued.  </p>
+<p>In the future, the TF1-compatible version of Spektral (&lt;0.2) will receive bug fixes, but all new features will only support TensorFlow 2.   </p>
 <h2 id="contributing">Contributing</h2>
 <p>Spektral is an open source project available <a href="https://github.com/danielegrattarola/spektral">on Github</a>, and contributions of all types are welcome. Feel free to open a pull request if you have something interesting that you want to add to the framework.</p>
               
@@ -367,5 +360,5 @@ $ python setup.py install  # Or 'pip install .'
 
 <!--
 MkDocs version : 1.0.4
-Build Date UTC : 2020-02-01 22:52:45
+Build Date UTC : 2020-02-21 00:03:24
 -->

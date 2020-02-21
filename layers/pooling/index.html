@@ -66,17 +66,21 @@
           
             <li class="toctree-l1">
 		
+    <span class="caption-text">Tutorials</span>
+    <ul class="subnav">
+                <li class="">
+                    
     <a class="" href="../../getting-started/">Getting started</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
+                </li>
+                <li class="">
+                    
     <a class="" href="../../data/">Data representation</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
+                </li>
+                <li class="">
+                    
     <a class="" href="../../examples/">Examples</a>
+                </li>
+    </ul>
 	    </li>
           
             <li class="toctree-l1">
@@ -161,29 +165,11 @@
           
             <li class="toctree-l1">
 		
-    <a class="" href="../../chem/">Chemistry</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../brain/">Brain</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
     <span class="caption-text">Utils</span>
     <ul class="subnav">
                 <li class="">
                     
     <a class="" href="../../utils/data/">Data</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../utils/io/">Input/Ouput</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../utils/conversion/">Conversion</a>
                 </li>
                 <li class="">
                     
@@ -197,7 +183,16 @@
                     
     <a class="" href="../../utils/plotting/">Plotting</a>
                 </li>
+                <li class="">
+                    
+    <a class="" href="../../utils/conversion/">Conversion</a>
+                </li>
     </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../chem/">Chemistry</a>
 	    </li>
           
             <li class="toctree-l1">
@@ -257,7 +252,7 @@ a simple global weighted sum pooling where weights are calculated with an
 attention mechanism. </p>
 <p>See <a href="/layers/convolution">the convolutional layers page</a> for the notation. </p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L12">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/diffpool.py#L8">[source]</a></span></p>
 <h3 id="diffpool">DiffPool</h3>
 <pre><code class="python">spektral.layers.DiffPool(k, channels=None, return_mask=True, activation=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None)
 </code></pre>
@@ -305,16 +300,16 @@ simply by minimizing the two auxiliary losses.</p>
 <li><code>k</code>: number of nodes to keep;</li>
 <li><code>channels</code>: number of output channels (if None, the number of output
 channels is assumed to be the same as the input);</li>
-<li><code>return_mask</code>: boolean, whether to return the cluster assignment matrix,</li>
+<li><code>return_mask</code>: boolean, whether to return the cluster assignment matrix;</li>
 <li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
 <li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
 <li><code>activity_regularizer</code>: regularization applied to the output;</li>
 <li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L217">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/mincut.py#L9">[source]</a></span></p>
 <h3 id="mincutpool">MinCutPool</h3>
-<pre><code class="python">spektral.layers.MinCutPool(k, h=None, return_mask=True, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<pre><code class="python">spektral.layers.MinCutPool(k, return_mask=False, mlp_hidden=None, mlp_activation='relu', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
 <p>A minCUT pooling layer as presented by
@@ -360,13 +355,17 @@ simply by minimizing the two auxiliary losses.</p>
 <li><code>channels</code>: number of output channels (if None, the number of output
 channels is assumed to be the same as the input);</li>
 <li><code>return_mask</code>: boolean, whether to return the cluster assignment matrix,</li>
+<li><code>mlp_hidden</code>: list of integers, number of hidden units for each hidden
+layer in the MLP used to compute cluster assignments (if None, the MLP has
+only the output layer);</li>
+<li><code>mlp_activation</code>: activation for the MLP layers;</li>
 <li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
 <li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
 <li><code>activity_regularizer</code>: regularization applied to the output;</li>
 <li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L441">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/topk.py#L8">[source]</a></span></p>
 <h3 id="topkpool">TopKPool</h3>
 <pre><code class="python">spektral.layers.TopKPool(ratio, return_mask=False, sigmoid_gating=False, kernel_initializer='glorot_uniform', kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None)
 </code></pre>
@@ -421,7 +420,7 @@ tanh;</li>
 <li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L600">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/sagpool.py#L8">[source]</a></span></p>
 <h3 id="sagpool">SAGPool</h3>
 <pre><code class="python">spektral.layers.SAGPool(ratio, return_mask=False, sigmoid_gating=False, kernel_initializer='glorot_uniform', kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None)
 </code></pre>
@@ -475,7 +474,7 @@ tanh;</li>
 <li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L805">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/globalpool.py#L51">[source]</a></span></p>
 <h3 id="globalsumpool">GlobalSumPool</h3>
 <pre><code class="python">spektral.layers.GlobalSumPool()
 </code></pre>
@@ -496,7 +495,7 @@ be <code>(1, F)</code>).</li>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L833">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/globalpool.py#L79">[source]</a></span></p>
 <h3 id="globalavgpool">GlobalAvgPool</h3>
 <pre><code class="python">spektral.layers.GlobalAvgPool()
 </code></pre>
@@ -517,7 +516,7 @@ be <code>(1, F)</code>).</li>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L861">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/globalpool.py#L107">[source]</a></span></p>
 <h3 id="globalmaxpool">GlobalMaxPool</h3>
 <pre><code class="python">spektral.layers.GlobalMaxPool()
 </code></pre>
@@ -538,7 +537,7 @@ be <code>(1, F)</code>).</li>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L889">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/globalpool.py#L135">[source]</a></span></p>
 <h3 id="globalattentionpool">GlobalAttentionPool</h3>
 <pre><code class="python">spektral.layers.GlobalAttentionPool(channels=32, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -572,7 +571,7 @@ be <code>(1, F)</code>).</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling.py#L1022">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/globalpool.py#L268">[source]</a></span></p>
 <h3 id="globalattnsumpool">GlobalAttnSumPool</h3>
 <pre><code class="python">spektral.layers.GlobalAttnSumPool(attn_kernel_initializer='glorot_uniform', kernel_regularizer=None, attn_kernel_regularizer=None, attn_kernel_constraint=None)
 </code></pre>
@@ -600,8 +599,8 @@ be <code>(1, F)</code>).</li>
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>attn_kernel_initializer</code>: initializer for the attention kernel matrix;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;  </li>
-<li><code>attn_kernel_regularizer</code>: regularization applied to the attention kernel 
+<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
+<li><code>attn_kernel_regularizer</code>: regularization applied to the attention kernel
 matrix;</li>
 <li><code>attn_kernel_constraint</code>: constraint applied to the attention kernel
 matrix;</li>
