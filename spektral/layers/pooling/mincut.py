@@ -145,7 +145,7 @@ class MinCutPool(Layer):
 
         # Orthogonality regularization
         SS = ops.matmul_AT_B(S, S)
-        I_S = tf.eye(self.k)
+        I_S = tf.eye(self.k, dtype=SS.dtype)
         ortho_loss = tf.norm(
             SS / tf.norm(SS, axis=(-1, -2), keepdims=True) - I_S / tf.norm(I_S),
             axis=(-1, -2)
@@ -156,7 +156,9 @@ class MinCutPool(Layer):
 
         # Pooling
         X_pooled = ops.matmul_AT_B(S, X)
-        A_pooled = tf.linalg.set_diag(A_pooled, tf.zeros(K.shape(A_pooled)[:-1]))  # Remove diagonal
+        A_pooled = tf.linalg.set_diag(
+            A_pooled, tf.zeros(K.shape(A_pooled)[:-1], dtype=A_pooled.dtype)
+        )  # Remove diagonal
         A_pooled = ops.normalize_A(A_pooled)
 
         output = [X_pooled, A_pooled]
