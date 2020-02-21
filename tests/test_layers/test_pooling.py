@@ -4,6 +4,7 @@ import tensorflow as tf
 from tensorflow.keras import Input, Model
 
 from spektral.layers import TopKPool, MinCutPool, DiffPool, SAGPool
+tf.keras.backend.set_floatx('float64')
 
 SINGLE, BATCH, DISJOINT = 1, 2, 3  # Single, batch, disjoint
 LAYER_K_, MODES_K_, KWARGS_K_ = 'layer', 'modes', 'kwargs'
