@@ -47,7 +47,7 @@ You can also find [pooling layers](https://danielegrattarola.github.io/spektral/
 
 Spektral also includes lots of utilities for your graph deep learning projects.  
 
-See how to [get started with Spektral](https://danielegrattarola.github.io/spektral/getting-started/) and have a look at the [examples](https://danielegrattarola.github.io/spektral/examples/) for some project templates.
+See how to [get started with Spektral](https://danielegrattarola.github.io/spektral/getting-started/) and have a look at the [examples](https://danielegrattarola.github.io/spektral/examples/) for some templates.
 
 The source code of the project is available on [Github](https://github.com/danielegrattarola/spektral).  
 Read the documentation [here](https://spektral.graphneural.network).
@@ -64,7 +64,7 @@ sudo apt install graphviz libgraphviz-dev libcgraph6
 
 Some optional features of Spektral also depend on [RDKit](http://www.rdkit.org/docs/index.html), 
 a library for cheminformatics and molecule manipulation (available through 
-Anaconda);
+Anaconda).
 
 The simplest way to install Spektral is from PyPi: 
 
