@@ -241,7 +241,7 @@
 <p>A graph is generally represented by three matrices:</p>
 <ul>
 <li>
-<script type="math/tex">A \in \mathbb{R}^{N \times N}</script>, a square adjacency matrix where <script type="math/tex">A_{ij} > 0</script> if there is a connection between nodes <script type="math/tex">i</script> and <script type="math/tex">j</script>, and <script type="math/tex">A_{ij} = 0</script> otherwise;</li>
+<script type="math/tex">A \in \{0, 1\}^{N \times N}</script>, a square adjacency matrix where <script type="math/tex">A_{ij} = 1</script> if there is a connection between nodes <script type="math/tex">i</script> and <script type="math/tex">j</script>, and <script type="math/tex">A_{ij} = 0</script> otherwise;</li>
 <li>
 <script type="math/tex">X \in \mathbb{R}^{N \times F}</script>, a matrix encoding node attributes, where each row represents the <script type="math/tex">F</script>-dimensional attribute vector of a node;</li>
 <li>
@@ -258,7 +258,7 @@
 <h2 id="modes">Modes</h2>
 <p>In Spektral, some functionalities are implemented to work on a single graph, while others consider batches of graphs. </p>
 <p>To understand the difference between the two settings, consider the difference between classifying the nodes of a citation network, and classifying the chemical properties of molecules.<br />
-For the citation network, we are interested in the individual nodes and the connections between them. Node and edge attributes are specific to each individual network, and we are usually not interested in training models that work on different networks. The nodes of themselves are our data.<br />
+For the citation network, we are interested in the individual nodes and the connections between them. Node and edge attributes are specific to each individual network, and we are usually not interested in training models that work on different networks. The nodes themselves are our data.<br />
 On the other hand, when working with molecules in a dataset, we are in a much more familiar setting. Each molecule is a sample of our dataset, and the atoms and bonds that make up the molecules are the constituent part of each data point (like pixels in images). In this case, we are interested in finding patterns that describe the properties of the molecules in general. </p>
 <p>The two settings require us to do things that are conceptually similar, but that need some minor adjustments in how the data is processed by our graph neural networks. This is why Spektral makes these differences explicit.</p>
 <p>In practice, we actually distinguish between three main <strong>modes</strong> of operation: </p>
@@ -304,7 +304,7 @@ On the other hand, when working with molecules in a dataset, we are in a much mo
 <pre><code class="py">In [1]: from spektral.datasets import citation
 Using TensorFlow backend.
 
-In [2]: A, X, _, _, _, _, _, _ = citation.load_data('cora')
+In [2]: A, X, _, _, _, _ = citation.load_data('cora')
 Loading cora dataset
 
 In [3]: A.shape
@@ -316,8 +316,7 @@ Out[4]: (2708, 1433)
 
 <p>When training GNNs in single mode, we cannot batch and shuffle the data along the first axis, and the whole graph must be fed to the model at each step (see <a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_classification_gcn.py">the node classification example</a>).</p>
 <h3 id="batch-mode">Batch mode</h3>
-<p>In <strong>batch mode</strong>, the matrices will have a <code>batch</code> dimension first. There are several benchmark datasets with this structure, including the very popular <a href="https://ls11-www.cs.tu-dortmund.de/staff/morris/graphkerneldatasets">Benchmark Data Sets for Graph Kernels</a>. <br />
-A batch mode dataset that can be loaded natively by Spektral is the QM9 chemical database of small molecules:</p>
+<p>In <strong>batch mode</strong>, the matrices will have a <code>batch</code> dimension first. For instance, we can load the QM9 chemical database of small molecules as follows:</p>
 <pre><code class="py">In [1]: from spektral.datasets import qm9
 Using TensorFlow backend.
 
@@ -336,7 +335,7 @@ In [5]: E.shape
 Out[5]: (133885, 9, 9, 1)
 </code></pre>
 
-<p>Note that the graphs in QM9 have variable order (i.e., different <code>N</code> for each graph), and that by default <code>load_data()</code> pads them with zeros in order to store the data in Numpy arrays.<br />
+<p>Note that the graphs in QM9 have variable order (i.e., a different number of nodes for each graph), and that by default <code>load_data()</code> pads them with zeros in order to store the data in Numpy arrays.<br />
 See the <a href="https://danielegrattarola.github.io/spektral/data/#disjoint-mode">disjoint mode</a> section for an alternative to zero-padding. </p>
 <h3 id="mixed-mode">Mixed mode</h3>
 <p>In <strong>mixed mode</strong> we consider a single adjacency matrix, and different node and edge attributes matrices. An example of a mixed mode dataset is the MNIST random grid proposed by <a href="https://arxiv.org/abs/1606.09375">Defferrard et al.</a>:</p>
@@ -355,14 +354,14 @@ Out[4]: (50000, 784, 1)
 <h3 id="disjoint-mode">Disjoint mode</h3>
 <p><img alt="" src="https://danielegrattarola.github.io/spektral/img/disjoint.svg" /></p>
 <p>When dealing with graphs with a variable number of nodes, representing a group of graphs in batch mode requires padding <code>A</code>, <code>X</code>, and <code>E</code> to a fixed dimension.  <br />
-In order to avoid this issue, a common approach is to represent a batch of graphs as a single disjoint union, and then using this "supergraph" in single mode.</p>
+In order to avoid this issue, a common approach is to represent a batch of graphs with their disjoint union, leading us back to single mode.</p>
 <p>The disjoint union of a batch of graphs is a graph where: </p>
 <ol>
 <li><code>A</code> is a block diagonal matrix, constructed from the adjacency matrices of the batch;</li>
 <li><code>X</code> is obtained by stacking the node attributes of the batch;</li>
 <li><code>E</code> is a block diagonal tensor of rank 3, obtained from the edge attributes;</li>
 </ol>
-<p>In order to keep track of different graphs in the disjoint union, we use an additional array of integers <code>I</code>, that maps each node to a graph with a progressive, zero-based indexing.</p>
+<p>In order to keep track of different graphs in the disjoint union, we use an additional array of integers <code>I</code>, that maps each node to a graph with a progressive zero-based index (color coded in the image above).</p>
 <p>Utilities for creating the disjoint union of a list of graphs are provided in <code>spektral.utils.data</code>:</p>
 <pre><code class="py">In [1]: from spektral.utils.data import Batch                                                               
 Using TensorFlow backend.
@@ -408,7 +407,7 @@ Out[8]:
 </code></pre>
 
 <p>Convolutional layers that work in single mode will work for this type of data representation, without any modification.<br />
-Pooling layers, on the other hand, require the batch indices vector in order to know which nodes to pool together. </p>
+Pooling layers, on the other hand, require the index vector <code>I</code> to know which nodes to pool together. </p>
 <p>Global pooling layers will consume <code>I</code> and reduce the graphs to single vectors. Standard pooling layers will return a reduced version of <code>I</code> along with the reduced graphs. </p>
 <hr />
 <h2 id="conversion-methods">Conversion methods</h2>
@@ -455,18 +454,6 @@ Conversion utils between <code>'numpy'</code> and <code>'networkx'</code> are pr
 <p>The <code>'rdkit'</code> format uses the <a href="http://www.rdkit.org/docs/index.html">RDKit</a> library to represent molecules, and offers several methods to manipulate molecules with a chemistry-oriented approach.</p>
 <p>The <code>'smiles'</code> format represents molecules as strings, and can be used as a space-efficient way to store molecules or perform quick checks on a dataset (e.g., counting the unique number of molecules in a dataset is quicker if all molecules are converted to SMILES first).</p>
 <p>The <code>spektral.chem</code> and <code>spektral.utils</code> modules offer conversion methods between all of these formats, although some conversions may need more than one step (e.g., <code>'sdf'</code> to <code>'networkx'</code> to <code>'numpy'</code> to <code>'smiles'</code>). </p>
-<table>
-<thead>
-<tr>
-<th align="left">NOTE</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left">Support for direct conversion between all formats will be added eventually.</td>
-</tr>
-</tbody>
-</table>
               
             </div>
           </div>
