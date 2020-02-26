@@ -44,42 +44,38 @@ class MinCutPool(Layer):
 
     **Output**
 
-    - Reduced node features of shape `([batch], K, channels)`;
+    - Reduced node features of shape `([batch], K, F)`;
     - Reduced adjacency matrix of shape `([batch], K, K)`;
     - If `return_mask=True`, the soft clustering matrix of shape `([batch], N, K)`.
 
     **Arguments**
 
     - `k`: number of nodes to keep;
-    - `channels`: number of output channels (if None, the number of output
-    channels is assumed to be the same as the input);
-    - `return_mask`: boolean, whether to return the cluster assignment matrix,
     - `mlp_hidden`: list of integers, number of hidden units for each hidden
     layer in the MLP used to compute cluster assignments (if None, the MLP has
     only the output layer);
     - `mlp_activation`: activation for the MLP layers;
+    - `return_mask`: boolean, whether to return the cluster assignment matrix;
     - `kernel_initializer`: initializer for the kernel matrix;
     - `kernel_regularizer`: regularization applied to the kernel matrix;
-    - `activity_regularizer`: regularization applied to the output;
     - `kernel_constraint`: constraint applied to the kernel matrix;
     """
+
     def __init__(self,
                  k,
-                 return_mask=False,
                  mlp_hidden=None,
                  mlp_activation='relu',
+                 return_mask=False,
                  activation=None,
                  use_bias=True,
                  kernel_initializer='glorot_uniform',
                  bias_initializer='zeros',
                  kernel_regularizer=None,
                  bias_regularizer=None,
-                 activity_regularizer=None,
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
-            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
+
         super().__init__(**kwargs)
         self.k = k
         self.mlp_hidden = mlp_hidden if mlp_hidden else []
@@ -91,28 +87,26 @@ class MinCutPool(Layer):
         self.bias_initializer = initializers.get(bias_initializer)
         self.kernel_regularizer = regularizers.get(kernel_regularizer)
         self.bias_regularizer = regularizers.get(bias_regularizer)
-        self.activity_regularizer = regularizers.get(activity_regularizer)
         self.kernel_constraint = constraints.get(kernel_constraint)
         self.bias_constraint = constraints.get(bias_constraint)
 
     def build(self, input_shape):
         assert isinstance(input_shape, list)
-        initializers_kwargs = dict(
+        layer_kwargs = dict(
             kernel_initializer=self.kernel_initializer,
             bias_initializer=self.bias_initializer,
             kernel_regularizer=self.kernel_regularizer,
             bias_regularizer=self.bias_regularizer,
-            activity_regularizer=self.activity_regularizer,
             kernel_constraint=self.kernel_constraint,
             bias_constraint=self.bias_constraint
         )
         mlp_layers = []
         for i, channels in enumerate(self.mlp_hidden):
             mlp_layers.append(
-                Dense(channels, self.mlp_activation, **initializers_kwargs)
+                Dense(channels, self.mlp_activation, **layer_kwargs)
             )
         mlp_layers.append(
-            Dense(self.k, 'softmax', **initializers_kwargs)
+            Dense(self.k, 'softmax', **layer_kwargs)
         )
         self.mlp = Sequential(mlp_layers)
 
@@ -201,7 +195,6 @@ class MinCutPool(Layer):
             'bias_initializer': initializers.serialize(self.bias_initializer),
             'kernel_regularizer': regularizers.serialize(self.kernel_regularizer),
             'bias_regularizer': regularizers.serialize(self.bias_regularizer),
-            'activity_regularizer': regularizers.serialize(self.activity_regularizer),
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
             'bias_constraint': constraints.serialize(self.bias_constraint)
         }

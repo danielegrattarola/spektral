@@ -1,6 +1,5 @@
 import tensorflow as tf
-from tensorflow.keras import activations, initializers, regularizers, constraints, \
-    backend as K
+from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Dense
 
 from spektral.layers import ops
@@ -65,19 +64,18 @@ class EdgeConditionedConv(GraphConv):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        super().__init__(channels, **kwargs)
-        self.channels = channels
+        super().__init__(channels,
+                         activation=activation,
+                         use_bias=use_bias,
+                         kernel_initializer=kernel_initializer,
+                         bias_initializer=bias_initializer,
+                         kernel_regularizer=kernel_regularizer,
+                         bias_regularizer=bias_regularizer,
+                         activity_regularizer=activity_regularizer,
+                         kernel_constraint=kernel_constraint,
+                         bias_constraint=bias_constraint,
+                         **kwargs)
         self.kernel_network = kernel_network
-        self.activation = activations.get(activation)
-        self.use_bias = use_bias
-        self.kernel_initializer = initializers.get(kernel_initializer)
-        self.bias_initializer = initializers.get(bias_initializer)
-        self.kernel_regularizer = regularizers.get(kernel_regularizer)
-        self.bias_regularizer = regularizers.get(bias_regularizer)
-        self.activity_regularizer = regularizers.get(activity_regularizer)
-        self.kernel_constraint = constraints.get(kernel_constraint)
-        self.bias_constraint = constraints.get(bias_constraint)
-        self.supports_masking = False
 
     def build(self, input_shape):
         F = input_shape[0][-1]
@@ -147,17 +145,7 @@ class EdgeConditionedConv(GraphConv):
 
     def get_config(self):
         config = {
-            'channels': self.channels,
             'kernel_network': self.kernel_network,
-            'activation': activations.serialize(self.activation),
-            'use_bias': self.use_bias,
-            'kernel_initializer': initializers.serialize(self.kernel_initializer),
-            'bias_initializer': initializers.serialize(self.bias_initializer),
-            'kernel_regularizer': regularizers.serialize(self.kernel_regularizer),
-            'bias_regularizer': regularizers.serialize(self.bias_regularizer),
-            'activity_regularizer': regularizers.serialize(self.activity_regularizer),
-            'kernel_constraint': constraints.serialize(self.kernel_constraint),
-            'bias_constraint': constraints.serialize(self.bias_constraint),
         }
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))

@@ -1,5 +1,6 @@
 import tensorflow as tf
-from tensorflow.keras import activations, initializers, regularizers, constraints, backend as K
+from tensorflow.keras import activations, initializers, regularizers, constraints
+from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Layer
 
 from spektral.layers import ops
@@ -56,7 +57,6 @@ class DiffPool(Layer):
     - `return_mask`: boolean, whether to return the cluster assignment matrix;
     - `kernel_initializer`: initializer for the kernel matrix;
     - `kernel_regularizer`: regularization applied to the kernel matrix;
-    - `activity_regularizer`: regularization applied to the output;
     - `kernel_constraint`: constraint applied to the kernel matrix;
     """
 
@@ -67,11 +67,9 @@ class DiffPool(Layer):
                  activation=None,
                  kernel_initializer='glorot_uniform',
                  kernel_regularizer=None,
-                 activity_regularizer=None,
                  kernel_constraint=None,
                  **kwargs):
-        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
-            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
+
         super().__init__(**kwargs)
         self.k = k
         self.channels = channels
@@ -79,9 +77,7 @@ class DiffPool(Layer):
         self.activation = activations.get(activation)
         self.kernel_initializer = initializers.get(kernel_initializer)
         self.kernel_regularizer = regularizers.get(kernel_regularizer)
-        self.activity_regularizer = regularizers.get(activity_regularizer)
         self.kernel_constraint = constraints.get(kernel_constraint)
-        self.mixed_mode = False
 
     def build(self, input_shape):
         assert isinstance(input_shape, list)
@@ -101,11 +97,10 @@ class DiffPool(Layer):
                                            initializer=self.kernel_initializer,
                                            regularizer=self.kernel_regularizer,
                                            constraint=self.kernel_constraint)
+
         super().build(input_shape)
 
     def call(self, inputs):
-        # Note that I is useless, because thee layer cannot be used in disjoint
-        # mode.
         if len(inputs) == 3:
             X, A, I = inputs
             if K.ndim(I) == 2:
@@ -161,9 +156,6 @@ class DiffPool(Layer):
         X_pooled = ops.matmul_AT_B(S, Z)
         A_pooled = ops.matmul_AT_B_A(S, A)
 
-        if K.ndim(A_pooled) == 3:
-            self.mixed_mode = True
-
         output = [X_pooled, A_pooled]
 
         if I is not None:
@@ -201,9 +193,9 @@ class DiffPool(Layer):
         config = {
             'k': self.k,
             'channels': self.channels,
+            'return_mask': self.return_mask,
             'kernel_initializer': initializers.serialize(self.kernel_initializer),
             'kernel_regularizer': regularizers.serialize(self.kernel_regularizer),
-            'activity_regularizer': regularizers.serialize(self.activity_regularizer),
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
         }
         base_config = super().get_config()
