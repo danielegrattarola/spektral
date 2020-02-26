@@ -45,10 +45,10 @@ class TopKPool(Layer):
 
     **Output**
 
-    - Reduced node features of shape `(K, channels)`;
-    - Reduced adjacency matrix of shape `(K, K)`;
-    - Reduced graph IDs of shape `(K, )` (only in disjoint mode);
-    - If `return_mask=True`, the binary pooling mask of shape `(K, )`.
+    - Reduced node features of shape `(ratio * N, F)`;
+    - Reduced adjacency matrix of shape `(ratio * N, ratio * N)`;
+    - Reduced graph IDs of shape `(ratio * N, )` (only in disjoint mode);
+    - If `return_mask=True`, the binary pooling mask of shape `(ratio * N, )`.
 
     **Arguments**
 
@@ -58,28 +58,24 @@ class TopKPool(Layer):
         tanh;
     - `kernel_initializer`: initializer for the kernel matrix;
     - `kernel_regularizer`: regularization applied to the kernel matrix;
-    - `activity_regularizer`: regularization applied to the output;
     - `kernel_constraint`: constraint applied to the kernel matrix;
     """
 
-    def __init__(self, ratio,
+    def __init__(self,
+                 ratio,
                  return_mask=False,
                  sigmoid_gating=False,
                  kernel_initializer='glorot_uniform',
                  kernel_regularizer=None,
-                 activity_regularizer=None,
                  kernel_constraint=None,
                  **kwargs):
-        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
-            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
         super().__init__(**kwargs)
-        self.ratio = ratio  # Ratio of nodes to keep in each graph
+        self.ratio = ratio
         self.return_mask = return_mask
         self.sigmoid_gating = sigmoid_gating
         self.gating_op = K.sigmoid if self.sigmoid_gating else K.tanh
         self.kernel_initializer = initializers.get(kernel_initializer)
         self.kernel_regularizer = regularizers.get(kernel_regularizer)
-        self.activity_regularizer = regularizers.get(activity_regularizer)
         self.kernel_constraint = constraints.get(kernel_constraint)
 
     def build(self, input_shape):
@@ -100,7 +96,7 @@ class TopKPool(Layer):
     def call(self, inputs):
         if len(inputs) == 3:
             X, A, I = inputs
-            self.data_mode = 'graph'
+            self.data_mode = 'disjoint'
         else:
             X, A = inputs
             I = tf.zeros(tf.shape(X)[:1])
@@ -112,7 +108,7 @@ class TopKPool(Layer):
         A_is_sparse = K.is_sparse(A)
 
         # Get mask
-        y = K.dot(X, K.l2_normalize(self.kernel))
+        y = self.compute_scores(X, A, I)
         N = K.shape(X)[-2]
         indices = ops.segment_top_k(y[:, 0], I, self.ratio, self.top_k_var)
         mask = tf.scatter_nd(tf.expand_dims(indices, 1), tf.ones_like(indices), (N,))
@@ -140,7 +136,7 @@ class TopKPool(Layer):
         output = [X_pooled, A_pooled]
 
         # Reduce I
-        if self.data_mode == 'graph':
+        if self.data_mode == 'disjoint':
             I_pooled = tf.boolean_mask(I[:, None], mask)[:, 0]
             output.append(I_pooled)
 
@@ -148,6 +144,9 @@ class TopKPool(Layer):
             output.append(mask)
 
         return output
+
+    def compute_scores(self, X, A, I):
+        return K.dot(X, K.l2_normalize(self.kernel))
 
     def compute_output_shape(self, input_shape):
         output_shape = input_shape
@@ -161,7 +160,6 @@ class TopKPool(Layer):
             'return_mask': self.return_mask,
             'kernel_initializer': initializers.serialize(self.kernel_initializer),
             'kernel_regularizer': regularizers.serialize(self.kernel_regularizer),
-            'activity_regularizer': regularizers.serialize(self.activity_regularizer),
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
         }
         base_config = super().get_config()

@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow.keras import activations, initializers, regularizers, constraints, backend as K
+from tensorflow.keras import activations, backend as K
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.models import Sequential
 
@@ -69,38 +69,36 @@ class GINConv(GraphConv):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        super().__init__(channels, **kwargs)
-        self.channels = channels
+        super().__init__(channels,
+                         activation=activation,
+                         use_bias=use_bias,
+                         kernel_initializer=kernel_initializer,
+                         bias_initializer=bias_initializer,
+                         kernel_regularizer=kernel_regularizer,
+                         bias_regularizer=bias_regularizer,
+                         activity_regularizer=activity_regularizer,
+                         kernel_constraint=kernel_constraint,
+                         bias_constraint=bias_constraint,
+                         **kwargs)
         self.epsilon = epsilon
         self.mlp_hidden = mlp_hidden if mlp_hidden else []
         self.mlp_activation = activations.get(mlp_activation)
-        self.activation = activations.get(activation)
-        self.use_bias = use_bias
-        self.kernel_initializer = initializers.get(kernel_initializer)
-        self.bias_initializer = initializers.get(bias_initializer)
-        self.kernel_regularizer = regularizers.get(kernel_regularizer)
-        self.bias_regularizer = regularizers.get(bias_regularizer)
-        self.activity_regularizer = regularizers.get(activity_regularizer)
-        self.kernel_constraint = constraints.get(kernel_constraint)
-        self.bias_constraint = constraints.get(bias_constraint)
-        self.supports_masking = False
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
-        initializers_kwargs = dict(
+        layer_kwargs = dict(
             kernel_initializer=self.kernel_initializer,
             bias_initializer=self.bias_initializer,
             kernel_regularizer=self.kernel_regularizer,
             bias_regularizer=self.bias_regularizer,
-            activity_regularizer=self.activity_regularizer,
             kernel_constraint=self.kernel_constraint,
             bias_constraint=self.bias_constraint
         )
         mlp_layers = []
         for i, channels in enumerate(self.mlp_hidden):
-            mlp_layers.append(Dense(channels, self.mlp_activation, **initializers_kwargs))
+            mlp_layers.append(Dense(channels, self.mlp_activation, **layer_kwargs))
         mlp_layers.append(
-            Dense(self.channels, self.activation, **initializers_kwargs)
+            Dense(self.channels, self.activation, **layer_kwargs)
         )
         self.mlp = Sequential(mlp_layers)
 
@@ -110,7 +108,7 @@ class GINConv(GraphConv):
                                        initializer=self.bias_initializer,
                                        name='eps')
         else:
-            # if epsilon is given, keep it constant
+            # If epsilon is given, keep it constant
             self.eps = K.constant(self.epsilon)
 
         self.built = True
@@ -131,6 +129,15 @@ class GINConv(GraphConv):
         output = self.mlp(hidden)
 
         return output
+
+    def get_config(self):
+        config = {
+            'epsilon': self.epsilon,
+            'mlp_hidden': self.mlp_hidden,
+            'mlp_activation': self.mlp_activation
+        }
+        base_config = super().get_config()
+        return dict(list(base_config.items()) + list(config.items()))
 
     @staticmethod
     def preprocess(A):

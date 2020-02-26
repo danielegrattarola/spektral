@@ -30,7 +30,7 @@ class SparseDropout(Layer):
     """
 
     def __init__(self, rate, noise_shape=None, seed=None, **kwargs):
-        super(SparseDropout, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.rate = rate
         self.noise_shape = noise_shape
         self.seed = seed
@@ -65,7 +65,7 @@ class SparseDropout(Layer):
             'noise_shape': self.noise_shape,
             'seed': self.seed
         }
-        base_config = super(SparseDropout, self).get_config()
+        base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
     @staticmethod
@@ -101,7 +101,6 @@ class InnerProduct(Layer):
     :param activation: activation function to use;
     :param kernel_initializer: initializer for the kernel matrix;
     :param kernel_regularizer: regularization applied to the kernel;
-    :param activity_regularizer: regularization applied to the output;
     :param kernel_constraint: constraint applied to the kernel;
     """
     def __init__(self,
@@ -109,17 +108,14 @@ class InnerProduct(Layer):
                  activation=None,
                  kernel_initializer='glorot_uniform',
                  kernel_regularizer=None,
-                 activity_regularizer=None,
                  kernel_constraint=None,
                  **kwargs):
-        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
-            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
-        super(InnerProduct, self).__init__(**kwargs)
+
+        super().__init__(**kwargs)
         self.trainable_kernel = trainable_kernel
         self.activation = activations.get(activation)
         self.kernel_initializer = initializers.get(kernel_initializer)
         self.kernel_regularizer = regularizers.get(kernel_regularizer)
-        self.activity_regularizer = regularizers.get(activity_regularizer)
         self.kernel_constraint = constraints.get(kernel_constraint)
 
     def build(self, input_shape):
@@ -127,8 +123,8 @@ class InnerProduct(Layer):
         if self.trainable_kernel:
             features_dim = input_shape[-1]
             self.kernel = self.add_weight(shape=(features_dim, features_dim),
-                                          initializer=self.kernel_initializer,
                                           name='kernel',
+                                          initializer=self.kernel_initializer,
                                           regularizer=self.kernel_regularizer,
                                           constraint=self.kernel_constraint)
         self.built = True
@@ -149,8 +145,14 @@ class InnerProduct(Layer):
             return input_shape[:-1] + (input_shape[-2], )
 
     def get_config(self, **kwargs):
-        config = {}
-        base_config = super(InnerProduct, self).get_config()
+        config = {
+            'trainable_kernel': self.trainable_kernel,
+            'activation': self.activation,
+            'kernel_initializer': self.kernel_initializer,
+            'kernel_regularizer': self.kernel_regularizer,
+            'kernel_constraint': self.kernel_constraint,
+        }
+        base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
 
@@ -179,19 +181,15 @@ class MinkowskiProduct(Layer):
     encounter issues with shapes in your model, in order to provide an explicit
     output shape for your layer.
     :param activation: activation function to use;
-    :param activity_regularizer: regularization applied to the output;
     """
     def __init__(self,
                  input_dim_1=None,
                  activation=None,
-                 activity_regularizer=None,
                  **kwargs):
-        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
-            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
+
         super(MinkowskiProduct, self).__init__(**kwargs)
         self.input_dim_1 = input_dim_1
         self.activation = activations.get(activation)
-        self.activity_regularizer = regularizers.get(activity_regularizer)
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
@@ -221,6 +219,9 @@ class MinkowskiProduct(Layer):
             return input_shape[:-1] + (input_shape[-2], )
 
     def get_config(self, **kwargs):
-        config = {}
-        base_config = super(MinkowskiProduct, self).get_config()
+        config = {
+            'input_dim_1': self.input_dim_1,
+            'activation': self.activation
+        }
+        base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))

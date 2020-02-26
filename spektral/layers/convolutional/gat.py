@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow.keras import activations, initializers, regularizers, constraints
+from tensorflow.keras import initializers, regularizers, constraints
 from tensorflow.keras.layers import Dropout
 
 from spektral.layers.convolutional.gcn import GraphConv
@@ -80,6 +80,7 @@ class GraphAttention(GraphConv):
     - `bias_constraint`: constraint applied to the bias vector.
 
     """
+
     def __init__(self,
                  channels,
                  attn_heads=1,
@@ -99,26 +100,24 @@ class GraphAttention(GraphConv):
                  bias_constraint=None,
                  attn_kernel_constraint=None,
                  **kwargs):
-        super().__init__(channels, **kwargs)
-
-        self.channels = channels
+        super().__init__(channels,
+                         activation=activation,
+                         use_bias=use_bias,
+                         kernel_initializer=kernel_initializer,
+                         bias_initializer=bias_initializer,
+                         kernel_regularizer=kernel_regularizer,
+                         bias_regularizer=bias_regularizer,
+                         activity_regularizer=activity_regularizer,
+                         kernel_constraint=kernel_constraint,
+                         bias_constraint=bias_constraint,
+                         **kwargs)
         self.attn_heads = attn_heads
         self.concat_heads = concat_heads
         self.dropout_rate = dropout_rate
         self.return_attn_coef = return_attn_coef
-        self.activation = activations.get(activation)
-        self.use_bias = use_bias
-        self.kernel_initializer = initializers.get(kernel_initializer)
-        self.bias_initializer = initializers.get(bias_initializer)
         self.attn_kernel_initializer = initializers.get(attn_kernel_initializer)
-        self.kernel_regularizer = regularizers.get(kernel_regularizer)
-        self.bias_regularizer = regularizers.get(bias_regularizer)
         self.attn_kernel_regularizer = regularizers.get(attn_kernel_regularizer)
-        self.activity_regularizer = regularizers.get(activity_regularizer)
-        self.kernel_constraint = constraints.get(kernel_constraint)
-        self.bias_constraint = constraints.get(bias_constraint)
         self.attn_kernel_constraint = constraints.get(attn_kernel_constraint)
-        self.supports_masking = False
 
         if concat_heads:
             # Output will have shape (..., attention_heads * channels)
@@ -205,21 +204,11 @@ class GraphAttention(GraphConv):
 
     def get_config(self):
         config = {
-            'channels': self.channels,
             'attn_heads': self.attn_heads,
             'concat_heads': self.concat_heads,
             'dropout_rate': self.dropout_rate,
-            'activation': activations.serialize(self.activation),
-            'use_bias': self.use_bias,
-            'kernel_initializer': initializers.serialize(self.kernel_initializer),
-            'bias_initializer': initializers.serialize(self.bias_initializer),
             'attn_kernel_initializer': initializers.serialize(self.attn_kernel_initializer),
-            'kernel_regularizer': regularizers.serialize(self.kernel_regularizer),
-            'bias_regularizer': regularizers.serialize(self.bias_regularizer),
             'attn_kernel_regularizer': regularizers.serialize(self.attn_kernel_regularizer),
-            'activity_regularizer': regularizers.serialize(self.activity_regularizer),
-            'kernel_constraint': constraints.serialize(self.kernel_constraint),
-            'bias_constraint': constraints.serialize(self.bias_constraint),
             'attn_kernel_constraint': constraints.serialize(self.attn_kernel_constraint),
         }
         base_config = super().get_config()
