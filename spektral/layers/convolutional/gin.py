@@ -125,7 +125,7 @@ class GINConv(GraphConv):
         targets = fltr.indices[:, -2]
         sources = fltr.indices[:, -1]
         messages = tf.gather(features, sources)
-        aggregated = ops.scatter_sum(targets, messages)
+        aggregated = ops.scatter_sum(targets, messages, N=tf.shape(features)[0])
         hidden = (1.0 + self.eps) * features + aggregated
 
         # MLP

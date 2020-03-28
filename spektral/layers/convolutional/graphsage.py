@@ -116,10 +116,11 @@ class GraphSageConv(GraphConv):
 
         # Propagation
         indices = fltr.indices
-        indices = ops.sparse_add_self_loops(indices)
+        N = tf.shape(features, out_type=indices.dtype)[0]
+        indices = ops.sparse_add_self_loops(indices, N)
         targets, sources = indices[:, -2], indices[:, -1]
         messages = tf.gather(features, sources)
-        aggregated = self.aggregate_op(targets, messages)
+        aggregated = self.aggregate_op(targets, messages, N)
         output = K.concatenate([features, aggregated])
         output = ops.dot(output, self.kernel)
 
