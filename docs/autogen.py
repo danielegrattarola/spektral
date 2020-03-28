@@ -125,10 +125,8 @@ PAGES = [
     {
         'page': 'utils/data.md',
         'functions': [
+            utils.data.numpy_to_disjoint,
             utils.data.batch_iterator
-        ],
-        'classes': [
-            (utils.data.Batch, ['get'])
         ]
     },
     {

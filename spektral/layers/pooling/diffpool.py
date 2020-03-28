@@ -4,6 +4,7 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Layer
 
 from spektral.layers import ops
+from spektral.layers.ops import modes
 
 
 class DiffPool(Layer):
@@ -112,7 +113,7 @@ class DiffPool(Layer):
         N = K.shape(A)[-1]
         # Check if the layer is operating in mixed or batch mode
         mode = ops.autodetect_mode(A, X)
-        self.reduce_loss = mode in (ops.modes['M'], ops.modes['B'])
+        self.reduce_loss = mode in (modes.MIXED, modes.BATCH)
 
         # Get normalized adjacency
         if K.is_sparse(A):

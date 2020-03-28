@@ -36,11 +36,7 @@ def train_step(inputs):
 
 
 np.random.seed(1)
-
 epochs = 5000        # Training iterations
-gnn_channels = 16    # Units in the GNN layer
-gnn_activ = 'elu'    # Activation for the GNN layer
-mlp_activ = None     # Activation for the hidden layers of MinCutPool
 lr = 5e-4            # Learning rate
 
 ################################################################################
@@ -49,24 +45,20 @@ lr = 5e-4            # Learning rate
 A, X, y, _, _, _ = citation.load_data('cora')
 A_norm = normalized_adjacency(A)  # Normalize adjacency matrix
 X = X.todense()
-n_feat = X.shape[-1]
+F = X.shape[-1]
 y = np.argmax(y, axis=-1)
-n_clust = y.max() + 1
+n_clusters = y.max() + 1
 
 ################################################################################
 # MODEL
 ################################################################################
-X_in = Input(shape=(n_feat, ), name='X_in')
+X_in = Input(shape=(F,), name='X_in')
 A_in = Input(shape=(None, ), name='A_in', sparse=True)
 
-X_1 = GraphConvSkip(gnn_channels,
-                    kernel_initializer='he_normal',
-                    activation=gnn_activ)([X_in, A_in])
-pool1, adj1, S = MinCutPool(n_clust,
-                            return_mask=True,
-                            activation=mlp_activ)([X_1, A_in])
+X_1 = GraphConvSkip(16, activation='elu')([X_in, A_in])
+X_1, A_1, S = MinCutPool(n_clusters, return_mask=True)([X_1, A_in])
 
-model = Model([X_in, A_in], [pool1, S])
+model = Model([X_in, A_in], [X_1, S])
 model.compile('adam', None)
 
 ################################################################################
@@ -95,10 +87,10 @@ loss_history = np.array(loss_history)
 ################################################################################
 _, S_ = model(inputs, training=False)
 s = np.argmax(S_, axis=-1)
-hs = homogeneity_score(y, s)
-cs = completeness_score(y, s)
-nmis = v_measure_score(y, s)
-print('Homogeneity: {:.3f}; Completeness: {:.3f}; NMI: {:.3f}'.format(hs, cs, nmis))
+hom = homogeneity_score(y, s)
+com = completeness_score(y, s)
+nmi = v_measure_score(y, s)
+print('Homogeneity: {:.3f}; Completeness: {:.3f}; NMI: {:.3f}'.format(hom, com, nmi))
 
 # Plots
 plt.figure(figsize=(10, 5))
