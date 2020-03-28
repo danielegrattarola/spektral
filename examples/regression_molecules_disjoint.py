@@ -11,17 +11,18 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.layers import Input, Dense
 from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
 
 from spektral.datasets import qm9
-from spektral.layers import GlobalAvgPool, EdgeConditionedConv
-from spektral.utils import Batch, batch_iterator
+from spektral.layers import EdgeConditionedConv, ops, GlobalSumPool
+from spektral.utils import batch_iterator, numpy_to_disjoint
 from spektral.utils import label_to_one_hot
 
 ################################################################################
 # PARAMETERS
 ################################################################################
 learning_rate = 1e-3  # Learning rate
-epochs = 25           # Number of training epochs
+epochs = 10           # Number of training epochs
 batch_size = 32       # Batch size
 
 ################################################################################
@@ -30,59 +31,63 @@ batch_size = 32       # Batch size
 A, X, E, y = qm9.load_data(return_type='numpy',
                            nf_keys='atomic_num',
                            ef_keys='type',
-                           self_loops=True,
+                           self_loops=False,
                            auto_pad=False,
                            amount=1000)  # Set to None to train on whole dataset
 y = y[['cv']].values  # Heat capacity at 298.15K
 
 # Preprocessing
-uniq_X = np.unique([v for x in X for v in np.unique(x)])
-X = [label_to_one_hot(x, uniq_X) for x in X]
-uniq_E = np.unique([v for e in E for v in np.unique(e)])
-uniq_E = uniq_E[uniq_E != 0]
-E = [label_to_one_hot(e, uniq_E) for e in E]
+X_uniq = np.unique([v for x in X for v in np.unique(x)])
+E_uniq = np.unique([v for e in E for v in np.unique(e)])
+X_uniq = X_uniq[X_uniq != 0]
+E_uniq = E_uniq[E_uniq != 0]
+
+X = [label_to_one_hot(x, labels=X_uniq) for x in X]
+E = [label_to_one_hot(e, labels=E_uniq) for e in E]
 
 # Parameters
-F = X[0].shape[-1]    # Dimension of node features
-S = E[0].shape[-1]    # Dimension of edge features
-n_out = y.shape[-1]   # Dimension of the target
+F = X[0].shape[-1]   # Dimension of node features
+S = E[0].shape[-1]   # Dimension of edge features
+n_out = y.shape[-1]  # Dimension of the target
 
 # Train/test split
 A_train, A_test, \
 X_train, X_test, \
 E_train, E_test, \
-y_train, y_test = train_test_split(A, X, E, y, test_size=0.1)
+y_train, y_test = train_test_split(A, X, E, y, test_size=0.1, random_state=0)
 
 ################################################################################
 # BUILD MODEL
 ################################################################################
 X_in = Input(shape=(F,), name='X_in')
-A_in = Input(shape=(None,), name='A_in')
-E_in = Input(shape=(None, S), name='E_in')
+A_in = Input(shape=(None,), sparse=True, name='A_in')
+E_in = Input(shape=(S,), name='E_in')
 I_in = Input(shape=(), name='segment_ids_in', dtype=tf.int32)
 
 X_1 = EdgeConditionedConv(32, activation='relu')([X_in, A_in, E_in])
 X_2 = EdgeConditionedConv(32, activation='relu')([X_1, A_in, E_in])
-X_3 = GlobalAvgPool()([X_2, I_in])
+X_3 = GlobalSumPool()([X_2, I_in])
 output = Dense(n_out)(X_3)
 
 # Build model
 model = Model(inputs=[X_in, A_in, E_in, I_in], outputs=output)
-model.compile(optimizer='adam',  # Doesn't matter, won't be used
-              loss='mse')
+opt = Adam(lr=learning_rate)
+model.compile(optimizer=opt, loss='mse')
+loss_fn = model.loss_functions[0]
 model.summary()
 
-# Training setup
-opt = tf.keras.optimizers.Adam(learning_rate=learning_rate)
-loss_fn = model.loss_functions[0]
 
-
-@tf.function(experimental_relax_shapes=True)
-def train_loop(inputs, targets):
+@tf.function(
+    input_signature=(tf.TensorSpec((None, F), dtype=tf.float64),
+                     tf.SparseTensorSpec((None, None), dtype=tf.float64),
+                     tf.TensorSpec((None, S), dtype=tf.float64),
+                     tf.TensorSpec((None,), dtype=tf.int32),
+                     tf.TensorSpec((None, n_out), dtype=tf.float64)),
+    experimental_relax_shapes=True)
+def train_step(X_, A_, E_, I_, y_):
     with tf.GradientTape() as tape:
-        predictions = model(inputs, training=True)
-        loss = loss_fn(targets, predictions)
-        loss += sum(model.losses)
+        predictions = model([X_, A_, E_, I_], training=True)
+        loss = loss_fn(y_, predictions)
     gradients = tape.gradient(loss, model.trainable_variables)
     opt.apply_gradients(zip(gradients, model.trainable_variables))
     return loss
@@ -96,12 +101,13 @@ model_loss = 0
 batches_in_epoch = np.ceil(len(A_train) / batch_size)
 
 print('Fitting model')
-batches_train = batch_iterator([A_train, X_train, E_train, y_train], batch_size=batch_size, epochs=epochs)
+batches_train = batch_iterator([X_train, A_train, E_train, y_train],
+                               batch_size=batch_size, epochs=epochs)
 for b in batches_train:
-    X_, A_, E_, I_ = Batch(b[0], b[1], b[2]).get('XAEI')
-    A_ = A_.toarray()  # ECC wants dense inputs
-    y_ = b[3]
-    outs = train_loop([X_, A_, E_, I_], y_)
+    X_, A_, E_, I_ = numpy_to_disjoint(*b[:-1])
+    A_ = ops.sp_matrix_to_sp_tensor(A_)
+    y_ = b[-1]
+    outs = train_step(X_, A_, E_, I_, y_)
 
     model_loss += outs.numpy()
     current_batch += 1
@@ -113,19 +119,16 @@ for b in batches_train:
 ################################################################################
 # EVALUATE MODEL
 ################################################################################
+print('Testing model')
 model_loss = 0
 batches_in_epoch = np.ceil(len(A_test) / batch_size)
-
-# Test model
-print('Testing model')
-batches_test = batch_iterator([A_test, X_test, E_test, y_test], batch_size=batch_size)
+batches_test = batch_iterator([X_test, A_test, E_test, y_test], batch_size=batch_size)
 for b in batches_test:
-    X_, A_, E_, I_ = Batch(b[0], b[1], b[2]).get('XAEI')
-    A_ = A_.toarray()
+    X_, A_, E_, I_ = numpy_to_disjoint(*b[:-1])
+    A_ = ops.sp_matrix_to_sp_tensor(A_)
     y_ = b[3]
 
     predictions = model([X_, A_, E_, I_], training=False)
     model_loss += loss_fn(y_, predictions)
 
-print('Done.\n'
-      'Test loss: {}'.format(model_loss / batches_in_epoch))
+print('Done.\nTest loss: {}'.format(model_loss / batches_in_epoch))

@@ -117,13 +117,16 @@ class GINConv(GraphConv):
         features = inputs[0]
         fltr = inputs[1]
 
-        # Enforce sparsity
+        # Enforce sparse representation
         if not K.is_sparse(fltr):
             fltr = ops.dense_to_sparse(fltr)
 
         # Propagation
-        features_neigh = tf.math.segment_sum(tf.gather(features, fltr.indices[:, -1]), fltr.indices[:, -2])
-        hidden = (1.0 + self.eps) * features + features_neigh
+        targets = fltr.indices[:, -2]
+        sources = fltr.indices[:, -1]
+        messages = tf.gather(features, sources)
+        aggregated = ops.scatter_sum(targets, messages)
+        hidden = (1.0 + self.eps) * features + aggregated
 
         # MLP
         output = self.mlp(hidden)

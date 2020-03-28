@@ -34,7 +34,7 @@ class GraphSageConv(GraphConv):
     **Arguments**
 
     - `channels`: number of output channels;
-    - `aggregate_method`: str, aggregation method to use (`'sum'`, `'mean'`,
+    - `aggregate_op`: str, aggregation method to use (`'sum'`, `'mean'`,
     `'max'`, `'min'`, `'prod'`);
     - `activation`: activation function to use;
     - `use_bias`: whether to add a bias to the linear transformation;
@@ -73,15 +73,15 @@ class GraphSageConv(GraphConv):
                          bias_constraint=bias_constraint,
                          **kwargs)
         if aggregate_op == 'sum':
-            self.aggregate_op = tf.math.segment_sum
+            self.aggregate_op = ops.scatter_sum
         elif aggregate_op == 'mean':
-            self.aggregate_op = tf.math.segment_mean
+            self.aggregate_op = ops.scatter_mean
         elif aggregate_op == 'max':
-            self.aggregate_op = tf.math.segment_max
+            self.aggregate_op = ops.scatter_max
         elif aggregate_op == 'min':
-            self.aggregate_op = tf.math.segment_sum
+            self.aggregate_op = ops.scatter_sum
         elif aggregate_op == 'prod':
-            self.aggregate_op = tf.math.segment_prod
+            self.aggregate_op = ops.scatter_prod
         elif callable(aggregate_op):
             self.aggregate_op = aggregate_op
         else:
@@ -110,20 +110,24 @@ class GraphSageConv(GraphConv):
         features = inputs[0]
         fltr = inputs[1]
 
+        # Enforce sparse representation
         if not K.is_sparse(fltr):
             fltr = ops.dense_to_sparse(fltr)
 
-        features_neigh = self.aggregate_op(
-            tf.gather(features, fltr.indices[:, -1]), fltr.indices[:, -2]
-        )
-        output = K.concatenate([features, features_neigh])
-        output = K.dot(output, self.kernel)
+        # Propagation
+        indices = fltr.indices
+        indices = ops.sparse_add_self_loops(indices)
+        targets, sources = indices[:, -2], indices[:, -1]
+        messages = tf.gather(features, sources)
+        aggregated = self.aggregate_op(targets, messages)
+        output = K.concatenate([features, aggregated])
+        output = ops.dot(output, self.kernel)
 
         if self.use_bias:
             output = K.bias_add(output, self.bias)
+        output = K.l2_normalize(output, axis=-1)
         if self.activation is not None:
             output = self.activation(output)
-        output = K.l2_normalize(output, axis=-1)
         return output
 
     def get_config(self):

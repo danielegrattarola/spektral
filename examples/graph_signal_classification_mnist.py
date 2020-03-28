@@ -1,6 +1,4 @@
 import tensorflow as tf
-
-tf.compat.v1.disable_eager_execution()
 from tensorflow.keras import Input, Model
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.layers import Dense, Flatten
@@ -10,7 +8,8 @@ from tensorflow.keras.regularizers import l2
 from spektral.datasets import mnist
 from spektral.layers import GraphConv
 from spektral.layers.ops import sp_matrix_to_sp_tensor
-from spektral.utils import normalized_laplacian
+
+tf.compat.v1.disable_eager_execution()
 
 # Parameters
 l2_reg = 5e-4         # Regularization rate for l2
@@ -20,13 +19,13 @@ epochs = 1000         # Number of training epochs
 es_patience = 10      # Patience fot early stopping
 
 # Load data
-X_train, y_train, X_val, y_val, X_test, y_test, adj = mnist.load_data()
+X_train, y_train, X_val, y_val, X_test, y_test, A = mnist.load_data()
 X_train, X_val, X_test = X_train[..., None], X_val[..., None], X_test[..., None]
 N = X_train.shape[-2]      # Number of nodes in the graphs
 F = X_train.shape[-1]      # Node features dimensionality
-n_out = 10  # Dimension of the target
+n_out = 10                 # Dimension of the target
 
-fltr = normalized_laplacian(adj)
+fltr = GraphConv.preprocess(A)
 
 # Model definition
 X_in = Input(shape=(N, F))
@@ -36,12 +35,10 @@ A_in = Input(tensor=sp_matrix_to_sp_tensor(fltr))
 
 graph_conv = GraphConv(32,
                        activation='elu',
-                       kernel_regularizer=l2(l2_reg),
-                       use_bias=True)([X_in, A_in])
+                       kernel_regularizer=l2(l2_reg))([X_in, A_in])
 graph_conv = GraphConv(32,
                        activation='elu',
-                       kernel_regularizer=l2(l2_reg),
-                       use_bias=True)([graph_conv, A_in])
+                       kernel_regularizer=l2(l2_reg))([graph_conv, A_in])
 flatten = Flatten()(graph_conv)
 fc = Dense(512, activation='relu')(flatten)
 output = Dense(n_out, activation='softmax')(fc)

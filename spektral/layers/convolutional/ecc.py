@@ -3,6 +3,7 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Dense
 
 from spektral.layers import ops
+from spektral.layers.ops import modes
 from spektral.layers.convolutional.gcn import GraphConv
 
 
@@ -13,7 +14,7 @@ class EdgeConditionedConv(GraphConv):
 
     **Mode**: single, batch.
 
-    **This layer expects dense inputs.**
+    **This layer expects dense inputs and self-loops when working in batch mode.**
 
     For each node \( i \), this layer computes:
     $$
@@ -54,6 +55,7 @@ class EdgeConditionedConv(GraphConv):
     def __init__(self,
                  channels,
                  kernel_network=None,
+                 root=True,
                  activation=None,
                  use_bias=True,
                  kernel_initializer='glorot_uniform',
@@ -76,6 +78,7 @@ class EdgeConditionedConv(GraphConv):
                          bias_constraint=bias_constraint,
                          **kwargs)
         self.kernel_network = kernel_network
+        self.root = root
 
     def build(self, input_shape):
         F = input_shape[0][-1]
@@ -96,10 +99,18 @@ class EdgeConditionedConv(GraphConv):
                           bias_constraint=self.bias_constraint)
                 )
         self.kernel_network_layers.append(Dense(F_ * F, name='FGN_out'))
+        if self.root:
+            self.root_kernel = self.add_weight(name='root_kernel',
+                                              shape=(F, F_),
+                                              initializer=self.kernel_initializer,
+                                              regularizer=self.kernel_regularizer,
+                                              constraint=self.kernel_constraint)
+        else:
+            self.root_kernel = None
         if self.use_bias:
-            self.bias = self.add_weight(shape=(self.channels,),
+            self.bias = self.add_weight(name='bias',
+                                        shape=(self.channels,),
                                         initializer=self.bias_initializer,
-                                        name='bias',
                                         regularizer=self.bias_regularizer,
                                         constraint=self.bias_constraint)
         else:
@@ -112,6 +123,8 @@ class EdgeConditionedConv(GraphConv):
         E = inputs[2]  # (batch_size, N, N, S)
 
         mode = ops.autodetect_mode(A, X)
+        if mode == modes.SINGLE:
+            return self._call_single(inputs)
 
         # Parameters
         N = K.shape(X)[-2]
@@ -127,15 +140,50 @@ class EdgeConditionedConv(GraphConv):
             kernel_network = l(kernel_network)
 
         # Convolution
-        target_shape = (-1, N, N, F_, F) if mode == ops.modes['B'] else (N, N, F_, F)
+        target_shape = (-1, N, N, F_, F) if mode == modes.BATCH else (N, N, F_, F)
         kernel = K.reshape(kernel_network, target_shape)
         output = kernel * A[..., None, None]
+        output = tf.einsum('abicf,aif->abc', output, X)
 
-        if mode == ops.modes['B']:
-            output = tf.einsum('abicf,aif->abc', output, X)
-        else:
-            output = tf.einsum('bicf,if->bc', output, X)
+        if self.use_bias:
+            output = K.bias_add(output, self.bias)
+        if self.activation is not None:
+            output = self.activation(output)
 
+        return output
+
+    def _call_single(self, inputs):
+        X = inputs[0]  # (N, F)
+        A = inputs[1]  # (N, N)
+        E = inputs[2]  # (n_edges, S)
+
+        # Enforce sparse representation
+        if not K.is_sparse(A):
+            A = ops.dense_to_sparse(A)
+
+        # Parameters
+        N = tf.shape(X)[-2]
+        F = K.int_shape(X)[-1]
+        F_ = self.channels
+
+        # Filter network
+        kernel_network = E
+        for l in self.kernel_network_layers:
+            kernel_network = l(kernel_network)  # (n_edges, F * F_)
+        target_shape = (-1, F, F_)
+        kernel = tf.reshape(kernel_network, target_shape)
+
+        # Propagation
+        targets = A.indices[:, -2]
+        sources = A.indices[:, -1]
+        messages = tf.gather(X, sources)
+        messages = ops.dot(messages[:, None, :], kernel)[:, 0, :]
+        aggregated = ops.scatter_sum(targets, messages, N)
+
+        # Update
+        output = aggregated
+        if self.root_kernel is not None:
+            output += ops.dot(X, self.root_kernel)
         if self.use_bias:
             output = K.bias_add(output, self.bias)
         if self.activation is not None:
