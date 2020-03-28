@@ -130,11 +130,11 @@ def dump_npy(obj, filename, zipped=False):
 
 def load_txt(filename, **kwargs):
     """
-    Loads a txt file using np.genfromtxt.
+    Loads a txt file using np.loadtxt.
     :param filename: a string or file-like object
     :return: the loaded object
     """
-    return np.genfromtxt(filename, **kwargs)
+    return np.loadtxt(filename, **kwargs)
 
 
 def dump_txt(obj, filename, **kwargs):

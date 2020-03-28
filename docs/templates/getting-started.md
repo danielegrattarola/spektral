@@ -22,6 +22,7 @@ The `datasets.citation` module of Spektral lets you to download and load three p
 from spektral.datasets import citation
 data = citation.load_data('cora')
 A, X, y, train_mask, val_mask, test_mask = data
+X = X.toarray()
 
 N = A.shape[0]
 F = X.shape[-1]
@@ -37,8 +38,8 @@ To create a GCN, we will use the `GraphConv` layer and the functional API of Ker
 
 ```python
 from spektral.layers import GraphConv
-from keras.models import Model
-from keras.layers import Input, Dropout
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Input, Dropout
 ```
 
 Building the model is no different than building any Keras model, but we will need to provide multiple inputs to the `GraphConv` layers (namely `A` and `X`):
@@ -69,14 +70,13 @@ Keep this detail in mind for later.
 ## Training the GNN
 
 Before training the model, we have to pre-process the adjacency matrix to scale the weights of a node's connections according to its degree. In other words, the more a node is connected to others, the less relative importance those connections have. 
-Most GNN layers available in Spektral require their own type of pre-processing in order to work correctly. You can find all necessary tools for pre-processing `A` in 
-`spektral.utils`.
+Most GNN layers available in Spektral require their own type of pre-processing in order to work correctly. You can find all necessary tools for pre-processing `A` in `spektral.utils`.
 
 In our example, the pre-processing required by GCN is: 
 
 ```python
 from spektral import utils
-A = utils.localpooling_filter(A)
+A = utils.localpooling_filter(A).astype('f4')
 ```
 
 And that's all! 

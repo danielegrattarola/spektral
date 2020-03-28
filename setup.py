@@ -5,10 +5,9 @@ with open("README.md", "r") as fh:
 
 setup(
     name='spektral',
-    version='0.3.0',
+    version='0.3.1',
     packages=find_packages(),
-    install_requires=['keras',
-                      'tensorflow>=2.1.0',
+    install_requires=['tensorflow>=2.1.0',
                       'networkx',
                       'pandas',
                       'lxml',
@@ -22,7 +21,7 @@ setup(
     license='MIT',
     author='Daniele Grattarola',
     author_email='daniele.grattarola@gmail.com',
-    description='Graph Neural Networks with Keras and Tensorflow.',
+    description='Graph Neural Networks with Keras and Tensorflow 2.',
     long_description=long_description,
     long_description_content_type="text/markdown",
     classifiers=[
