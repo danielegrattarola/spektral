@@ -1,4 +1,5 @@
-from tensorflow.keras import activations, initializers, regularizers, constraints, backend as K
+from tensorflow.keras import activations, initializers, regularizers, constraints
+from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Layer
 
 from spektral.layers import ops
@@ -56,9 +57,8 @@ class GraphConv(Layer):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
-            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
-        super().__init__(**kwargs)
+
+        super().__init__(activity_regularizer=activity_regularizer, **kwargs)
         self.channels = channels
         self.activation = activations.get(activation)
         self.use_bias = use_bias
@@ -66,7 +66,6 @@ class GraphConv(Layer):
         self.bias_initializer = initializers.get(bias_initializer)
         self.kernel_regularizer = regularizers.get(kernel_regularizer)
         self.bias_regularizer = regularizers.get(bias_regularizer)
-        self.activity_regularizer = regularizers.get(activity_regularizer)
         self.kernel_constraint = constraints.get(kernel_constraint)
         self.bias_constraint = constraints.get(bias_constraint)
         self.supports_masking = False
@@ -117,7 +116,6 @@ class GraphConv(Layer):
             'bias_initializer': initializers.serialize(self.bias_initializer),
             'kernel_regularizer': regularizers.serialize(self.kernel_regularizer),
             'bias_regularizer': regularizers.serialize(self.bias_regularizer),
-            'activity_regularizer': regularizers.serialize(self.activity_regularizer),
             'kernel_constraint': constraints.serialize(self.kernel_constraint),
             'bias_constraint': constraints.serialize(self.bias_constraint)
         }

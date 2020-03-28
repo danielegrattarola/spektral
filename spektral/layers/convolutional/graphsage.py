@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow.keras import activations, initializers, regularizers, constraints, backend as K
+from tensorflow.keras import backend as K
 
 from spektral.layers import ops
 from spektral.layers.convolutional.gcn import GraphConv
@@ -50,7 +50,7 @@ class GraphSageConv(GraphConv):
 
     def __init__(self,
                  channels,
-                 aggregate_method='mean',
+                 aggregate_op='mean',
                  activation=None,
                  use_bias=True,
                  kernel_initializer='glorot_uniform',
@@ -61,28 +61,29 @@ class GraphSageConv(GraphConv):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        super().__init__(channels, **kwargs)
-        self.channels = channels
-        self.activation = activations.get(activation)
-        self.use_bias = use_bias
-        self.kernel_initializer = initializers.get(kernel_initializer)
-        self.bias_initializer = initializers.get(bias_initializer)
-        self.kernel_regularizer = regularizers.get(kernel_regularizer)
-        self.bias_regularizer = regularizers.get(bias_regularizer)
-        self.activity_regularizer = regularizers.get(activity_regularizer)
-        self.kernel_constraint = constraints.get(kernel_constraint)
-        self.bias_constraint = constraints.get(bias_constraint)
-        self.supports_masking = False
-        if aggregate_method == 'sum':
+        super().__init__(channels,
+                         activation=activation,
+                         use_bias=use_bias,
+                         kernel_initializer=kernel_initializer,
+                         bias_initializer=bias_initializer,
+                         kernel_regularizer=kernel_regularizer,
+                         bias_regularizer=bias_regularizer,
+                         activity_regularizer=activity_regularizer,
+                         kernel_constraint=kernel_constraint,
+                         bias_constraint=bias_constraint,
+                         **kwargs)
+        if aggregate_op == 'sum':
             self.aggregate_op = tf.math.segment_sum
-        elif aggregate_method == 'mean':
+        elif aggregate_op == 'mean':
             self.aggregate_op = tf.math.segment_mean
-        elif aggregate_method == 'max':
+        elif aggregate_op == 'max':
             self.aggregate_op = tf.math.segment_max
-        elif aggregate_method == 'min':
+        elif aggregate_op == 'min':
             self.aggregate_op = tf.math.segment_sum
-        elif aggregate_method == 'prod':
+        elif aggregate_op == 'prod':
             self.aggregate_op = tf.math.segment_prod
+        elif callable(aggregate_op):
+            self.aggregate_op = aggregate_op
         else:
             raise ValueError('Possbile aggragation methods: sum, mean, max, min, '
                              'prod')
@@ -124,6 +125,13 @@ class GraphSageConv(GraphConv):
             output = self.activation(output)
         output = K.l2_normalize(output, axis=-1)
         return output
+
+    def get_config(self):
+        config = {
+            'aggregate_op': self.aggregate_op
+        }
+        base_config = super().get_config()
+        return dict(list(base_config.items()) + list(config.items()))
 
     @staticmethod
     def preprocess(A):

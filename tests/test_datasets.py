@@ -49,5 +49,5 @@ def test_qm9():
 
 
 def test_tud():
-    tud.load_data('PROTEINS', normalize_features='ohe', clean=False)
-    tud.load_data('ENZYMES', normalize_features='zscore', clean=True)
+    tud.load_data('PROTEINS', clean=False)
+    tud.load_data('ENZYMES', clean=True)

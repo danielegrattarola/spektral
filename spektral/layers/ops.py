@@ -400,6 +400,7 @@ def segment_top_k(x, I, ratio, top_k_var):
     :return: a rank 1 Tensor containing the indices to get the top K values of
     each segment in x.
     """
+    I = tf.cast(I, tf.int32)
     num_nodes = tf.math.segment_sum(tf.ones_like(I), I)  # Number of nodes in each graph
     cumsum = tf.cumsum(num_nodes)  # Cumulative number of nodes (A, A+B, A+B+C)
     cumsum_start = cumsum - num_nodes  # Start index of each graph
@@ -407,7 +408,7 @@ def segment_top_k(x, I, ratio, top_k_var):
     max_n_nodes = tf.reduce_max(num_nodes)  # Order of biggest graph in batch
     batch_n_nodes = tf.shape(I)[0]  # Number of overall nodes in batch
     to_keep = tf.math.ceil(ratio * tf.cast(num_nodes, tf.float32))
-    to_keep = tf.cast(to_keep, tf.int32)  # Nodes to keep in each graph
+    to_keep = tf.cast(to_keep, I.dtype)  # Nodes to keep in each graph
 
     index = tf.range(batch_n_nodes)
     index = (index - tf.gather(cumsum_start, I)) + (I * max_n_nodes)
@@ -415,10 +416,11 @@ def segment_top_k(x, I, ratio, top_k_var):
     y_min = tf.reduce_min(x)
     dense_y = tf.ones((n_graphs * max_n_nodes,))
     # subtract 1 to ensure that filler values do not get picked
-    dense_y = dense_y * tf.cast(y_min - 1, tf.float32)
+    dense_y = dense_y * tf.cast(y_min - 1, dense_y.dtype)
+    dense_y = tf.cast(dense_y, top_k_var.dtype)
     # top_k_var is a variable with unknown shape defined in the elsewhere
     top_k_var.assign(dense_y)
-    dense_y = tf.tensor_scatter_nd_update(top_k_var, index[..., None], x)
+    dense_y = tf.tensor_scatter_nd_update(top_k_var, index[..., None], tf.cast(x, top_k_var.dtype))
     dense_y = tf.reshape(dense_y, (n_graphs, max_n_nodes))
 
     perm = tf.argsort(dense_y, direction='DESCENDING')

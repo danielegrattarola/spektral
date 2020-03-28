@@ -1,7 +1,7 @@
 <img src="https://danielegrattarola.github.io/spektral/img/logo_dark.svg" width="50%"/>
 
 ## Welcome to Spektral
-Spektral is a Python library for graph deep learning, based on Keras and TensorFlow.
+Spektral is a Python library for graph deep learning, based on the Keras API and TensorFlow 2.
 The main goal of this project is to provide a simple but flexible framework for creating graph neural networks (GNNs).
 
 You can use Spektral for classifying the nodes of a network, predicting molecular properties, generating new graphs with GANs, clustering nodes, predicting links, and any other task where data is described by graphs. 
@@ -28,7 +28,7 @@ You can also find [pooling layers](https://danielegrattarola.github.io/spektral/
 
 Spektral also includes lots of utilities for your graph deep learning projects.  
 
-See how to [get started with Spektral](https://danielegrattarola.github.io/spektral/getting-started/) and have a look at the [examples](https://danielegrattarola.github.io/spektral/examples/) for some project templates.
+See how to [get started with Spektral](https://danielegrattarola.github.io/spektral/getting-started/) and have a look at the [examples](https://danielegrattarola.github.io/spektral/examples/) for some templates.
 
 The source code of the project is available on [Github](https://github.com/danielegrattarola/spektral).  
 Read the documentation [here](https://spektral.graphneural.network).
@@ -45,7 +45,7 @@ sudo apt install graphviz libgraphviz-dev libcgraph6
 
 Some optional features of Spektral also depend on [RDKit](http://www.rdkit.org/docs/index.html), 
 a library for cheminformatics and molecule manipulation (available through 
-Anaconda);
+Anaconda).
 
 The simplest way to install Spektral is from PyPi: 
 
@@ -68,18 +68,18 @@ To install Spektral on [Google Colab](https://colab.research.google.com/):
 ! pip install spektral
 ```
 
-### TensorFlow 2, tf.keras, and future development
-Starting from version 0.2, Spektral will only support TensorFlow 2 and tf.keras.  
-The migration is happening on the `develop` branch, and TF2 users can already use the library (including examples) by installing from source:
+### TensorFlow 1 and Keras
+Starting from version 0.3, Spektral only supports TensorFlow 2 and `tf.keras`.
+The old version of Spektral, which is based on TensorFlow 1 and the stand-alone Keras library, is still available on the `tf1` branch on GitHub and can be installed from source:
 
 ```bash
 git clone https://github.com/danielegrattarola/spektral.git
 cd spektral
-git checkout develop
+git checkout tf1
 python setup.py install  # Or 'pip install .'
 ```
 
-In the future, the TF1-compatible version of Spektral (<0.2) will gradually be discontinued.  
+In the future, the TF1-compatible version of Spektral (<0.2) will receive bug fixes, but all new features will only support TensorFlow 2.   
 
 ## Contributing
 Spektral is an open source project available [on Github](https://github.com/danielegrattarola/spektral), and contributions of all types are welcome. Feel free to open a pull request if you have something interesting that you want to add to the framework.

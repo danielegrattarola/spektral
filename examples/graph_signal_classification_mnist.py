@@ -5,7 +5,7 @@ from tensorflow.keras import Input, Model
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.layers import Dense, Flatten
 from tensorflow.keras.optimizers import Adam
-from keras.regularizers import l2
+from tensorflow.keras.regularizers import l2
 
 from spektral.datasets import mnist
 from spektral.layers import GraphConv

@@ -1,4 +1,4 @@
-from tensorflow.keras import activations, initializers, regularizers, constraints
+from tensorflow.keras import activations
 from tensorflow.keras.layers import Dropout, Dense
 from tensorflow.keras.models import Sequential
 
@@ -70,31 +70,30 @@ class APPNP(GraphConv):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        super().__init__(channels, **kwargs)
-        self.channels = channels
+        super().__init__(channels,
+                         activation=activation,
+                         use_bias=use_bias,
+                         kernel_initializer=kernel_initializer,
+                         bias_initializer=bias_initializer,
+                         kernel_regularizer=kernel_regularizer,
+                         bias_regularizer=bias_regularizer,
+                         activity_regularizer=activity_regularizer,
+                         kernel_constraint=kernel_constraint,
+                         bias_constraint=bias_constraint,
+                         **kwargs)
         self.mlp_hidden = mlp_hidden if mlp_hidden else []
         self.alpha = alpha
         self.propagations = propagations
         self.mlp_activation = activations.get(mlp_activation)
-        self.activation = activations.get(activation)
         self.dropout_rate = dropout_rate
-        self.use_bias = use_bias
-        self.kernel_initializer = initializers.get(kernel_initializer)
-        self.bias_initializer = initializers.get(bias_initializer)
-        self.kernel_regularizer = regularizers.get(kernel_regularizer)
-        self.bias_regularizer = regularizers.get(bias_regularizer)
-        self.activity_regularizer = regularizers.get(activity_regularizer)
-        self.kernel_constraint = constraints.get(kernel_constraint)
-        self.bias_constraint = constraints.get(bias_constraint)
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
-        initializers_kwargs = dict(
+        layer_kwargs = dict(
             kernel_initializer=self.kernel_initializer,
             bias_initializer=self.bias_initializer,
             kernel_regularizer=self.kernel_regularizer,
             bias_regularizer=self.bias_regularizer,
-            activity_regularizer=self.activity_regularizer,
             kernel_constraint=self.kernel_constraint,
             bias_constraint=self.bias_constraint
         )
@@ -102,10 +101,10 @@ class APPNP(GraphConv):
         for i, channels in enumerate(self.mlp_hidden):
             mlp_layers.extend([
                 Dropout(self.dropout_rate),
-                Dense(channels, self.mlp_activation, **initializers_kwargs)
+                Dense(channels, self.mlp_activation, **layer_kwargs)
             ])
         mlp_layers.append(
-            Dense(self.channels, 'linear', **initializers_kwargs)
+            Dense(self.channels, 'linear', **layer_kwargs)
         )
         self.mlp = Sequential(mlp_layers)
         self.built = True
@@ -130,21 +129,11 @@ class APPNP(GraphConv):
 
     def get_config(self):
         config = {
-            'channels': self.channels,
             'alpha': self.alpha,
             'propagations': self.propagations,
             'mlp_hidden': self.mlp_hidden,
             'mlp_activation': activations.serialize(self.mlp_activation),
-            'activation': activations.serialize(self.activation),
             'dropout_rate': self.dropout_rate,
-            'use_bias': self.use_bias,
-            'kernel_initializer': initializers.serialize(self.kernel_initializer),
-            'bias_initializer': initializers.serialize(self.bias_initializer),
-            'kernel_regularizer': regularizers.serialize(self.kernel_regularizer),
-            'bias_regularizer': regularizers.serialize(self.bias_regularizer),
-            'activity_regularizer': regularizers.serialize(self.activity_regularizer),
-            'kernel_constraint': constraints.serialize(self.kernel_constraint),
-            'bias_constraint': constraints.serialize(self.bias_constraint),
         }
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))

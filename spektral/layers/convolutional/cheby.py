@@ -1,4 +1,4 @@
-from tensorflow.keras import activations, initializers, regularizers, constraints, backend as K
+from tensorflow.keras import backend as K
 
 from spektral.layers import ops
 from spektral.layers.convolutional.gcn import GraphConv
@@ -44,6 +44,7 @@ class ChebConv(GraphConv):
     **Arguments**
 
     - `channels`: number of output channels;
+    - `K`: order of the Chebyshev polynomials;
     - `activation`: activation function to use;
     - `use_bias`: boolean, whether to add a bias to the linear transformation;
     - `kernel_initializer`: initializer for the kernel matrix;
@@ -69,19 +70,18 @@ class ChebConv(GraphConv):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        super().__init__(channels, **kwargs)
-        self.channels = channels
+        super().__init__(channels,
+                         activation=activation,
+                         use_bias=use_bias,
+                         kernel_initializer=kernel_initializer,
+                         bias_initializer=bias_initializer,
+                         kernel_regularizer=kernel_regularizer,
+                         bias_regularizer=bias_regularizer,
+                         activity_regularizer=activity_regularizer,
+                         kernel_constraint=kernel_constraint,
+                         bias_constraint=bias_constraint,
+                         **kwargs)
         self.K = K
-        self.activation = activations.get(activation)
-        self.use_bias = use_bias
-        self.kernel_initializer = initializers.get(kernel_initializer)
-        self.bias_initializer = initializers.get(bias_initializer)
-        self.kernel_regularizer = regularizers.get(kernel_regularizer)
-        self.bias_regularizer = regularizers.get(bias_regularizer)
-        self.activity_regularizer = regularizers.get(activity_regularizer)
-        self.kernel_constraint = constraints.get(kernel_constraint)
-        self.bias_constraint = constraints.get(bias_constraint)
-        self.supports_masking = False
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
@@ -123,6 +123,13 @@ class ChebConv(GraphConv):
         if self.activation is not None:
             output = self.activation(output)
         return output
+
+    def get_config(self):
+        config = {
+            'K': self.K
+        }
+        base_config = super(ChebConv, self).get_config()
+        return dict(list(base_config.items()) + list(config.items()))
 
     @staticmethod
     def preprocess(A):
