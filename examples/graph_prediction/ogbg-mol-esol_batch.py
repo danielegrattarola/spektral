@@ -78,5 +78,4 @@ evaluator = Evaluator(name=dataset_name)
 y_pred = model.predict([X_te, A_te], batch_size=batch_size)
 ogb_score = evaluator.eval({'y_true': y_te, 'y_pred': y_pred})
 
-print('Done.\n'
-      'OGB ROC-AUC: {}'.format(ogb_score))
+print('Done. RMSE: {:.4f}'.format(ogb_score['rmse']))

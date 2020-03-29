@@ -118,6 +118,5 @@ y_pred = np.vstack(y_pred)
 model_loss = loss_fn(y_te, y_pred)
 ogb_score = evaluator.eval({'y_true': y_te, 'y_pred': y_pred})
 
-print('Done.\n'
-      'Test loss: {}\n'
-      'OGB ROC-AUC: {}'.format(model_loss, ogb_score))
+print('Done. Test loss: {:.4f}. ROC-AUC: {:.2f}'
+      .format(model_loss, ogb_score['rocauc']))

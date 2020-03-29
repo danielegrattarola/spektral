@@ -130,5 +130,5 @@ for b in batches_test:
 
     predictions = model([X_, A_, E_, I_], training=False)
     model_loss += loss_fn(y_, predictions)
-
-print('Done.\nTest loss: {}'.format(model_loss / batches_in_epoch))
+model_loss /= batches_in_epoch
+print('Done. Test loss: {}'.format(model_loss))

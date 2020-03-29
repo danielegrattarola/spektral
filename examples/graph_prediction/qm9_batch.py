@@ -84,4 +84,4 @@ print('Testing model')
 model_loss = model.evaluate([X_test, A_test, E_test],
                             y_test,
                             batch_size=batch_size)
-print('Done.\nTest loss: {}'.format(model_loss))
+print('Done. Test loss: {}'.format(model_loss))
