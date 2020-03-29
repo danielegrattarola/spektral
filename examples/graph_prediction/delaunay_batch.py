@@ -63,6 +63,4 @@ print('Evaluating model.')
 eval_results = model.evaluate([x_test, A_test],
                               y_test,
                               batch_size=batch_size)
-print('Done.\n'
-      'Test loss: {}\n'
-      'Test accuracy: {}'.format(*eval_results))
+print('Done. Test loss: {:.4f}. Test acc: {:.2f}'.format(*eval_results))

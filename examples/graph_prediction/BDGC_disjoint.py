@@ -165,4 +165,4 @@ for b in batches:
 print('Testing model')
 model.set_weights(best_weights)  # Load best model
 test_loss, test_acc = evaluate(A_test, X_test, y_test, [loss_fn, acc_fn], batch_size=batch_size)
-print('Done.\nTest loss: {:.2f}\nTest acc: {:.2f}'.format(test_loss, test_acc))
+print('Done. Test loss: {:.4f}. Test acc: {:.2f}'.format(test_loss, test_acc))
