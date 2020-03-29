@@ -38,8 +38,9 @@ nav:
     - Citation: datasets/citation.md
     - Delaunay: datasets/delaunay.md
     - GraphSage: datasets/graphsage.md
-    - QM9: datasets/qm9.md
     - MNIST: datasets/mnist.md
+    - OGB: datasets/ogb.md
+    - QM9: datasets/qm9.md
     - TU Dortmund: datasets/tud.md
 - Utils:
     - Data: utils/data.md

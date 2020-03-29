@@ -131,7 +131,7 @@ class MinCutPool(Layer):
         A_pooled = ops.matmul_AT_B_A(S, A)
         num = tf.linalg.trace(A_pooled)
         D = ops.degree_matrix(A)
-        den = tf.linalg.trace(ops.matmul_AT_B_A(S, D))
+        den = tf.linalg.trace(ops.matmul_AT_B_A(S, D)) + K.epsilon()
         cut_loss = -(num / den)
         if batch_mode:
             cut_loss = K.mean(cut_loss)

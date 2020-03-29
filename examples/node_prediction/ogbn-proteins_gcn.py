@@ -5,7 +5,6 @@ See https://github.com/snap-stanford/ogb/blob/master/examples/nodeproppred/prote
 for the reference implementation.
 """
 import numpy as np
-import scipy.sparse as sp
 from ogb.nodeproppred import NodePropPredDataset, Evaluator
 from tensorflow.keras.layers import Input
 from tensorflow.keras.losses import BinaryCrossentropy
@@ -13,6 +12,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from tqdm import tqdm
 
+from spektral.datasets import ogb
 from spektral.layers import GraphConv
 
 
@@ -33,10 +33,8 @@ dataset_name = 'ogbn-proteins'
 dataset = NodePropPredDataset(dataset_name)
 evaluator = Evaluator(dataset_name)
 graph, y = dataset[0]
-X = graph['node_feat']
-N = graph['num_nodes']
-row, col = graph['edge_index']
-A = sp.coo_matrix((np.ones_like(row), (row, col)), shape=(N, N))
+X, A, _ = ogb.graph_to_numpy(graph)
+N = A.shape[0]
 
 # Data splits
 idxs = dataset.get_idx_split()
