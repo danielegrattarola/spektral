@@ -18,7 +18,8 @@ def numpy_to_disjoint(X_list, A_list, E_list=None):
     X_out = np.vstack(X_list)
     A_list = [sp.coo_matrix(a) for a in A_list]
     if E_list is not None:
-        E_list = [e[a.row, a.col] for e, a in zip(E_list, A_list)]
+        if E_list[0].ndim == 3:
+            E_list = [e[a.row, a.col] for e, a in zip(E_list, A_list)]
         E_out = np.vstack(E_list)
     A_out = sp.block_diag(A_list)
     n_nodes = np.array([x.shape[0] for x in X_list])

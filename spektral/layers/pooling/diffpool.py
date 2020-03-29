@@ -64,7 +64,7 @@ class DiffPool(Layer):
     def __init__(self,
                  k,
                  channels=None,
-                 return_mask=True,
+                 return_mask=False,
                  activation=None,
                  kernel_initializer='glorot_uniform',
                  kernel_regularizer=None,

@@ -98,6 +98,15 @@ PAGES = [
         'classes': []
     },
     {
+        'page': 'datasets/ogb.md',
+        'functions': [
+            datasets.ogb.graph_to_numpy,
+            datasets.ogb.dataset_to_numpy
+        ],
+        'methods': [],
+        'classes': []
+    },
+    {
         'page': 'datasets/delaunay.md',
         'functions': [
             datasets.delaunay.generate_data

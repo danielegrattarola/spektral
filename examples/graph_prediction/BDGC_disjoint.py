@@ -3,7 +3,7 @@ This example shows how to perform graph classification with a synthetic
 benchmark dataset created by F. M. Bianchi (https://github.com/FilippoMB/Benchmark_dataset_for_graph_classification),
 using a GNN with convolutional and pooling blocks in disjoint mode.
 This is a more advanced example that also shows how to do validation and early
-stopping. For a beginner-level example, see regression_molecules_disjoint.py.
+stopping. For a beginner-level example, see qm9_disjoint.py.
 """
 
 import os
