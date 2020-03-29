@@ -26,13 +26,27 @@ jobs:
         pip install .
     - name: Just one epoch
       run: |
-        sed -i -e 's/epochs = /epochs = 1 #/g' examples/*.py
+        sed -i -e 's/epochs = /epochs = 1 #/g' examples/node_prediction/*.py
+        sed -i -e 's/epochs = /epochs = 1 #/g' examples/graph_prediction/*.py
+        sed -i -e 's/epochs = /epochs = 1 #/g' examples/other/*.py
     - name: Run all examples
       run: |
-        cd examples/
+        cd examples/node_prediction/
         for c_py in *.py; do
           echo "##### $c_py #####"
           python $c_py 
+        done
+        cd ..
+        cd graph_prediction/
+        for c_py in *.py; do
+          echo "##### $c_py #####"
+          python $c_py
+        done
+        cd ..
+        cd other/
+        for c_py in *.py; do
+          echo "##### $c_py #####"
+          python $c_py
         done
         cd ..
         
