@@ -2,8 +2,8 @@ import tensorflow as tf
 from tensorflow.keras import backend as K
 from tensorflow.python.ops.linalg.sparse import sparse as tfsp
 
-import spektral.layers.ops.ops as ops
 import spektral.layers.ops.modes as modes
+import spektral.layers.ops.ops as ops
 
 
 def filter_dot(fltr, features):
@@ -162,3 +162,19 @@ def matmul_A_B_AT(a, b):
     a_b_at = matmul_A_B(a, b_at)
 
     return a_b_at
+
+
+def matrix_power(a, k):
+    """
+    If a is a square matrix, computes a^k. If a is a rank 3 Tensor of square
+    matrices, computes the exponent of each inner matrix.
+    :param a: Tensor or SparseTensor with rank 2 or 3. The innermost two
+    dimensions must be the same.
+    :param k: int, the exponent to which to raise the matrices.
+    :return: Tensor or SparseTensor with same rank as the input.
+    """
+    x_k = a
+    for _ in range(k - 1):
+        x_k = matmul_A_B(a, x_k)
+
+    return x_k

@@ -1,8 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras import backend as K
 
-import spektral.layers.ops.matmul as mm
-
 
 def transpose(a, perm=None, name=None):
     """
@@ -36,22 +34,6 @@ def reshape(a, shape=None, name=None):
         reshape_op = tf.reshape
 
     return reshape_op(a, shape=shape, name=name)
-
-
-def matrix_power(a, k):
-    """
-    If a is a square matrix, computes a^k. If a is a rank 3 Tensor of square
-    matrices, computes the exponent of each inner matrix.
-    :param a: Tensor or SparseTensor with rank 2 or 3. The innermost two
-    dimensions must be the same.
-    :param k: int, the exponent to which to raise the matrices.
-    :return: Tensor or SparseTensor with same rank as the input.
-    """
-    x_k = a
-    for _ in range(k - 1):
-        x_k = mm.matmul_A_B(a, x_k)
-
-    return x_k
 
 
 def repeat(x, repeats):
