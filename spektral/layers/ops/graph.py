@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras import backend as K
 
-import spektral.layers.ops.ops as ops
+from . import ops as ops
 
 
 def normalize_A(A):

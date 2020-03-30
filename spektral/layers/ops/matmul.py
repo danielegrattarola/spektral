@@ -2,8 +2,8 @@ import tensorflow as tf
 from tensorflow.keras import backend as K
 from tensorflow.python.ops.linalg.sparse import sparse as tfsp
 
-import spektral.layers.ops.modes as modes
-import spektral.layers.ops.ops as ops
+from . import modes as modes
+from . import ops as ops
 
 
 def filter_dot(fltr, features):
