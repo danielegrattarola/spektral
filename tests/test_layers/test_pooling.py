@@ -12,22 +12,22 @@ TESTS = [
     {
         LAYER_K_: TopKPool,
         MODES_K_: [SINGLE, DISJOINT],
-        KWARGS_K_: {'ratio': 0.5, 'return_mask': True}
+        KWARGS_K_: {'ratio': 0.5, 'return_mask': True, 'sparse': True}
     },
     {
         LAYER_K_: SAGPool,
         MODES_K_: [SINGLE, DISJOINT],
-        KWARGS_K_: {'ratio': 0.5, 'return_mask': True}
+        KWARGS_K_: {'ratio': 0.5, 'return_mask': True, 'sparse': True}
     },
     {
         LAYER_K_: MinCutPool,
         MODES_K_: [SINGLE, BATCH],
-        KWARGS_K_: {'k': 5, 'return_mask': True}
+        KWARGS_K_: {'k': 5, 'return_mask': True, 'sparse': True}
     },
     {
         LAYER_K_: DiffPool,
         MODES_K_: [SINGLE, BATCH],
-        KWARGS_K_: {'k': 5, 'return_mask': True}
+        KWARGS_K_: {'k': 5, 'return_mask': True, 'sparse': True}
     },
 
 ]
@@ -54,8 +54,9 @@ def _check_number_of_nodes(N_pool_expected, N_pool_true):
 def _test_single_mode(layer, **kwargs):
     A = np.ones((N, N))
     X = np.random.normal(size=(N, F))
+    sparse = kwargs.pop('sparse', None) is not None
 
-    A_in = Input(shape=(None, ))
+    A_in = Input(shape=(None, ), sparse=sparse)
     X_in = Input(shape=(F,))
 
     layer_instance = layer(**kwargs)
@@ -117,8 +118,9 @@ def _test_disjoint_mode(layer, **kwargs):
     A = sp.block_diag([np.ones((N1, N1)), np.ones((N2, N2)), np.ones((N3, N3))]).todense()
     X = np.random.normal(size=(N, F))
     I = np.array([0] * N1 + [1] * N2 + [2] * N3).astype(int)
+    sparse = kwargs.pop('sparse', None) is not None
 
-    A_in = Input(shape=(None, ))
+    A_in = Input(shape=(None, ), sparse=sparse)
     X_in = Input(shape=(F,))
     I_in = Input(shape=(), dtype=tf.int32)
 
@@ -157,8 +159,12 @@ def test_layers():
         for mode in test[MODES_K_]:
             if mode == SINGLE:
                 _test_single_mode(test[LAYER_K_], **test[KWARGS_K_])
+                if test[KWARGS_K_].pop('sparse', None):
+                    _test_single_mode(test[LAYER_K_], **test[KWARGS_K_])
             elif mode == BATCH:
                 _test_batch_mode(test[LAYER_K_], **test[KWARGS_K_])
             elif mode == DISJOINT:
                 _test_disjoint_mode(test[LAYER_K_], **test[KWARGS_K_])
+                if test[KWARGS_K_].pop('sparse', None):
+                    _test_disjoint_mode(test[LAYER_K_], **test[KWARGS_K_])
         _test_get_config(test[LAYER_K_], **test[KWARGS_K_])

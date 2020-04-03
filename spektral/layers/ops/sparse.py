@@ -71,3 +71,10 @@ def sparse_add_self_loops(indices, N=None):
     dummy_values = tf.ones_like(indices[:, 0])
     indices, _ = gen_sparse_ops.sparse_reorder(indices, dummy_values, (N, N))
     return indices
+
+
+def sparse_softmax(x, indices, N=None):
+    N = tf.reduce_max(indices) + 1 if N is None else N
+    e_x = tf.exp(x - tf.gather(tf.math.unsorted_segment_max(x, indices, N), indices))
+    e_x /= tf.gather(tf.math.unsorted_segment_sum(e_x, indices, N) + 1e-9, indices)
+    return e_x
