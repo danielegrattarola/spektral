@@ -13,7 +13,6 @@ from tensorflow.keras.regularizers import l2
 
 from spektral.datasets import citation
 from spektral.layers import GraphAttention
-from spektral.utils.misc import add_eye
 
 # Load data
 dataset = 'cora'
@@ -32,12 +31,12 @@ epochs = 20000          # Number of training epochs
 es_patience = 100       # Patience for early stopping
 
 # Preprocessing operations
-A = add_eye(A).toarray()  # Add self-loops
+A = A.astype('f4')
 X = X.toarray()
 
 # Model definition
 X_in = Input(shape=(F, ))
-A_in = Input(shape=(N, ), sparse=False)
+A_in = Input(shape=(N, ), sparse=True)
 
 dropout_1 = Dropout(dropout)(X_in)
 graph_attention_1 = GraphAttention(channels,
