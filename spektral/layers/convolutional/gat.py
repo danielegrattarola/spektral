@@ -15,7 +15,7 @@ class GraphAttention(GraphConv):
 
     **Mode**: single, mixed, batch.
 
-    **This layer expects dense inputs.**
+    **This layer expects dense inputs when working in batch mode.**
 
     This layer computes a convolution similar to `layers.GraphConv`, but
     uses the attention mechanism to weight the adjacency matrix instead of
