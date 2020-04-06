@@ -129,11 +129,15 @@
                 </li>
                 <li class="">
                     
-    <a class="" href="../../datasets/qm9/">QM9</a>
+    <a class="" href="../../datasets/mnist/">MNIST</a>
                 </li>
                 <li class="">
                     
-    <a class="" href="../../datasets/mnist/">MNIST</a>
+    <a class="" href="../../datasets/ogb/">OGB</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../datasets/qm9/">QM9</a>
                 </li>
                 <li class="">
                     
@@ -220,7 +224,7 @@
               
                 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L82">[source]</a></span></p>
 <h3 id="innerproduct">InnerProduct</h3>
-<pre><code class="python">spektral.layers.InnerProduct(trainable_kernel=False, activation=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None)
+<pre><code class="python">spektral.layers.InnerProduct(trainable_kernel=False, activation=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
 </code></pre>
 
 <p>Computes the inner product between elements of a 2d Tensor:
@@ -253,16 +257,13 @@ product (e.g., <code>X @ W @ X.T</code>);</p>
 <p><code>kernel_regularizer</code>: regularization applied to the kernel;</p>
 </li>
 <li>
-<p><code>activity_regularizer</code>: regularization applied to the output;</p>
-</li>
-<li>
 <p><code>kernel_constraint</code>: constraint applied to the kernel;</p>
 </li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L157">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L159">[source]</a></span></p>
 <h3 id="minkowskiproduct">MinkowskiProduct</h3>
-<pre><code class="python">spektral.layers.MinkowskiProduct(input_dim_1=None, activation=None, activity_regularizer=None)
+<pre><code class="python">spektral.layers.MinkowskiProduct(input_dim_1=None, activation=None)
 </code></pre>
 
 <p>Computes the hyperbolic inner product between elements of a rank 2 Tensor:
@@ -292,9 +293,6 @@ output shape for your layer.</p>
 </li>
 <li>
 <p><code>activation</code>: activation function to use;</p>
-</li>
-<li>
-<p><code>activity_regularizer</code>: regularization applied to the output;</p>
 </li>
 </ul>
               

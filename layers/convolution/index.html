@@ -150,11 +150,15 @@
                 </li>
                 <li class="">
                     
-    <a class="" href="../../datasets/qm9/">QM9</a>
+    <a class="" href="../../datasets/mnist/">MNIST</a>
                 </li>
                 <li class="">
                     
-    <a class="" href="../../datasets/mnist/">MNIST</a>
+    <a class="" href="../../datasets/ogb/">OGB</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../datasets/qm9/">QM9</a>
                 </li>
                 <li class="">
                     
@@ -276,7 +280,7 @@
 <script type="math/tex"> F' </script>: dimension of the node attributes after a message-passing layer;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gcn.py#L8">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gcn.py#L9">[source]</a></span></p>
 <h3 id="graphconv">GraphConv</h3>
 <pre><code class="python">spektral.layers.GraphConv(channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -354,6 +358,7 @@ dimension changed to <code>channels</code>.</li>
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>channels</code>: number of output channels;</li>
+<li><code>K</code>: order of the Chebyshev polynomials;</li>
 <li><code>activation</code>: activation function to use;</li>
 <li><code>use_bias</code>: boolean, whether to add a bias to the linear transformation;</li>
 <li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
@@ -367,7 +372,7 @@ dimension changed to <code>channels</code>.</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/graphsage.py#L8">[source]</a></span></p>
 <h3 id="graphsageconv">GraphSageConv</h3>
-<pre><code class="python">spektral.layers.GraphSageConv(channels, aggregate_method='mean', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<pre><code class="python">spektral.layers.GraphSageConv(channels, aggregate_op='mean', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
 <p>A GraphSAGE layer as presented by
@@ -394,7 +399,7 @@ dimension changed to <code>channels</code>.</li>
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>channels</code>: number of output channels;</li>
-<li><code>aggregate_method</code>: str, aggregation method to use (<code>'sum'</code>, <code>'mean'</code>,
+<li><code>aggregate_op</code>: str, aggregation method to use (<code>'sum'</code>, <code>'mean'</code>,
 <code>'max'</code>, <code>'min'</code>, <code>'prod'</code>);</li>
 <li><code>activation</code>: activation function to use;</li>
 <li><code>use_bias</code>: whether to add a bias to the linear transformation;</li>
@@ -466,13 +471,13 @@ stack;</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/ecc.py#L10">[source]</a></span></p>
 <h3 id="edgeconditionedconv">EdgeConditionedConv</h3>
-<pre><code class="python">spektral.layers.EdgeConditionedConv(channels, kernel_network=None, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<pre><code class="python">spektral.layers.EdgeConditionedConv(channels, kernel_network=None, root=True, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
 <p>An edge-conditioned convolutional layer (ECC) as presented by
 <a href="https://arxiv.org/abs/1704.02901">Simonovsky &amp; Komodakis (2017)</a>.</p>
 <p><strong>Mode</strong>: single, batch.</p>
-<p><strong>This layer expects dense inputs.</strong></p>
+<p><strong>This layer expects dense inputs and self-loops when working in batch mode.</strong></p>
 <p>For each node <script type="math/tex"> i </script>, this layer computes:
 <script type="math/tex; mode=display">
 \Z_i =  \frac{1}{\mathcal{N}(i)} \sum\limits_{j \in \mathcal{N}(i)} \textrm{MLP}(\E_{ji}) \X_{j} + \b
@@ -507,15 +512,15 @@ output);</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gat.py#L9">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gat.py#L11">[source]</a></span></p>
 <h3 id="graphattention">GraphAttention</h3>
-<pre><code class="python">spektral.layers.GraphAttention(channels, attn_heads=1, concat_heads=True, dropout_rate=0.5, return_attn_coef=False, activation='relu', use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', attn_kernel_initializer='glorot_uniform', kernel_regularizer=None, bias_regularizer=None, attn_kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None, attn_kernel_constraint=None)
+<pre><code class="python">spektral.layers.GraphAttention(channels, attn_heads=1, concat_heads=True, dropout_rate=0.5, return_attn_coef=False, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', attn_kernel_initializer='glorot_uniform', kernel_regularizer=None, bias_regularizer=None, attn_kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None, attn_kernel_constraint=None)
 </code></pre>
 
 <p>A graph attention layer (GAT) as presented by
 <a href="https://arxiv.org/abs/1710.10903">Velickovic et al. (2017)</a>.</p>
 <p><strong>Mode</strong>: single, mixed, batch.</p>
-<p><strong>This layer expects dense inputs.</strong></p>
+<p><strong>This layer expects dense inputs when working in batch mode.</strong></p>
 <p>This layer computes a convolution similar to <code>layers.GraphConv</code>, but
 uses the attention mechanism to weight the adjacency matrix instead of
 using the normalized Laplacian:

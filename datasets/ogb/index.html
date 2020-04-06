@@ -8,7 +8,7 @@
   
   <meta name="author" content="Daniele Grattarola">
   <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>Delaunay - Spektral</title>
+  <title>OGB - Spektral</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
@@ -18,9 +18,9 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Delaunay";
-    var mkdocs_page_input_path = "datasets/delaunay.md";
-    var mkdocs_page_url = "/spektral/datasets/delaunay/";
+    var mkdocs_page_name = "OGB";
+    var mkdocs_page_input_path = "datasets/ogb.md";
+    var mkdocs_page_url = "/spektral/datasets/ogb/";
   </script>
   
   <script src="../../js/jquery-2.1.1.min.js" defer></script>
@@ -110,15 +110,9 @@
                     
     <a class="" href="../citation/">Citation</a>
                 </li>
-                <li class=" current">
+                <li class="">
                     
-    <a class="current" href="./">Delaunay</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l3"><a href="#generate_data">generate_data</a></li>
-    
-
-    </ul>
+    <a class="" href="../delaunay/">Delaunay</a>
                 </li>
                 <li class="">
                     
@@ -128,9 +122,18 @@
                     
     <a class="" href="../mnist/">MNIST</a>
                 </li>
-                <li class="">
+                <li class=" current">
                     
-    <a class="" href="../ogb/">OGB</a>
+    <a class="current" href="./">OGB</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#graph_to_numpy">graph_to_numpy</a></li>
+    
+
+    <li class="toctree-l3"><a href="#dataset_to_numpy">dataset_to_numpy</a></li>
+    
+
+    </ul>
                 </li>
                 <li class="">
                     
@@ -206,10 +209,10 @@
         
       
     
-    <li>Delaunay</li>
+    <li>OGB</li>
     <li class="wy-breadcrumbs-aside">
       
-        <a href="https://github.com/danielegrattarola/spektral/edit/master/docs/sources/datasets/delaunay.md"
+        <a href="https://github.com/danielegrattarola/spektral/edit/master/docs/sources/datasets/ogb.md"
           class="icon icon-github"> Edit on GitHub</a>
       
     </li>
@@ -219,60 +222,58 @@
           <div role="main">
             <div class="section">
               
-                <h3 id="generate_data">generate_data</h3>
-<pre><code class="python">spektral.datasets.delaunay.generate_data(classes=0, n_samples_in_class=1000, n_nodes=7, support_low=0.0, support_high=10.0, drift_amount=1.0, one_hot_labels=True, support=None, seed=None, return_type='numpy')
+                <h3 id="graph_to_numpy">graph_to_numpy</h3>
+<pre><code class="python">spektral.datasets.ogb.graph_to_numpy(graph, dtype=None)
 </code></pre>
 
-<p>Generates a dataset of Delaunay triangulations as described by
-<a href="https://arxiv.org/abs/1706.06941">Zambon et al. (2017)</a>.</p>
-<p>Node attributes are the 2D coordinates of the points.
-Two nodes are connected if they share an edge in the Delaunay triangulation.
-Labels represent the class of the graph (0 to 20, each class index i
-represent the "difficulty" of the classification problem 0 v. i. In other
-words, the higher the class index, the more similar the class is to class 0).</p>
+<p>Converts a graph in OGB's library-agnostic format to a representation in
+Numpy/Scipy. See the <a href="https://ogb.stanford.edu">Open Graph Benchmark's website</a>
+for more information.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
 <li>
-<p><code>classes</code>: indices of the classes to load (integer, or list of integers
-between 0 and 20);</p>
+<p><code>graph</code>: OGB library-agnostic graph;</p>
 </li>
 <li>
-<p><code>n_samples_in_class</code>: number of generated samples per class;</p>
-</li>
-<li>
-<p><code>n_nodes</code>: number of nodes in a graph;</p>
-</li>
-<li>
-<p><code>support_low</code>: lower bound of the uniform distribution from which the 
-support is generated;</p>
-</li>
-<li>
-<p><code>support_high</code>: upper bound of the uniform distribution from which the 
-support is generated;</p>
-</li>
-<li>
-<p><code>drift_amount</code>: coefficient to control the amount of change between 
-classes;</p>
-</li>
-<li>
-<p><code>one_hot_labels</code>: one-hot encode dataset labels;</p>
-</li>
-<li>
-<p><code>support</code>: custom support to use instead of generating it randomly; </p>
-</li>
-<li>
-<p><code>seed</code>: random numpy seed;</p>
-</li>
-<li>
-<p><code>return_type</code>: <code>'numpy'</code> or <code>'networkx'</code>, data format to return;</p>
+<p><code>dtype</code>: if set, all output arrays will be cast to this dtype.</p>
 </li>
 </ul>
 <p><strong>Return</strong>  </p>
 <ul>
-<li>if <code>return_type='numpy'</code>, the adjacency matrix, node features, and
-an array containing labels;</li>
-<li>if <code>return_type='networkx'</code>, a list of graphs in Networkx format, and an
-array containing labels;</li>
+<li>X: np.array of shape (N, F) with the node features;</li>
+<li>A: scipy.sparse adjacency matrix of shape (N, N) in COOrdinate format;</li>
+<li>E: if edge features are available, np.array of shape (n_edges, S),
+<code>None</code> otherwise.</li>
+</ul>
+<hr />
+<h3 id="dataset_to_numpy">dataset_to_numpy</h3>
+<pre><code class="python">spektral.datasets.ogb.dataset_to_numpy(dataset, indices=None, dtype=None)
+</code></pre>
+
+<p>Converts a dataset in OGB's library-agnostic version to lists of Numpy/Scipy
+arrays. See the <a href="https://ogb.stanford.edu">Open Graph Benchmark's website</a>
+for more information.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>dataset</code>: OGB library-agnostic dataset (e.g., GraphPropPredDataset);</p>
+</li>
+<li>
+<p><code>indices</code>: optional, a list of integer indices; if provided, only these
+graphs will be converted;</p>
+</li>
+<li>
+<p><code>dtype</code>: if set, the arrays in the returned lists will have this dtype.</p>
+</li>
+</ul>
+<p><strong>Return</strong>  </p>
+<ul>
+<li>X_list: list of np.arrays of (variable) shape (N, F) with node features;</li>
+<li>A_list: list of scipy.sparse adjacency matrices of (variable) shape
+(N, N);</li>
+<li>E_list: list of np.arrays of (variable) shape (n_nodes, S) with edge
+attributes. If edge attributes are not available, a list of None.</li>
+<li>y_list: np.array of shape (n_graphs, n_tasks) with the task labels;</li>
 </ul>
               
             </div>
@@ -281,10 +282,10 @@ array containing labels;</li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../graphsage/" class="btn btn-neutral float-right" title="GraphSage">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../qm9/" class="btn btn-neutral float-right" title="QM9">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../citation/" class="btn btn-neutral" title="Citation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../mnist/" class="btn btn-neutral" title="MNIST"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -312,10 +313,10 @@ array containing labels;</li>
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../citation/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../mnist/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../graphsage/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../qm9/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

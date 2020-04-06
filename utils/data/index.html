@@ -120,11 +120,15 @@
                 </li>
                 <li class="">
                     
-    <a class="" href="../../datasets/qm9/">QM9</a>
+    <a class="" href="../../datasets/mnist/">MNIST</a>
                 </li>
                 <li class="">
                     
-    <a class="" href="../../datasets/mnist/">MNIST</a>
+    <a class="" href="../../datasets/ogb/">OGB</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../../datasets/qm9/">QM9</a>
                 </li>
                 <li class="">
                     
@@ -142,18 +146,10 @@
     <a class="current" href="./">Data</a>
     <ul class="subnav">
             
-    <li class="toctree-l3"><a href="#batch-class">Batch class</a></li>
+    <li class="toctree-l3"><a href="#numpy_to_disjoint">numpy_to_disjoint</a></li>
     
 
-    <li class="toctree-l3"><a href="#batch-methods">Batch methods</a></li>
-    
-        <ul>
-        
-            <li><a class="toctree-l4" href="#get">get</a></li>
-        
-            <li><a class="toctree-l4" href="#batch_iterator">batch_iterator</a></li>
-        
-        </ul>
+    <li class="toctree-l3"><a href="#batch_iterator">batch_iterator</a></li>
     
 
     </ul>
@@ -226,83 +222,28 @@
           <div role="main">
             <div class="section">
               
-                <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/utils/data.py#L5">[source]</a></span></p>
-<h2 id="batch-class">Batch class</h2>
-<pre><code class="python">spektral.utils.Batch(A_list, X_list, E_list=None)
+                <h3 id="numpy_to_disjoint">numpy_to_disjoint</h3>
+<pre><code class="python">spektral.utils.numpy_to_disjoint(X_list, A_list, E_list=None)
 </code></pre>
 
-<p>Converts a batch of graphs stored in lists to the
-<a href="https://danielegrattarola.github.io/spektral/data/">disjoint format</a>.</p>
-<p><strong>Input</strong></p>
-<ul>
-<li><code>A_list</code>, list of adjacency matrices of shape <code>(N, N)</code>;</li>
-<li><code>X_list</code>, list of node attributes matrices of shape <code>(N, F)</code>;</li>
-</ul>
-<p><strong> Properties </strong></p>
-<ul>
-<li><code>A</code>: returns the block diagonal adjacency matrix;</li>
-<li><code>X</code>: returns the stacked node attributes;</li>
-<li><code>I</code>: returns the graph indices mapping each node to a graph (numbering is
-relative to the batch).</li>
-</ul>
-<p><strong> Usage </strong></p>
-<pre><code class="py">In [1]: from spektral.utils.data import Batch
-Using TensorFlow backend.
-
-In [2]: A_list = [np.ones((2, 2))] * 3
-
-In [3]: X_list = [np.random.normal(size=(2, 4))] * 3
-
-In [4]: b = Batch(A_list, X_list)
-
-In [5]: b.A.todense()
-Out[5]:
-matrix([[1., 1., 0., 0., 0., 0.],
-        [1., 1., 0., 0., 0., 0.],
-        [0., 0., 1., 1., 0., 0.],
-        [0., 0., 1., 1., 0., 0.],
-        [0., 0., 0., 0., 1., 1.],
-        [0., 0., 0., 0., 1., 1.]])
-
-In [6]: b.X
-Out[6]:
-array([[-0.85196709, -1.66795384, -1.14046868,  0.4735151 ],
-       [ 0.14221143, -0.76473164, -1.05635638,  1.45961459],
-       [-0.85196709, -1.66795384, -1.14046868,  0.4735151 ],
-       [ 0.14221143, -0.76473164, -1.05635638,  1.45961459],
-       [-0.85196709, -1.66795384, -1.14046868,  0.4735151 ],
-       [ 0.14221143, -0.76473164, -1.05635638,  1.45961459]])
-
-In [7]: b.I
-Out[7]: array([0, 0, 1, 1, 2, 2])
-
-In [8]: b.get('AXI')
-Out[8]:
-(&lt;6x6 sparse matrix of type '&lt;class 'numpy.float64'&gt;'
-  with 12 stored elements in COOrdinate format&gt;,
- array([[-0.85196709, -1.66795384, -1.14046868,  0.4735151 ],
-        [ 0.14221143, -0.76473164, -1.05635638,  1.45961459],
-        [-0.85196709, -1.66795384, -1.14046868,  0.4735151 ],
-        [ 0.14221143, -0.76473164, -1.05635638,  1.45961459],
-        [-0.85196709, -1.66795384, -1.14046868,  0.4735151 ],
-        [ 0.14221143, -0.76473164, -1.05635638,  1.45961459]]),
- array([0, 0, 1, 1, 2, 2]))
-</code></pre>
-
-<hr />
-<h2 id="batch-methods">Batch methods</h2>
-<h3 id="get">get</h3>
-<pre><code class="python">spektral.utils.get(attr)
-</code></pre>
-
-<p>Splits a strings and returns the associated matrices in order, e.g.,
-<code>data = b.get('AXI')</code> is equivalent to <code>data = b.A, b.X, b.I</code>.</p>
+<p>Converts a batch of graphs stored in lists (X, A, and optionally E) to the
+<a href="https://danielegrattarola.github.io/spektral/data/">disjoint mode</a>.
+Note that the number of nodes N can vary between graphs, although each entry
+i of each list should be associated to the same graph, i.e.,
+<code>X_list[i].shape[0] == A_list[i].shape[0] == E_list[i].shape[0]</code>.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
-<li><code>attr</code>: a string (possible literals can be seen with <code>b.attr_map.keys()</code>.</li>
+<li>
+<p><code>X_list</code>: a list of np.arrays of shape (N, F);</p>
+</li>
+<li>
+<p><code>A_list</code>: a list of np.arrays or sparse matrices of shape (N, N);</p>
+</li>
+<li>
+<p><code>E_list</code>: a list of np.arrays of shape (N, N, S);</p>
+</li>
 </ul>
-<p><strong>Return</strong><br />
- A tuple with the requested matrices.</p>
+<p><strong>Return</strong>  </p>
 <hr />
 <h3 id="batch_iterator">batch_iterator</h3>
 <pre><code class="python">spektral.utils.batch_iterator(data, batch_size=32, epochs=1, shuffle=True)
