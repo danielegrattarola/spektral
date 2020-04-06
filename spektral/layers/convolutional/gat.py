@@ -198,10 +198,6 @@ class GraphAttention(GraphConv):
         attn_kernel_self = ops.transpose(self.attn_kernel_self, (2, 1, 0))
         attn_kernel_neighs = ops.transpose(self.attn_kernel_neighs, (2, 1, 0))
 
-        # Enforce sparse representation
-        if not K.is_sparse(A):
-            A = ops.dense_to_sparse(A)
-
         # Prepare message-passing
         indices = A.indices
         N = tf.shape(X, out_type=indices.dtype)[0]
@@ -220,7 +216,7 @@ class GraphAttention(GraphConv):
 
         attn_coef = attn_for_self + attn_for_neighs
         attn_coef = tf.nn.leaky_relu(attn_coef, alpha=0.2)
-        attn_coef = ops.sparse_softmax(attn_coef, targets, N)
+        attn_coef = ops.unsorted_segment_softmax(attn_coef, targets, N)
         attn_coef = self.dropout(attn_coef)
         attn_coef = attn_coef[..., None]
 
