@@ -137,6 +137,8 @@ class DiffPool(Layer):
 
         # Link prediction loss
         S_gram = ops.matmul_A_BT(S, S)
+        if mode == modes.MIXED:
+            A = tf.sparse.to_dense(A)[None, ...]
         if K.is_sparse(A):
             LP_loss = tf.sparse.add(A, -S_gram)  # A/tf.norm(A) - S_gram/tf.norm(S_gram)
         else:
