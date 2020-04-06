@@ -62,6 +62,14 @@ def dense_to_sparse(x):
 
 
 def sparse_add_self_loops(indices, N=None):
+    """
+    Given the indices of a square SparseTensor, adds the diagonal entries (i, i)
+    and returns the reordered indices.
+    :param indices: Tensor of rank 2, the indices to a SparseTensor.
+    :param N: the size of the N x N SparseTensor indexed by the indices. If `None`,
+    N is calculated as the maximum entry in the indices plus 1.
+    :return: Tensor of rank 2, the indices to a SparseTensor.
+    """
     N = tf.reduce_max(indices) + 1 if N is None else N
     row, col = indices[..., 0], indices[..., 1]
     mask = tf.ensure_shape(row != col, row.shape)
@@ -73,7 +81,18 @@ def sparse_add_self_loops(indices, N=None):
     return indices
 
 
-def sparse_softmax(x, indices, N=None):
+def unsorted_segment_softmax(x, indices, N=None):
+    """
+    Applies softmax along the segments of a Tensor. This operator is similar
+    to the tf.math.segment_* operators, which apply a certain reduction to the
+    segments. In this case, the output tensor is not reduced and maintains the
+    same shape as the input.
+    :param x: a Tensor. The softmax is applied along the first dimension.
+    :param indices: a Tensor, indices to the segments.
+    :param N: the number of unique segments in the indices. If `None`, N is
+    calculated as the maximum entry in the indices plus 1.
+    :return: a Tensor with the same shape as the input.
+    """
     N = tf.reduce_max(indices) + 1 if N is None else N
     e_x = tf.exp(x - tf.gather(tf.math.unsorted_segment_max(x, indices, N), indices))
     e_x /= tf.gather(tf.math.unsorted_segment_sum(e_x, indices, N) + 1e-9, indices)
