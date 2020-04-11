@@ -145,7 +145,7 @@ class MinCutPool(Layer):
             axis=(-1, -2)
         )
         if batch_mode:
-            ortho_loss = K.mean(cut_loss)
+            ortho_loss = K.mean(ortho_loss)
         self.add_loss(ortho_loss)
 
         # Pooling
