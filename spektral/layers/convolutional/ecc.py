@@ -14,7 +14,10 @@ class EdgeConditionedConv(GraphConv):
 
     **Mode**: single, batch.
 
-    **This layer expects dense inputs and self-loops when working in batch mode.**
+    **Notes**:
+        - This layer expects dense inputs and self-loops when working in batch mode.
+        - In single mode, if the adjacency matrix is dense it will be converted
+        to a SparseTensor automatically (which is an expensive operation).
 
     For each node \( i \), this layer computes:
     $$
@@ -27,7 +30,8 @@ class EdgeConditionedConv(GraphConv):
 
     - Node features of shape `([batch], N, F)`;
     - Binary adjacency matrices with self-loops, of shape `([batch], N, N)`;
-    - Edge features of shape `([batch], N, N, S)`;
+    - Edge features. In single mode, shape `(num_edges, S)`; in batch mode, shape
+    `(batch, N, N, S)`.
 
     **Output**
 
@@ -37,9 +41,8 @@ class EdgeConditionedConv(GraphConv):
     **Arguments**
 
     - `channels`: integer, number of output channels;
-    - `kernel_network`: a list of integers describing the hidden structure of
-    the kernel-generating network (i.e., the ReLU layers before the linear
-    output);
+    - `kernel_network`: a list of integers representing the hidden neurons of
+    the kernel-generating network;
     - `activation`: activation function to use;
     - `use_bias`: boolean, whether to add a bias to the linear transformation;
     - `kernel_initializer`: initializer for the kernel matrix;
@@ -120,7 +123,7 @@ class EdgeConditionedConv(GraphConv):
     def call(self, inputs):
         X = inputs[0]  # (batch_size, N, F)
         A = inputs[1]  # (batch_size, N, N)
-        E = inputs[2]  # (batch_size, N, N, S)
+        E = inputs[2]  # (n_edges, S) or (batch_size, N, N, S)
 
         mode = ops.autodetect_mode(A, X)
         if mode == modes.SINGLE:
