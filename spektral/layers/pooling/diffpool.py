@@ -12,7 +12,7 @@ class DiffPool(Layer):
     A DiffPool layer as presented by
     [Ying et al.](https://arxiv.org/abs/1806.08804).
 
-    **Mode**: single, batch.
+    **Mode**: batch.
 
     This layer computes a soft clustering \(\S\) of the input graphs using a GNN,
     and reduces graphs as follows:
