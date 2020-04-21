@@ -6,7 +6,8 @@ paper), using faster training and test functions.
 
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Dropout
-from tensorflow.keras.metrics import categorical_accuracy
+from tensorflow.keras.losses import CategoricalCrossentropy
+from tensorflow.keras.metrics import CategoricalAccuracy
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
@@ -47,8 +48,8 @@ X_2 = GraphAttention(y.shape[1],
 # Build model
 model = Model(inputs=[X_in, fltr_in], outputs=X_2)
 optimizer = Adam(lr=5e-3)
-model.compile(optimizer=optimizer, loss='categorical_crossentropy')
-loss_fn = model.loss_functions[0]
+loss_fn = CategoricalCrossentropy()
+acc_fn = CategoricalAccuracy()
 
 
 # Training step
@@ -64,7 +65,7 @@ def train():
 
 
 @tf.function
-def test():
+def evaluate():
     predictions = model([X, fltr], training=False)
     losses = []
     accuracies = []
@@ -72,7 +73,7 @@ def test():
         loss = loss_fn(y[mask], predictions[mask])
         loss += sum(model.losses)
         losses.append(loss)
-        acc = tf.reduce_mean(categorical_accuracy(y[mask], predictions[mask]))
+        acc = acc_fn(y[mask], predictions[mask])
         accuracies.append(acc)
     return losses, accuracies
 
@@ -83,7 +84,7 @@ current_patience = patience = 100
 tic()
 for epoch in range(1, 99999):
     train()
-    l, a = test()
+    l, a = evaluate()
     print('Loss tr: {:.4f}, Acc tr: {:.4f}, '
           'Loss va: {:.4f}, Acc va: {:.4f}, '
           'Loss te: {:.4f}, Acc te: {:.4f}'

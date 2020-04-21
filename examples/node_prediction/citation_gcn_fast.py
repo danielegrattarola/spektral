@@ -7,6 +7,7 @@ In total, this script has 34 SLOC.
 """
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Dropout
+from tensorflow.keras.losses import CategoricalCrossentropy
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
@@ -31,8 +32,7 @@ X_2 = GraphConv(y.shape[1], 'softmax', True)([X_1, fltr_in])
 # Build model
 model = Model(inputs=[X_in, fltr_in], outputs=X_2)
 optimizer = Adam(lr=1e-2)
-model.compile(optimizer=optimizer, loss='categorical_crossentropy')
-loss_fn = model.loss_functions[0]
+loss_fn = CategoricalCrossentropy()
 
 
 # Training step
