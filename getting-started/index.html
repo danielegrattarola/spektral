@@ -244,11 +244,9 @@ In this type of graph, each node represents a document and is associated to a bi
 If a document cites another, then there exist an undirected edge between the two corresponding nodes. 
 Finally, each node has a class label that we want to predict. </p>
 <p>This is a <strong>transductive</strong> learning setting, where we observe all of the nodes and edges at training time, but only a fraction of the labels. The goal is to learn to predict the missing labels.</p>
-<p>The <code>datasets.citation</code> module of Spektral lets you to download and load three popular citation datasets (Cora, Citeseer and Pubmed) in one line of code. For instance, loading the Cora dataset is as simple as: </p>
+<p>The <code>datasets.citation</code> module of Spektral lets you download and load three popular citation datasets (Cora, Citeseer and Pubmed) in one line of code. For instance, loading the Cora dataset is as simple as: </p>
 <pre><code class="python">from spektral.datasets import citation
-data = citation.load_data('cora')
-A, X, y, train_mask, val_mask, test_mask = data
-X = X.toarray()
+A, X, y, train_mask, val_mask, test_mask = citation.load_data('cora')
 
 N = A.shape[0]
 F = X.shape[-1]
@@ -263,30 +261,29 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Dropout
 </code></pre>
 
-<p>Building the model is no different than building any Keras model, but we will need to provide multiple inputs to the <code>GraphConv</code> layers (namely <code>A</code> and <code>X</code>):</p>
-<pre><code class="python"># Model definition
-X_in = Input(shape=(F, ))  # Input layer for X
-A_in = Input((N, ), sparse=True)  # Input layer for A
+<p>Building the model is no different than building any Keras model, but we will need to provide multiple inputs (<code>X</code> and <code>A</code>) to the <code>GraphConv</code> layers:</p>
+<pre><code class="python">X_in = Input(shape=(F, ))
+A_in = Input((N, ), sparse=True)
 
-graph_conv_1 = GraphConv(16, activation='relu')([X_in, A_in])
-dropout = Dropout(0.5)(graph_conv_1)
-graph_conv_2 = GraphConv(n_classes, activation='softmax')([dropout, A_in])
+X_1 = GraphConv(16, 'relu')([X_in, A_in])
+X_1 = Dropout(0.5)(X_1)
+X_2 = GraphConv(n_classes, 'softmax')([X_1, A_in])
 
-# Build model
-model = Model(inputs=[X_in, A_in], outputs=graph_conv_2)
+model = Model(inputs=[X_in, A_in], outputs=X_2)
 </code></pre>
 
 <p>And that's it. We just built our first GNN in Spektral and Keras. </p>
 <p>Note how we used the familiar API of Keras to create the GCN layers, as well as the standard <code>Dropout</code> layer to regularize our model. All features of Keras are also supported by Spektral (including initializers, regularizers, etc.).</p>
-<p>An important thing to notice at this point is how we defined the <code>Input</code> layers of our model. Because the "elements" of our dataset are the node themselves, we are telling Keras to consider each node as a separate sample, so that the "batch" axis is implicitly defined as <code>None</code>.<br />
-In other words, a sample of the node attributes will be a vector of shape <code>(F, )</code> and a sample of the adjacency matrix will be one of its rows of shape <code>(N, )</code>. </p>
+<p>An important thing to notice at this point is how we defined the <code>Input</code> layers of our model. 
+Because the "elements" of our dataset are the node themselves, we are telling Keras to consider each node as a separate sample so that the <code>batch</code> axis is implicitly defined as <code>None</code>.<br />
+In other words, a sample of the node attributes will be a vector of shape <code>(F, )</code> and a sample of the adjacency matrix will be one row of shape <code>(N, )</code>. </p>
 <p>Keep this detail in mind for later. </p>
 <h2 id="training-the-gnn">Training the GNN</h2>
-<p>Before training the model, we have to pre-process the adjacency matrix to scale the weights of a node's connections according to its degree. In other words, the more a node is connected to others, the less relative importance those connections have. 
-Most GNN layers available in Spektral require their own type of pre-processing in order to work correctly. You can find all necessary tools for pre-processing <code>A</code> in <code>spektral.utils</code>.</p>
+<p>When training GCN, we have to pre-process the adjacency matrix to 1) add self-loops and 2) scale the weights of a node's connections according to its degree.</p>
+<p>Some layers in Spektral require a different type of pre-processing in order to work correctly, and some work out-of-the-box on the binary <code>A</code>. 
+The pre-processing required by each layer is available as a static class method <code>preprocess()</code>.</p>
 <p>In our example, the pre-processing required by GCN is: </p>
-<pre><code class="python">from spektral import utils
-A = utils.localpooling_filter(A).astype('f4')
+<pre><code class="python">A = GraphConv.preprocess(A).astype('f4')
 </code></pre>
 
 <p>And that's all! 
@@ -298,27 +295,29 @@ model.summary()
 </code></pre>
 
 <p>Note that we used the <code>weighted_metrics</code> argument instead of the usual <code>metrics</code>. This is due to the particular semi-supervised problem that we are dealing with, and has to do with the boolean masks that we loaded earlier (more on that later).</p>
-<p>We can now train the model using the native <code>fit()</code> method of Keras, no modifications needed:</p>
-<pre><code class="python"># Train model
+<p>We can now train the model using the native <code>fit()</code> method of Keras:</p>
+<pre><code class="python"># Prepare data
+X = X.toarray()
+A = A.astype('f4')
 validation_data = ([X, A], y, val_mask)
-model.fit([X, A],
-          y,
+
+# Train model
+model.fit([X, A], y,
           sample_weight=train_mask,
-          epochs=100,
-          batch_size=N,
           validation_data=validation_data,
-          shuffle=False)  # Shuffling data means shuffling the whole graph
+          batch_size=N,
+          shuffle=False)
 </code></pre>
 
 <p>There are a couple of things to note here.</p>
-<p>We have set <code>batch_size=N</code> and <code>shuffle=False</code>. This is because, since we are considering our nodes as samples in a dataset, the default behaviour of Keras will be to split our graph into batches of 32, and shuffle the batches at each epoch. 
-However, shuffling the adjacency matrix along one axis and not the other means that row <code>i</code> will represent a different node than column <code>i</code>. 
-At the same time, if we split the graph in batches, we can easily end up in a situation where we need to use a node attribute that is not part of the batch. The only solution is to take all the node features at the same time, hence <code>batch_size=N</code>.</p>
+<p>We have set <code>batch_size=N</code> and <code>shuffle=False</code>. This is because the default behaviour of Keras is to split the data into batches of 32 and shuffle the samples at each epoch. 
+However, shuffling the adjacency matrix along one axis and not the other means that row <code>i</code> will represent a different node than column <code>i</code>.<br />
+At the same time, if we split the graph into batches we may end up in a situation where we need to use a node attribute that is not part of the batch. The only solution is to take all the node features at the same time, hence <code>batch_size=N</code>.</p>
 <p>Finally, we used <code>train_mask</code> and <code>val_mask</code> as <code>sample_weight</code>. <br />
 This means that, during training, the training nodes will have a weight of 1 and the validation nodes will have a weight of 0. Then, in validation, we will set the training nodes to have a weight of 0 and the validation nodes to have a weight of 1. </p>
 <p>This is all that we need to do to differentiate between training and test data. See how the model takes as input the full <code>X</code>, <code>A</code>, and <code>y</code> for both training and valdation? The only thing that changes is the mask. This is also why we used the <code>weighted_metrics</code> keyword when compiling the model, so that our accuracy is calculated only on the correct nodes at each phase. </p>
 <h2 id="evaluating-the-model">Evaluating the model</h2>
-<p>Once again, evaluation is done in vanilla Keras. We just have to keep in mind the same considerations about batching that we did for training (note that in <code>model.evaluate()</code>, by default, <code>shuffle=False</code>): </p>
+<p>Once again, evaluation is done in vanilla Keras. We just have to keep in mind the same considerations about batching that we did for training (note that in <code>model.evaluate()</code> by default <code>shuffle=False</code>): </p>
 <pre><code class="python"># Evaluate model
 eval_results = model.evaluate([X, A],
                               y,
@@ -329,12 +328,11 @@ print('Done.\n'
       'Test accuracy: {}'.format(*eval_results))
 </code></pre>
 
-<p>Done! Our model has been defined, trained, and evaluated.</p>
 <h2 id="go-create">Go create!</h2>
 <p>You are now ready to use Spektral to create your own models. </p>
-<p>If you want to build a GNN for a specific task, chances are that the things you need to define the model and pre-process the data are already part of Spektral. Check the <a href="https://github.com/danielegrattarola/spektral/tree/master/examples">examples</a> for some ideas and practical tips.</p>
-<p>Remember to read the <a href="https://danielegrattarola.github.io/spektral/data/">data representation section</a> to learn about how GNNs can be used to solve different machine learning problems on graphs. </p>
-<p>Make sure to check the documentation, and leave a comment <a href="https://github.com/danielegrattarola/spektral">on Github</a> if you have a feature that you want to see implemented. </p>
+<p>If you want to build a GNN for a specific task, chances are that everything you need is already part of Spektral. Check the <a href="https://github.com/danielegrattarola/spektral/tree/master/examples">examples</a> for some ideas and practical tips.</p>
+<p>Remember to read the <a href="https://danielegrattarola.github.io/spektral/data/">data representation section</a> to learn different ways of representing a graph or batches of different graphs. </p>
+<p>Make sure to check the documentation, and get in touch <a href="https://github.com/danielegrattarola/spektral">on Github</a> if you have a feature that you want to see implemented. </p>
               
             </div>
           </div>
