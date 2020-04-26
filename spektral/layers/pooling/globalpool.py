@@ -41,7 +41,8 @@ class GlobalPooling(Layer):
         elif self.data_mode == 'batch':
             return input_shape[:-2] + input_shape[-1:]
         else:
-            return input_shape[0]  # Input shape is a list of shapes for X and I
+            # Input shape is a list of shapes for X and I
+            return input_shape[0]
 
     def get_config(self):
         return super().get_config()
@@ -215,7 +216,8 @@ class GlobalAttentionPool(GlobalPooling):
         attn = self.attention_layer(X)
         masked_inputs = inputs_linear * attn
         if self.data_mode in {'single', 'batch'}:
-            output = K.sum(masked_inputs, axis=-2, keepdims=self.data_mode == 'single')
+            output = K.sum(masked_inputs, axis=-2,
+                           keepdims=self.data_mode == 'single')
         else:
             output = tf.math.segment_sum(masked_inputs, I)
 
@@ -285,8 +287,10 @@ class GlobalAttnSumPool(GlobalPooling):
                  attn_kernel_constraint=None,
                  **kwargs):
         super().__init__(**kwargs)
-        self.attn_kernel_initializer = initializers.get(attn_kernel_initializer)
-        self.attn_kernel_regularizer = regularizers.get(attn_kernel_regularizer)
+        self.attn_kernel_initializer = initializers.get(
+            attn_kernel_initializer)
+        self.attn_kernel_regularizer = regularizers.get(
+            attn_kernel_regularizer)
         self.attn_kernel_constraint = constraints.get(attn_kernel_constraint)
 
     def build(self, input_shape):
@@ -333,6 +337,113 @@ class GlobalAttnSumPool(GlobalPooling):
             'attn_kernel_initializer': self.attn_kernel_initializer,
             'attn_kernel_regularizer': self.attn_kernel_regularizer,
             'attn_kernel_constraint': self.attn_kernel_constraint,
+        }
+        base_config = super().get_config()
+        return dict(list(base_config.items()) + list(config.items()))
+
+
+class SortPool(Layer):
+    r"""
+    SortPool layer pooling the top \(k\) most relevant nodes as described by
+    (Zhang et al.)[https://www.cse.wustl.edu/~muhan/papers/AAAI_2018_DGCNN.pdf]
+
+    This layers takes a graph signal \(\X\) and sorts the rows by the elements
+    of its last column. It then keeps the top \(k\) rows.
+    Should \(\X\) have less than \(k\) rows, it sorts and then adds rows full
+    of zeros until \(\X\) has \(k\) rows.
+
+    **Mode**: single, batch.
+
+    **Input**
+
+    - Node features of shape `([batch], N, F)`;
+
+    **Output**
+
+    - Pooled node features of shape `([batch], k, F)`;
+
+    **Arguments**
+
+    - `k`: number of nodes to keep;
+
+    """
+
+    def __init__(self, k: int):
+        super(SortPool, self).__init__()
+
+        # Number of nodes to be kept (k in paper)
+        k = int(k)
+        if k <= 0:
+            raise ValueError("K must be a positive integer")
+        self.k = k
+
+    def build(self, input_shape):
+
+        # check what mode we are in
+        if isinstance(input_shape, list) and len(input_shape) == 2:
+            raise NotImplementedError("Disjoint mode not supported.")
+        else:
+            if len(input_shape) == 2:
+                self.data_mode = 'single'
+            else:
+                self.data_mode = 'batch'
+
+    def call(self, inputs):
+
+        # Takes the (ideally concatenated & convolved) graph signal X
+        X = inputs
+
+        # turn to trivial batch if in "single" mode
+        # (N, F) -> (1, N, F)
+        if self.data_mode == 'single':
+            X = tf.expand_dims(X, 0)
+
+        # get number of nodes
+        n = tf.shape(X)[-2]
+
+        # Sort last column and return permutation of indices
+        sort_perm = tf.argsort(X[..., -1], direction='DESCENDING')
+
+        # Gather rows according to the sorting permutation
+        # thus sorting the rows according to the last column
+        X_sorted = tf.gather(X, sort_perm, axis=-2, batch_dims=1)
+
+        # cast X_sorted into float32
+        X_sorted = tf.cast(X_sorted, tf.float32)
+
+        def truncate():
+            """If we have more nodes than we want to keep,
+            then we simply truncate.
+            """
+
+            # trim number of nodes to k if k < n
+            X_out = X_sorted[..., : self.k, :]
+
+            return X_out
+
+        def pad():
+            """If we have less nodes than we would like to keep,
+            then we simply pad with empty nodes.
+            """
+
+            padding = [[0, 0], [0, self.k - n], [0, 0]]
+
+            # padded output
+            X_out = tf.pad(X_sorted, padding)
+
+            return X_out
+
+        X_out = tf.cond(tf.less_equal(self.k, n), truncate, pad)
+
+        # undo trivial batching if in "single" mode
+        if self.data_mode == 'single':
+            X_out = tf.squeeze(X_out, [0])
+
+        return X_out
+
+    def get_config(self):
+        config = {
+            'k': self.k
         }
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))

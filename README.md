@@ -25,6 +25,7 @@ You can also find [pooling layers](https://danielegrattarola.github.io/spektral/
 - [Self-Attention Graph (SAG) pooling](https://arxiv.org/abs/1904.08082)
 - Global sum, average, and max pooling
 - [Global gated attention pooling](https://arxiv.org/abs/1511.05493)
+- [SortPool](https://www.cse.wustl.edu/~muhan/papers/AAAI_2018_DGCNN.pdf)
 
 Spektral also includes lots of utilities for your graph deep learning projects.  
 
