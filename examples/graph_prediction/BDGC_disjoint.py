@@ -71,7 +71,6 @@ A_test = [normalized_adjacency(a) for a in A_test]
 # Parameters
 F = X_train[0].shape[-1]  # Dimension of node features
 n_out = y_train[0].shape[-1]  # Dimension of the target
-average_N = np.ceil(np.mean([a.shape[-1] for a in A_train]))  # Average number of nodes in dataset
 
 ################################################################################
 # BUILD MODEL

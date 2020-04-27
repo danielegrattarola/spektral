@@ -60,7 +60,8 @@ PAGES = [
             layers.GlobalAvgPool,
             layers.GlobalMaxPool,
             layers.GlobalAttentionPool,
-            layers.GlobalAttnSumPool
+            layers.GlobalAttnSumPool,
+            layers.SortPool
         ]
     },
     {
