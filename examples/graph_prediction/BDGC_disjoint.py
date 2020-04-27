@@ -11,9 +11,9 @@ import os
 import numpy as np
 import requests
 import tensorflow as tf
-from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Input, Dense
-from tensorflow.keras.metrics import categorical_accuracy
+from tensorflow.keras.losses import CategoricalCrossentropy
+from tensorflow.keras.metrics import CategoricalAccuracy
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 
@@ -91,10 +91,8 @@ output = Dense(n_out, activation='softmax')(X_3)
 # Build model
 model = Model(inputs=[X_in, A_in, I_in], outputs=output)
 opt = Adam(lr=learning_rate)
-model.compile(optimizer=opt, loss='categorical_crossentropy')
-loss_fn = model.loss_functions[0]
-acc_fn = lambda x, y: K.mean(categorical_accuracy(x, y))
-# model.summary()
+loss_fn = CategoricalCrossentropy()
+acc_fn = CategoricalAccuracy()
 
 
 @tf.function(
@@ -107,15 +105,18 @@ def train_step(X_, A_, I_, y_):
     with tf.GradientTape() as tape:
         predictions = model([X_, A_, I_], training=True)
         loss = loss_fn(y_, predictions)
+        loss += sum(model.losses)
         acc = acc_fn(y_, predictions)
     gradients = tape.gradient(loss, model.trainable_variables)
     opt.apply_gradients(zip(gradients, model.trainable_variables))
     return loss, acc
 
+
 ################################################################################
 # FIT MODEL
 ################################################################################
 current_batch = 0
+epoch = 0
 model_loss = 0
 model_acc = 0
 best_val_loss = np.inf
@@ -127,6 +128,8 @@ print('Fitting model')
 batches = batch_iterator([X_train, A_train, y_train],
                          batch_size=batch_size, epochs=epochs)
 for b in batches:
+    current_batch += 1
+
     X_, A_, I_ = numpy_to_disjoint(*b[:-1])
     A_ = ops.sp_matrix_to_sp_tensor(A_)
     y_ = b[-1]
@@ -134,15 +137,15 @@ for b in batches:
 
     model_loss += outs[0]
     model_acc += outs[1]
-    current_batch += 1
     if current_batch == batches_in_epoch:
+        epoch += 1
         model_loss /= batches_in_epoch
         model_acc /= batches_in_epoch
 
         # Compute validation loss and accuracy
         val_loss, val_acc = evaluate(A_val, X_val, y_val, [loss_fn, acc_fn], batch_size=batch_size)
         print('Ep. {} - Loss: {:.2f} - Acc: {:.2f} - Val loss: {:.2f} - Val acc: {:.2f}'
-              .format(current_batch // batches_in_epoch, model_loss, model_acc, val_loss, val_acc))
+              .format(epoch, model_loss, model_acc, val_loss, val_acc))
 
         # Check if loss improved for early stopping
         if val_loss < best_val_loss:

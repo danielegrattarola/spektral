@@ -10,6 +10,7 @@ import numpy as np
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.layers import Input, Dense
+from tensorflow.keras.losses import MeanSquaredError
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 
@@ -72,9 +73,7 @@ output = Dense(n_out)(X_3)
 # Build model
 model = Model(inputs=[X_in, A_in, E_in, I_in], outputs=output)
 opt = Adam(lr=learning_rate)
-model.compile(optimizer=opt, loss='mse')
-loss_fn = model.loss_functions[0]
-model.summary()
+loss_fn = MeanSquaredError()
 
 
 @tf.function(
@@ -88,6 +87,7 @@ def train_step(X_, A_, E_, I_, y_):
     with tf.GradientTape() as tape:
         predictions = model([X_, A_, E_, I_], training=True)
         loss = loss_fn(y_, predictions)
+        loss += sum(model.losses)
     gradients = tape.gradient(loss, model.trainable_variables)
     opt.apply_gradients(zip(gradients, model.trainable_variables))
     return loss

@@ -11,7 +11,7 @@ class MinCutPool(Layer):
     A minCUT pooling layer as presented by
     [Bianchi et al.](https://arxiv.org/abs/1907.00481).
 
-    **Mode**: single, batch.
+    **Mode**: batch.
 
     This layer computes a soft clustering \(\S\) of the input graphs using a MLP,
     and reduces graphs as follows:
@@ -145,7 +145,7 @@ class MinCutPool(Layer):
             axis=(-1, -2)
         )
         if batch_mode:
-            ortho_loss = K.mean(cut_loss)
+            ortho_loss = K.mean(ortho_loss)
         self.add_loss(ortho_loss)
 
         # Pooling

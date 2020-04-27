@@ -1,9 +1,9 @@
 import numpy as np
 import tensorflow as tf
+from tensorflow.python.framework import smart_cond
 from tensorflow.keras import activations, initializers, regularizers, constraints
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Layer
-from tensorflow_core.python.keras.utils import tf_utils
 
 
 class SparseDropout(Layer):
@@ -51,9 +51,9 @@ class SparseDropout(Layer):
               rate=self.rate
             )
 
-        output = tf_utils.smart_cond(training,
-                                     dropped_inputs,
-                                     lambda: inputs)
+        output = smart_cond.smart_cond(training,
+                                       dropped_inputs,
+                                       lambda: inputs)
         return output
 
     def compute_output_shape(self, input_shape):
