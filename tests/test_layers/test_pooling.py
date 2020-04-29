@@ -29,11 +29,6 @@ TESTS = [
         MODES_K_: [SINGLE, BATCH],
         KWARGS_K_: {'k': 5, 'return_mask': True, 'sparse': True}
     },
-    {
-        LAYER_K_: SortPool,
-        MODES_K_: [SINGLE, BATCH],
-        KWARGS_K_: {'k': 5}
-    },
 
 ]
 

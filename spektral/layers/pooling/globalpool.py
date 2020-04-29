@@ -345,7 +345,7 @@ class GlobalAttnSumPool(GlobalPooling):
 class SortPool(Layer):
     r"""
     SortPool layer pooling the top \(k\) most relevant nodes as described by
-    (Zhang et al.)[https://www.cse.wustl.edu/~muhan/papers/AAAI_2018_DGCNN.pdf]
+    [Zhang et al.](https://www.cse.wustl.edu/~muhan/papers/AAAI_2018_DGCNN.pdf)
 
     This layers takes a graph signal \(\X\) and sorts the rows by the elements
     of its last column. It then keeps the top \(k\) rows.
@@ -447,3 +447,9 @@ class SortPool(Layer):
         }
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
+
+    def compute_output_shape(self, input_shape):
+        if self.data_mode == 'single':
+            return (self.k, input_shape[-1])
+        elif self.data_mode == 'batch':
+            return (input_shape[0], self.k, input_shape[-1])
