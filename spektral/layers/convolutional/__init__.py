@@ -7,3 +7,4 @@ from .gcn import GraphConv
 from .gcs import GraphConvSkip
 from .gin import GINConv
 from .graphsage import GraphSageConv
+from .diffconv import DiffusionConvolution

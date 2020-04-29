@@ -44,7 +44,8 @@ PAGES = [
             layers.GraphAttention,
             layers.GraphConvSkip,
             layers.APPNP,
-            layers.GINConv
+            layers.GINConv,
+            layers.DiffusionConvolution
         ]
     },
     {
@@ -319,7 +320,8 @@ def count_leading_spaces(s):
 
 def process_list_block(docstring, starting_point, leading_spaces, marker):
     ending_point = docstring.find('\n\n', starting_point)
-    block = docstring[starting_point:(None if ending_point == -1 else ending_point - 1)]
+    block = docstring[starting_point:(
+        None if ending_point == -1 else ending_point - 1)]
     # Place marker for later reinjection.
     docstring = docstring.replace(block, marker)
     lines = block.split('\n')
@@ -329,7 +331,8 @@ def process_list_block(docstring, starting_point, leading_spaces, marker):
     # These have to be removed, but first the list roots have to be detected.
     top_level_regex = r'^    ([^\s\\\(]+):(.*)'
     top_level_replacement = r'- __\1__:\2'
-    lines = [re.sub(top_level_regex, top_level_replacement, line) for line in lines]
+    lines = [re.sub(top_level_regex, top_level_replacement, line)
+             for line in lines]
     # All the other lines get simply the 4 leading space (if present) removed
     lines = [re.sub(r'^    ', '', line) for line in lines]
     # Fix text lines after lists
@@ -366,13 +369,14 @@ def process_docstring(docstring):
             index = tmp[3:].find('```') + 6
             snippet = tmp[:index]
             # Place marker in docstring for later reinjection.
-            docstring = docstring.replace(snippet, '$CODE_BLOCK_%d' % len(code_blocks))
+            docstring = docstring.replace(
+                snippet, '$CODE_BLOCK_%d' % len(code_blocks))
             snippet_lines = snippet.split('\n')
             # Remove leading spaces.
             num_leading_spaces = snippet_lines[-1].find('`')
             snippet_lines = ([snippet_lines[0]] +
                              [line[num_leading_spaces:]
-                             for line in snippet_lines[1:]])
+                              for line in snippet_lines[1:]])
             # Most code snippets have 3 or 4 more leading spaces
             # on inner lines, but not all. Remove them.
             inner_lines = snippet_lines[1:-1]
@@ -432,7 +436,8 @@ def process_docstring(docstring):
     # Spektral-specific code
     docstring = re.sub(r':param', '\n**Arguments**  \n:param', docstring, 1)
     docstring = re.sub(r':param(.*):', r'\n- `\1`:', docstring)
-    docstring = re.sub(r':return: ([a-z])', lambda m: ':return: {}'.format(m.group(1).upper()), docstring)
+    docstring = re.sub(
+        r':return: ([a-z])', lambda m: ':return: {}'.format(m.group(1).upper()), docstring)
     docstring = re.sub(r':return:', '\n**Return**  \n', docstring)
 
     return docstring
@@ -494,7 +499,7 @@ def read_page_data(page_data, type):
                 continue
             module_member = getattr(module, name)
             if (inspect.isclass(module_member) and type == 'classes' or
-               inspect.isfunction(module_member) and type == 'functions'):
+                    inspect.isfunction(module_member) and type == 'functions'):
                 instance = module_member
                 if module.__name__ in instance.__module__:
                     if instance not in module_data:
@@ -587,9 +592,12 @@ if __name__ == '__main__':
         if not os.path.exists('sources/custom_theme/img/'):
             os.makedirs('sources/custom_theme/img/')
 
-        shutil.copy('./stylesheets/extra.css', './sources/stylesheets/extra.css')
+        shutil.copy('./stylesheets/extra.css',
+                    './sources/stylesheets/extra.css')
         shutil.copy('./js/macros.js', './sources/js/macros.js')
         for file in glob.glob(r'./img/*.svg'):
             shutil.copy(file, './sources/img/')
-        shutil.copy('./img/favicon.ico', './sources/custom_theme/img/favicon.ico')
-        shutil.copy('./templates/google8a76765aa72fa8c1.html', './sources/google8a76765aa72fa8c1.html')
+        shutil.copy('./img/favicon.ico',
+                    './sources/custom_theme/img/favicon.ico')
+        shutil.copy('./templates/google8a76765aa72fa8c1.html',
+                    './sources/google8a76765aa72fa8c1.html')

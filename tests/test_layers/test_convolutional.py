@@ -3,7 +3,7 @@ import tensorflow as tf
 from tensorflow.keras import Model, Input
 
 from spektral.layers import GraphConv, ChebConv, EdgeConditionedConv, GraphAttention, GraphConvSkip, ARMAConv, APPNP, \
-    GraphSageConv, GINConv
+    GraphSageConv, GINConv, DiffusionConvolution
 
 tf.keras.backend.set_floatx('float64')
 SINGLE, BATCH, MIXED = 1, 2, 3  # Single, batch, mixed
@@ -54,6 +54,11 @@ TESTS = [
         LAYER_K_: GINConv,
         MODES_K_: [SINGLE],
         KWARGS_K_: {'channels': 8, 'activation': 'relu', 'mlp_hidden': [16], 'sparse': True}
+    },
+    {
+        LAYER_K_: DiffusionConvolution,
+        MODES_K_: [SINGLE, BATCH, MIXED],
+        KWARGS_K_: {'channels': 8, 'activation': 'tanh', 'num_diffusion_steps': 5}
     }
 ]
 
