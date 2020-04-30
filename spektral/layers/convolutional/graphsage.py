@@ -120,7 +120,7 @@ class GraphSageConv(GraphConv):
         indices = ops.sparse_add_self_loops(indices, N)
         targets, sources = indices[:, -2], indices[:, -1]
         messages = tf.gather(features, sources)
-        aggregated = self.aggregate_op(targets, messages, N)
+        aggregated = self.aggregate_op(messages, targets, N)
         output = K.concatenate([features, aggregated])
         output = ops.dot(output, self.kernel)
 

@@ -45,7 +45,8 @@ PAGES = [
             layers.GraphConvSkip,
             layers.APPNP,
             layers.GINConv,
-            layers.DiffusionConvolution
+            layers.DiffusionConvolution,
+            layers.MessagePassing
         ]
     },
     {
