@@ -9,7 +9,7 @@ from spektral.layers import ops
 class MinCutPool(Layer):
     r"""
     A minCUT pooling layer as presented by
-    [Bianchi et al.](https://arxiv.org/abs/1907.00481).
+    [Bianchi et al. (2019)](https://arxiv.org/abs/1907.00481).
 
     **Mode**: batch.
 

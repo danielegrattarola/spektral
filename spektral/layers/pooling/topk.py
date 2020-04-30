@@ -8,8 +8,10 @@ from spektral.layers import ops
 class TopKPool(Layer):
     r"""
     A gPool/Top-K layer as presented by
-    [Gao & Ji](http://proceedings.mlr.press/v97/gao19a/gao19a.pdf) and
-    [Cangea et al.](https://arxiv.org/abs/1811.01287).
+    [Gao & Ji (2019)](http://proceedings.mlr.press/v97/gao19a/gao19a.pdf) and
+    [Cangea et al. (2018)](https://arxiv.org/abs/1811.01287).
+
+    **Mode**: single, disjoint.
 
     This layer computes the following operations:
 
@@ -17,25 +19,21 @@ class TopKPool(Layer):
     \y = \frac{\X\p}{\|\p\|}; \;\;\;\;
     \i = \textrm{rank}(\y, K); \;\;\;\;
     \X' = (\X \odot \textrm{tanh}(\y))_\i; \;\;\;\;
-    \A' = \A^2_{\i, \i}
+    \A' = \A_{\i, \i}
     $$
 
     where \( \textrm{rank}(\y, K) \) returns the indices of the top K values of
-    \(\y\), and \(\p\) is a learnable parameter vector of size \(F\).
+    \(\y\), and \(\p\) is a learnable parameter vector of size \(F\). \(K\) is
+    defined for each graph as a fraction of the number of nodes.
     Note that the the gating operation \(\textrm{tanh}(\y)\) (Cangea et al.)
-    can be replaced with a sigmoid (Gao & Ji). The paper by Gao & Ji originally
-    used a tanh as well, but was later updated to use a sigmoid activation.
+    can be replaced with a sigmoid (Gao & Ji).
 
-    Due to the lack of sparse-sparse matrix multiplication support, this layer
-    temporarily makes the adjacency matrix dense in order to compute \(\A^2\)
-    (needed to preserve connectivity after pooling).
-
-    **If memory is not an issue, considerable speedups can be achieved by using
+    This layer temporarily makes the adjacency matrix dense in order to compute
+    \(\A'\).
+    If memory is not an issue, considerable speedups can be achieved by using
     dense graphs directly.
     Converting a graph from sparse to dense and back to sparse is an expensive
-    operation.**
-
-    **Mode**: single, disjoint.
+    operation.
 
     **Input**
 
@@ -120,15 +118,9 @@ class TopKPool(Layer):
         # Reduce X
         X_pooled = tf.boolean_mask(features, mask, axis=axis)
 
-        # Compute A^2
-        if A_is_sparse:
-            A_dense = tf.sparse.to_dense(A)
-        else:
-            A_dense = A
-        A_squared = K.dot(A, A_dense)
-
         # Reduce A
-        A_pooled = tf.boolean_mask(A_squared, mask, axis=axis)
+        A_dense = tf.sparse.to_dense(A) if A_is_sparse else A
+        A_pooled = tf.boolean_mask(A_dense, mask, axis=axis)
         A_pooled = tf.boolean_mask(A_pooled, mask, axis=axis + 1)
         if A_is_sparse:
             A_pooled = ops.dense_to_sparse(A_pooled)

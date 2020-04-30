@@ -10,7 +10,7 @@ from spektral.layers.ops import modes
 class DiffPool(Layer):
     r"""
     A DiffPool layer as presented by
-    [Ying et al.](https://arxiv.org/abs/1806.08804).
+    [Ying et al. (2018)](https://arxiv.org/abs/1806.08804).
 
     **Mode**: batch.
 
