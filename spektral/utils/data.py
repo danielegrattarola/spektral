@@ -1,19 +1,25 @@
 import numpy as np
 import scipy.sparse as sp
 
+from spektral.utils import pad_jagged_array
+
 
 def numpy_to_disjoint(X_list, A_list, E_list=None):
     """
     Converts a batch of graphs stored in lists (X, A, and optionally E) to the
-    [disjoint mode](https://danielegrattarola.github.io/spektral/data/).
-    Note that the number of nodes N can vary between graphs, although each entry
-    i of each list should be associated to the same graph, i.e.,
+    [disjoint mode](https://danielegrattarola.github.io/spektral/data/#disjoint-mode).
+
+    Each entry i of the lists should be associated to the same graph, i.e.,
     `X_list[i].shape[0] == A_list[i].shape[0] == E_list[i].shape[0]`.
 
-    :param X_list: a list of np.arrays of shape (N, F);
-    :param A_list: a list of np.arrays or sparse matrices of shape (N, N);
-    :param E_list: a list of np.arrays of shape (N, N, S);
+    :param X_list: a list of np.arrays of shape `(N, F)`;
+    :param A_list: a list of np.arrays or sparse matrices of shape `(N, N)`;
+    :param E_list: a list of np.arrays of shape `(N, N, S)`;
     :return:
+        -  `X_out`: a rank 2 array of shape `(n_nodes, F)`;
+        -  `A_out`: a rank 2 array of shape `(n_nodes, n_nodes)`;
+        -  `E_out`: (only if `E_list` is given) a rank 2 array of shape
+        `(n_edges, S)`;
     """
     X_out = np.vstack(X_list)
     A_list = [sp.coo_matrix(a) for a in A_list]
@@ -30,16 +36,44 @@ def numpy_to_disjoint(X_list, A_list, E_list=None):
         return X_out, A_out, I_out
 
 
+def numpy_to_batch(X_list, A_list, E_list=None):
+    """
+    Converts a batch of graphs stored in lists (X, A, and optionally E) to the
+    [batch mode](https://danielegrattarola.github.io/spektral/data/#batch-mode)
+    by zero-padding all X, A and E matrices to have the same node dimensions
+    (`N_max`).
+
+    Each entry i of the lists should be associated to the same graph, i.e.,
+    `X_list[i].shape[0] == A_list[i].shape[0] == E_list[i].shape[0]`.
+
+    :param X_list: a list of np.arrays of shape `(N, F)`;
+    :param A_list: a list of np.arrays or sparse matrices of shape `(N, N)`;
+    :param E_list: a list of np.arrays of shape `(N, N, S)`;
+    :return:
+        -  `X_out`: a rank 3 array of shape `(batch, N_max, F)`;
+        -  `A_out`: a rank 2 array of shape `(batch, N_max, N_max)`;
+        -  `E_out`: (only if `E_list` if given) a rank 2 array of shape
+        `(batch, N_max, N_max, S)`;
+    """
+    N_max = max([a.shape[-1] for a in A_list])
+    X_out = pad_jagged_array(X_list, (N_max, -1))
+    A_out = pad_jagged_array(A_list, (N_max, N_max))
+    if E_list is not None:
+        E_out = pad_jagged_array(E_list, (N_max, N_max, -1))
+        return X_out, A_out, E_out
+    else:
+        return X_out, A_out
+
+
 def batch_iterator(data, batch_size=32, epochs=1, shuffle=True):
     """
     Iterates over the data for the given number of epochs, yielding batches of
     size `batch_size`.
-    :param data: np.array or list of np.arrays with equal first dimension.
-    :param batch_size: number of samples in a batch
-    :param epochs: number of times to iterate over the data
+    :param data: np.array or list of np.arrays with the same first dimension;
+    :param batch_size: number of samples in a batch;
+    :param epochs: number of times to iterate over the data;
     :param shuffle: whether to shuffle the data at the beginning of each epoch
-    :yield: a batch of samples (or tuple of batches if X had more than one
-    array).
+    :return: batches of size `batch_size`.
     """
     if not isinstance(data, list):
         data = [data]

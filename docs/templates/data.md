@@ -26,7 +26,8 @@ The difference between the four data modes can be easily seen in how `A`, `X`, a
 |Mixed   |`(N, N)`       |`(batch, N, F)`| N/A              |
 
 
-### Single mode
+
+## Single mode
 In **single mode** the data describes a single graph where:
 
 - `A` is a sparse matrix of shape `(N, N)`;
@@ -46,7 +47,7 @@ Loading cora dataset
 (2708, 1433)
 ```
 
-### Disjoint mode
+## Disjoint mode
 
 **Disjoint mode** is a smart way of representing a set of graphs as a single graph.
 In particular, the disjoint union of a batch is a graph where 
@@ -82,7 +83,7 @@ array([[1., 1., 0., 0., 0.],
 array([0, 0, 1, 1, 1])
 ```
 
-### Batch mode
+## Batch mode
 In **batch mode**, graphs have the same number of nodes and are stacked in tensors of shape `(batch, N, ...)`. 
 Due to the general lack of support for sparse higher-order tensors both in Scipy and TensorFlow, `A` and `X` will be dense tensors.
 
@@ -108,7 +109,7 @@ Reading SDF
 (133885, 9, 9, 5)
 ```
 
-### Mixed mode
+## Mixed mode
 In **mixed mode** we consider a single adjacency matrix that acts as the support for different node attributes (also sometimes called "signals").
 
 In this case we have that: 
