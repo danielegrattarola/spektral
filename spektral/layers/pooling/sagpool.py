@@ -6,8 +6,9 @@ from spektral.layers.pooling.topk import ops, TopKPool
 class SAGPool(TopKPool):
     r"""
     A self-attention graph pooling layer as presented by
-    [Lee et al. (2019)](https://arxiv.org/abs/1904.08082) and
-    [Knyazev et al. (2019)](https://arxiv.org/abs/1905.02850).
+    [Lee et al. (2019)](https://arxiv.org/abs/1904.08082).
+
+    **Mode**: single, disjoint.
 
     This layer computes the following operations:
 
@@ -15,23 +16,20 @@ class SAGPool(TopKPool):
     \y = \textrm{GNN}(\A, \X); \;\;\;\;
     \i = \textrm{rank}(\y, K); \;\;\;\;
     \X' = (\X \odot \textrm{tanh}(\y))_\i; \;\;\;\;
-    \A' = \A^2_{\i, \i}
+    \A' = \A_{\i, \i}
     $$
 
     where \( \textrm{rank}(\y, K) \) returns the indices of the top K values of
     \(\y\), and \(\textrm{GNN}\) consists of one GraphConv layer with no
-    activation.
+    activation. \(K\) is defined for each graph as a fraction of the number of
+    nodes.
 
-    Due to the lack of sparse-sparse matrix multiplication support, this layer
-    temporarily makes the adjacency matrix dense in order to compute \(\A^2\)
-    (needed to preserve connectivity after pooling).
-
-    **If memory is not an issue, considerable speedups can be achieved by using
+    This layer temporarily makes the adjacency matrix dense in order to compute
+    \(\A'\).
+    If memory is not an issue, considerable speedups can be achieved by using
     dense graphs directly.
     Converting a graph from sparse to dense and back to sparse is an expensive
-    operation.**
-
-    **Mode**: single, disjoint.
+    operation.
 
     **Input**
 
