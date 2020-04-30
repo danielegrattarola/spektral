@@ -6,14 +6,6 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Layer
 
 
-LAYER_KWARGS = {'activation', 'use_bias', 'kernel_initializer', 'bias_initializer',
-                'kernel_initializer=', 'bias_initializer', 'kernel_regularizer',
-                'bias_regularizer', 'activity_regularizer', 'kernel_constraint',
-                'bias_constraint'}
-KERAS_KWARGS = {'activity_regularizer', 'autocast', 'batch_input_shape',
-                'batch_size', 'input_shape', 'weights'}
-
-
 class SparseDropout(Layer):
     """Applies Dropout to the input.
 

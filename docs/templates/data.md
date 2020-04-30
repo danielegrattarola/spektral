@@ -1,4 +1,4 @@
-## Representing graphs
+# Representing graphs
 
 In Spektral, graphs are represented as matrices:
 

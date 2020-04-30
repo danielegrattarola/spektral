@@ -1,5 +1,5 @@
 site_name: Spektral
-site_url: https://danielegrattarola.github.io/spektral/
+site_url: https://spektral.graphneural.network/
 theme:
     name: 'readthedocs'
     custom_dir: 'sources/custom_theme/'
@@ -9,7 +9,7 @@ docs_dir: sources
 repo_url: 'https://github.com/danielegrattarola/spektral/'
 edit_uri: 'edit/master/docs/sources'
 site_author: Daniele Grattarola
-site_description: 'Spektral: a Framework for Relational Representation Learning'
+site_description: 'Spektral: Graph Neural Networks in TensorFlow 2 and Keras'
 google_analytics:
     - UA-125823175-1
     - auto
@@ -23,6 +23,8 @@ extra_javascript:
 
 markdown_extensions:
     - mdx_math
+    - toc:
+          baselevel: 2
 
 nav:
 - Home: index.md
@@ -34,19 +36,14 @@ nav:
     - Convolutional Layers: layers/convolution.md
     - Pooling Layers: layers/pooling.md
     - Base Layers: layers/base.md
-- Datasets:
-    - Citation: datasets/citation.md
-    - Delaunay: datasets/delaunay.md
-    - GraphSage: datasets/graphsage.md
-    - MNIST: datasets/mnist.md
-    - OGB: datasets/ogb.md
-    - QM9: datasets/qm9.md
-    - TU Dortmund: datasets/tud.md
+- Data:
+    - Datasets: datasets.md
+    - Data utils: utils/data.md
 - Utils:
-    - Data: utils/data.md
     - Convolution: utils/convolution.md
     - Miscellaneous: utils/misc.md
     - Plotting: utils/plotting.md
     - Conversion: utils/conversion.md
 - Chemistry: chem.md
-- About: about.md
+- Other:
+  - About: about.md

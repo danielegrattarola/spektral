@@ -1,4 +1,4 @@
-## About
+# About
 
 Spektral is an open-source project freely [available on Github](https://github.com/danielegrattarola/spektral) under MIT license.
 

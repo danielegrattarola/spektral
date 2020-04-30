@@ -2,7 +2,7 @@
     display: none !important;
 }
 
-body > div.wy-grid-for-nav > nav > div.wy-side-nav-search > a {
+body > div.wy-grid-for-nav > nav > div > div.wy-side-nav-search > a {
     color: transparent !important;
     background-image: url('../img/logo_light.svg') !important;
     background-size: contain !important;
@@ -16,13 +16,23 @@ body > div.wy-grid-for-nav > nav > div.wy-side-nav-search > a {
     width: auto !important;
 }
 
-/*.wy-side-nav-search {
+.wy-side-nav-search {
     background-color: #e67e22;
 }
 
 .wy-side-nav-search input[type=text] {
     border-color: #e67e22;
-}*/
+}
+
+.wy-menu-vertical a:active {
+    background-color: #e67e22;
+    cursor: pointer;
+    color: #fff;
+}
+
+.wy-side-scroll {
+    padding-bottom: 5em;
+}
 
 .MathJax_Display {
     overflow-x: auto;
