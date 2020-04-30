@@ -139,6 +139,7 @@ PAGES = [
         'page': 'utils/data.md',
         'functions': [
             utils.data.numpy_to_disjoint,
+            utils.data.numpy_to_batch,
             utils.data.batch_iterator
         ]
     },

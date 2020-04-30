@@ -64,7 +64,7 @@ python setup.py install  # Or 'pip install .'
 
 To install Spektral on [Google Colab](https://colab.research.google.com/):
 
-```jupyter
+```
 ! apt install graphviz libgraphviz-dev libcgraph6
 ! pip install spektral
 ```
