@@ -19,6 +19,39 @@ A = np.ones((N, N))
 X = np.random.normal(size=(N, F))
 E = np.random.normal(size=(N, N, S))
 
+"""
+Each entry in TESTS represent a test to be run for a particular Layer.
+Each config dictionary has the form: 
+{
+    LAYER_K_: LayerClass,
+    MODES_K_: [...],
+    KWARGS_K_: {...},
+},
+
+LAYER_K_ is the class of the layer to be tested.
+ 
+MODES_K_ is a list containing the data modes supported by the model, and should 
+be at least one of: SINGLE, MIXED, BATCH. 
+
+KWARGS_K_ is a dictionary containing: 
+    - all keywords to be passed to the layer (including mandatory ones);
+    - an optional entry 'edges': True if the layer supports edge attributes; 
+    - an optional entry 'sparse': [...], indicating whether the layer supports 
+    sparse or dense inputs as a bool (e.g., 'sparse': [False, True] will 
+    test the layer on both dense and sparse adjacency matrix; 'sparse': [True] 
+    will only test for sparse). By default, each layer is tested only on dense
+    inputs. Batch mode only tests for dense inputs. 
+
+The testing loop will create a simple 1-layer model and run it in single, mixed, 
+and batch mode according the what specified in MODES_K_ in the testing config. 
+The loop will check: 
+    - that the model does not crash; 
+    - that the output shape is pre-computed correctly; 
+    - that the real output shape is correct; 
+    - that the get_config() method works correctly (i.e., it is possible to 
+    re-instatiate a layer using LayerClass(**layer_instance.get_config())).
+"""
+
 TESTS = [
     {
         LAYER_K_: GraphConv,
