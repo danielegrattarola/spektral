@@ -12,7 +12,7 @@ class GatedGraphConv(MessagePassing):
 
     **Mode**: single.
 
-    **This layer expects sparse inputs.**
+    **This layer expects a sparse adjacency matrix.**
 
     This layer repeatedly applies a GRU cell \(L\) times to the node attributes
     $$

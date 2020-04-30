@@ -50,7 +50,7 @@ There are no hard rules for contributing to Spektral, but you should try to foll
 - Make sure that the code you contribute is clearly identifiable in a PR (e.g., watch out for your IDE automatically reformatting the whole project);
 - New features should support:
     - Python >= 3.5
-    - TensorFlow >= 2.0.0
+    - TensorFlow >= 2.1.0
     - Linux (at least Ubuntu >= 16.04) and MacOS >= 10.14
 - Write tests for the new feature and then run:
     ```

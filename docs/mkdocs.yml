@@ -42,7 +42,6 @@ nav:
 - Utils:
     - Convolution: utils/convolution.md
     - Miscellaneous: utils/misc.md
-    - Plotting: utils/plotting.md
     - Conversion: utils/conversion.md
 - Chemistry: chem.md
 - Other:

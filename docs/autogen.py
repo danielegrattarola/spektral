@@ -12,7 +12,6 @@ from spektral import chem
 from spektral import datasets
 from spektral import layers
 from spektral import utils
-from spektral.utils import plotting
 
 try:
     reload(sys)
@@ -169,15 +168,6 @@ PAGES = [
             utils.misc.sub_eye_batch,
             utils.misc.add_eye_jagged,
             utils.misc.sub_eye_jagged,
-        ],
-        'methods': [],
-        'classes': []
-    },
-    {
-        'page': 'utils/plotting.md',
-        'functions': [
-            plotting.plot_numpy,
-            plotting.plot_nx
         ],
         'methods': [],
         'classes': []

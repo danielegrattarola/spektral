@@ -38,15 +38,8 @@ Read the documentation [here](https://spektral.graphneural.network).
 Spektral is compatible with Python 3.5+, and is tested on Ubuntu 16.04+ and MacOS. 
 Other Linux distros should work as well, but Windows is not supported for now. 
 
-To install the required dependencies on Ubuntu run:
-
-```bash
-sudo apt install graphviz libgraphviz-dev libcgraph6
-```
-
-Some optional features of Spektral also depend on [RDKit](http://www.rdkit.org/docs/index.html), 
-a library for cheminformatics and molecule manipulation (available through 
-Anaconda).
+Some optional features of Spektral depend on [RDKit](http://www.rdkit.org/docs/index.html), 
+a library for cheminformatics and molecule manipulation (available through Anaconda).
 
 The simplest way to install Spektral is from PyPi: 
 
@@ -65,7 +58,6 @@ python setup.py install  # Or 'pip install .'
 To install Spektral on [Google Colab](https://colab.research.google.com/):
 
 ```
-! apt install graphviz libgraphviz-dev libcgraph6
 ! pip install spektral
 ```
 
@@ -83,4 +75,7 @@ python setup.py install  # Or 'pip install .'
 In the future, the TF1-compatible version of Spektral (<0.2) will receive bug fixes, but all new features will only support TensorFlow 2.   
 
 ## Contributing
-Spektral is an open source project available [on Github](https://github.com/danielegrattarola/spektral), and contributions of all types are welcome. Feel free to open a pull request if you have something interesting that you want to add to the framework.
+Spektral is an open source project available [on Github](https://github.com/danielegrattarola/spektral), and contributions of all types are welcome. 
+Feel free to open a pull request if you have something interesting that you want to add to the framework.
+
+The contribution guidelines are available [here](https://github.com/danielegrattarola/spektral/blob/master/CONTRIBUTING.md) and a list of feature requests is available [here](https://github.com/danielegrattarola/spektral/projects/1).
