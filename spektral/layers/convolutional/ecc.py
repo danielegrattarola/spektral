@@ -181,7 +181,7 @@ class EdgeConditionedConv(GraphConv):
         sources = A.indices[:, -1]
         messages = tf.gather(X, sources)
         messages = ops.dot(messages[:, None, :], kernel)[:, 0, :]
-        aggregated = ops.scatter_sum(targets, messages, N)
+        aggregated = ops.scatter_sum(messages, targets, N)
 
         # Update
         output = aggregated

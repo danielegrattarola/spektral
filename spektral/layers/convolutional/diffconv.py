@@ -86,16 +86,18 @@ class DiffusionConvolution(GraphConv):
 
     **Mode**: single, mixed, batch.
 
+    **This layer expects a dense adjacency matrix.**
+
     Given a number of diffusion steps \(K\) and a row normalized adjacency matrix \(\hat \A \),
     this layer calculates the q'th channel as:
     $$
-    \mathbf{H}_{~:,~q} = \sigma(
+    \mathbf{H}_{~:,~q} = \sigma\left(
         \sum_{f=1}^{F}
             \left(
                 \sum_{k=0}^{K-1}\theta_k {\hat \A}^k
             \right)
         \X_{~:,~f}
-    )
+    \right)
     $$
 
     **Input**

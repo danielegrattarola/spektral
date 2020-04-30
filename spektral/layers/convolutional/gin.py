@@ -1,13 +1,11 @@
-import tensorflow as tf
 from tensorflow.keras import activations, backend as K
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.models import Sequential
 
-from spektral.layers import ops
-from spektral.layers.convolutional.gcn import GraphConv
+from spektral.layers.convolutional.mp import MessagePassing
 
 
-class GINConv(GraphConv):
+class GINConv(MessagePassing):
     r"""
     A Graph Isomorphism Network (GIN) as presented by
     [Xu et al. (2018)](https://arxiv.org/abs/1810.00826).
@@ -69,7 +67,7 @@ class GINConv(GraphConv):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        super().__init__(channels,
+        super().__init__(aggregate='sum',
                          activation=activation,
                          use_bias=use_bias,
                          kernel_initializer=kernel_initializer,
@@ -80,6 +78,7 @@ class GINConv(GraphConv):
                          kernel_constraint=kernel_constraint,
                          bias_constraint=bias_constraint,
                          **kwargs)
+        self.channels = self.output_dim = channels
         self.epsilon = epsilon
         self.mlp_hidden = mlp_hidden if mlp_hidden else []
         self.mlp_activation = activations.get(mlp_activation)
@@ -94,15 +93,12 @@ class GINConv(GraphConv):
             kernel_constraint=self.kernel_constraint,
             bias_constraint=self.bias_constraint
         )
-        mlp_layers = []
-        for i, channels in enumerate(self.mlp_hidden):
-            mlp_layers.append(Dense(channels, self.mlp_activation, **layer_kwargs))
-        mlp_layers.append(
-            Dense(self.channels, self.activation, **layer_kwargs)
-        )
-        self.mlp = Sequential(mlp_layers)
 
-        # Parameter for propagating features
+        self.mlp = Sequential([
+            Dense(channels, self.mlp_activation, **layer_kwargs)
+            for channels in self.mlp_hidden
+        ] + [Dense(self.channels, self.activation, **layer_kwargs)])
+
         if self.epsilon is None:
             self.eps = self.add_weight(shape=(1,),
                                        initializer=self.bias_initializer,
@@ -114,34 +110,18 @@ class GINConv(GraphConv):
         self.built = True
 
     def call(self, inputs):
-        features = inputs[0]
-        fltr = inputs[1]
-
-        # Enforce sparse representation
-        if not K.is_sparse(fltr):
-            fltr = ops.dense_to_sparse(fltr)
-
-        # Propagation
-        targets = fltr.indices[:, -2]
-        sources = fltr.indices[:, -1]
-        messages = tf.gather(features, sources)
-        aggregated = ops.scatter_sum(targets, messages, N=tf.shape(features)[0])
-        hidden = (1.0 + self.eps) * features + aggregated
-
-        # MLP
-        output = self.mlp(hidden)
+        X, A, E = self.get_inputs(inputs)
+        output = self.mlp((1.0 + self.eps) * X + self.propagate(X, A, E))
 
         return output
 
     def get_config(self):
         config = {
+            'channels': self.channels,
             'epsilon': self.epsilon,
             'mlp_hidden': self.mlp_hidden,
             'mlp_activation': self.mlp_activation
         }
         base_config = super().get_config()
+        base_config.pop('aggregate')
         return dict(list(base_config.items()) + list(config.items()))
-
-    @staticmethod
-    def preprocess(A):
-        return A

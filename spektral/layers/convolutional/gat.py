@@ -222,7 +222,7 @@ class GraphAttention(GraphConv):
 
         # Update representation
         output = attn_coef * tf.gather(X, sources)
-        output = ops.scatter_sum(targets, output, N)
+        output = ops.scatter_sum(output, targets, N)
 
         return output, attn_coef
 
