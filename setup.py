@@ -12,7 +12,6 @@ setup(
                       'pandas',
                       'lxml',
                       'joblib',
-                      'pygraphviz',
                       'numpy',
                       'scipy',
                       'requests',
