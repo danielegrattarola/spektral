@@ -1,8 +1,9 @@
-from tensorflow.keras.layers import Layer
-from tensorflow.keras import backend as K
 import tensorflow as tf
+from tensorflow.keras import backend as K
+from tensorflow.keras.layers import Layer
+
+from spektral.utils.keras import is_layer_kwarg, is_keras_kwarg, deserialize_kwarg, serialize_kwarg
 from spektral.layers.ops.scatter import deserialize_scatter
-from spektral.layers.base import LAYER_KWARGS, KERAS_KWARGS
 
 
 class MessagePassing(Layer):
@@ -57,12 +58,16 @@ class MessagePassing(Layer):
     and return a rank 2 tensor with shape `(N, ...)`.
     """
     def __init__(self, aggregate='sum', **kwargs):
-        super().__init__(**{k: v for k, v in kwargs.items() if k in KERAS_KWARGS})
+        super().__init__(**{k: v for k, v in kwargs.items() if is_keras_kwarg(k)})
         self.aggr = deserialize_scatter(aggregate)
         self.output_dim = None
+        self.kwargs_keys = []
         for key in kwargs:
-            if key in LAYER_KWARGS:
-                setattr(self, key, kwargs[key])
+            if is_layer_kwarg(key):
+                attr = kwargs[key]
+                attr = deserialize_kwarg(key, attr)
+                self.kwargs_keys.append(key)
+                setattr(self, key, attr)
 
     def call(self, inputs, **kwargs):
         X, A, E = self.get_inputs(inputs)
@@ -116,10 +121,12 @@ class MessagePassing(Layer):
 
     def get_config(self):
         config = {
-            'aggregate': self.aggr
+            'aggregate': self.aggr,
         }
+        for key in self.kwargs_keys:
+            config[key] = serialize_kwarg(key, getattr(self, key))
         base_config = super().get_config()
-        return dict(list(base_config.items()) + list(config.items()))
+        return {**base_config, **config}
 
     @staticmethod
     def preprocess(A):

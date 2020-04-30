@@ -1,3 +1,5 @@
+# Convolutional layers
+
 The message-passing layers from these papers are available in Spektral:
 
 - [Semi-Supervised Classification with Graph Convolutional Networks](https://arxiv.org/abs/1609.02907)

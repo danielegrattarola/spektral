@@ -97,7 +97,7 @@ class GINConv(MessagePassing):
         self.mlp = Sequential([
             Dense(channels, self.mlp_activation, **layer_kwargs)
             for channels in self.mlp_hidden
-        ] + [Dense(self.channels, self.activation, **layer_kwargs)])
+        ] + [Dense(self.channels, self.activation, use_bias=self.use_bias, **layer_kwargs)])
 
         if self.epsilon is None:
             self.eps = self.add_weight(shape=(1,),
@@ -123,5 +123,5 @@ class GINConv(MessagePassing):
             'mlp_activation': self.mlp_activation
         }
         base_config = super().get_config()
-        base_config.pop('aggregate')
-        return dict(list(base_config.items()) + list(config.items()))
+        base_config.pop('aggregate')  # Remove it because it's defined by constructor
+        return {**base_config, **config}

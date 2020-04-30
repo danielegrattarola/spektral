@@ -1,6 +1,6 @@
 <img src="https://danielegrattarola.github.io/spektral/img/logo_dark.svg" width="50%"/>
 
-## Welcome to Spektral
+# Welcome to Spektral
 Spektral is a Python library for graph deep learning, based on the Keras API and TensorFlow 2.
 The main goal of this project is to provide a simple but flexible framework for creating graph neural networks (GNNs).
 
@@ -69,7 +69,7 @@ To install Spektral on [Google Colab](https://colab.research.google.com/):
 ! pip install spektral
 ```
 
-### TensorFlow 1 and Keras
+## TensorFlow 1 and Keras
 Starting from version 0.3, Spektral only supports TensorFlow 2 and `tf.keras`.
 The old version of Spektral, which is based on TensorFlow 1 and the stand-alone Keras library, is still available on the `tf1` branch on GitHub and can be installed from source:
 

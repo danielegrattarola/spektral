@@ -1,3 +1,5 @@
+# Pooling layers
+
 The pooling layers from these papers are available in Spektral:
 
 - [Hierarchical Graph Representation Learning with Differentiable Pooling](https://arxiv.org/abs/1806.08804)
