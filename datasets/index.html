@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="Daniele Grattarola">
+  <link rel="canonical" href="https://spektral.graphneural.network/datasets/">
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Datasets - Spektral</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link href="../stylesheets/extra.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Datasets";
+    var mkdocs_page_input_path = "datasets.md";
+    var mkdocs_page_url = "/datasets/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+  <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-125823175-1', 'auto');
+      ga('send', 'pageview');
+  </script>
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Spektral</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Tutorials</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../getting-started/">Getting started</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../data/">Data representation</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Layers</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../layers/convolution/">Convolutional Layers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../layers/pooling/">Pooling Layers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../layers/base/">Base Layers</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Data</span></p>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Datasets</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#citation-networks">Citation networks</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#load_data">load_data</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#graphsage-datasets">GraphSAGE datasets</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#load_data_1">load_data</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#tu-dortmund-benchmark-datasets-for-graph-kernels">TU Dortmund Benchmark Datasets for Graph Kernels</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#load_data_2">load_data</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#open-graph-benchmark-ogb">Open Graph Benchmark (OGB)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#graph_to_numpy">graph_to_numpy</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#dataset_to_numpy">dataset_to_numpy</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#qm9-small-molecules">QM9 Small Molecules</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#load_data_3">load_data</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#mnist-knn-grid">MNIST KNN Grid</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#load_data_4">load_data</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#delaunay-triangulations">Delaunay Triangulations</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#generate_data">generate_data</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../utils/data/">Data utils</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Utils</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../utils/convolution/">Convolution</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../utils/misc/">Miscellaneous</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../utils/conversion/">Conversion</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../chem/">Chemistry</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Other</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../about/">About</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Spektral</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Data &raquo;</li>
+        
+      
+    
+    <li>Datasets</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/danielegrattarola/spektral/edit/master/docs/sources/datasets.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="datasets">Datasets</h2>
+<h3 id="citation-networks">Citation networks</h3>
+<h4 id="load_data">load_data</h4>
+<pre><code class="python">spektral.datasets.citation.load_data(dataset_name='cora', normalize_features=True, random_split=False)
+</code></pre>
+
+<p>Loads a citation dataset (Cora, Citeseer or Pubmed) using the "Planetoid"
+splits intialliy defined in <a href="https://arxiv.org/abs/1603.08861">Yang et al. (2016)</a>.
+The train, test, and validation splits are given as binary masks.</p>
+<p>Node attributes are bag-of-words vectors representing the most common words
+in the text document associated to each node.
+Two papers are connected if either one cites the other.
+Labels represent the class of the paper.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>dataset_name</code>: name of the dataset to load (<code>'cora'</code>, <code>'citeseer'</code>, or
+<code>'pubmed'</code>);</p>
+</li>
+<li>
+<p><code>normalize_features</code>: if True, the node features are normalized;</p>
+</li>
+<li>
+<p><code>random_split</code>: if True, return a randomized split (20 nodes per class
+for training, 30 nodes per class for validation and the remaining nodes for
+testing, <a href="https://arxiv.org/abs/1811.05868">Shchur et al. (2018)</a>).</p>
+</li>
+</ul>
+<p><strong>Return</strong>  </p>
+<ul>
+<li>Adjacency matrix;</li>
+<li>Node features;</li>
+<li>Labels;</li>
+<li>Three binary masks for train, validation, and test splits.</li>
+</ul>
+<h3 id="graphsage-datasets">GraphSAGE datasets</h3>
+<h4 id="load_data_1">load_data</h4>
+<pre><code class="python">spektral.datasets.graphsage.load_data(dataset_name, max_degree=-1, normalize_features=True)
+</code></pre>
+
+<p>Loads one of the datasets (PPI or Reddit) used in
+<a href="https://arxiv.org/abs/1706.02216">Hamilton &amp; Ying (2017)</a>.</p>
+<p>The PPI dataset (originally <a href="https://www.ncbi.nlm.nih.gov/pubmed/16381927">Stark et al. (2006)</a>)
+for inductive node classification uses positional gene sets, motif gene sets
+and immunological signatures as features and gene ontology sets as labels.</p>
+<p>The Reddit dataset consists of a graph made of Reddit posts in the month of
+September, 2014. The label for each node is the community that a
+post belongs to. The graph is built by sampling 50 large communities and
+two nodes are connected if the same user commented on both. Node features
+are obtained by concatenating the average GloVe CommonCrawl vectors of
+the title and comments, the post's score and the number of comments.</p>
+<p>The train, test, and validation splits are returned as binary masks.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>dataset_name</code>: name of the dataset to load (<code>'ppi'</code>, or <code>'reddit'</code>);</p>
+</li>
+<li>
+<p><code>max_degree</code>: int, if positive, subsample edges so that each node has
+the specified maximum degree.</p>
+</li>
+<li>
+<p><code>normalize_features</code>: if True, the node features are normalized;</p>
+</li>
+</ul>
+<p><strong>Return</strong>  </p>
+<ul>
+<li>Adjacency matrix;</li>
+<li>Node features;</li>
+<li>Labels;</li>
+<li>Three binary masks for train, validation, and test splits.</li>
+</ul>
+<h3 id="tu-dortmund-benchmark-datasets-for-graph-kernels">TU Dortmund Benchmark Datasets for Graph Kernels</h3>
+<h4 id="load_data_2">load_data</h4>
+<pre><code class="python">spektral.datasets.tud.load_data(dataset_name, clean=False)
+</code></pre>
+
+<p>Loads one of the Benchmark Data Sets for Graph Kernels from TU Dortmund
+(<a href="https://ls11-www.cs.tu-dortmund.de/staff/morris/graphkerneldatasets">link</a>).
+The node features are computed by concatenating the following features for
+each node:</p>
+<ul>
+<li>node attributes, if available, normalized as specified in <code>normalize_features</code>;</li>
+<li>clustering coefficient, normalized with z-score;</li>
+<li>node degrees, normalized as specified in <code>normalize_features</code>;</li>
+<li>node labels, if available, one-hot encoded.</li>
+</ul>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>dataset_name</code>: name of the dataset to load (see <code>spektral.datasets.tud.AVAILABLE_DATASETS</code>).</p>
+</li>
+<li>
+<p><code>normalize_features</code>: <code>None</code>, <code>'zscore'</code> or <code>'ohe'</code>, how to normalize
+the node features (only works for node attributes).</p>
+</li>
+<li>
+<p><code>clean</code>: if True, return a version of the dataset with no isomorphic
+graphs.</p>
+</li>
+</ul>
+<p><strong>Return</strong>  </p>
+<ul>
+<li>a list of adjacency matrices;</li>
+<li>a list of node feature matrices;</li>
+<li>a numpy array containing the one-hot encoded targets.</li>
+</ul>
+<h3 id="open-graph-benchmark-ogb">Open Graph Benchmark (OGB)</h3>
+<h4 id="graph_to_numpy">graph_to_numpy</h4>
+<pre><code class="python">spektral.datasets.ogb.graph_to_numpy(graph, dtype=None)
+</code></pre>
+
+<p>Converts a graph in OGB's library-agnostic format to a representation in
+Numpy/Scipy. See the <a href="https://ogb.stanford.edu">Open Graph Benchmark's website</a>
+for more information.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>graph</code>: OGB library-agnostic graph;</p>
+</li>
+<li>
+<p><code>dtype</code>: if set, all output arrays will be cast to this dtype.</p>
+</li>
+</ul>
+<p><strong>Return</strong>  </p>
+<ul>
+<li>X: np.array of shape (N, F) with the node features;</li>
+<li>A: scipy.sparse adjacency matrix of shape (N, N) in COOrdinate format;</li>
+<li>E: if edge features are available, np.array of shape (n_edges, S),
+<code>None</code> otherwise.</li>
+</ul>
+<hr />
+<h4 id="dataset_to_numpy">dataset_to_numpy</h4>
+<pre><code class="python">spektral.datasets.ogb.dataset_to_numpy(dataset, indices=None, dtype=None)
+</code></pre>
+
+<p>Converts a dataset in OGB's library-agnostic version to lists of Numpy/Scipy
+arrays. See the <a href="https://ogb.stanford.edu">Open Graph Benchmark's website</a>
+for more information.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>dataset</code>: OGB library-agnostic dataset (e.g., GraphPropPredDataset);</p>
+</li>
+<li>
+<p><code>indices</code>: optional, a list of integer indices; if provided, only these
+graphs will be converted;</p>
+</li>
+<li>
+<p><code>dtype</code>: if set, the arrays in the returned lists will have this dtype.</p>
+</li>
+</ul>
+<p><strong>Return</strong>  </p>
+<ul>
+<li>X_list: list of np.arrays of (variable) shape (N, F) with node features;</li>
+<li>A_list: list of scipy.sparse adjacency matrices of (variable) shape
+(N, N);</li>
+<li>E_list: list of np.arrays of (variable) shape (n_nodes, S) with edge
+attributes. If edge attributes are not available, a list of None.</li>
+<li>y_list: np.array of shape (n_graphs, n_tasks) with the task labels;</li>
+</ul>
+<h3 id="qm9-small-molecules">QM9 Small Molecules</h3>
+<h4 id="load_data_3">load_data</h4>
+<pre><code class="python">spektral.datasets.qm9.load_data(nf_keys=None, ef_keys=None, auto_pad=True, self_loops=False, amount=None, return_type='numpy')
+</code></pre>
+
+<p>Loads the QM9 chemical data set of small molecules.</p>
+<p>Nodes represent heavy atoms (hydrogens are discarded), edges represent
+chemical bonds.</p>
+<p>The node features represent the chemical properties of each atom, and are
+loaded according to the <code>nf_keys</code> argument.
+See <code>spektral.datasets.qm9.NODE_FEATURES</code> for possible node features, and
+see <a href="http://www.nonlinear.com/progenesis/sdf-studio/v0.9/faq/sdf-file-format-guidance.aspx">this link</a>
+for the meaning of each property. Usually, it is sufficient to load the
+atomic number.</p>
+<p>The edge features represent the type and stereoscopy of each chemical bond
+between two atoms.
+See <code>spektral.datasets.qm9.EDGE_FEATURES</code> for possible edge features, and
+see <a href="http://www.nonlinear.com/progenesis/sdf-studio/v0.9/faq/sdf-file-format-guidance.aspx">this link</a>
+for the meaning of each property. Usually, it is sufficient to load the
+type of bond.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>nf_keys</code>: list or str, node features to return (see <code>qm9.NODE_FEATURES</code>
+for available features);</p>
+</li>
+<li>
+<p><code>ef_keys</code>: list or str, edge features to return (see <code>qm9.EDGE_FEATURES</code>
+for available features);</p>
+</li>
+<li>
+<p><code>auto_pad</code>: if <code>return_type='numpy'</code>, zero pad graph matrices to have 
+the same number of nodes;</p>
+</li>
+<li>
+<p><code>self_loops</code>: if <code>return_type='numpy'</code>, add self loops to adjacency 
+matrices;</p>
+</li>
+<li>
+<p><code>amount</code>: the amount of molecules to return (in ascending order by
+number of atoms).</p>
+</li>
+<li>
+<p><code>return_type</code>: <code>'numpy'</code>, <code>'networkx'</code>, or <code>'sdf'</code>, data format to return;</p>
+</li>
+</ul>
+<p><strong>Return</strong>  </p>
+<ul>
+<li>if <code>return_type='numpy'</code>, the adjacency matrix, node features,
+edge features, and a Pandas dataframe containing labels;</li>
+<li>if <code>return_type='networkx'</code>, a list of graphs in Networkx format,
+and a dataframe containing labels;   </li>
+<li>if <code>return_type='sdf'</code>, a list of molecules in the internal SDF format and
+a dataframe containing labels.</li>
+</ul>
+<h3 id="mnist-knn-grid">MNIST KNN Grid</h3>
+<h4 id="load_data_4">load_data</h4>
+<pre><code class="python">spektral.datasets.mnist.load_data(k=8, noise_level=0.0)
+</code></pre>
+
+<p>Loads the MNIST dataset and a K-NN graph to perform graph signal
+classification, as described by <a href="https://arxiv.org/abs/1606.09375">Defferrard et al. (2016)</a>.
+The K-NN graph is statically determined from a regular grid of pixels using
+the 2d coordinates.</p>
+<p>The node features of each graph are the MNIST digits vectorized and rescaled
+to [0, 1].
+Two nodes are connected if they are neighbours according to the K-NN graph.
+Labels are the MNIST class associated to each sample.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>k</code>: int, number of neighbours for each node;</p>
+</li>
+<li>
+<p><code>noise_level</code>: fraction of edges to flip (from 0 to 1 and vice versa);</p>
+</li>
+</ul>
+<p><strong>Return</strong>  </p>
+<ul>
+<li>X_train, y_train: training node features and labels;</li>
+<li>X_val, y_val: validation node features and labels;</li>
+<li>X_test, y_test: test node features and labels;</li>
+<li>A: adjacency matrix of the grid;</li>
+</ul>
+<h3 id="delaunay-triangulations">Delaunay Triangulations</h3>
+<h4 id="generate_data">generate_data</h4>
+<pre><code class="python">spektral.datasets.delaunay.generate_data(classes=0, n_samples_in_class=1000, n_nodes=7, support_low=0.0, support_high=10.0, drift_amount=1.0, one_hot_labels=True, support=None, seed=None, return_type='numpy')
+</code></pre>
+
+<p>Generates a dataset of Delaunay triangulations as described by
+<a href="https://arxiv.org/abs/1706.06941">Zambon et al. (2017)</a>.</p>
+<p>Node attributes are the 2D coordinates of the points.
+Two nodes are connected if they share an edge in the Delaunay triangulation.
+Labels represent the class of the graph (0 to 20, each class index i
+represent the "difficulty" of the classification problem 0 v. i. In other
+words, the higher the class index, the more similar the class is to class 0).</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>classes</code>: indices of the classes to load (integer, or list of integers
+between 0 and 20);</p>
+</li>
+<li>
+<p><code>n_samples_in_class</code>: number of generated samples per class;</p>
+</li>
+<li>
+<p><code>n_nodes</code>: number of nodes in a graph;</p>
+</li>
+<li>
+<p><code>support_low</code>: lower bound of the uniform distribution from which the 
+support is generated;</p>
+</li>
+<li>
+<p><code>support_high</code>: upper bound of the uniform distribution from which the 
+support is generated;</p>
+</li>
+<li>
+<p><code>drift_amount</code>: coefficient to control the amount of change between 
+classes;</p>
+</li>
+<li>
+<p><code>one_hot_labels</code>: one-hot encode dataset labels;</p>
+</li>
+<li>
+<p><code>support</code>: custom support to use instead of generating it randomly; </p>
+</li>
+<li>
+<p><code>seed</code>: random numpy seed;</p>
+</li>
+<li>
+<p><code>return_type</code>: <code>'numpy'</code> or <code>'networkx'</code>, data format to return;</p>
+</li>
+</ul>
+<p><strong>Return</strong>  </p>
+<ul>
+<li>if <code>return_type='numpy'</code>, the adjacency matrix, node features, and
+an array containing labels;</li>
+<li>if <code>return_type='networkx'</code>, a list of graphs in Networkx format, and an
+array containing labels;</li>
+</ul>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../utils/data/" class="btn btn-neutral float-right" title="Data utils">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../layers/base/" class="btn btn-neutral" title="Base Layers"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../layers/base/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../utils/data/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+      <script src="../js/macros.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

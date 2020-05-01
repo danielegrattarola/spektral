@@ -5,27 +5,28 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Spektral: a Framework for Relational Representation Learning">
+  <meta name="description" content="Spektral: Graph Neural Networks in TensorFlow 2 and Keras">
   <meta name="author" content="Daniele Grattarola">
+  <link rel="canonical" href="https://spektral.graphneural.network/">
   <link rel="shortcut icon" href="img/favicon.ico">
-  <title>Home - Spektral</title>
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+  <title>Spektral</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
-  <link rel="stylesheet" href="css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
-  <link href="stylesheets/extra.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link href="stylesheets/extra.css" rel="stylesheet" />
   
   <script>
     // Current page data
     var mkdocs_page_name = "Home";
     var mkdocs_page_input_path = "index.md";
-    var mkdocs_page_url = "/spektral/";
+    var mkdocs_page_url = "/";
   </script>
   
   <script src="js/jquery-2.1.1.min.js" defer></script>
   <script src="js/modernizr-2.8.3.min.js" defer></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
   
   <script>
@@ -46,6 +47,7 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
         <a href="." class="icon icon-home"> Spektral</a>
         <div role="search">
@@ -56,145 +58,63 @@
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-	<ul class="current">
-	  
-          
-            <li class="toctree-l1 current">
-		
-    <a class="current" href=".">Home</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l2"><a href="#welcome-to-spektral">Welcome to Spektral</a></li>
-    
-
-    <li class="toctree-l2"><a href="#installation">Installation</a></li>
-    
-        <ul>
-        
-            <li><a class="toctree-l3" href="#tensorflow-1-and-keras">TensorFlow 1 and Keras</a></li>
-        
-        </ul>
-    
-
-    <li class="toctree-l2"><a href="#contributing">Contributing</a></li>
-    
-
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href=".">Home</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#tensorflow-1-and-keras">TensorFlow 1 and Keras</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#contributing">Contributing</a>
+    </li>
     </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Tutorials</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="getting-started/">Getting started</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="data/">Data representation</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="examples/">Examples</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Layers</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="layers/convolution/">Convolutional Layers</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="layers/pooling/">Pooling Layers</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="layers/base/">Base Layers</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Datasets</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="datasets/citation/">Citation</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="datasets/delaunay/">Delaunay</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="datasets/graphsage/">GraphSage</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="datasets/mnist/">MNIST</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="datasets/ogb/">OGB</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="datasets/qm9/">QM9</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="datasets/tud/">TU Dortmund</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Utils</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="utils/data/">Data</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="utils/convolution/">Convolution</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="utils/misc/">Miscellaneous</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="utils/plotting/">Plotting</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="utils/conversion/">Conversion</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="chem/">Chemistry</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="about/">About</a>
-	    </li>
-          
-        </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Tutorials</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="getting-started/">Getting started</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="data/">Data representation</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="examples/">Examples</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Layers</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="layers/convolution/">Convolutional Layers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="layers/pooling/">Pooling Layers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="layers/base/">Base Layers</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Data</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="datasets/">Datasets</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="utils/data/">Data utils</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Utils</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="utils/convolution/">Convolution</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="utils/misc/">Miscellaneous</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="utils/conversion/">Conversion</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="chem/">Chemistry</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Other</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="about/">About</a>
+                    </li>
+                </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
@@ -222,6 +142,7 @@
       
     </li>
   </ul>
+  
   <hr/>
 </div>
           <div role="main">
@@ -251,21 +172,17 @@ The main goal of this project is to provide a simple but flexible framework for 
 <li><a href="https://arxiv.org/abs/1904.08082">Self-Attention Graph (SAG) pooling</a></li>
 <li>Global sum, average, and max pooling</li>
 <li><a href="https://arxiv.org/abs/1511.05493">Global gated attention pooling</a></li>
+<li><a href="https://www.cse.wustl.edu/~muhan/papers/AAAI_2018_DGCNN.pdf">SortPool</a></li>
 </ul>
 <p>Spektral also includes lots of utilities for your graph deep learning projects.  </p>
 <p>See how to <a href="https://danielegrattarola.github.io/spektral/getting-started/">get started with Spektral</a> and have a look at the <a href="https://danielegrattarola.github.io/spektral/examples/">examples</a> for some templates.</p>
 <p>The source code of the project is available on <a href="https://github.com/danielegrattarola/spektral">Github</a>.<br />
 Read the documentation <a href="https://spektral.graphneural.network">here</a>.</p>
-<h2 id="installation">Installation</h2>
+<h3 id="installation">Installation</h3>
 <p>Spektral is compatible with Python 3.5+, and is tested on Ubuntu 16.04+ and MacOS. 
 Other Linux distros should work as well, but Windows is not supported for now. </p>
-<p>To install the required dependencies on Ubuntu run:</p>
-<pre><code class="bash">sudo apt install graphviz libgraphviz-dev libcgraph6
-</code></pre>
-
-<p>Some optional features of Spektral also depend on <a href="http://www.rdkit.org/docs/index.html">RDKit</a>, 
-a library for cheminformatics and molecule manipulation (available through 
-Anaconda).</p>
+<p>Some optional features of Spektral depend on <a href="http://www.rdkit.org/docs/index.html">RDKit</a>, 
+a library for cheminformatics and molecule manipulation (available through Anaconda).</p>
 <p>The simplest way to install Spektral is from PyPi: </p>
 <pre><code class="bash">pip install spektral
 </code></pre>
@@ -277,8 +194,7 @@ python setup.py install  # Or 'pip install .'
 </code></pre>
 
 <p>To install Spektral on <a href="https://colab.research.google.com/">Google Colab</a>:</p>
-<pre><code class="jupyter">! apt install graphviz libgraphviz-dev libcgraph6
-! pip install spektral
+<pre><code>! pip install spektral
 </code></pre>
 
 <h3 id="tensorflow-1-and-keras">TensorFlow 1 and Keras</h3>
@@ -291,8 +207,10 @@ python setup.py install  # Or 'pip install .'
 </code></pre>
 
 <p>In the future, the TF1-compatible version of Spektral (&lt;0.2) will receive bug fixes, but all new features will only support TensorFlow 2.   </p>
-<h2 id="contributing">Contributing</h2>
-<p>Spektral is an open source project available <a href="https://github.com/danielegrattarola/spektral">on Github</a>, and contributions of all types are welcome. Feel free to open a pull request if you have something interesting that you want to add to the framework.</p>
+<h3 id="contributing">Contributing</h3>
+<p>Spektral is an open source project available <a href="https://github.com/danielegrattarola/spektral">on Github</a>, and contributions of all types are welcome. 
+Feel free to open a pull request if you have something interesting that you want to add to the framework.</p>
+<p>The contribution guidelines are available <a href="https://github.com/danielegrattarola/spektral/blob/master/CONTRIBUTING.md">here</a> and a list of feature requests is available <a href="https://github.com/danielegrattarola/spektral/projects/1">here</a>.</p>
               
             </div>
           </div>
@@ -313,7 +231,7 @@ python setup.py install  # Or 'pip install .'
     
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
       
         </div>
@@ -323,7 +241,7 @@ python setup.py install  # Or 'pip install .'
 
   </div>
 
-  <div class="rst-versions" role="note" style="cursor: pointer">
+  <div class="rst-versions" role="note" aria-label="versions">
     <span class="rst-current-version" data-toggle="rst-current-version">
       
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
@@ -339,11 +257,16 @@ python setup.py install  # Or 'pip install .'
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
       <script src="js/macros.js" defer></script>
       <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
 
 </body>
 </html>
 
 <!--
-MkDocs version : 1.0.4
-Build Date UTC : 2020-04-21 10:01:21
+MkDocs version : 1.1
+Build Date UTC : 2020-05-01 09:28:29
 -->

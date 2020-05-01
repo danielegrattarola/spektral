@@ -7,25 +7,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <meta name="author" content="Daniele Grattarola">
+  <link rel="canonical" href="https://spektral.graphneural.network/chem/">
   <link rel="shortcut icon" href="../img/favicon.ico">
   <title>Chemistry - Spektral</title>
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
-  <link href="../stylesheets/extra.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link href="../stylesheets/extra.css" rel="stylesheet" />
   
   <script>
     // Current page data
     var mkdocs_page_name = "Chemistry";
     var mkdocs_page_input_path = "chem.md";
-    var mkdocs_page_url = "/spektral/chem/";
+    var mkdocs_page_url = "/chem/";
   </script>
   
   <script src="../js/jquery-2.1.1.min.js" defer></script>
   <script src="../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
   
   <script>
@@ -46,6 +47,7 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
         <a href=".." class="icon icon-home"> Spektral</a>
         <div role="search">
@@ -56,172 +58,85 @@
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-	<ul class="current">
-	  
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="..">Home</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Tutorials</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../getting-started/">Getting started</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../data/">Data representation</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../examples/">Examples</a>
-                </li>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Tutorials</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../getting-started/">Getting started</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../data/">Data representation</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Layers</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../layers/convolution/">Convolutional Layers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../layers/pooling/">Pooling Layers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../layers/base/">Base Layers</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Data</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../datasets/">Datasets</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../utils/data/">Data utils</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Utils</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../utils/convolution/">Convolution</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../utils/misc/">Miscellaneous</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../utils/conversion/">Conversion</a>
+                    </li>
+                </ul>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Chemistry</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#numpy_to_rdkit">numpy_to_rdkit</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#numpy_to_smiles">numpy_to_smiles</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#rdkit_to_smiles">rdkit_to_smiles</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#sdf_to_nx">sdf_to_nx</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#nx_to_sdf">nx_to_sdf</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#validate_rdkit">validate_rdkit</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#get_atomic_symbol">get_atomic_symbol</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#get_atomic_num">get_atomic_num</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#valid_score">valid_score</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#novel_score">novel_score</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#unique_score">unique_score</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#enable_rdkit_log">enable_rdkit_log</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#plot_rdkit">plot_rdkit</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#plot_rdkit_svg_grid">plot_rdkit_svg_grid</a>
+    </li>
     </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Layers</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../layers/convolution/">Convolutional Layers</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../layers/pooling/">Pooling Layers</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../layers/base/">Base Layers</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Datasets</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../datasets/citation/">Citation</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../datasets/delaunay/">Delaunay</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../datasets/graphsage/">GraphSage</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../datasets/mnist/">MNIST</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../datasets/ogb/">OGB</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../datasets/qm9/">QM9</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../datasets/tud/">TU Dortmund</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Utils</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../utils/data/">Data</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../utils/convolution/">Convolution</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../utils/misc/">Miscellaneous</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../utils/plotting/">Plotting</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../utils/conversion/">Conversion</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1 current">
-		
-    <a class="current" href="./">Chemistry</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l2"><a href="#numpy_to_rdkit">numpy_to_rdkit</a></li>
-    
-
-    <li class="toctree-l2"><a href="#numpy_to_smiles">numpy_to_smiles</a></li>
-    
-
-    <li class="toctree-l2"><a href="#rdkit_to_smiles">rdkit_to_smiles</a></li>
-    
-
-    <li class="toctree-l2"><a href="#sdf_to_nx">sdf_to_nx</a></li>
-    
-
-    <li class="toctree-l2"><a href="#nx_to_sdf">nx_to_sdf</a></li>
-    
-
-    <li class="toctree-l2"><a href="#validate_rdkit">validate_rdkit</a></li>
-    
-
-    <li class="toctree-l2"><a href="#get_atomic_symbol">get_atomic_symbol</a></li>
-    
-
-    <li class="toctree-l2"><a href="#get_atomic_num">get_atomic_num</a></li>
-    
-
-    <li class="toctree-l2"><a href="#valid_score">valid_score</a></li>
-    
-
-    <li class="toctree-l2"><a href="#novel_score">novel_score</a></li>
-    
-
-    <li class="toctree-l2"><a href="#unique_score">unique_score</a></li>
-    
-
-    <li class="toctree-l2"><a href="#enable_rdkit_log">enable_rdkit_log</a></li>
-    
-
-    <li class="toctree-l2"><a href="#plot_rdkit">plot_rdkit</a></li>
-    
-
-    <li class="toctree-l2"><a href="#plot_rdkit_svg_grid">plot_rdkit_svg_grid</a></li>
-    
-
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../about/">About</a>
-	    </li>
-          
-        </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Other</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../about/">About</a>
+                    </li>
+                </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
@@ -249,15 +164,17 @@
       
     </li>
   </ul>
+  
   <hr/>
 </div>
           <div role="main">
             <div class="section">
               
-                <p>This module provides some functions to work with molecules, and requires
+                <h2 id="chemistry">Chemistry</h2>
+<p>This module provides some functions to work with molecules, and requires
 the <a href="http://www.rdkit.org/docs/index.html">RDKit</a> library to be
 installed on the system.</p>
-<h3 id="numpy_to_rdkit">numpy_to_rdkit</h3>
+<h4 id="numpy_to_rdkit">numpy_to_rdkit</h4>
 <pre><code class="python">spektral.chem.numpy_to_rdkit(adj, nf, ef, sanitize=False)
 </code></pre>
 
@@ -280,7 +197,7 @@ installed on the system.</p>
 <p><strong>Return</strong><br />
  An RDKit molecule</p>
 <hr />
-<h3 id="numpy_to_smiles">numpy_to_smiles</h3>
+<h4 id="numpy_to_smiles">numpy_to_smiles</h4>
 <pre><code class="python">spektral.chem.numpy_to_smiles(adj, nf, ef)
 </code></pre>
 
@@ -300,7 +217,7 @@ installed on the system.</p>
 <p><strong>Return</strong><br />
  The SMILES string of the molecule</p>
 <hr />
-<h3 id="rdkit_to_smiles">rdkit_to_smiles</h3>
+<h4 id="rdkit_to_smiles">rdkit_to_smiles</h4>
 <pre><code class="python">spektral.chem.rdkit_to_smiles(mol)
 </code></pre>
 
@@ -312,7 +229,7 @@ installed on the system.</p>
 <p><strong>Return</strong><br />
  The SMILES string of the molecule </p>
 <hr />
-<h3 id="sdf_to_nx">sdf_to_nx</h3>
+<h4 id="sdf_to_nx">sdf_to_nx</h4>
 <pre><code class="python">spektral.chem.sdf_to_nx(sdf, keep_hydrogen=False)
 </code></pre>
 
@@ -329,7 +246,7 @@ installed on the system.</p>
 <p><strong>Return</strong><br />
  List of nx.Graphs.</p>
 <hr />
-<h3 id="nx_to_sdf">nx_to_sdf</h3>
+<h4 id="nx_to_sdf">nx_to_sdf</h4>
 <pre><code class="python">spektral.chem.nx_to_sdf(graphs)
 </code></pre>
 
@@ -341,7 +258,7 @@ installed on the system.</p>
 <p><strong>Return</strong><br />
  List of molecules in the internal SDF format.</p>
 <hr />
-<h3 id="validate_rdkit">validate_rdkit</h3>
+<h4 id="validate_rdkit">validate_rdkit</h4>
 <pre><code class="python">spektral.chem.validate_rdkit(mol)
 </code></pre>
 
@@ -354,7 +271,7 @@ installed on the system.</p>
  Boolean array, True if the molecules are chemically valid, False 
 otherwise</p>
 <hr />
-<h3 id="get_atomic_symbol">get_atomic_symbol</h3>
+<h4 id="get_atomic_symbol">get_atomic_symbol</h4>
 <pre><code class="python">spektral.chem.get_atomic_symbol(number)
 </code></pre>
 
@@ -366,7 +283,7 @@ otherwise</p>
 <p><strong>Return</strong><br />
  String, atomic symbol</p>
 <hr />
-<h3 id="get_atomic_num">get_atomic_num</h3>
+<h4 id="get_atomic_num">get_atomic_num</h4>
 <pre><code class="python">spektral.chem.get_atomic_num(symbol)
 </code></pre>
 
@@ -378,7 +295,7 @@ otherwise</p>
 <p><strong>Return</strong><br />
  Int &lt;= 118</p>
 <hr />
-<h3 id="valid_score">valid_score</h3>
+<h4 id="valid_score">valid_score</h4>
 <pre><code class="python">spektral.chem.valid_score(molecules, from_numpy=False)
 </code></pre>
 
@@ -396,7 +313,7 @@ array representing the validity of each molecule.</p>
 <p><strong>Return</strong><br />
  Boolean array with the validity for each molecule</p>
 <hr />
-<h3 id="novel_score">novel_score</h3>
+<h4 id="novel_score">novel_score</h4>
 <pre><code class="python">spektral.chem.novel_score(molecules, smiles, from_numpy=False)
 </code></pre>
 
@@ -419,7 +336,7 @@ novelty</p>
 <p><strong>Return</strong><br />
  Boolean array with the novelty for each valid molecule</p>
 <hr />
-<h3 id="unique_score">unique_score</h3>
+<h4 id="unique_score">unique_score</h4>
 <pre><code class="python">spektral.chem.unique_score(molecules, from_numpy=False)
 </code></pre>
 
@@ -437,14 +354,14 @@ of unique and valid molecules w.r.t. to the number of valid molecules.</p>
 <p><strong>Return</strong><br />
  Fraction of unique valid molecules w.r.t. to valid molecules</p>
 <hr />
-<h3 id="enable_rdkit_log">enable_rdkit_log</h3>
+<h4 id="enable_rdkit_log">enable_rdkit_log</h4>
 <pre><code class="python">spektral.chem.enable_rdkit_log()
 </code></pre>
 
 <p>Enables RDkit logging.</p>
 <p><strong>Return</strong>  </p>
 <hr />
-<h3 id="plot_rdkit">plot_rdkit</h3>
+<h4 id="plot_rdkit">plot_rdkit</h4>
 <pre><code class="python">spektral.chem.plot_rdkit(mol, filename=None)
 </code></pre>
 
@@ -461,7 +378,7 @@ of unique and valid molecules w.r.t. to the number of valid molecules.</p>
 <p><strong>Return</strong><br />
  The image as np.array</p>
 <hr />
-<h3 id="plot_rdkit_svg_grid">plot_rdkit_svg_grid</h3>
+<h4 id="plot_rdkit_svg_grid">plot_rdkit_svg_grid</h4>
 <pre><code class="python">spektral.chem.plot_rdkit_svg_grid(mols, mols_per_row=5, filename=None)
 </code></pre>
 
@@ -505,7 +422,7 @@ of unique and valid molecules w.r.t. to the number of valid molecules.</p>
     
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
       
         </div>
@@ -515,7 +432,7 @@ of unique and valid molecules w.r.t. to the number of valid molecules.</p>
 
   </div>
 
-  <div class="rst-versions" role="note" style="cursor: pointer">
+  <div class="rst-versions" role="note" aria-label="versions">
     <span class="rst-current-version" data-toggle="rst-current-version">
       
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
@@ -533,6 +450,11 @@ of unique and valid molecules w.r.t. to the number of valid molecules.</p>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
       <script src="../js/macros.js" defer></script>
       <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
 
 </body>
 </html>

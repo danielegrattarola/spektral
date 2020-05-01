@@ -1,108 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    <url>
-     <loc>https://danielegrattarola.github.io/spektral/</loc>
-     <lastmod>2020-04-21</lastmod>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url>
+     <loc>https://spektral.graphneural.network/</loc>
+     <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
-    </url>
-    <url>
-     <loc>https://danielegrattarola.github.io/spektral/getting-started/</loc>
-     <lastmod>2020-04-21</lastmod>
+    </url><url>
+     <loc>https://spektral.graphneural.network/getting-started/</loc>
+     <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
-    </url>
-    <url>
-     <loc>https://danielegrattarola.github.io/spektral/data/</loc>
-     <lastmod>2020-04-21</lastmod>
+    </url><url>
+     <loc>https://spektral.graphneural.network/data/</loc>
+     <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
-    </url>
-    <url>
-     <loc>https://danielegrattarola.github.io/spektral/examples/</loc>
-     <lastmod>2020-04-21</lastmod>
+    </url><url>
+     <loc>https://spektral.graphneural.network/examples/</loc>
+     <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
-    </url>
-    <url>
-     <loc>https://danielegrattarola.github.io/spektral/layers/convolution/</loc>
-     <lastmod>2020-04-21</lastmod>
+    </url><url>
+     <loc>https://spektral.graphneural.network/layers/convolution/</loc>
+     <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
-    </url>
-    <url>
-     <loc>https://danielegrattarola.github.io/spektral/layers/pooling/</loc>
-     <lastmod>2020-04-21</lastmod>
+    </url><url>
+     <loc>https://spektral.graphneural.network/layers/pooling/</loc>
+     <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
-    </url>
-    <url>
-     <loc>https://danielegrattarola.github.io/spektral/layers/base/</loc>
-     <lastmod>2020-04-21</lastmod>
+    </url><url>
+     <loc>https://spektral.graphneural.network/layers/base/</loc>
+     <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
-    </url>
-    <url>
-     <loc>https://danielegrattarola.github.io/spektral/datasets/citation/</loc>
-     <lastmod>2020-04-21</lastmod>
+    </url><url>
+     <loc>https://spektral.graphneural.network/datasets/</loc>
+     <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
-    </url>
-    <url>
-     <loc>https://danielegrattarola.github.io/spektral/datasets/delaunay/</loc>
-     <lastmod>2020-04-21</lastmod>
+    </url><url>
+     <loc>https://spektral.graphneural.network/utils/data/</loc>
+     <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
-    </url>
-    <url>
-     <loc>https://danielegrattarola.github.io/spektral/datasets/graphsage/</loc>
-     <lastmod>2020-04-21</lastmod>
+    </url><url>
+     <loc>https://spektral.graphneural.network/utils/convolution/</loc>
+     <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
-    </url>
-    <url>
-     <loc>https://danielegrattarola.github.io/spektral/datasets/mnist/</loc>
-     <lastmod>2020-04-21</lastmod>
+    </url><url>
+     <loc>https://spektral.graphneural.network/utils/misc/</loc>
+     <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
-    </url>
-    <url>
-     <loc>https://danielegrattarola.github.io/spektral/datasets/ogb/</loc>
-     <lastmod>2020-04-21</lastmod>
+    </url><url>
+     <loc>https://spektral.graphneural.network/utils/conversion/</loc>
+     <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
-    </url>
-    <url>
-     <loc>https://danielegrattarola.github.io/spektral/datasets/qm9/</loc>
-     <lastmod>2020-04-21</lastmod>
+    </url><url>
+     <loc>https://spektral.graphneural.network/chem/</loc>
+     <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
-    </url>
-    <url>
-     <loc>https://danielegrattarola.github.io/spektral/datasets/tud/</loc>
-     <lastmod>2020-04-21</lastmod>
-     <changefreq>daily</changefreq>
-    </url>
-    <url>
-     <loc>https://danielegrattarola.github.io/spektral/utils/data/</loc>
-     <lastmod>2020-04-21</lastmod>
-     <changefreq>daily</changefreq>
-    </url>
-    <url>
-     <loc>https://danielegrattarola.github.io/spektral/utils/convolution/</loc>
-     <lastmod>2020-04-21</lastmod>
-     <changefreq>daily</changefreq>
-    </url>
-    <url>
-     <loc>https://danielegrattarola.github.io/spektral/utils/misc/</loc>
-     <lastmod>2020-04-21</lastmod>
-     <changefreq>daily</changefreq>
-    </url>
-    <url>
-     <loc>https://danielegrattarola.github.io/spektral/utils/plotting/</loc>
-     <lastmod>2020-04-21</lastmod>
-     <changefreq>daily</changefreq>
-    </url>
-    <url>
-     <loc>https://danielegrattarola.github.io/spektral/utils/conversion/</loc>
-     <lastmod>2020-04-21</lastmod>
-     <changefreq>daily</changefreq>
-    </url>
-    <url>
-     <loc>https://danielegrattarola.github.io/spektral/chem/</loc>
-     <lastmod>2020-04-21</lastmod>
-     <changefreq>daily</changefreq>
-    </url>
-    <url>
-     <loc>https://danielegrattarola.github.io/spektral/about/</loc>
-     <lastmod>2020-04-21</lastmod>
+    </url><url>
+     <loc>https://spektral.graphneural.network/about/</loc>
+     <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
     </url>
 </urlset>

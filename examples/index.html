@@ -7,25 +7,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <meta name="author" content="Daniele Grattarola">
+  <link rel="canonical" href="https://spektral.graphneural.network/examples/">
   <link rel="shortcut icon" href="../img/favicon.ico">
   <title>Examples - Spektral</title>
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
-  <link href="../stylesheets/extra.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link href="../stylesheets/extra.css" rel="stylesheet" />
   
   <script>
     // Current page data
     var mkdocs_page_name = "Examples";
     var mkdocs_page_input_path = "examples.md";
-    var mkdocs_page_url = "/spektral/examples/";
+    var mkdocs_page_url = "/examples/";
   </script>
   
   <script src="../js/jquery-2.1.1.min.js" defer></script>
   <script src="../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
   
   <script>
@@ -46,6 +47,7 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
         <a href=".." class="icon icon-home"> Spektral</a>
         <div role="search">
@@ -56,145 +58,65 @@
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-	<ul class="current">
-	  
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="..">Home</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Tutorials</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../getting-started/">Getting started</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../data/">Data representation</a>
-                </li>
-                <li class=" current">
-                    
-    <a class="current" href="./">Examples</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l3"><a href="#examples">Examples</a></li>
-    
-        <ul>
-        
-            <li><a class="toctree-l4" href="#node-classification">Node classification</a></li>
-        
-            <li><a class="toctree-l4" href="#graph-level-prediction">Graph-level prediction</a></li>
-        
-            <li><a class="toctree-l4" href="#graph-signal-classification">Graph signal classification</a></li>
-        
-            <li><a class="toctree-l4" href="#other-applications">Other applications</a></li>
-        
-        </ul>
-    
-
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Tutorials</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../getting-started/">Getting started</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../data/">Data representation</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Examples</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#node-classification">Node classification</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#graph-level-prediction">Graph-level prediction</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#graph-signal-classification">Graph signal classification</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#other-applications">Other applications</a>
+    </li>
     </ul>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Layers</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../layers/convolution/">Convolutional Layers</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../layers/pooling/">Pooling Layers</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../layers/base/">Base Layers</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Datasets</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../datasets/citation/">Citation</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../datasets/delaunay/">Delaunay</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../datasets/graphsage/">GraphSage</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../datasets/mnist/">MNIST</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../datasets/ogb/">OGB</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../datasets/qm9/">QM9</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../datasets/tud/">TU Dortmund</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Utils</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../utils/data/">Data</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../utils/convolution/">Convolution</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../utils/misc/">Miscellaneous</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../utils/plotting/">Plotting</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../utils/conversion/">Conversion</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../chem/">Chemistry</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../about/">About</a>
-	    </li>
-          
-        </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Layers</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../layers/convolution/">Convolutional Layers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../layers/pooling/">Pooling Layers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../layers/base/">Base Layers</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Data</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../datasets/">Datasets</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../utils/data/">Data utils</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Utils</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../utils/convolution/">Convolution</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../utils/misc/">Miscellaneous</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../utils/conversion/">Conversion</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../chem/">Chemistry</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Other</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../about/">About</a>
+                    </li>
+                </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
@@ -226,14 +148,15 @@
       
     </li>
   </ul>
+  
   <hr/>
 </div>
           <div role="main">
             <div class="section">
               
-                <h1 id="examples">Examples</h1>
+                <h2 id="examples">Examples</h2>
 <p>This is a collection of example scripts that you can use as template to solve your own tasks. </p>
-<h2 id="node-classification">Node classification</h2>
+<h3 id="node-classification">Node classification</h3>
 <ul>
 <li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_gcn.py">Node classification on citation networks with GCN</a>;</li>
 <li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_cheby.py">Node classification on citation networks with ChebNets</a>;</li>
@@ -242,7 +165,7 @@
 <li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_simple_gc.py">Node classification on citation networks with SimpleGCN</a>;</li>
 <li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/ogbn-proteins_gcn.py">Node classification on the Open Graph Benchmark dataset (ogbn-proteins)</a>;</li>
 </ul>
-<h2 id="graph-level-prediction">Graph-level prediction</h2>
+<h3 id="graph-level-prediction">Graph-level prediction</h3>
 <p>Batch mode:</p>
 <ul>
 <li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/delaunay_batch.py">Classification of synthetic graphs with GAT</a>;</li>
@@ -253,11 +176,11 @@
 <li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/BDGC_disjoint.py">Classification of synthetic graphs with TopK pooling</a>;</li>
 <li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/qm9_disjoint.py">Regression of molecular properties on QM9 with ECC</a>;</li>
 </ul>
-<h2 id="graph-signal-classification">Graph signal classification</h2>
+<h3 id="graph-signal-classification">Graph signal classification</h3>
 <ul>
 <li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/other/graph_signal_classification_mnist.py">Graph signal classification on MNIST (mixed mode)</a>;</li>
 </ul>
-<h2 id="other-applications">Other applications</h2>
+<h3 id="other-applications">Other applications</h3>
 <ul>
 <li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/other/node_clustering_mincut.py">Node clustering on citation networks with minCUT pooling (unsupervised)</a>;</li>
 </ul>
@@ -288,7 +211,7 @@
     
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
       
         </div>
@@ -298,7 +221,7 @@
 
   </div>
 
-  <div class="rst-versions" role="note" style="cursor: pointer">
+  <div class="rst-versions" role="note" aria-label="versions">
     <span class="rst-current-version" data-toggle="rst-current-version">
       
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
@@ -316,6 +239,11 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
       <script src="../js/macros.js" defer></script>
       <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
 
 </body>
 </html>

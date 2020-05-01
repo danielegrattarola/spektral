@@ -7,25 +7,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <meta name="author" content="Daniele Grattarola">
+  <link rel="canonical" href="https://spektral.graphneural.network/utils/conversion/">
   <link rel="shortcut icon" href="../../img/favicon.ico">
   <title>Conversion - Spektral</title>
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
-  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
-  <link href="../../stylesheets/extra.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/theme.css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link href="../../stylesheets/extra.css" rel="stylesheet" />
   
   <script>
     // Current page data
     var mkdocs_page_name = "Conversion";
     var mkdocs_page_input_path = "utils/conversion.md";
-    var mkdocs_page_url = "/spektral/utils/conversion/";
+    var mkdocs_page_url = "/utils/conversion/";
   </script>
   
   <script src="../../js/jquery-2.1.1.min.js" defer></script>
   <script src="../../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
   
   <script>
@@ -46,6 +47,7 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
         <a href="../.." class="icon icon-home"> Spektral</a>
         <div role="search">
@@ -56,145 +58,67 @@
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-	<ul class="current">
-	  
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../..">Home</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Tutorials</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../../getting-started/">Getting started</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../data/">Data representation</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../examples/">Examples</a>
-                </li>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Tutorials</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting started</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../data/">Data representation</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../examples/">Examples</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Layers</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../layers/convolution/">Convolutional Layers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../layers/pooling/">Pooling Layers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../layers/base/">Base Layers</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Data</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../datasets/">Datasets</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../data/">Data utils</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Utils</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../convolution/">Convolution</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../misc/">Miscellaneous</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Conversion</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#nx_to_adj">nx_to_adj</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#nx_to_node_features">nx_to_node_features</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#nx_to_edge_features">nx_to_edge_features</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#nx_to_numpy">nx_to_numpy</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#numpy_to_nx">numpy_to_nx</a>
+    </li>
     </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Layers</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../../layers/convolution/">Convolutional Layers</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../layers/pooling/">Pooling Layers</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../layers/base/">Base Layers</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Datasets</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../../datasets/citation/">Citation</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/delaunay/">Delaunay</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/graphsage/">GraphSage</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/mnist/">MNIST</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/ogb/">OGB</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/qm9/">QM9</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/tud/">TU Dortmund</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Utils</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../data/">Data</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../convolution/">Convolution</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../misc/">Miscellaneous</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../plotting/">Plotting</a>
-                </li>
-                <li class=" current">
-                    
-    <a class="current" href="./">Conversion</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l3"><a href="#nx_to_adj">nx_to_adj</a></li>
-    
-
-    <li class="toctree-l3"><a href="#nx_to_node_features">nx_to_node_features</a></li>
-    
-
-    <li class="toctree-l3"><a href="#nx_to_edge_features">nx_to_edge_features</a></li>
-    
-
-    <li class="toctree-l3"><a href="#nx_to_numpy">nx_to_numpy</a></li>
-    
-
-    <li class="toctree-l3"><a href="#numpy_to_nx">numpy_to_nx</a></li>
-    
-
-    </ul>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../chem/">Chemistry</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../about/">About</a>
-	    </li>
-          
-        </ul>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../chem/">Chemistry</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Other</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../about/">About</a>
+                    </li>
+                </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
@@ -226,12 +150,14 @@
       
     </li>
   </ul>
+  
   <hr/>
 </div>
           <div role="main">
             <div class="section">
               
-                <h3 id="nx_to_adj">nx_to_adj</h3>
+                <h2 id="conversion">Conversion</h2>
+<h4 id="nx_to_adj">nx_to_adj</h4>
 <pre><code class="python">spektral.utils.nx_to_adj(graphs)
 </code></pre>
 
@@ -244,7 +170,7 @@ of shape <code>(num_graphs, num_nodes, num_nodes)</code>.</p>
 <p><strong>Return</strong><br />
  A rank 3 np.array of adjacency matrices.</p>
 <hr />
-<h3 id="nx_to_node_features">nx_to_node_features</h3>
+<h4 id="nx_to_node_features">nx_to_node_features</h4>
 <pre><code class="python">spektral.utils.nx_to_node_features(graphs, keys, post_processing=None)
 </code></pre>
 
@@ -269,7 +195,7 @@ function to leave the attribute unchanged.</p>
 <p><strong>Return</strong><br />
  A rank 3 np.array of feature matrices</p>
 <hr />
-<h3 id="nx_to_edge_features">nx_to_edge_features</h3>
+<h4 id="nx_to_edge_features">nx_to_edge_features</h4>
 <pre><code class="python">spektral.utils.nx_to_edge_features(graphs, keys, post_processing=None)
 </code></pre>
 
@@ -294,7 +220,7 @@ function to leave the attribute unchanged.</p>
 <p><strong>Return</strong><br />
  A rank 3 np.array of feature matrices</p>
 <hr />
-<h3 id="nx_to_numpy">nx_to_numpy</h3>
+<h4 id="nx_to_numpy">nx_to_numpy</h4>
 <pre><code class="python">spektral.utils.nx_to_numpy(graphs, auto_pad=True, self_loops=True, nf_keys=None, ef_keys=None, nf_postprocessing=None, ef_postprocessing=None)
 </code></pre>
 
@@ -339,7 +265,7 @@ function to leave the attribute unchanged.</p>
 <li>edge attributes matrices of shape <code>(num_samples, num_nodes, num_nodes, edge_features_dim)</code></li>
 </ul>
 <hr />
-<h3 id="numpy_to_nx">numpy_to_nx</h3>
+<h4 id="numpy_to_nx">numpy_to_nx</h4>
 <pre><code class="python">spektral.utils.numpy_to_nx(adj, node_features=None, edge_features=None, nf_name=None, ef_name=None)
 </code></pre>
 
@@ -377,7 +303,7 @@ If there is only one sample, the first dimension can be dropped.</p>
         <a href="../../chem/" class="btn btn-neutral float-right" title="Chemistry">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../plotting/" class="btn btn-neutral" title="Plotting"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../misc/" class="btn btn-neutral" title="Miscellaneous"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -389,7 +315,7 @@ If there is only one sample, the first dimension can be dropped.</p>
     
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
       
         </div>
@@ -399,13 +325,13 @@ If there is only one sample, the first dimension can be dropped.</p>
 
   </div>
 
-  <div class="rst-versions" role="note" style="cursor: pointer">
+  <div class="rst-versions" role="note" aria-label="versions">
     <span class="rst-current-version" data-toggle="rst-current-version">
       
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../plotting/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../misc/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
         <span style="margin-left: 15px"><a href="../../chem/" style="color: #fcfcfc">Next &raquo;</a></span>
@@ -417,6 +343,11 @@ If there is only one sample, the first dimension can be dropped.</p>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
       <script src="../../js/macros.js" defer></script>
       <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
 
 </body>
 </html>

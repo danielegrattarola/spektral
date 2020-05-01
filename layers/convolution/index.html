@@ -7,25 +7,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <meta name="author" content="Daniele Grattarola">
+  <link rel="canonical" href="https://spektral.graphneural.network/layers/convolution/">
   <link rel="shortcut icon" href="../../img/favicon.ico">
   <title>Convolutional Layers - Spektral</title>
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
-  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
-  <link href="../../stylesheets/extra.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/theme.css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link href="../../stylesheets/extra.css" rel="stylesheet" />
   
   <script>
     // Current page data
     var mkdocs_page_name = "Convolutional Layers";
     var mkdocs_page_input_path = "layers/convolution.md";
-    var mkdocs_page_url = "/spektral/layers/convolution/";
+    var mkdocs_page_url = "/layers/convolution/";
   </script>
   
   <script src="../../js/jquery-2.1.1.min.js" defer></script>
   <script src="../../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
   
   <script>
@@ -46,6 +47,7 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
         <a href="../.." class="icon icon-home"> Spektral</a>
         <div role="search">
@@ -56,157 +58,81 @@
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-	<ul class="current">
-	  
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../..">Home</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Tutorials</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../../getting-started/">Getting started</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../data/">Data representation</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../examples/">Examples</a>
-                </li>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Tutorials</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting started</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../data/">Data representation</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../examples/">Examples</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Layers</span></p>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Convolutional Layers</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#graphconv">GraphConv</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#chebconv">ChebConv</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#graphsageconv">GraphSageConv</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#armaconv">ARMAConv</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#edgeconditionedconv">EdgeConditionedConv</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#graphattention">GraphAttention</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#graphconvskip">GraphConvSkip</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#appnp">APPNP</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#ginconv">GINConv</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#diffusionconvolution">DiffusionConvolution</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#gatedgraphconv">GatedGraphConv</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#messagepassing">MessagePassing</a>
+    </li>
     </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Layers</span>
-    <ul class="subnav">
-                <li class=" current">
-                    
-    <a class="current" href="./">Convolutional Layers</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l3"><a href="#graphconv">GraphConv</a></li>
-    
-
-    <li class="toctree-l3"><a href="#chebconv">ChebConv</a></li>
-    
-
-    <li class="toctree-l3"><a href="#graphsageconv">GraphSageConv</a></li>
-    
-
-    <li class="toctree-l3"><a href="#armaconv">ARMAConv</a></li>
-    
-
-    <li class="toctree-l3"><a href="#edgeconditionedconv">EdgeConditionedConv</a></li>
-    
-
-    <li class="toctree-l3"><a href="#graphattention">GraphAttention</a></li>
-    
-
-    <li class="toctree-l3"><a href="#graphconvskip">GraphConvSkip</a></li>
-    
-
-    <li class="toctree-l3"><a href="#appnp">APPNP</a></li>
-    
-
-    <li class="toctree-l3"><a href="#ginconv">GINConv</a></li>
-    
-
-    </ul>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../pooling/">Pooling Layers</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../base/">Base Layers</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Datasets</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../../datasets/citation/">Citation</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/delaunay/">Delaunay</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/graphsage/">GraphSage</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/mnist/">MNIST</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/ogb/">OGB</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/qm9/">QM9</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/tud/">TU Dortmund</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Utils</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../../utils/data/">Data</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../utils/convolution/">Convolution</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../utils/misc/">Miscellaneous</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../utils/plotting/">Plotting</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../utils/conversion/">Conversion</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../chem/">Chemistry</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../about/">About</a>
-	    </li>
-          
-        </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../pooling/">Pooling Layers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../base/">Base Layers</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Data</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../datasets/">Datasets</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../utils/data/">Data utils</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Utils</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../utils/convolution/">Convolution</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../utils/misc/">Miscellaneous</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../utils/conversion/">Conversion</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../chem/">Chemistry</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Other</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../about/">About</a>
+                    </li>
+                </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
@@ -238,12 +164,14 @@
       
     </li>
   </ul>
+  
   <hr/>
 </div>
           <div role="main">
             <div class="section">
               
-                <p>The message-passing layers from these papers are available in Spektral:</p>
+                <h2 id="convolutional-layers">Convolutional layers</h2>
+<p>The message-passing layers from these papers are available in Spektral:</p>
 <ul>
 <li><a href="https://arxiv.org/abs/1609.02907">Semi-Supervised Classification with Graph Convolutional Networks</a></li>
 <li><a href="https://arxiv.org/abs/1606.09375">Convolutional Neural Networks on Graphs with Fast Localized Spectral Filtering</a></li>
@@ -281,7 +209,7 @@
 </ul>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gcn.py#L9">[source]</a></span></p>
-<h3 id="graphconv">GraphConv</h3>
+<h4 id="graphconv">GraphConv</h4>
 <pre><code class="python">spektral.layers.GraphConv(channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
@@ -320,7 +248,7 @@ dimension changed to <code>channels</code>.</li>
 </ul>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/cheby.py#L8">[source]</a></span></p>
-<h3 id="chebconv">ChebConv</h3>
+<h4 id="chebconv">ChebConv</h4>
 <pre><code class="python">spektral.layers.ChebConv(channels, K=1, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
@@ -371,7 +299,7 @@ dimension changed to <code>channels</code>.</li>
 </ul>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/graphsage.py#L8">[source]</a></span></p>
-<h3 id="graphsageconv">GraphSageConv</h3>
+<h4 id="graphsageconv">GraphSageConv</h4>
 <pre><code class="python">spektral.layers.GraphSageConv(channels, aggregate_op='mean', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
@@ -413,7 +341,7 @@ dimension changed to <code>channels</code>.</li>
 </ul>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/arma.py#L9">[source]</a></span></p>
-<h3 id="armaconv">ARMAConv</h3>
+<h4 id="armaconv">ARMAConv</h4>
 <pre><code class="python">spektral.layers.ARMAConv(channels, order=1, iterations=1, share_weights=False, gcn_activation='relu', dropout_rate=0.0, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
@@ -470,14 +398,17 @@ stack;</li>
 </ul>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/ecc.py#L10">[source]</a></span></p>
-<h3 id="edgeconditionedconv">EdgeConditionedConv</h3>
+<h4 id="edgeconditionedconv">EdgeConditionedConv</h4>
 <pre><code class="python">spektral.layers.EdgeConditionedConv(channels, kernel_network=None, root=True, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
 <p>An edge-conditioned convolutional layer (ECC) as presented by
 <a href="https://arxiv.org/abs/1704.02901">Simonovsky &amp; Komodakis (2017)</a>.</p>
 <p><strong>Mode</strong>: single, batch.</p>
-<p><strong>This layer expects dense inputs and self-loops when working in batch mode.</strong></p>
+<p><strong>Notes</strong>:
+- This layer expects dense inputs and self-loops when working in batch mode.
+- In single mode, if the adjacency matrix is dense it will be converted
+to a SparseTensor automatically (which is an expensive operation).</p>
 <p>For each node <script type="math/tex"> i </script>, this layer computes:
 <script type="math/tex; mode=display">
 \Z_i =  \frac{1}{\mathcal{N}(i)} \sum\limits_{j \in \mathcal{N}(i)} \textrm{MLP}(\E_{ji}) \X_{j} + \b
@@ -488,7 +419,8 @@ convolutional kernel <script type="math/tex">\W</script> as a function of edge a
 <ul>
 <li>Node features of shape <code>([batch], N, F)</code>;</li>
 <li>Binary adjacency matrices with self-loops, of shape <code>([batch], N, N)</code>;</li>
-<li>Edge features of shape <code>([batch], N, N, S)</code>;</li>
+<li>Edge features. In single mode, shape <code>(num_edges, S)</code>; in batch mode, shape
+<code>(batch, N, N, S)</code>.</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
@@ -498,9 +430,8 @@ changed to <code>channels</code>.</li>
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>channels</code>: integer, number of output channels;</li>
-<li><code>kernel_network</code>: a list of integers describing the hidden structure of
-the kernel-generating network (i.e., the ReLU layers before the linear
-output);</li>
+<li><code>kernel_network</code>: a list of integers representing the hidden neurons of
+the kernel-generating network;</li>
 <li><code>activation</code>: activation function to use;</li>
 <li><code>use_bias</code>: boolean, whether to add a bias to the linear transformation;</li>
 <li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
@@ -513,7 +444,7 @@ output);</li>
 </ul>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gat.py#L11">[source]</a></span></p>
-<h3 id="graphattention">GraphAttention</h3>
+<h4 id="graphattention">GraphAttention</h4>
 <pre><code class="python">spektral.layers.GraphAttention(channels, attn_heads=1, concat_heads=True, dropout_rate=0.5, return_attn_coef=False, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', attn_kernel_initializer='glorot_uniform', kernel_regularizer=None, bias_regularizer=None, attn_kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None, attn_kernel_constraint=None)
 </code></pre>
 
@@ -586,7 +517,7 @@ the given input (one N x N matrix for each head).</li>
 </ul>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gcs.py#L8">[source]</a></span></p>
-<h3 id="graphconvskip">GraphConvSkip</h3>
+<h4 id="graphconvskip">GraphConvSkip</h4>
 <pre><code class="python">spektral.layers.GraphConvSkip(channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
@@ -623,7 +554,7 @@ dimension changed to <code>channels</code>.</li>
 </ul>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/appnp.py#L9">[source]</a></span></p>
-<h3 id="appnp">APPNP</h3>
+<h4 id="appnp">APPNP</h4>
 <pre><code class="python">spektral.layers.APPNP(channels, alpha=0.2, propagations=1, mlp_hidden=None, mlp_activation='relu', dropout_rate=0.0, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
@@ -669,8 +600,8 @@ layer in the MLP (if None, the MLP has only the output layer);</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gin.py#L10">[source]</a></span></p>
-<h3 id="ginconv">GINConv</h3>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gin.py#L8">[source]</a></span></p>
+<h4 id="ginconv">GINConv</h4>
 <pre><code class="python">spektral.layers.GINConv(channels, epsilon=None, mlp_hidden=None, mlp_activation='relu', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
@@ -714,6 +645,143 @@ layer in the MLP (if None, the MLP has only the output layer);</li>
 <li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/diffconv.py#L83">[source]</a></span></p>
+<h4 id="diffusionconvolution">DiffusionConvolution</h4>
+<pre><code class="python">spektral.layers.DiffusionConvolution(channels, num_diffusion_steps=6, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None, activation='tanh')
+</code></pre>
+
+<p>Applies Graph Diffusion Convolution as descibed by
+<a href="https://arxiv.org/pdf/1707.01926.pdf">Li et al. (2016)</a></p>
+<p><strong>Mode</strong>: single, mixed, batch.</p>
+<p><strong>This layer expects a dense adjacency matrix.</strong></p>
+<p>Given a number of diffusion steps <script type="math/tex">K</script> and a row normalized adjacency matrix <script type="math/tex">\hat \A </script>,
+this layer calculates the q'th channel as:
+<script type="math/tex; mode=display">
+\mathbf{H}_{~:,~q} = \sigma\left(
+\sum_{f=1}^{F}
+\left(
+\sum_{k=0}^{K-1}\theta_k {\hat \A}^k
+\right)
+\X_{~:,~f}
+\right)
+</script>
+</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>([batch], N, F)</code>;</li>
+<li>Normalized adjacency or attention coef. matrix <script type="math/tex">\hat \A </script> of shape
+<code>([batch], N, N)</code>; Use <code>DiffusionConvolution.preprocess</code> to normalize.</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Node features with the same shape as the input, but with the last
+dimension changed to <code>channels</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>channels</code>: number of output channels;</li>
+<li><code>num_diffusion_steps</code>: How many diffusion steps to consider. <script type="math/tex">K</script> in paper.</li>
+<li><code>activation</code>: activation function <script type="math/tex">\sigma</script>; (<script type="math/tex">\tanh</script> by default)</li>
+<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the kernel vectors;</li>
+<li><code>kernel_constraint</code>: constraint applied to the kernel vectors;</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gated_graph.py#L8">[source]</a></span></p>
+<h4 id="gatedgraphconv">GatedGraphConv</h4>
+<pre><code class="python">spektral.layers.GatedGraphConv(channels, n_layers, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+</code></pre>
+
+<p>A gated graph convolutional layer as presented by
+<a href="https://arxiv.org/abs/1511.05493">Li et al. (2018)</a>.</p>
+<p><strong>Mode</strong>: single.</p>
+<p><strong>This layer expects a sparse adjacency matrix.</strong></p>
+<p>This layer repeatedly applies a GRU cell <script type="math/tex">L</script> times to the node attributes
+<script type="math/tex; mode=display">
+\begin{align}
+& \h^{(0)}_i = \X_i \| \mathbf{0} \\
+& \m^{(l)}_i = \sum\limits_{j \in \mathcal{N}(i)} \h^{(l - 1)}_j \W \\
+& \h^{(l)}_i = \textrm{GRU} \left(\m^{(l)}_i, \h^{(l - 1)}_i \right) \\
+& \Z_i = h^{(L)}_i
+\end{align}
+</script>
+where <script type="math/tex">\textrm{GRU}</script> is the GRU cell.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>(N, F)</code>; note that <code>F</code> must be smaller or equal
+than <code>channels</code>.</li>
+<li>Binary adjacency matrix of shape <code>(N, N)</code>.</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Node features with the same shape of the input, but the last dimension
+changed to <code>channels</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>channels</code>: integer, number of output channels;</li>
+<li><code>n_layers</code>: integer, number of iterations with the GRU cell;</li>
+<li><code>activation</code>: activation function to use;</li>
+<li><code>use_bias</code>: whether to add a bias to the linear transformation;</li>
+<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
+<li><code>bias_initializer</code>: initializer for the bias vector;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
+<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
+<li><code>activity_regularizer</code>: regularization applied to the output;</li>
+<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
+<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/mp.py#L9">[source]</a></span></p>
+<h4 id="messagepassing">MessagePassing</h4>
+<pre><code class="python">spektral.layers.MessagePassing(aggregate='sum')
+</code></pre>
+
+<p>A general class for message passing as presented by
+<a href="https://arxiv.org/abs/1704.01212">Gilmer et al. (2017)</a>.</p>
+<p><strong>Mode</strong>: single/disjoint.</p>
+<p><strong>This layer and all of its extensions expect a sparse adjacency matrix.</strong></p>
+<p>This layer computes:
+<script type="math/tex; mode=display">
+\Z_i = \gamma \left( \X_i, \square_{j \in \mathcal{N}(i)} \,
+\phi \left(\X_i, \X_j, \E_{j,i} \right) \right),
+</script>
+</p>
+<p>where <script type="math/tex"> \gamma </script> is a differentiable update function, <script type="math/tex"> \phi </script> is a
+differentiable message function, <script type="math/tex"> \square </script> is a permutation-invariant
+function to aggregate the messages (like the sum or the average), and
+<script type="math/tex">\E_{ij}</script> is the edge attribute of edge i-j.</p>
+<p>By extending this class, it is possible to create any message-passing layer
+in single/disjoint mode.</p>
+<p><strong>API:</strong></p>
+<ul>
+<li><code>propagate(X, A, E=None)</code>: propagate the messages and computes embeddings
+for each node in the graph.</li>
+<li><code>message(X_j)</code>: computes messages for each node j. <code>X_j</code> is rank 2 tensor
+obtained by gathering the node features of each node's neighbours, i.e.,
+<code>X_j = X[A.indices[1]]</code>. This is equivalent to <script type="math/tex">\phi</script> in the definition
+(support for X_i and E_ij can be obtained by extending this layer and
+re-implementing the <code>message</code> and <code>propagate</code> functions).</li>
+<li><code>aggregate(messages, indices, N)</code>: aggregates the messages according to
+<code>indices</code> (usually <code>indices = A.indices[0]</code>, i.e., the messages from each
+node's neighbours are aggregated). This is equivalent to <script type="math/tex">\square</script> in
+the definition. The behaviour of this function can also be controlled using
+the <code>aggregate</code> keyword in the constructor of the layer (supported
+aggregations: sum, mean, max, min, prod).</li>
+<li><code>update(embeddings)</code>: updates the aggregated messages. This is equivalent
+to <script type="math/tex">\gamma</script> in the definition (support for X_i can be obtained by
+extending this layer and re-implementing the <code>update</code> and <code>propagate</code>
+functions).</li>
+</ul>
+<p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>aggregate</code>: string or callable, an aggregate function. This flag can be
+used to control the behaviour of <code>aggregate()</code> wihtout re-implementing it.
+Supported aggregations: 'sum', 'mean', 'max', 'min', 'prod'.
+If callable, the function must have the signature <code>foo(updates, indices, N)</code>
+and return a rank 2 tensor with shape <code>(N, ...)</code>.</li>
+</ul>
               
             </div>
           </div>
@@ -736,7 +804,7 @@ layer in the MLP (if None, the MLP has only the output layer);</li>
     
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
       
         </div>
@@ -746,7 +814,7 @@ layer in the MLP (if None, the MLP has only the output layer);</li>
 
   </div>
 
-  <div class="rst-versions" role="note" style="cursor: pointer">
+  <div class="rst-versions" role="note" aria-label="versions">
     <span class="rst-current-version" data-toggle="rst-current-version">
       
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
@@ -764,6 +832,11 @@ layer in the MLP (if None, the MLP has only the output layer);</li>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
       <script src="../../js/macros.js" defer></script>
       <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
 
 </body>
 </html>

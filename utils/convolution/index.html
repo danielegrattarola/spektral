@@ -7,25 +7,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <meta name="author" content="Daniele Grattarola">
+  <link rel="canonical" href="https://spektral.graphneural.network/utils/convolution/">
   <link rel="shortcut icon" href="../../img/favicon.ico">
   <title>Convolution - Spektral</title>
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
-  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
-  <link href="../../stylesheets/extra.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/theme.css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link href="../../stylesheets/extra.css" rel="stylesheet" />
   
   <script>
     // Current page data
     var mkdocs_page_name = "Convolution";
     var mkdocs_page_input_path = "utils/convolution.md";
-    var mkdocs_page_url = "/spektral/utils/convolution/";
+    var mkdocs_page_url = "/utils/convolution/";
   </script>
   
   <script src="../../js/jquery-2.1.1.min.js" defer></script>
   <script src="../../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
   
   <script>
@@ -46,6 +47,7 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
         <a href="../.." class="icon icon-home"> Spektral</a>
         <div role="search">
@@ -56,157 +58,75 @@
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-	<ul class="current">
-	  
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../..">Home</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Tutorials</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../../getting-started/">Getting started</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../data/">Data representation</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../examples/">Examples</a>
-                </li>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Tutorials</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting started</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../data/">Data representation</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../examples/">Examples</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Layers</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../layers/convolution/">Convolutional Layers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../layers/pooling/">Pooling Layers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../layers/base/">Base Layers</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Data</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../datasets/">Datasets</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../data/">Data utils</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Utils</span></p>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Convolution</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#degree_matrix">degree_matrix</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#degree_power">degree_power</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#normalized_adjacency">normalized_adjacency</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#laplacian">laplacian</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#normalized_laplacian">normalized_laplacian</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#rescale_laplacian">rescale_laplacian</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#localpooling_filter">localpooling_filter</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#chebyshev_polynomial">chebyshev_polynomial</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#chebyshev_filter">chebyshev_filter</a>
+    </li>
     </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Layers</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../../layers/convolution/">Convolutional Layers</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../layers/pooling/">Pooling Layers</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../layers/base/">Base Layers</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Datasets</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../../datasets/citation/">Citation</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/delaunay/">Delaunay</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/graphsage/">GraphSage</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/mnist/">MNIST</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/ogb/">OGB</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/qm9/">QM9</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/tud/">TU Dortmund</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Utils</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../data/">Data</a>
-                </li>
-                <li class=" current">
-                    
-    <a class="current" href="./">Convolution</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l3"><a href="#degree_matrix">degree_matrix</a></li>
-    
-
-    <li class="toctree-l3"><a href="#degree_power">degree_power</a></li>
-    
-
-    <li class="toctree-l3"><a href="#normalized_adjacency">normalized_adjacency</a></li>
-    
-
-    <li class="toctree-l3"><a href="#laplacian">laplacian</a></li>
-    
-
-    <li class="toctree-l3"><a href="#normalized_laplacian">normalized_laplacian</a></li>
-    
-
-    <li class="toctree-l3"><a href="#rescale_laplacian">rescale_laplacian</a></li>
-    
-
-    <li class="toctree-l3"><a href="#localpooling_filter">localpooling_filter</a></li>
-    
-
-    <li class="toctree-l3"><a href="#chebyshev_polynomial">chebyshev_polynomial</a></li>
-    
-
-    <li class="toctree-l3"><a href="#chebyshev_filter">chebyshev_filter</a></li>
-    
-
-    </ul>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../misc/">Miscellaneous</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../plotting/">Plotting</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../conversion/">Conversion</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../chem/">Chemistry</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../about/">About</a>
-	    </li>
-          
-        </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../misc/">Miscellaneous</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../conversion/">Conversion</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../chem/">Chemistry</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Other</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../about/">About</a>
+                    </li>
+                </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
@@ -238,12 +158,14 @@
       
     </li>
   </ul>
+  
   <hr/>
 </div>
           <div role="main">
             <div class="section">
               
-                <h3 id="degree_matrix">degree_matrix</h3>
+                <h2 id="convolution">Convolution</h2>
+<h4 id="degree_matrix">degree_matrix</h4>
 <pre><code class="python">spektral.utils.degree_matrix(A)
 </code></pre>
 
@@ -256,7 +178,7 @@
  If A is a dense array, a dense array; if A is sparse, a sparse
 matrix in DIA format.</p>
 <hr />
-<h3 id="degree_power">degree_power</h3>
+<h4 id="degree_power">degree_power</h4>
 <pre><code class="python">spektral.utils.degree_power(A, k)
 </code></pre>
 
@@ -275,7 +197,7 @@ normalised Laplacian.</p>
  If A is a dense array, a dense array; if A is sparse, a sparse
 matrix in DIA format.</p>
 <hr />
-<h3 id="normalized_adjacency">normalized_adjacency</h3>
+<h4 id="normalized_adjacency">normalized_adjacency</h4>
 <pre><code class="python">spektral.utils.normalized_adjacency(A, symmetric=True)
 </code></pre>
 
@@ -293,7 +215,7 @@ matrix in DIA format.</p>
 <p><strong>Return</strong><br />
  The normalized adjacency matrix.</p>
 <hr />
-<h3 id="laplacian">laplacian</h3>
+<h4 id="laplacian">laplacian</h4>
 <pre><code class="python">spektral.utils.laplacian(A)
 </code></pre>
 
@@ -305,7 +227,7 @@ matrix in DIA format.</p>
 <p><strong>Return</strong><br />
  The Laplacian.</p>
 <hr />
-<h3 id="normalized_laplacian">normalized_laplacian</h3>
+<h4 id="normalized_laplacian">normalized_laplacian</h4>
 <pre><code class="python">spektral.utils.normalized_laplacian(A, symmetric=True)
 </code></pre>
 
@@ -323,7 +245,7 @@ matrix in DIA format.</p>
 <p><strong>Return</strong><br />
  The normalized Laplacian.</p>
 <hr />
-<h3 id="rescale_laplacian">rescale_laplacian</h3>
+<h4 id="rescale_laplacian">rescale_laplacian</h4>
 <pre><code class="python">spektral.utils.rescale_laplacian(L, lmax=None)
 </code></pre>
 
@@ -341,7 +263,7 @@ If scalar, use this value as largest eignevalue when rescaling.</p>
 </ul>
 <p><strong>Return</strong>  </p>
 <hr />
-<h3 id="localpooling_filter">localpooling_filter</h3>
+<h4 id="localpooling_filter">localpooling_filter</h4>
 <pre><code class="python">spektral.utils.localpooling_filter(A, symmetric=True)
 </code></pre>
 
@@ -360,7 +282,7 @@ If scalar, use this value as largest eignevalue when rescaling.</p>
 <p><strong>Return</strong><br />
  Array or sparse matrix with rank 2 or 3, same as A;</p>
 <hr />
-<h3 id="chebyshev_polynomial">chebyshev_polynomial</h3>
+<h4 id="chebyshev_polynomial">chebyshev_polynomial</h4>
 <pre><code class="python">spektral.utils.chebyshev_polynomial(X, k)
 </code></pre>
 
@@ -378,7 +300,7 @@ If scalar, use this value as largest eignevalue when rescaling.</p>
  A list of k + 1 arrays or sparse matrices with one element for each
 degree of the polynomial.</p>
 <hr />
-<h3 id="chebyshev_filter">chebyshev_filter</h3>
+<h4 id="chebyshev_filter">chebyshev_filter</h4>
 <pre><code class="python">spektral.utils.chebyshev_filter(A, k, symmetric=True)
 </code></pre>
 
@@ -410,7 +332,7 @@ degree of the polynomial.</p>
         <a href="../misc/" class="btn btn-neutral float-right" title="Miscellaneous">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../data/" class="btn btn-neutral" title="Data"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../data/" class="btn btn-neutral" title="Data utils"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -422,7 +344,7 @@ degree of the polynomial.</p>
     
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
       
         </div>
@@ -432,7 +354,7 @@ degree of the polynomial.</p>
 
   </div>
 
-  <div class="rst-versions" role="note" style="cursor: pointer">
+  <div class="rst-versions" role="note" aria-label="versions">
     <span class="rst-current-version" data-toggle="rst-current-version">
       
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
@@ -450,6 +372,11 @@ degree of the polynomial.</p>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
       <script src="../../js/macros.js" defer></script>
       <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
 
 </body>
 </html>

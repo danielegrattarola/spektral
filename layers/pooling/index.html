@@ -7,25 +7,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <meta name="author" content="Daniele Grattarola">
+  <link rel="canonical" href="https://spektral.graphneural.network/layers/pooling/">
   <link rel="shortcut icon" href="../../img/favicon.ico">
   <title>Pooling Layers - Spektral</title>
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
-  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
-  <link href="../../stylesheets/extra.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/theme.css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link href="../../stylesheets/extra.css" rel="stylesheet" />
   
   <script>
     // Current page data
     var mkdocs_page_name = "Pooling Layers";
     var mkdocs_page_input_path = "layers/pooling.md";
-    var mkdocs_page_url = "/spektral/layers/pooling/";
+    var mkdocs_page_url = "/layers/pooling/";
   </script>
   
   <script src="../../js/jquery-2.1.1.min.js" defer></script>
   <script src="../../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
   
   <script>
@@ -46,6 +47,7 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
         <a href="../.." class="icon icon-home"> Spektral</a>
         <div role="search">
@@ -56,157 +58,77 @@
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-	<ul class="current">
-	  
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../..">Home</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Tutorials</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../../getting-started/">Getting started</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../data/">Data representation</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../examples/">Examples</a>
-                </li>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Tutorials</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting started</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../data/">Data representation</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../examples/">Examples</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Layers</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../convolution/">Convolutional Layers</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Pooling Layers</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#diffpool">DiffPool</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#mincutpool">MinCutPool</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#topkpool">TopKPool</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#sagpool">SAGPool</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#globalsumpool">GlobalSumPool</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#globalavgpool">GlobalAvgPool</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#globalmaxpool">GlobalMaxPool</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#globalattentionpool">GlobalAttentionPool</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#globalattnsumpool">GlobalAttnSumPool</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#sortpool">SortPool</a>
+    </li>
     </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Layers</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../convolution/">Convolutional Layers</a>
-                </li>
-                <li class=" current">
-                    
-    <a class="current" href="./">Pooling Layers</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l3"><a href="#diffpool">DiffPool</a></li>
-    
-
-    <li class="toctree-l3"><a href="#mincutpool">MinCutPool</a></li>
-    
-
-    <li class="toctree-l3"><a href="#topkpool">TopKPool</a></li>
-    
-
-    <li class="toctree-l3"><a href="#sagpool">SAGPool</a></li>
-    
-
-    <li class="toctree-l3"><a href="#globalsumpool">GlobalSumPool</a></li>
-    
-
-    <li class="toctree-l3"><a href="#globalavgpool">GlobalAvgPool</a></li>
-    
-
-    <li class="toctree-l3"><a href="#globalmaxpool">GlobalMaxPool</a></li>
-    
-
-    <li class="toctree-l3"><a href="#globalattentionpool">GlobalAttentionPool</a></li>
-    
-
-    <li class="toctree-l3"><a href="#globalattnsumpool">GlobalAttnSumPool</a></li>
-    
-
-    </ul>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../base/">Base Layers</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Datasets</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../../datasets/citation/">Citation</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/delaunay/">Delaunay</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/graphsage/">GraphSage</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/mnist/">MNIST</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/ogb/">OGB</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/qm9/">QM9</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/tud/">TU Dortmund</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Utils</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../../utils/data/">Data</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../utils/convolution/">Convolution</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../utils/misc/">Miscellaneous</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../utils/plotting/">Plotting</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../utils/conversion/">Conversion</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../chem/">Chemistry</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../about/">About</a>
-	    </li>
-          
-        </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../base/">Base Layers</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Data</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../datasets/">Datasets</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../utils/data/">Data utils</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Utils</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../utils/convolution/">Convolution</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../utils/misc/">Miscellaneous</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../utils/conversion/">Conversion</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../chem/">Chemistry</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Other</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../about/">About</a>
+                    </li>
+                </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
@@ -238,12 +160,14 @@
       
     </li>
   </ul>
+  
   <hr/>
 </div>
           <div role="main">
             <div class="section">
               
-                <p>The pooling layers from these papers are available in Spektral:</p>
+                <h2 id="pooling-layers">Pooling layers</h2>
+<p>The pooling layers from these papers are available in Spektral:</p>
 <ul>
 <li><a href="https://arxiv.org/abs/1806.08804">Hierarchical Graph Representation Learning with Differentiable Pooling</a></li>
 <li><a href="https://arxiv.org/abs/1907.00481">Mincut pooling in Graph Neural Networks</a></li>
@@ -257,13 +181,13 @@ attention mechanism. </p>
 <p>See <a href="/layers/convolution">the convolutional layers page</a> for the notation. </p>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/diffpool.py#L10">[source]</a></span></p>
-<h3 id="diffpool">DiffPool</h3>
+<h4 id="diffpool">DiffPool</h4>
 <pre><code class="python">spektral.layers.DiffPool(k, channels=None, return_mask=False, activation=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
 </code></pre>
 
 <p>A DiffPool layer as presented by
-<a href="https://arxiv.org/abs/1806.08804">Ying et al.</a>.</p>
-<p><strong>Mode</strong>: single, batch.</p>
+<a href="https://arxiv.org/abs/1806.08804">Ying et al. (2018)</a>.</p>
+<p><strong>Mode</strong>: batch.</p>
 <p>This layer computes a soft clustering <script type="math/tex">\S</script> of the input graphs using a GNN,
 and reduces graphs as follows:</p>
 <p>
@@ -311,13 +235,13 @@ channels is assumed to be the same as the input);</li>
 </ul>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/mincut.py#L9">[source]</a></span></p>
-<h3 id="mincutpool">MinCutPool</h3>
+<h4 id="mincutpool">MinCutPool</h4>
 <pre><code class="python">spektral.layers.MinCutPool(k, mlp_hidden=None, mlp_activation='relu', return_mask=False, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
 <p>A minCUT pooling layer as presented by
-<a href="https://arxiv.org/abs/1907.00481">Bianchi et al.</a>.</p>
-<p><strong>Mode</strong>: single, batch.</p>
+<a href="https://arxiv.org/abs/1907.00481">Bianchi et al. (2019)</a>.</p>
+<p><strong>Mode</strong>: batch.</p>
 <p>This layer computes a soft clustering <script type="math/tex">\S</script> of the input graphs using a MLP,
 and reduces graphs as follows:</p>
 <p>
@@ -366,35 +290,34 @@ only the output layer);</li>
 </ul>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/topk.py#L8">[source]</a></span></p>
-<h3 id="topkpool">TopKPool</h3>
+<h4 id="topkpool">TopKPool</h4>
 <pre><code class="python">spektral.layers.TopKPool(ratio, return_mask=False, sigmoid_gating=False, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
 </code></pre>
 
 <p>A gPool/Top-K layer as presented by
-<a href="http://proceedings.mlr.press/v97/gao19a/gao19a.pdf">Gao &amp; Ji</a> and
-<a href="https://arxiv.org/abs/1811.01287">Cangea et al.</a>.</p>
+<a href="http://proceedings.mlr.press/v97/gao19a/gao19a.pdf">Gao &amp; Ji (2019)</a> and
+<a href="https://arxiv.org/abs/1811.01287">Cangea et al. (2018)</a>.</p>
+<p><strong>Mode</strong>: single, disjoint.</p>
 <p>This layer computes the following operations:</p>
 <p>
 <script type="math/tex; mode=display">
 \y = \frac{\X\p}{\|\p\|}; \;\;\;\;
 \i = \textrm{rank}(\y, K); \;\;\;\;
 \X' = (\X \odot \textrm{tanh}(\y))_\i; \;\;\;\;
-\A' = \A^2_{\i, \i}
+\A' = \A_{\i, \i}
 </script>
 </p>
 <p>where <script type="math/tex"> \textrm{rank}(\y, K) </script> returns the indices of the top K values of
-<script type="math/tex">\y</script>, and <script type="math/tex">\p</script> is a learnable parameter vector of size <script type="math/tex">F</script>.
+<script type="math/tex">\y</script>, and <script type="math/tex">\p</script> is a learnable parameter vector of size <script type="math/tex">F</script>. <script type="math/tex">K</script> is
+defined for each graph as a fraction of the number of nodes.
 Note that the the gating operation <script type="math/tex">\textrm{tanh}(\y)</script> (Cangea et al.)
-can be replaced with a sigmoid (Gao &amp; Ji). The paper by Gao &amp; Ji originally
-used a tanh as well, but was later updated to use a sigmoid activation.</p>
-<p>Due to the lack of sparse-sparse matrix multiplication support, this layer
-temporarily makes the adjacency matrix dense in order to compute <script type="math/tex">\A^2</script>
-(needed to preserve connectivity after pooling).</p>
-<p><strong>If memory is not an issue, considerable speedups can be achieved by using
+can be replaced with a sigmoid (Gao &amp; Ji).</p>
+<p>This layer temporarily makes the adjacency matrix dense in order to compute
+<script type="math/tex">\A'</script>.
+If memory is not an issue, considerable speedups can be achieved by using
 dense graphs directly.
 Converting a graph from sparse to dense and back to sparse is an expensive
-operation.</strong></p>
-<p><strong>Mode</strong>: single, disjoint.</p>
+operation.</p>
 <p><strong>Input</strong></p>
 <ul>
 <li>Node features of shape <code>(N, F)</code>;</li>
@@ -420,33 +343,32 @@ tanh;</li>
 </ul>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/sagpool.py#L6">[source]</a></span></p>
-<h3 id="sagpool">SAGPool</h3>
+<h4 id="sagpool">SAGPool</h4>
 <pre><code class="python">spektral.layers.SAGPool(ratio, return_mask=False, sigmoid_gating=False, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
 </code></pre>
 
 <p>A self-attention graph pooling layer as presented by
-<a href="https://arxiv.org/abs/1904.08082">Lee et al. (2019)</a> and
-<a href="https://arxiv.org/abs/1905.02850">Knyazev et al. (2019)</a>.</p>
+<a href="https://arxiv.org/abs/1904.08082">Lee et al. (2019)</a>.</p>
+<p><strong>Mode</strong>: single, disjoint.</p>
 <p>This layer computes the following operations:</p>
 <p>
 <script type="math/tex; mode=display">
 \y = \textrm{GNN}(\A, \X); \;\;\;\;
 \i = \textrm{rank}(\y, K); \;\;\;\;
 \X' = (\X \odot \textrm{tanh}(\y))_\i; \;\;\;\;
-\A' = \A^2_{\i, \i}
+\A' = \A_{\i, \i}
 </script>
 </p>
 <p>where <script type="math/tex"> \textrm{rank}(\y, K) </script> returns the indices of the top K values of
 <script type="math/tex">\y</script>, and <script type="math/tex">\textrm{GNN}</script> consists of one GraphConv layer with no
-activation.</p>
-<p>Due to the lack of sparse-sparse matrix multiplication support, this layer
-temporarily makes the adjacency matrix dense in order to compute <script type="math/tex">\A^2</script>
-(needed to preserve connectivity after pooling).</p>
-<p><strong>If memory is not an issue, considerable speedups can be achieved by using
+activation. <script type="math/tex">K</script> is defined for each graph as a fraction of the number of
+nodes.</p>
+<p>This layer temporarily makes the adjacency matrix dense in order to compute
+<script type="math/tex">\A'</script>.
+If memory is not an issue, considerable speedups can be achieved by using
 dense graphs directly.
 Converting a graph from sparse to dense and back to sparse is an expensive
-operation.</strong></p>
-<p><strong>Mode</strong>: single, disjoint.</p>
+operation.</p>
 <p><strong>Input</strong></p>
 <ul>
 <li>Node features of shape <code>(N, F)</code>;</li>
@@ -471,8 +393,8 @@ tanh;</li>
 <li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/globalpool.py#L50">[source]</a></span></p>
-<h3 id="globalsumpool">GlobalSumPool</h3>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/globalpool.py#L51">[source]</a></span></p>
+<h4 id="globalsumpool">GlobalSumPool</h4>
 <pre><code class="python">spektral.layers.GlobalSumPool()
 </code></pre>
 
@@ -492,8 +414,8 @@ be <code>(1, F)</code>).</li>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/globalpool.py#L79">[source]</a></span></p>
-<h3 id="globalavgpool">GlobalAvgPool</h3>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/globalpool.py#L80">[source]</a></span></p>
+<h4 id="globalavgpool">GlobalAvgPool</h4>
 <pre><code class="python">spektral.layers.GlobalAvgPool()
 </code></pre>
 
@@ -513,8 +435,8 @@ be <code>(1, F)</code>).</li>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/globalpool.py#L108">[source]</a></span></p>
-<h3 id="globalmaxpool">GlobalMaxPool</h3>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/globalpool.py#L109">[source]</a></span></p>
+<h4 id="globalmaxpool">GlobalMaxPool</h4>
 <pre><code class="python">spektral.layers.GlobalMaxPool()
 </code></pre>
 
@@ -534,8 +456,8 @@ be <code>(1, F)</code>).</li>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/globalpool.py#L137">[source]</a></span></p>
-<h3 id="globalattentionpool">GlobalAttentionPool</h3>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/globalpool.py#L138">[source]</a></span></p>
+<h4 id="globalattentionpool">GlobalAttentionPool</h4>
 <pre><code class="python">spektral.layers.GlobalAttentionPool(channels, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
@@ -567,8 +489,8 @@ shape will be <code>(1, channels)</code>).</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vectors.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/globalpool.py#L248">[source]</a></span></p>
-<h3 id="globalattnsumpool">GlobalAttnSumPool</h3>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/globalpool.py#L250">[source]</a></span></p>
+<h4 id="globalattnsumpool">GlobalAttnSumPool</h4>
 <pre><code class="python">spektral.layers.GlobalAttnSumPool(attn_kernel_initializer='glorot_uniform', attn_kernel_regularizer=None, attn_kernel_constraint=None)
 </code></pre>
 
@@ -600,6 +522,31 @@ matrix;</li>
 <li><code>attn_kernel_constraint</code>: constraint applied to the attention kernel
 matrix;</li>
 </ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/globalpool.py#L345">[source]</a></span></p>
+<h4 id="sortpool">SortPool</h4>
+<pre><code class="python">spektral.layers.SortPool(k)
+</code></pre>
+
+<p>SortPool layer pooling the top <script type="math/tex">k</script> most relevant nodes as described by
+<a href="https://www.cse.wustl.edu/~muhan/papers/AAAI_2018_DGCNN.pdf">Zhang et al.</a></p>
+<p>This layers takes a graph signal <script type="math/tex">\X</script> and sorts the rows by the elements
+of its last column. It then keeps the top <script type="math/tex">k</script> rows.
+Should <script type="math/tex">\X</script> have less than <script type="math/tex">k</script> rows, it sorts and then adds rows full
+of zeros until <script type="math/tex">\X</script> has <script type="math/tex">k</script> rows.</p>
+<p><strong>Mode</strong>: single, batch.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>([batch], N, F)</code>;</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Pooled node features of shape <code>([batch], k, F)</code>;</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>k</code>: number of nodes to keep;</li>
+</ul>
               
             </div>
           </div>
@@ -622,7 +569,7 @@ matrix;</li>
     
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
       
         </div>
@@ -632,7 +579,7 @@ matrix;</li>
 
   </div>
 
-  <div class="rst-versions" role="note" style="cursor: pointer">
+  <div class="rst-versions" role="note" aria-label="versions">
     <span class="rst-current-version" data-toggle="rst-current-version">
       
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
@@ -650,6 +597,11 @@ matrix;</li>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
       <script src="../../js/macros.js" defer></script>
       <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
 
 </body>
 </html>

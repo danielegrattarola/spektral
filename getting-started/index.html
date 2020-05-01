@@ -7,25 +7,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <meta name="author" content="Daniele Grattarola">
+  <link rel="canonical" href="https://spektral.graphneural.network/getting-started/">
   <link rel="shortcut icon" href="../img/favicon.ico">
   <title>Getting started - Spektral</title>
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
-  <link href="../stylesheets/extra.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link href="../stylesheets/extra.css" rel="stylesheet" />
   
   <script>
     // Current page data
     var mkdocs_page_name = "Getting started";
     var mkdocs_page_input_path = "getting-started.md";
-    var mkdocs_page_url = "/spektral/getting-started/";
+    var mkdocs_page_url = "/getting-started/";
   </script>
   
   <script src="../js/jquery-2.1.1.min.js" defer></script>
   <script src="../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
   
   <script>
@@ -46,6 +47,7 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
         <a href=".." class="icon icon-home"> Spektral</a>
         <div role="search">
@@ -56,147 +58,67 @@
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-	<ul class="current">
-	  
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="..">Home</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Tutorials</span>
-    <ul class="subnav">
-                <li class=" current">
-                    
-    <a class="current" href="./">Getting started</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l3"><a href="#getting-started">Getting started</a></li>
-    
-        <ul>
-        
-            <li><a class="toctree-l4" href="#node-classification-on-citation-networks">Node classification on citation networks</a></li>
-        
-            <li><a class="toctree-l4" href="#creating-a-gnn">Creating a GNN</a></li>
-        
-            <li><a class="toctree-l4" href="#training-the-gnn">Training the GNN</a></li>
-        
-            <li><a class="toctree-l4" href="#evaluating-the-model">Evaluating the model</a></li>
-        
-            <li><a class="toctree-l4" href="#go-create">Go create!</a></li>
-        
-        </ul>
-    
-
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Tutorials</span></p>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Getting started</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#node-classification-on-citation-networks">Node classification on citation networks</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#creating-a-gnn">Creating a GNN</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#training-the-gnn">Training the GNN</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#evaluating-the-model">Evaluating the model</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#go-create">Go create!</a>
+    </li>
     </ul>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../data/">Data representation</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../examples/">Examples</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Layers</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../layers/convolution/">Convolutional Layers</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../layers/pooling/">Pooling Layers</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../layers/base/">Base Layers</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Datasets</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../datasets/citation/">Citation</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../datasets/delaunay/">Delaunay</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../datasets/graphsage/">GraphSage</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../datasets/mnist/">MNIST</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../datasets/ogb/">OGB</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../datasets/qm9/">QM9</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../datasets/tud/">TU Dortmund</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Utils</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../utils/data/">Data</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../utils/convolution/">Convolution</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../utils/misc/">Miscellaneous</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../utils/plotting/">Plotting</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../utils/conversion/">Conversion</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../chem/">Chemistry</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../about/">About</a>
-	    </li>
-          
-        </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../data/">Data representation</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Layers</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../layers/convolution/">Convolutional Layers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../layers/pooling/">Pooling Layers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../layers/base/">Base Layers</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Data</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../datasets/">Datasets</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../utils/data/">Data utils</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Utils</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../utils/convolution/">Convolution</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../utils/misc/">Miscellaneous</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../utils/conversion/">Conversion</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../chem/">Chemistry</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Other</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../about/">About</a>
+                    </li>
+                </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
@@ -228,16 +150,17 @@
       
     </li>
   </ul>
+  
   <hr/>
 </div>
           <div role="main">
             <div class="section">
               
-                <h1 id="getting-started">Getting started</h1>
+                <h2 id="getting-started">Getting started</h2>
 <p>Spektral is designed according to the guiding principles of the Keras API to make things extremely simple for beginners while maintaining flexibility for experts and researchers.  </p>
 <p>The most important modules of Spektral are <code>layers.convolutional</code> and <code>layers.pooling</code>, which offer a number of popular layers to start building graph neural networks (GNNs) right away.   <br />
 Because Spektral is designed as an extension of Keras, you can plug any Spektral layer into an existing Keras <code>Model</code> without modifications. </p>
-<h2 id="node-classification-on-citation-networks">Node classification on citation networks</h2>
+<h3 id="node-classification-on-citation-networks">Node classification on citation networks</h3>
 <p>In this example, we will build a simple <a href="https://arxiv.org/abs/1609.02907">Graph Convolutional Network</a> for semi-supervised classification of nodes.</p>
 <p>This is a simple but challenging task that consists of classifying text documents in a <strong>citation network</strong>. <br />
 In this type of graph, each node represents a document and is associated to a binary bag-of-words attribute (1 if a given word appears in the text, 0 otherwise). 
@@ -254,7 +177,7 @@ n_classes = y.shape[-1]
 </code></pre>
 
 <p>This will load the network's adjacency matrix <code>A</code> as a Scipy sparse matrix of shape <code>(N, N)</code>, the node features <code>X</code> of shape <code>(N, F)</code>, and the labels <code>y</code> of shape <code>(N, n_classes)</code>. The loader will also return some boolean masks to know which nodes belong to the training, validation and test sets (<code>train_mask, val_mask, test_mask</code>).</p>
-<h2 id="creating-a-gnn">Creating a GNN</h2>
+<h3 id="creating-a-gnn">Creating a GNN</h3>
 <p>To create a GCN, we will use the <code>GraphConv</code> layer and the functional API of Keras:</p>
 <pre><code class="python">from spektral.layers import GraphConv
 from tensorflow.keras.models import Model
@@ -278,7 +201,7 @@ model = Model(inputs=[X_in, A_in], outputs=X_2)
 Because the "elements" of our dataset are the node themselves, we are telling Keras to consider each node as a separate sample so that the <code>batch</code> axis is implicitly defined as <code>None</code>.<br />
 In other words, a sample of the node attributes will be a vector of shape <code>(F, )</code> and a sample of the adjacency matrix will be one row of shape <code>(N, )</code>. </p>
 <p>Keep this detail in mind for later. </p>
-<h2 id="training-the-gnn">Training the GNN</h2>
+<h3 id="training-the-gnn">Training the GNN</h3>
 <p>When training GCN, we have to pre-process the adjacency matrix to 1) add self-loops and 2) scale the weights of a node's connections according to its degree.</p>
 <p>Some layers in Spektral require a different type of pre-processing in order to work correctly, and some work out-of-the-box on the binary <code>A</code>. 
 The pre-processing required by each layer is available as a static class method <code>preprocess()</code>.</p>
@@ -316,7 +239,7 @@ At the same time, if we split the graph into batches we may end up in a situatio
 <p>Finally, we used <code>train_mask</code> and <code>val_mask</code> as <code>sample_weight</code>. <br />
 This means that, during training, the training nodes will have a weight of 1 and the validation nodes will have a weight of 0. Then, in validation, we will set the training nodes to have a weight of 0 and the validation nodes to have a weight of 1. </p>
 <p>This is all that we need to do to differentiate between training and test data. See how the model takes as input the full <code>X</code>, <code>A</code>, and <code>y</code> for both training and valdation? The only thing that changes is the mask. This is also why we used the <code>weighted_metrics</code> keyword when compiling the model, so that our accuracy is calculated only on the correct nodes at each phase. </p>
-<h2 id="evaluating-the-model">Evaluating the model</h2>
+<h3 id="evaluating-the-model">Evaluating the model</h3>
 <p>Once again, evaluation is done in vanilla Keras. We just have to keep in mind the same considerations about batching that we did for training (note that in <code>model.evaluate()</code> by default <code>shuffle=False</code>): </p>
 <pre><code class="python"># Evaluate model
 eval_results = model.evaluate([X, A],
@@ -328,7 +251,7 @@ print('Done.\n'
       'Test accuracy: {}'.format(*eval_results))
 </code></pre>
 
-<h2 id="go-create">Go create!</h2>
+<h3 id="go-create">Go create!</h3>
 <p>You are now ready to use Spektral to create your own models. </p>
 <p>If you want to build a GNN for a specific task, chances are that everything you need is already part of Spektral. Check the <a href="https://github.com/danielegrattarola/spektral/tree/master/examples">examples</a> for some ideas and practical tips.</p>
 <p>Remember to read the <a href="https://danielegrattarola.github.io/spektral/data/">data representation section</a> to learn different ways of representing a graph or batches of different graphs. </p>
@@ -355,7 +278,7 @@ print('Done.\n'
     
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
       
         </div>
@@ -365,7 +288,7 @@ print('Done.\n'
 
   </div>
 
-  <div class="rst-versions" role="note" style="cursor: pointer">
+  <div class="rst-versions" role="note" aria-label="versions">
     <span class="rst-current-version" data-toggle="rst-current-version">
       
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
@@ -383,6 +306,11 @@ print('Done.\n'
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
       <script src="../js/macros.js" defer></script>
       <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
 
 </body>
 </html>

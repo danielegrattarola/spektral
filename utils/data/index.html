@@ -7,25 +7,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <meta name="author" content="Daniele Grattarola">
+  <link rel="canonical" href="https://spektral.graphneural.network/utils/data/">
   <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>Data - Spektral</title>
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+  <title>Data utils - Spektral</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
-  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
-  <link href="../../stylesheets/extra.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/theme.css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link href="../../stylesheets/extra.css" rel="stylesheet" />
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Data";
+    var mkdocs_page_name = "Data utils";
     var mkdocs_page_input_path = "utils/data.md";
-    var mkdocs_page_url = "/spektral/utils/data/";
+    var mkdocs_page_url = "/utils/data/";
   </script>
   
   <script src="../../js/jquery-2.1.1.min.js" defer></script>
   <script src="../../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
   
   <script>
@@ -46,6 +47,7 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
         <a href="../.." class="icon icon-home"> Spektral</a>
         <div role="search">
@@ -56,136 +58,63 @@
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-	<ul class="current">
-	  
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../..">Home</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Tutorials</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../../getting-started/">Getting started</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../data/">Data representation</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../examples/">Examples</a>
-                </li>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Tutorials</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting started</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../data/">Data representation</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../examples/">Examples</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Layers</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../layers/convolution/">Convolutional Layers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../layers/pooling/">Pooling Layers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../layers/base/">Base Layers</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Data</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../../datasets/">Datasets</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Data utils</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#numpy_to_disjoint">numpy_to_disjoint</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#numpy_to_batch">numpy_to_batch</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#batch_iterator">batch_iterator</a>
+    </li>
     </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Layers</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../../layers/convolution/">Convolutional Layers</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../layers/pooling/">Pooling Layers</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../layers/base/">Base Layers</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Datasets</span>
-    <ul class="subnav">
-                <li class="">
-                    
-    <a class="" href="../../datasets/citation/">Citation</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/delaunay/">Delaunay</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/graphsage/">GraphSage</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/mnist/">MNIST</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/ogb/">OGB</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/qm9/">QM9</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../../datasets/tud/">TU Dortmund</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Utils</span>
-    <ul class="subnav">
-                <li class=" current">
-                    
-    <a class="current" href="./">Data</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l3"><a href="#numpy_to_disjoint">numpy_to_disjoint</a></li>
-    
-
-    <li class="toctree-l3"><a href="#batch_iterator">batch_iterator</a></li>
-    
-
-    </ul>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../convolution/">Convolution</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../misc/">Miscellaneous</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../plotting/">Plotting</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../conversion/">Conversion</a>
-                </li>
-    </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../chem/">Chemistry</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../about/">About</a>
-	    </li>
-          
-        </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Utils</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../convolution/">Convolution</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../misc/">Miscellaneous</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../conversion/">Conversion</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../chem/">Chemistry</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Other</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../about/">About</a>
+                    </li>
+                </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
@@ -205,11 +134,11 @@
     
       
         
-          <li>Utils &raquo;</li>
+          <li>Data &raquo;</li>
         
       
     
-    <li>Data</li>
+    <li>Data utils</li>
     <li class="wy-breadcrumbs-aside">
       
         <a href="https://github.com/danielegrattarola/spektral/edit/master/docs/sources/utils/data.md"
@@ -217,35 +146,72 @@
       
     </li>
   </ul>
+  
   <hr/>
 </div>
           <div role="main">
             <div class="section">
               
-                <h3 id="numpy_to_disjoint">numpy_to_disjoint</h3>
+                <h2 id="data">Data</h2>
+<h4 id="numpy_to_disjoint">numpy_to_disjoint</h4>
 <pre><code class="python">spektral.utils.numpy_to_disjoint(X_list, A_list, E_list=None)
 </code></pre>
 
 <p>Converts a batch of graphs stored in lists (X, A, and optionally E) to the
-<a href="https://danielegrattarola.github.io/spektral/data/">disjoint mode</a>.
-Note that the number of nodes N can vary between graphs, although each entry
-i of each list should be associated to the same graph, i.e.,
+<a href="https://danielegrattarola.github.io/spektral/data/#disjoint-mode">disjoint mode</a>.</p>
+<p>Each entry i of the lists should be associated to the same graph, i.e.,
 <code>X_list[i].shape[0] == A_list[i].shape[0] == E_list[i].shape[0]</code>.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
 <li>
-<p><code>X_list</code>: a list of np.arrays of shape (N, F);</p>
+<p><code>X_list</code>: a list of np.arrays of shape <code>(N, F)</code>;</p>
 </li>
 <li>
-<p><code>A_list</code>: a list of np.arrays or sparse matrices of shape (N, N);</p>
+<p><code>A_list</code>: a list of np.arrays or sparse matrices of shape <code>(N, N)</code>;</p>
 </li>
 <li>
-<p><code>E_list</code>: a list of np.arrays of shape (N, N, S);</p>
+<p><code>E_list</code>: a list of np.arrays of shape <code>(N, N, S)</code>;</p>
 </li>
 </ul>
 <p><strong>Return</strong>  </p>
+<ul>
+<li><code>X_out</code>: a rank 2 array of shape <code>(n_nodes, F)</code>;</li>
+<li><code>A_out</code>: a rank 2 array of shape <code>(n_nodes, n_nodes)</code>;</li>
+<li><code>E_out</code>: (only if <code>E_list</code> is given) a rank 2 array of shape
+<code>(n_edges, S)</code>;</li>
+</ul>
 <hr />
-<h3 id="batch_iterator">batch_iterator</h3>
+<h4 id="numpy_to_batch">numpy_to_batch</h4>
+<pre><code class="python">spektral.utils.numpy_to_batch(X_list, A_list, E_list=None)
+</code></pre>
+
+<p>Converts a batch of graphs stored in lists (X, A, and optionally E) to the
+<a href="https://danielegrattarola.github.io/spektral/data/#batch-mode">batch mode</a>
+by zero-padding all X, A and E matrices to have the same node dimensions
+(<code>N_max</code>).</p>
+<p>Each entry i of the lists should be associated to the same graph, i.e.,
+<code>X_list[i].shape[0] == A_list[i].shape[0] == E_list[i].shape[0]</code>.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>X_list</code>: a list of np.arrays of shape <code>(N, F)</code>;</p>
+</li>
+<li>
+<p><code>A_list</code>: a list of np.arrays or sparse matrices of shape <code>(N, N)</code>;</p>
+</li>
+<li>
+<p><code>E_list</code>: a list of np.arrays of shape <code>(N, N, S)</code>;</p>
+</li>
+</ul>
+<p><strong>Return</strong>  </p>
+<ul>
+<li><code>X_out</code>: a rank 3 array of shape <code>(batch, N_max, F)</code>;</li>
+<li><code>A_out</code>: a rank 2 array of shape <code>(batch, N_max, N_max)</code>;</li>
+<li><code>E_out</code>: (only if <code>E_list</code> if given) a rank 2 array of shape
+<code>(batch, N_max, N_max, S)</code>;</li>
+</ul>
+<hr />
+<h4 id="batch_iterator">batch_iterator</h4>
 <pre><code class="python">spektral.utils.batch_iterator(data, batch_size=32, epochs=1, shuffle=True)
 </code></pre>
 
@@ -254,20 +220,20 @@ size <code>batch_size</code>.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
 <li>
-<p><code>data</code>: np.array or list of np.arrays with equal first dimension.</p>
+<p><code>data</code>: np.array or list of np.arrays with the same first dimension;</p>
 </li>
 <li>
-<p><code>batch_size</code>: number of samples in a batch</p>
+<p><code>batch_size</code>: number of samples in a batch;</p>
 </li>
 <li>
-<p><code>epochs</code>: number of times to iterate over the data</p>
+<p><code>epochs</code>: number of times to iterate over the data;</p>
 </li>
 <li>
-<p><code>shuffle</code>: whether to shuffle the data at the beginning of each epoch
-:yield: a batch of samples (or tuple of batches if X had more than one
-array).</p>
+<p><code>shuffle</code>: whether to shuffle the data at the beginning of each epoch</p>
 </li>
 </ul>
+<p><strong>Return</strong><br />
+ Batches of size <code>batch_size</code>.</p>
               
             </div>
           </div>
@@ -278,7 +244,7 @@ array).</p>
         <a href="../convolution/" class="btn btn-neutral float-right" title="Convolution">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../../datasets/tud/" class="btn btn-neutral" title="TU Dortmund"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../datasets/" class="btn btn-neutral" title="Datasets"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -290,7 +256,7 @@ array).</p>
     
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
       
         </div>
@@ -300,13 +266,13 @@ array).</p>
 
   </div>
 
-  <div class="rst-versions" role="note" style="cursor: pointer">
+  <div class="rst-versions" role="note" aria-label="versions">
     <span class="rst-current-version" data-toggle="rst-current-version">
       
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../../datasets/tud/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../../datasets/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
         <span style="margin-left: 15px"><a href="../convolution/" style="color: #fcfcfc">Next &raquo;</a></span>
@@ -318,6 +284,11 @@ array).</p>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
       <script src="../../js/macros.js" defer></script>
       <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
 
 </body>
 </html>
