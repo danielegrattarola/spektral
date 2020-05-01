@@ -1,58 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url>
-     <loc>https://spektral.graphneural.network/</loc>
+     <loc>https://graphneural.network/</loc>
      <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
-     <loc>https://spektral.graphneural.network/getting-started/</loc>
+     <loc>https://graphneural.network/getting-started/</loc>
      <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
-     <loc>https://spektral.graphneural.network/data/</loc>
+     <loc>https://graphneural.network/data/</loc>
      <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
-     <loc>https://spektral.graphneural.network/examples/</loc>
+     <loc>https://graphneural.network/examples/</loc>
      <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
-     <loc>https://spektral.graphneural.network/layers/convolution/</loc>
+     <loc>https://graphneural.network/layers/convolution/</loc>
      <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
-     <loc>https://spektral.graphneural.network/layers/pooling/</loc>
+     <loc>https://graphneural.network/layers/pooling/</loc>
      <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
-     <loc>https://spektral.graphneural.network/layers/base/</loc>
+     <loc>https://graphneural.network/layers/base/</loc>
      <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
-     <loc>https://spektral.graphneural.network/datasets/</loc>
+     <loc>https://graphneural.network/datasets/</loc>
      <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
-     <loc>https://spektral.graphneural.network/utils/data/</loc>
+     <loc>https://graphneural.network/utils/data/</loc>
      <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
-     <loc>https://spektral.graphneural.network/utils/convolution/</loc>
+     <loc>https://graphneural.network/utils/convolution/</loc>
      <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
-     <loc>https://spektral.graphneural.network/utils/misc/</loc>
+     <loc>https://graphneural.network/utils/misc/</loc>
      <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
-     <loc>https://spektral.graphneural.network/utils/conversion/</loc>
+     <loc>https://graphneural.network/utils/conversion/</loc>
      <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
-     <loc>https://spektral.graphneural.network/chem/</loc>
+     <loc>https://graphneural.network/chem/</loc>
      <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
-     <loc>https://spektral.graphneural.network/about/</loc>
+     <loc>https://graphneural.network/about/</loc>
      <lastmod>2020-05-01</lastmod>
      <changefreq>daily</changefreq>
     </url>
