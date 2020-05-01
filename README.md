@@ -16,6 +16,7 @@ Spektral implements some of the most popular layers for graph deep learning, inc
 - [Graph attention networks (GAT)](https://arxiv.org/abs/1710.10903)
 - [Approximated Personalized Propagation of Neural Predictions (APPNP)](https://arxiv.org/abs/1810.05997)
 - [Graph Isomorphism Networks (GIN)](https://arxiv.org/abs/1810.00826)
+- [Diffusional Convolutions](https://arxiv.org/abs/1707.01926)
 
 You can also find [pooling layers](https://danielegrattarola.github.io/spektral/layers/pooling/), including:
 
