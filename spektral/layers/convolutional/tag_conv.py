@@ -2,6 +2,7 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Dense
 
 from spektral.layers.convolutional.message_passing import MessagePassing
+from spektral.utils import normalized_adjacency
 
 
 class TAGConv(MessagePassing):
@@ -107,3 +108,7 @@ class TAGConv(MessagePassing):
         base_config = super().get_config()
         base_config.pop('aggregate')  # Remove it because it's defined by constructor
         return {**base_config, **config}
+
+    @staticmethod
+    def preprocess(A):
+        return normalized_adjacency(A)
