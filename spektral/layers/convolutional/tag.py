@@ -1,24 +1,22 @@
-from tensorflow.keras import activations, backend as K
+from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Dense
-from tensorflow.keras.models import Sequential
 
 from spektral.layers.convolutional.mp import MessagePassing
 
 
-class GINConv(MessagePassing):
+class TAGConv(MessagePassing):
     r"""
-    A Graph Isomorphism Network (GIN) as presented by
-    [Xu et al. (2018)](https://arxiv.org/abs/1810.00826).
+    A Topology Adaptive Graph Convolutional layer (TAG) as presented by
+    [Du et al. (2017)](https://arxiv.org/abs/1710.10370).
 
     **Mode**: single.
 
     **This layer expects sparse inputs.**
 
-    This layer computes for each node \(i\):
+    This layer computes:
     $$
-        \Z_i = \textrm{MLP}\big( (1 + \epsilon) \cdot \X_i + \sum\limits_{j \in \mathcal{N}(i)} \X_j \big)
+        \Z = \sum\limits_{k=0}^{K} \D^{-1/2}\A^k\D^{-1/2}\X\W^{(k)}
     $$
-    where \(\textrm{MLP}\) is a multi-layer perceptron.
 
     **Input**
 
@@ -33,13 +31,8 @@ class GINConv(MessagePassing):
     **Arguments**
 
     - `channels`: integer, number of output channels;
-    - `epsilon`: unnamed parameter, see
-    [Xu et al. (2018)](https://arxiv.org/abs/1810.00826), and the equation above.
-    By setting `epsilon=None`, the parameter will be learned (default behaviour).
-    If given as a value, the parameter will stay fixed.
-    - `mlp_hidden`: list of integers, number of hidden units for each hidden
-    layer in the MLP (if None, the MLP has only the output layer);
-    - `mlp_activation`: activation for the MLP layers;
+    - `K`: the order of the layer (i.e., the layer will consider a K-hop
+    neighbourhood for each node);
     - `activation`: activation function to use;
     - `use_bias`: whether to add a bias to the linear transformation;
     - `kernel_initializer`: initializer for the kernel matrix;
@@ -53,9 +46,7 @@ class GINConv(MessagePassing):
 
     def __init__(self,
                  channels,
-                 epsilon=None,
-                 mlp_hidden=None,
-                 mlp_activation='relu',
+                 K=3,
                  activation=None,
                  use_bias=True,
                  kernel_initializer='glorot_uniform',
@@ -78,48 +69,40 @@ class GINConv(MessagePassing):
                          bias_constraint=bias_constraint,
                          **kwargs)
         self.channels = self.output_dim = channels
-        self.epsilon = epsilon
-        self.mlp_hidden = mlp_hidden if mlp_hidden else []
-        self.mlp_activation = activations.get(mlp_activation)
+        self.K = K
+        self.linear = Dense(channels,
+                            activation=activation,
+                            use_bias=use_bias,
+                            kernel_initializer=kernel_initializer,
+                            bias_initializer=bias_initializer,
+                            kernel_regularizer=kernel_regularizer,
+                            bias_regularizer=bias_regularizer,
+                            activity_regularizer=activity_regularizer,
+                            kernel_constraint=kernel_constraint,
+                            bias_constraint=bias_constraint)
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
-        layer_kwargs = dict(
-            kernel_initializer=self.kernel_initializer,
-            bias_initializer=self.bias_initializer,
-            kernel_regularizer=self.kernel_regularizer,
-            bias_regularizer=self.bias_regularizer,
-            kernel_constraint=self.kernel_constraint,
-            bias_constraint=self.bias_constraint
-        )
-
-        self.mlp = Sequential([
-            Dense(channels, self.mlp_activation, **layer_kwargs)
-            for channels in self.mlp_hidden
-        ] + [Dense(self.channels, self.activation, use_bias=self.use_bias, **layer_kwargs)])
-
-        if self.epsilon is None:
-            self.eps = self.add_weight(shape=(1,),
-                                       initializer='zeros',
-                                       name='eps')
-        else:
-            # If epsilon is given, keep it constant
-            self.eps = K.constant(self.epsilon)
-
         self.built = True
 
-    def call(self, inputs):
+    def call(self, inputs, **kwargs):
         X, A, E = self.get_inputs(inputs)
-        output = self.mlp((1.0 + self.eps) * X + self.propagate(X, A, E))
+        edge_weight = A.values
 
-        return output
+        output = [X]
+        for k in range(self.K):
+            output.append(self.propagate(X, A, E, edge_weight=edge_weight))
+        output = K.concatenate(output)
+
+        return self.linear(output)
+
+    def message(self, X, edge_weight=None):
+        X_j = self.get_j(X)
+        return edge_weight[:, None] * X_j
 
     def get_config(self):
         config = {
             'channels': self.channels,
-            'epsilon': self.epsilon,
-            'mlp_hidden': self.mlp_hidden,
-            'mlp_activation': self.mlp_activation
         }
         base_config = super().get_config()
         base_config.pop('aggregate')  # Remove it because it's defined by constructor
