@@ -616,7 +616,7 @@ layer in the MLP (if None, the MLP has only the output layer);</li>
 <p>A Graph Isomorphism Network (GIN) as presented by
 <a href="https://arxiv.org/abs/1810.00826">Xu et al. (2018)</a>.</p>
 <p><strong>Mode</strong>: single.</p>
-<p><strong>This layer expects sparse inputs.</strong></p>
+<p><strong>This layer expects a sparse adjacency matrix.</strong></p>
 <p>This layer computes for each node <script type="math/tex">i</script>:
 <script type="math/tex; mode=display">
 \Z_i = \textrm{MLP}\big( (1 + \epsilon) \cdot \X_i + \sum\limits_{j \in \mathcal{N}(i)} \X_j \big)
@@ -748,7 +748,7 @@ changed to <code>channels</code>.</li>
 <p>An Attention-based Graph Neural Network (AGNN) as presented by
 <a href="https://arxiv.org/abs/1803.03735">Thekumparampil et al. (2018)</a>.</p>
 <p><strong>Mode</strong>: single.</p>
-<p><strong>This layer expects sparse inputs.</strong></p>
+<p><strong>This layer expects a sparse adjacency matrix.</strong></p>
 <p>This layer computes:
 <script type="math/tex; mode=display">
 \Z = \P\X
@@ -787,7 +787,7 @@ Otherwise, beta is fixed to 1;</li>
 <p>A Topology Adaptive Graph Convolutional layer (TAG) as presented by
 <a href="https://arxiv.org/abs/1710.10370">Du et al. (2017)</a>.</p>
 <p><strong>Mode</strong>: single.</p>
-<p><strong>This layer expects sparse inputs.</strong></p>
+<p><strong>This layer expects a sparse adjacency matrix.</strong></p>
 <p>This layer computes:
 <script type="math/tex; mode=display">
 \Z = \sum\limits_{k=0}^{K} \D^{-1/2}\A^k\D^{-1/2}\X\W^{(k)}
