@@ -12,7 +12,7 @@ class AGNNConv(MessagePassing):
 
     **Mode**: single.
 
-    **This layer expects sparse inputs.**
+    **This layer expects a sparse adjacency matrix.**
 
     This layer computes:
     $$

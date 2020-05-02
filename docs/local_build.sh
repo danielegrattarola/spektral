@@ -2,7 +2,7 @@
 
 # install current branch
 cd ../
-python setup.py install
+# python setup.py install
 cd docs/
 
 # delete old docs
