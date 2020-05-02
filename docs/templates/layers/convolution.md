@@ -5,11 +5,15 @@ The message-passing layers from these papers are available in Spektral:
 - [Semi-Supervised Classification with Graph Convolutional Networks](https://arxiv.org/abs/1609.02907)
 - [Convolutional Neural Networks on Graphs with Fast Localized Spectral Filtering](https://arxiv.org/abs/1606.09375)
 - [Inductive Representation Learning on Large Graphs](https://arxiv.org/abs/1706.02216)
+- [Graph Neural Networks with convolutional ARMA filters](https://arxiv.org/abs/1901.01343)
 - [Dynamic Edge-Conditioned Filters in Convolutional Neural Networks on Graphs](https://arxiv.org/abs/1704.02901)
 - [Graph Attention Networks](https://arxiv.org/abs/1710.10903)
-- [Graph Neural Networks with convolutional ARMA filters](https://arxiv.org/abs/1901.01343)
 - [Predict then Propagate: Graph Neural Networks meet Personalized PageRank](https://arxiv.org/abs/1810.05997)
 - [How Powerful are Graph Neural Networks?](https://arxiv.org/abs/1810.00826)
+- [Diffusion Convolutional Recurrent Neural Network: Data-Driven Traffic Forecasting](https://arxiv.org/abs/1707.01926)
+- [Gated Graph Sequence Neural Networks](https://arxiv.org/abs/1511.05493)
+- [Attention-based Graph Neural Network for Semi-supervised Learning](https://arxiv.org/abs/1803.03735)
+- [Topology Adaptive Graph Convolutional Networks](https://arxiv.org/abs/1710.10370)
 
 Notation:
 

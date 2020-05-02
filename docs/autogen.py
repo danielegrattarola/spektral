@@ -46,7 +46,9 @@ PAGES = [
             layers.GINConv,
             layers.DiffusionConvolution,
             layers.GatedGraphConv,
-            layers.MessagePassing
+            layers.AGNNConv,
+            layers.TAGConv,
+            layers.MessagePassing,
         ]
     },
     {
