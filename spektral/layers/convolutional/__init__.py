@@ -1,3 +1,4 @@
+from .agnn import AGNNConv
 from .appnp import APPNP
 from .arma import ARMAConv
 from .cheby import ChebConv

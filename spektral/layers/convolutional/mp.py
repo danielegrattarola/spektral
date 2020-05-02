@@ -77,7 +77,6 @@ class MessagePassing(Layer):
         self.built = True
 
     def propagate(self, X, A, E=None):
-        assert K.is_sparse(A), 'A must be a SparseTensor'
         N = tf.shape(X)[0]
         index_i, index_j = A.indices[:, 0], A.indices[:, 1]
         x_j = tf.gather(X, index_j)
@@ -108,6 +107,7 @@ class MessagePassing(Layer):
             raise ValueError('Expected 2 or 3 inputs tensors (X, A, E), got {}.'
                              .format(len(inputs)))
         assert K.ndim(X) == 2, 'X must have rank 2'
+        assert K.is_sparse(A), 'A must be a SparseTensor'
         assert K.ndim(A) == 2, 'A must have rank 2'
 
         return X, A, E
