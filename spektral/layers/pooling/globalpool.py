@@ -347,10 +347,10 @@ class SortPool(Layer):
     SortPool layer pooling the top \(k\) most relevant nodes as described by
     [Zhang et al.](https://www.cse.wustl.edu/~muhan/papers/AAAI_2018_DGCNN.pdf)
 
-    This layers takes a graph signal \(\X\) and sorts the rows by the elements
-    of its last column. It then keeps the top \(k\) rows.
-    Should \(\X\) have less than \(k\) rows, it sorts and then adds rows full
-    of zeros until \(\X\) has \(k\) rows.
+    This layers takes a graph signal \(\mathbf{X}\) and sorts the rows by the
+    elements of its last column. It then keeps the top \(k\) rows.
+    Should \(\mathbf{X}\) have less than \(k\) rows, it sorts and then adds rows
+    full of zeros until \(\mathbf{X}\) has \(k\) rows.
 
     **Mode**: single, batch.
 
