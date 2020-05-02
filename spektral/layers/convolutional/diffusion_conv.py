@@ -1,6 +1,6 @@
 import tensorflow as tf
 import tensorflow.keras.layers as layers
-from spektral.layers.convolutional.gcn import GraphConv
+from spektral.layers.convolutional.graph_conv import GraphConv
 
 
 class DiffuseFeatures(layers.Layer):

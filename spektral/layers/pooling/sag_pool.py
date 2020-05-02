@@ -1,6 +1,6 @@
 from tensorflow.keras import backend as K
 
-from spektral.layers.pooling.topk import ops, TopKPool
+from spektral.layers.pooling.topk_pool import ops, TopKPool
 
 
 class SAGPool(TopKPool):

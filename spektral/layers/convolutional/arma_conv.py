@@ -2,7 +2,7 @@ from tensorflow.keras import activations, backend as K
 from tensorflow.keras.layers import Dropout
 
 from spektral.layers import ops
-from spektral.layers.convolutional.gcn import GraphConv
+from spektral.layers.convolutional.graph_conv import GraphConv
 from spektral.utils import normalized_laplacian, rescale_laplacian
 
 
