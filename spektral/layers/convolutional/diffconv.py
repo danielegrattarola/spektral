@@ -80,7 +80,7 @@ class DiffuseFeatures(layers.Layer):
         return tf.expand_dims(H, -1)
 
 
-class DiffusionConvolution(GraphConv):
+class DiffusionConv(GraphConv):
     r"""Applies Graph Diffusion Convolution as descibed by
     [Li et al. (2016)](https://arxiv.org/pdf/1707.01926.pdf)
 
