@@ -7,7 +7,7 @@ class DiffuseFeatures(layers.Layer):
     r"""Utility layer calculating a single channel of the
     diffusional convolution.
 
-    Procedure is based on https://arxiv.org/pdf/1707.01926.pdf
+    Procedure is based on https://arxiv.org/abs/1707.01926
 
     **Input**
 
@@ -80,7 +80,7 @@ class DiffuseFeatures(layers.Layer):
         return tf.expand_dims(H, -1)
 
 
-class DiffusionConvolution(GraphConv):
+class DiffusionConv(GraphConv):
     r"""Applies Graph Diffusion Convolution as descibed by
     [Li et al. (2016)](https://arxiv.org/pdf/1707.01926.pdf)
 

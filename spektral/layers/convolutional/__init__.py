@@ -1,7 +1,8 @@
+from .agnn import AGNNConv
 from .appnp import APPNP
 from .arma import ARMAConv
 from .cheby import ChebConv
-from .diffconv import DiffusionConvolution
+from .diffconv import DiffusionConv
 from .ecc import EdgeConditionedConv
 from .gat import GraphAttention
 from .gated_graph import GatedGraphConv
@@ -10,3 +11,4 @@ from .gcs import GraphConvSkip
 from .gin import GINConv
 from .graphsage import GraphSageConv
 from .mp import MessagePassing
+from .tag import TAGConv

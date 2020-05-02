@@ -44,9 +44,11 @@ PAGES = [
             layers.GraphConvSkip,
             layers.APPNP,
             layers.GINConv,
-            layers.DiffusionConvolution,
+            layers.DiffusionConv,
             layers.GatedGraphConv,
-            layers.MessagePassing
+            layers.AGNNConv,
+            layers.TAGConv,
+            layers.MessagePassing,
         ]
     },
     {

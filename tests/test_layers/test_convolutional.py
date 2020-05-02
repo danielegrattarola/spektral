@@ -3,10 +3,9 @@ import tensorflow as tf
 from tensorflow.keras import Model, Input
 
 from spektral.layers import GraphConv, ChebConv, EdgeConditionedConv, GraphAttention, \
-    GraphConvSkip, ARMAConv, APPNP, GraphSageConv, GINConv, DiffusionConvolution, \
-    GatedGraphConv, MessagePassing
+    GraphConvSkip, ARMAConv, APPNP, GraphSageConv, GINConv, DiffusionConv, \
+    GatedGraphConv, AGNNConv, TAGConv, MessagePassing
 from spektral.layers.ops import sp_matrix_to_sp_tensor
-
 
 tf.keras.backend.set_floatx('float64')
 SINGLE, BATCH, MIXED = 1, 2, 3  # Single, batch, mixed
@@ -104,7 +103,7 @@ TESTS = [
                     'sparse': [True]}
     },
     {
-        LAYER_K_: DiffusionConvolution,
+        LAYER_K_: DiffusionConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
         KWARGS_K_: {'channels': 8, 'activation': 'tanh', 'num_diffusion_steps': 5,
                     'sparse': [False]}
@@ -113,6 +112,16 @@ TESTS = [
         LAYER_K_: GatedGraphConv,
         MODES_K_: [SINGLE],
         KWARGS_K_: {'channels': 10, 'n_layers': 3, 'sparse': [True]}
+    },
+    {
+        LAYER_K_: AGNNConv,
+        MODES_K_: [SINGLE],
+        KWARGS_K_: {'channels': F, 'trainable': True, 'sparse': [True]}
+    },
+    {
+        LAYER_K_: TAGConv,
+        MODES_K_: [SINGLE],
+        KWARGS_K_: {'channels': F, 'K': 3, 'sparse': [True]}
     },
     {
         LAYER_K_: MessagePassing,

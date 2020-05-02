@@ -28,6 +28,10 @@ table {
     border-color: #e88c3b;
 }
 
+.wy-nav-top {
+    background-color: #e88c3b;
+}
+
 .wy-menu-vertical a:active {
     background-color: #e88c3b;
     cursor: pointer;
