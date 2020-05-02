@@ -22,8 +22,8 @@ class GINConv(MessagePassing):
 
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
-    - Binary adjacency matrix of shape `([batch], N, N)`.
+    - Node features of shape `(N, F)`;
+    - Binary adjacency matrix of shape `(N, N)`.
 
     **Output**
 
@@ -35,9 +35,8 @@ class GINConv(MessagePassing):
     - `channels`: integer, number of output channels;
     - `epsilon`: unnamed parameter, see
     [Xu et al. (2018)](https://arxiv.org/abs/1810.00826), and the equation above.
-    This parameter can be learned by setting `epsilon=None`, or it can be set
-    to a constant value, which is what happens by default (0). In practice, it
-    is safe to leave it to 0.
+    By setting `epsilon=None`, the parameter will be learned (default behaviour).
+    If given as a value, the parameter will stay fixed.
     - `mlp_hidden`: list of integers, number of hidden units for each hidden
     layer in the MLP (if None, the MLP has only the output layer);
     - `mlp_activation`: activation for the MLP layers;
@@ -101,7 +100,7 @@ class GINConv(MessagePassing):
 
         if self.epsilon is None:
             self.eps = self.add_weight(shape=(1,),
-                                       initializer=self.bias_initializer,
+                                       initializer='zeros',
                                        name='eps')
         else:
             # If epsilon is given, keep it constant

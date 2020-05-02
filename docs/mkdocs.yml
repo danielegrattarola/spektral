@@ -1,5 +1,5 @@
 site_name: Spektral
-site_url: https://spektral.graphneural.network/
+site_url: https://graphneural.network/
 theme:
     name: 'readthedocs'
     custom_dir: 'sources/custom_theme/'

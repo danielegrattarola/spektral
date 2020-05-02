@@ -4,9 +4,8 @@ from tensorflow.keras import Model, Input
 
 from spektral.layers import GraphConv, ChebConv, EdgeConditionedConv, GraphAttention, \
     GraphConvSkip, ARMAConv, APPNP, GraphSageConv, GINConv, DiffusionConvolution, \
-    GatedGraphConv, MessagePassing
+    GatedGraphConv, AGNNConv, MessagePassing
 from spektral.layers.ops import sp_matrix_to_sp_tensor
-
 
 tf.keras.backend.set_floatx('float64')
 SINGLE, BATCH, MIXED = 1, 2, 3  # Single, batch, mixed
@@ -113,6 +112,11 @@ TESTS = [
         LAYER_K_: GatedGraphConv,
         MODES_K_: [SINGLE],
         KWARGS_K_: {'channels': 10, 'n_layers': 3, 'sparse': [True]}
+    },
+    {
+        LAYER_K_: AGNNConv,
+        MODES_K_: [SINGLE],
+        KWARGS_K_: {'channels': F, 'trainable': True, 'sparse': [True]}
     },
     {
         LAYER_K_: MessagePassing,
