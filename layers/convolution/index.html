@@ -93,9 +93,13 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#ginconv">GINConv</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#diffusionconvolution">DiffusionConvolution</a>
+    <li class="toctree-l2"><a class="reference internal" href="#diffusionconv">DiffusionConv</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#gatedgraphconv">GatedGraphConv</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#agnnconv">AGNNConv</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#tagconv">TAGConv</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#messagepassing">MessagePassing</a>
     </li>
@@ -176,11 +180,15 @@
 <li><a href="https://arxiv.org/abs/1609.02907">Semi-Supervised Classification with Graph Convolutional Networks</a></li>
 <li><a href="https://arxiv.org/abs/1606.09375">Convolutional Neural Networks on Graphs with Fast Localized Spectral Filtering</a></li>
 <li><a href="https://arxiv.org/abs/1706.02216">Inductive Representation Learning on Large Graphs</a></li>
+<li><a href="https://arxiv.org/abs/1901.01343">Graph Neural Networks with convolutional ARMA filters</a></li>
 <li><a href="https://arxiv.org/abs/1704.02901">Dynamic Edge-Conditioned Filters in Convolutional Neural Networks on Graphs</a></li>
 <li><a href="https://arxiv.org/abs/1710.10903">Graph Attention Networks</a></li>
-<li><a href="https://arxiv.org/abs/1901.01343">Graph Neural Networks with convolutional ARMA filters</a></li>
 <li><a href="https://arxiv.org/abs/1810.05997">Predict then Propagate: Graph Neural Networks meet Personalized PageRank</a></li>
 <li><a href="https://arxiv.org/abs/1810.00826">How Powerful are Graph Neural Networks?</a></li>
+<li><a href="https://arxiv.org/abs/1707.01926">Diffusion Convolutional Recurrent Neural Network: Data-Driven Traffic Forecasting</a></li>
+<li><a href="https://arxiv.org/abs/1511.05493">Gated Graph Sequence Neural Networks</a></li>
+<li><a href="https://arxiv.org/abs/1803.03735">Attention-based Graph Neural Network for Semi-supervised Learning</a></li>
+<li><a href="https://arxiv.org/abs/1710.10370">Topology Adaptive Graph Convolutional Networks</a></li>
 </ul>
 <p>Notation:</p>
 <ul>
@@ -616,8 +624,8 @@ layer in the MLP (if None, the MLP has only the output layer);</li>
 where <script type="math/tex">\textrm{MLP}</script> is a multi-layer perceptron.</p>
 <p><strong>Input</strong></p>
 <ul>
-<li>Node features of shape <code>([batch], N, F)</code>;</li>
-<li>Binary adjacency matrix of shape <code>([batch], N, N)</code>.</li>
+<li>Node features of shape <code>(N, F)</code>;</li>
+<li>Binary adjacency matrix of shape <code>(N, N)</code>.</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
@@ -629,9 +637,8 @@ changed to <code>channels</code>.</li>
 <li><code>channels</code>: integer, number of output channels;</li>
 <li><code>epsilon</code>: unnamed parameter, see
 <a href="https://arxiv.org/abs/1810.00826">Xu et al. (2018)</a>, and the equation above.
-This parameter can be learned by setting <code>epsilon=None</code>, or it can be set
-to a constant value, which is what happens by default (0). In practice, it
-is safe to leave it to 0.</li>
+By setting <code>epsilon=None</code>, the parameter will be learned (default behaviour).
+If given as a value, the parameter will stay fixed.</li>
 <li><code>mlp_hidden</code>: list of integers, number of hidden units for each hidden
 layer in the MLP (if None, the MLP has only the output layer);</li>
 <li><code>mlp_activation</code>: activation for the MLP layers;</li>
@@ -647,8 +654,8 @@ layer in the MLP (if None, the MLP has only the output layer);</li>
 </ul>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/diffconv.py#L83">[source]</a></span></p>
-<h4 id="diffusionconvolution">DiffusionConvolution</h4>
-<pre><code class="python">spektral.layers.DiffusionConvolution(channels, num_diffusion_steps=6, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None, activation='tanh')
+<h4 id="diffusionconv">DiffusionConv</h4>
+<pre><code class="python">spektral.layers.DiffusionConv(channels, num_diffusion_steps=6, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None, activation='tanh')
 </code></pre>
 
 <p>Applies Graph Diffusion Convolution as descibed by
@@ -733,7 +740,86 @@ changed to <code>channels</code>.</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/mp.py#L9">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/agnn.py#L8">[source]</a></span></p>
+<h4 id="agnnconv">AGNNConv</h4>
+<pre><code class="python">spektral.layers.AGNNConv(trainable=True, activation=None)
+</code></pre>
+
+<p>An Attention-based Graph Neural Network (AGNN) as presented by
+<a href="https://arxiv.org/abs/1803.03735">Thekumparampil et al. (2018)</a>.</p>
+<p><strong>Mode</strong>: single.</p>
+<p><strong>This layer expects sparse inputs.</strong></p>
+<p>This layer computes:
+<script type="math/tex; mode=display">
+\Z = \P\X
+</script>
+where
+<script type="math/tex; mode=display">
+\P_{ij} = \frac{
+\exp \left( \beta \cos \left( \X_i, \X_j \right) \right)
+}{
+\sum\limits_{k \in \mathcal{N}(i) \cup \{ i \}}
+\exp \left( \beta \cos \left( \X_i, \X_k \right) \right)
+}
+</script>
+and <script type="math/tex">\beta</script> is a trainable parameter.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>(N, F)</code>;</li>
+<li>Binary adjacency matrix of shape <code>(N, N)</code>.</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Node features with the same shape of the input.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>trainable</code>: boolean, if True, then beta is a trainable parameter.
+Otherwise, beta is fixed to 1;</li>
+<li><code>activation</code>: activation function to use;</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/tag.py#L7">[source]</a></span></p>
+<h4 id="tagconv">TAGConv</h4>
+<pre><code class="python">spektral.layers.TAGConv(channels, K=3, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+</code></pre>
+
+<p>A Topology Adaptive Graph Convolutional layer (TAG) as presented by
+<a href="https://arxiv.org/abs/1710.10370">Du et al. (2017)</a>.</p>
+<p><strong>Mode</strong>: single.</p>
+<p><strong>This layer expects sparse inputs.</strong></p>
+<p>This layer computes:
+<script type="math/tex; mode=display">
+\Z = \sum\limits_{k=0}^{K} \D^{-1/2}\A^k\D^{-1/2}\X\W^{(k)}
+</script>
+</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>(N, F)</code>;</li>
+<li>Binary adjacency matrix of shape <code>(N, N)</code>.</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Node features with the same shape of the input, but the last dimension
+changed to <code>channels</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>channels</code>: integer, number of output channels;</li>
+<li><code>K</code>: the order of the layer (i.e., the layer will consider a K-hop
+neighbourhood for each node);</li>
+<li><code>activation</code>: activation function to use;</li>
+<li><code>use_bias</code>: whether to add a bias to the linear transformation;</li>
+<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
+<li><code>bias_initializer</code>: initializer for the bias vector;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
+<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
+<li><code>activity_regularizer</code>: regularization applied to the output;</li>
+<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
+<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/mp.py#L11">[source]</a></span></p>
 <h4 id="messagepassing">MessagePassing</h4>
 <pre><code class="python">spektral.layers.MessagePassing(aggregate='sum')
 </code></pre>
@@ -756,23 +842,27 @@ function to aggregate the messages (like the sum or the average), and
 in single/disjoint mode.</p>
 <p><strong>API:</strong></p>
 <ul>
-<li><code>propagate(X, A, E=None)</code>: propagate the messages and computes embeddings
-for each node in the graph.</li>
-<li><code>message(X_j)</code>: computes messages for each node j. <code>X_j</code> is rank 2 tensor
-obtained by gathering the node features of each node's neighbours, i.e.,
-<code>X_j = X[A.indices[1]]</code>. This is equivalent to <script type="math/tex">\phi</script> in the definition
-(support for X_i and E_ij can be obtained by extending this layer and
-re-implementing the <code>message</code> and <code>propagate</code> functions).</li>
-<li><code>aggregate(messages, indices, N)</code>: aggregates the messages according to
-<code>indices</code> (usually <code>indices = A.indices[0]</code>, i.e., the messages from each
-node's neighbours are aggregated). This is equivalent to <script type="math/tex">\square</script> in
-the definition. The behaviour of this function can also be controlled using
-the <code>aggregate</code> keyword in the constructor of the layer (supported
-aggregations: sum, mean, max, min, prod).</li>
-<li><code>update(embeddings)</code>: updates the aggregated messages. This is equivalent
-to <script type="math/tex">\gamma</script> in the definition (support for X_i can be obtained by
-extending this layer and re-implementing the <code>update</code> and <code>propagate</code>
-functions).</li>
+<li><code>propagate(X, A, E=None, **kwargs)</code>: propagate the messages and computes
+embeddings for each node in the graph. <code>kwargs</code> will be propagated as
+keyword arguments to <code>message()</code>, <code>aggregate()</code> and <code>update()</code>.</li>
+<li><code>message(X, **kwargs)</code>: computes messages, equivalent to <script type="math/tex">\phi</script> in the
+definition.
+Any extra keyword argument of this function will be  populated by
+<code>propagate()</code> if a matching keyword is found.
+Use <code>self.get_i()</code> and  <code>self.get_j()</code> to gather the elements using the
+indices <code>i</code> or <code>j</code> of the adjacency matrix (e.g, <code>self.get_j(X)</code> will get
+the features of the neighbours).</li>
+<li><code>aggregate(messages, **kwargs)</code>: aggregates the messages, equivalent to
+<script type="math/tex">\square</script> in the definition.
+The behaviour of this function can also be controlled using the <code>aggregate</code>
+keyword in the constructor of the layer (supported aggregations: sum, mean,
+max, min, prod).
+Any extra keyword argument of this function will be  populated by
+<code>propagate()</code> if a matching keyword is found.</li>
+<li><code>update(embeddings, **kwargs)</code>: updates the aggregated messages to obtain
+the final node embeddings, equivalent to <script type="math/tex">\gamma</script> in the definition.
+Any extra keyword argument of this function will be  populated by
+<code>propagate()</code> if a matching keyword is found.</li>
 </ul>
 <p><strong>Arguments</strong>:</p>
 <ul>

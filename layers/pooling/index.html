@@ -530,10 +530,10 @@ matrix;</li>
 
 <p>SortPool layer pooling the top <script type="math/tex">k</script> most relevant nodes as described by
 <a href="https://www.cse.wustl.edu/~muhan/papers/AAAI_2018_DGCNN.pdf">Zhang et al.</a></p>
-<p>This layers takes a graph signal <script type="math/tex">\X</script> and sorts the rows by the elements
-of its last column. It then keeps the top <script type="math/tex">k</script> rows.
-Should <script type="math/tex">\X</script> have less than <script type="math/tex">k</script> rows, it sorts and then adds rows full
-of zeros until <script type="math/tex">\X</script> has <script type="math/tex">k</script> rows.</p>
+<p>This layers takes a graph signal <script type="math/tex">\mathbf{X}</script> and sorts the rows by the
+elements of its last column. It then keeps the top <script type="math/tex">k</script> rows.
+Should <script type="math/tex">\mathbf{X}</script> have less than <script type="math/tex">k</script> rows, it sorts and then adds rows
+full of zeros until <script type="math/tex">\mathbf{X}</script> has <script type="math/tex">k</script> rows.</p>
 <p><strong>Mode</strong>: single, batch.</p>
 <p><strong>Input</strong></p>
 <ul>
