@@ -7,7 +7,7 @@ class DiffuseFeatures(layers.Layer):
     r"""Utility layer calculating a single channel of the
     diffusional convolution.
 
-    Procedure is based on https://arxiv.org/pdf/1707.01926.pdf
+    Procedure is based on https://arxiv.org/abs/1707.01926
 
     **Input**
 

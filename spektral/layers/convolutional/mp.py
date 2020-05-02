@@ -1,3 +1,5 @@
+import inspect
+
 import tensorflow as tf
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Layer
@@ -59,7 +61,6 @@ class MessagePassing(Layer):
     """
     def __init__(self, aggregate='sum', **kwargs):
         super().__init__(**{k: v for k, v in kwargs.items() if is_keras_kwarg(k)})
-        self.aggr = deserialize_scatter(aggregate)
         self.output_dim = None
         self.kwargs_keys = []
         for key in kwargs:
@@ -69,6 +70,11 @@ class MessagePassing(Layer):
                 self.kwargs_keys.append(key)
                 setattr(self, key, attr)
 
+        self.msg_signature = inspect.signature(self.message).parameters
+        self.agg_signature = inspect.signature(self.aggregate).parameters
+        self.upd_signature = inspect.signature(self.update).parameters
+        self.agg = deserialize_scatter(aggregate)
+
     def call(self, inputs, **kwargs):
         X, A, E = self.get_inputs(inputs)
         return self.propagate(X, A, E)
@@ -76,24 +82,58 @@ class MessagePassing(Layer):
     def build(self, input_shape):
         self.built = True
 
-    def propagate(self, X, A, E=None):
-        N = tf.shape(X)[0]
-        index_i, index_j = A.indices[:, 0], A.indices[:, 1]
-        x_j = tf.gather(X, index_j)
-        messages = self.message(x_j)
-        embeddings = self.aggregate(messages, index_i, N)
-        output = self.update(embeddings)
+    def propagate(self, X, A, E=None, **kwargs):
+        self.N = tf.shape(X)[0]
+        self.index_i = A.indices[:, 0]
+        self.index_j = A.indices[:, 1]
+
+        # Message
+        msg_kwargs = self.get_kwargs(X, A, E, self.msg_signature, kwargs)
+        messages = self.message(X, **msg_kwargs)
+
+        # Aggregate
+        agg_kwargs = self.get_kwargs(X, A, E, self.agg_signature, kwargs)
+        embeddings = self.aggregate(messages, **agg_kwargs)
+
+        # Update
+        upd_kwargs = self.get_kwargs(X, A, E, self.upd_signature, kwargs)
+        output = self.update(embeddings, **upd_kwargs)
 
         return output
 
-    def message(self, x_j):
-        return x_j
+    def message(self, X, **kwargs):
+        return self.get_j(X)
 
-    def aggregate(self, messages, indices, N):
-        return self.aggr(messages, indices, N)
+    def aggregate(self, messages, **kwargs):
+        return self.agg(messages, self.index_i, self.N)
 
-    def update(self, embeddings):
+    def update(self, embeddings, **kwargs):
         return embeddings
+
+    def get_i(self, x):
+        return tf.gather(x, self.index_i)
+
+    def get_j(self, x):
+        return tf.gather(x, self.index_j)
+
+    def get_kwargs(self, X, A, E, signature, kwargs):
+        output = {}
+        for k in signature.keys():
+            if signature[k].default is inspect.Parameter.empty or k == 'kwargs':
+                pass
+            elif k == 'X':
+                output[k] = X
+            elif k == 'A':
+                output[k] = A
+            elif k == 'E':
+                output[k] = E
+            elif k in kwargs:
+                output[k] = kwargs[k]
+            else:
+                raise ValueError('Missing key {} for signature {}'
+                                 .format(k, signature))
+
+        return output
 
     @staticmethod
     def get_inputs(inputs):
@@ -121,7 +161,7 @@ class MessagePassing(Layer):
 
     def get_config(self):
         config = {
-            'aggregate': self.aggr,
+            'aggregate': self.agg,
         }
         for key in self.kwargs_keys:
             config[key] = serialize_kwarg(key, getattr(self, key))

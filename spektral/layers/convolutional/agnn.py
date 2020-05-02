@@ -57,32 +57,23 @@ class AGNNConv(MessagePassing):
             self.beta = K.constant(1.)
         self.built = True
 
-    def propagate(self, X, A, E=None):
-        # Prepare
-        N = tf.shape(X)[0]
+    def call(self, inputs, **kwargs):
+        X, A, E = self.get_inputs(inputs)
         X_norm = K.l2_normalize(X, axis=-1)
-
-        # Gather
-        indices = ops.sparse_add_self_loops(A.indices)
-        index_i, index_j = indices[:, 0], indices[:, 1]
-        X_j = tf.gather(X, index_j)
-        X_norm_i = tf.gather(X_norm, index_j)
-        X_norm_j = tf.gather(X_norm, index_j)
-
-        # Propagate
-        messages = self.message(X_j, X_norm_i, X_norm_j, index_i, N)
-        embeddings = self.aggregate(messages, index_i, N)
-        output = self.update(embeddings)
+        output = self.propagate(X, A, E, X_norm=X_norm)
         output = self.activation(output)
 
         return output
 
-    def message(self, x_j, x_norm_i, x_norm_j, index_i, N):
-        alpha = self.beta * tf.reduce_sum(x_norm_i * x_norm_i, axis=-1)
-        alpha = ops.unsorted_segment_softmax(alpha, index_i, N)
+    def message(self, X, X_norm=None):
+        X_j = self.get_j(X)
+        X_norm_i = self.get_i(X_norm)
+        X_norm_j = self.get_j(X_norm)
+        alpha = self.beta * tf.reduce_sum(X_norm_i * X_norm_j, axis=-1)
+        alpha = ops.unsorted_segment_softmax(alpha, self.index_i, self.N)
         alpha = alpha[:, None]
 
-        return alpha * x_j
+        return alpha * X_j
 
     def get_config(self):
         config = {
