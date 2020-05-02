@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow.keras import backend as K
 
 from spektral.layers import ops
-from spektral.layers.convolutional.gcn import GraphConv
+from spektral.layers.convolutional.graph_conv import GraphConv
 
 
 class GraphSageConv(GraphConv):

@@ -4,7 +4,7 @@ from tensorflow.keras import initializers, regularizers, constraints
 from tensorflow.keras.layers import Dropout
 
 from spektral.layers import ops
-from spektral.layers.convolutional.gcn import GraphConv
+from spektral.layers.convolutional.graph_conv import GraphConv
 from spektral.layers.ops import modes
 
 

@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow.keras import backend as K
 
 from spektral.layers import ops
-from spektral.layers.convolutional.mp import MessagePassing
+from spektral.layers.convolutional.message_passing import MessagePassing
 
 
 class AGNNConv(MessagePassing):

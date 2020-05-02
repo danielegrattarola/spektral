@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import GRUCell
 
-from spektral.layers.convolutional.mp import MessagePassing
+from spektral.layers.convolutional.message_passing import MessagePassing
 
 
 class GatedGraphConv(MessagePassing):

@@ -4,7 +4,7 @@ from tensorflow.keras.layers import Dense
 
 from spektral.layers import ops
 from spektral.layers.ops import modes
-from spektral.layers.convolutional.gcn import GraphConv
+from spektral.layers.convolutional.graph_conv import GraphConv
 
 
 class EdgeConditionedConv(GraphConv):

@@ -3,7 +3,7 @@ from tensorflow.keras.layers import Dropout, Dense
 from tensorflow.keras.models import Sequential
 
 from spektral.layers import ops
-from spektral.layers.convolutional.gcn import GraphConv
+from spektral.layers.convolutional.graph_conv import GraphConv
 
 
 class APPNP(GraphConv):
