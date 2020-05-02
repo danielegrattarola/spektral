@@ -9,6 +9,6 @@ from .gated_graph_conv import GatedGraphConv
 from .graph_conv import GraphConv
 from .gcs import GraphConvSkip
 from .gin_conv import GINConv
-from .graphsage import GraphSageConv
+from .graphsage_conv import GraphSageConv
 from .message_passing import MessagePassing
 from .tag_conv import TAGConv
