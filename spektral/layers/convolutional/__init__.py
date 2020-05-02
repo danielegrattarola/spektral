@@ -2,7 +2,7 @@ from .agnn import AGNNConv
 from .appnp import APPNP
 from .arma import ARMAConv
 from .cheby import ChebConv
-from .diffconv import DiffusionConvolution
+from .diffconv import DiffusionConv
 from .ecc import EdgeConditionedConv
 from .gat import GraphAttention
 from .gated_graph import GatedGraphConv
