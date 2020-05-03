@@ -17,11 +17,13 @@ class CrystalConv(MessagePassing):
     $$
         \H_i = \X_i +
                \sum\limits_{j \in \mathcal{N}(i)}
-                    \sigma \left( \z_{ij} \W^{(f)} + \b^{(f)}} \right)
+                    \sigma \left( \z_{ij} \W^{(f)} + \b^{(f)} \right)
                     \odot
                     \g \left( \z_{ij} \W^{(s)} + \b^{(s)} \right)
     $$
-    where \(\z_{ij} = X_i \| X_j \| E_{ij} \).
+    where \(\z_{ij} = \X_i \| \X_j \| \E_{ij} \), \(\sigma\) is a sigmoid
+    activation, and \(g\) is the activation function (defined by the `activation`
+    argument).
 
     **Input**
 
