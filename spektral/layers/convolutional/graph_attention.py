@@ -69,15 +69,15 @@ class GraphAttention(GraphConv):
     - `return_attn_coef`: if True, return the attention coefficients for
     the given input (one N x N matrix for each head).
     - `activation`: activation function to use;
-    - `use_bias`: whether to add a bias to the linear transformation;
-    - `kernel_initializer`: initializer for the kernel matrix;
-    - `attn_kernel_initializer`: initializer for the attention kernels;
+    - `use_bias`: bool, add a bias vector to the output;
+    - `kernel_initializer`: initializer for the weights;
+    - `attn_kernel_initializer`: initializer for the attention weights;
     - `bias_initializer`: initializer for the bias vector;
-    - `kernel_regularizer`: regularization applied to the kernel matrix;
+    - `kernel_regularizer`: regularization applied to the weights;
     - `attn_kernel_regularizer`: regularization applied to the attention kernels;
     - `bias_regularizer`: regularization applied to the bias vector;
     - `activity_regularizer`: regularization applied to the output;
-    - `kernel_constraint`: constraint applied to the kernel matrix;
+    - `kernel_constraint`: constraint applied to the weights;
     - `attn_kernel_constraint`: constraint applied to the attention kernels;
     - `bias_constraint`: constraint applied to the bias vector.
 

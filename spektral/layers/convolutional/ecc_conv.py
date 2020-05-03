@@ -44,13 +44,13 @@ class EdgeConditionedConv(GraphConv):
     - `kernel_network`: a list of integers representing the hidden neurons of
     the kernel-generating network;
     - `activation`: activation function to use;
-    - `use_bias`: boolean, whether to add a bias to the linear transformation;
-    - `kernel_initializer`: initializer for the kernel matrix;
+    - `use_bias`: bool, add a bias vector to the output;
+    - `kernel_initializer`: initializer for the weights;
     - `bias_initializer`: initializer for the bias vector;
-    - `kernel_regularizer`: regularization applied to the kernel matrix;
+    - `kernel_regularizer`: regularization applied to the weights;
     - `bias_regularizer`: regularization applied to the bias vector;
     - `activity_regularizer`: regularization applied to the output;
-    - `kernel_constraint`: constraint applied to the kernel matrix;
+    - `kernel_constraint`: constraint applied to the weights;
     - `bias_constraint`: constraint applied to the bias vector.
 
     """
