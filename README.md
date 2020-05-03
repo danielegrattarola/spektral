@@ -18,7 +18,9 @@ Spektral implements some of the most popular layers for graph deep learning, inc
 - [Graph Isomorphism Networks (GIN)](https://arxiv.org/abs/1810.00826)
 - [Diffusional Convolutions](https://arxiv.org/abs/1707.01926)
 
-You can also find [pooling layers](https://danielegrattarola.github.io/spektral/layers/pooling/), including:
+and many others (see [convolutional layers](https://graphneural.network/layers/convolution/)).
+
+You can also find [pooling layers](https://graphneural.network/layers/pooling/), including:
 
 - [DiffPool](https://arxiv.org/abs/1806.08804)
 - [MinCUT pooling](https://arxiv.org/abs/1907.00481)
@@ -30,10 +32,10 @@ You can also find [pooling layers](https://danielegrattarola.github.io/spektral/
 
 Spektral also includes lots of utilities for your graph deep learning projects.  
 
-See how to [get started with Spektral](https://danielegrattarola.github.io/spektral/getting-started/) and have a look at the [examples](https://danielegrattarola.github.io/spektral/examples/) for some templates.
+See how to [get started with Spektral](https://graphneural.network/getting-started/) and have a look at the [examples](https://danielegrattarola.github.io/spektral/examples/) for some templates.
 
 The source code of the project is available on [Github](https://github.com/danielegrattarola/spektral).  
-Read the documentation [here](https://spektral.graphneural.network).
+Read the documentation [here](https://graphneural.network).
 
 ## Installation
 Spektral is compatible with Python 3.5+, and is tested on Ubuntu 16.04+ and MacOS. 
