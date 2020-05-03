@@ -49,6 +49,7 @@ PAGES = [
             layers.AGNNConv,
             layers.TAGConv,
             layers.CrystalConv,
+            layers.EdgeConv,
             layers.MessagePassing,
         ]
     },
