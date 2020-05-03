@@ -159,6 +159,7 @@ class EdgeConditionedConv(GraphConv):
         X = inputs[0]  # (N, F)
         A = inputs[1]  # (N, N)
         E = inputs[2]  # (n_edges, S)
+        assert K.ndim(E) == 2, 'In single mode, E must have shape (n_edges, S).'
 
         # Enforce sparse representation
         if not K.is_sparse(A):
