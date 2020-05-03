@@ -2,13 +2,14 @@ from .agnn_conv import AGNNConv
 from .appnp import APPNP
 from .arma_conv import ARMAConv
 from .cheb_conv import ChebConv
+from .crystal_conv import CrystalConv
 from .diffusion_conv import DiffusionConv
 from .ecc_conv import EdgeConditionedConv
-from .graph_attention import GraphAttention
 from .gated_graph_conv import GatedGraphConv
-from .graph_conv import GraphConv
-from .gcs import GraphConvSkip
 from .gin_conv import GINConv
+from .graph_attention import GraphAttention
+from .graph_conv import GraphConv
+from .graph_conv_skip import GraphConvSkip
 from .graphsage_conv import GraphSageConv
 from .message_passing import MessagePassing
 from .tag_conv import TAGConv
