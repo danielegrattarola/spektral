@@ -101,6 +101,10 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#tagconv">TAGConv</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#crystalconv">CrystalConv</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#edgeconv">EdgeConv</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#messagepassing">MessagePassing</a>
     </li>
     </ul>
@@ -189,6 +193,8 @@
 <li><a href="https://arxiv.org/abs/1511.05493">Gated Graph Sequence Neural Networks</a></li>
 <li><a href="https://arxiv.org/abs/1803.03735">Attention-based Graph Neural Network for Semi-supervised Learning</a></li>
 <li><a href="https://arxiv.org/abs/1710.10370">Topology Adaptive Graph Convolutional Networks</a></li>
+<li><a href="https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.145301">Crystal Graph Convolutional Neural Networks for an Accurate and Interpretable Prediction of Material Properties</a></li>
+<li><a href="https://arxiv.org/abs/1801.07829">Dynamic Graph CNN for Learning on Point Clouds</a></li>
 </ul>
 <p>Notation:</p>
 <ul>
@@ -216,7 +222,7 @@
 <script type="math/tex"> F' </script>: dimension of the node attributes after a message-passing layer;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gcn.py#L9">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/graph_conv.py#L9">[source]</a></span></p>
 <h4 id="graphconv">GraphConv</h4>
 <pre><code class="python">spektral.layers.GraphConv(channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -245,17 +251,17 @@ dimension changed to <code>channels</code>.</li>
 <ul>
 <li><code>channels</code>: number of output channels;</li>
 <li><code>activation</code>: activation function to use;</li>
-<li><code>use_bias</code>: whether to add a bias to the linear transformation;</li>
-<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
+<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
 <li><code>bias_initializer</code>: initializer for the bias vector;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
 <li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
 <li><code>activity_regularizer</code>: regularization applied to the output;</li>
-<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/cheby.py#L8">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/cheb_conv.py#L8">[source]</a></span></p>
 <h4 id="chebconv">ChebConv</h4>
 <pre><code class="python">spektral.layers.ChebConv(channels, K=1, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -296,17 +302,17 @@ dimension changed to <code>channels</code>.</li>
 <li><code>channels</code>: number of output channels;</li>
 <li><code>K</code>: order of the Chebyshev polynomials;</li>
 <li><code>activation</code>: activation function to use;</li>
-<li><code>use_bias</code>: boolean, whether to add a bias to the linear transformation;</li>
-<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
+<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
 <li><code>bias_initializer</code>: initializer for the bias vector;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
 <li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
 <li><code>activity_regularizer</code>: regularization applied to the output;</li>
-<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/graphsage.py#L8">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/graphsage_conv.py#L8">[source]</a></span></p>
 <h4 id="graphsageconv">GraphSageConv</h4>
 <pre><code class="python">spektral.layers.GraphSageConv(channels, aggregate_op='mean', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -338,17 +344,17 @@ dimension changed to <code>channels</code>.</li>
 <li><code>aggregate_op</code>: str, aggregation method to use (<code>'sum'</code>, <code>'mean'</code>,
 <code>'max'</code>, <code>'min'</code>, <code>'prod'</code>);</li>
 <li><code>activation</code>: activation function to use;</li>
-<li><code>use_bias</code>: whether to add a bias to the linear transformation;</li>
-<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
+<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
 <li><code>bias_initializer</code>: initializer for the bias vector;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
 <li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
 <li><code>activity_regularizer</code>: regularization applied to the output;</li>
-<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/arma.py#L9">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/arma_conv.py#L9">[source]</a></span></p>
 <h4 id="armaconv">ARMAConv</h4>
 <pre><code class="python">spektral.layers.ARMAConv(channels, order=1, iterations=1, share_weights=False, gcn_activation='relu', dropout_rate=0.0, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -395,17 +401,17 @@ stacks in the layer;</li>
 stack;</li>
 <li><code>dropout_rate</code>: dropout rate for skip connection;</li>
 <li><code>activation</code>: activation function to use;</li>
-<li><code>use_bias</code>: whether to add a bias to the linear transformation;</li>
-<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
+<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
 <li><code>bias_initializer</code>: initializer for the bias vector;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
 <li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
 <li><code>activity_regularizer</code>: regularization applied to the output;</li>
-<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/ecc.py#L10">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/ecc_conv.py#L10">[source]</a></span></p>
 <h4 id="edgeconditionedconv">EdgeConditionedConv</h4>
 <pre><code class="python">spektral.layers.EdgeConditionedConv(channels, kernel_network=None, root=True, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -441,17 +447,17 @@ changed to <code>channels</code>.</li>
 <li><code>kernel_network</code>: a list of integers representing the hidden neurons of
 the kernel-generating network;</li>
 <li><code>activation</code>: activation function to use;</li>
-<li><code>use_bias</code>: boolean, whether to add a bias to the linear transformation;</li>
-<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
+<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
 <li><code>bias_initializer</code>: initializer for the bias vector;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
 <li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
 <li><code>activity_regularizer</code>: regularization applied to the output;</li>
-<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gat.py#L11">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/graph_attention.py#L11">[source]</a></span></p>
 <h4 id="graphattention">GraphAttention</h4>
 <pre><code class="python">spektral.layers.GraphAttention(channels, attn_heads=1, concat_heads=True, dropout_rate=0.5, return_attn_coef=False, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', attn_kernel_initializer='glorot_uniform', kernel_regularizer=None, bias_regularizer=None, attn_kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None, attn_kernel_constraint=None)
 </code></pre>
@@ -511,20 +517,20 @@ heads instead of averaging;</li>
 <li><code>return_attn_coef</code>: if True, return the attention coefficients for
 the given input (one N x N matrix for each head).</li>
 <li><code>activation</code>: activation function to use;</li>
-<li><code>use_bias</code>: whether to add a bias to the linear transformation;</li>
-<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
-<li><code>attn_kernel_initializer</code>: initializer for the attention kernels;</li>
+<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
+<li><code>attn_kernel_initializer</code>: initializer for the attention weights;</li>
 <li><code>bias_initializer</code>: initializer for the bias vector;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
 <li><code>attn_kernel_regularizer</code>: regularization applied to the attention kernels;</li>
 <li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
 <li><code>activity_regularizer</code>: regularization applied to the output;</li>
-<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
 <li><code>attn_kernel_constraint</code>: constraint applied to the attention kernels;</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gcs.py#L8">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/graph_conv_skip.py#L8">[source]</a></span></p>
 <h4 id="graphconvskip">GraphConvSkip</h4>
 <pre><code class="python">spektral.layers.GraphConvSkip(channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -551,13 +557,13 @@ dimension changed to <code>channels</code>.</li>
 <ul>
 <li><code>channels</code>: number of output channels;</li>
 <li><code>activation</code>: activation function to use;</li>
-<li><code>use_bias</code>: whether to add a bias to the linear transformation;</li>
-<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
+<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
 <li><code>bias_initializer</code>: initializer for the bias vector;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
 <li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
 <li><code>activity_regularizer</code>: regularization applied to the output;</li>
-<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
@@ -598,17 +604,17 @@ layer in the MLP (if None, the MLP has only the output layer);</li>
 <li><code>mlp_activation</code>: activation for the MLP layers;</li>
 <li><code>dropout_rate</code>: dropout rate for Laplacian and MLP layers;</li>
 <li><code>activation</code>: activation function to use;</li>
-<li><code>use_bias</code>: whether to add a bias to the linear transformation;</li>
-<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
+<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
 <li><code>bias_initializer</code>: initializer for the bias vector;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
 <li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
 <li><code>activity_regularizer</code>: regularization applied to the output;</li>
-<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gin.py#L8">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gin_conv.py#L8">[source]</a></span></p>
 <h4 id="ginconv">GINConv</h4>
 <pre><code class="python">spektral.layers.GINConv(channels, epsilon=None, mlp_hidden=None, mlp_activation='relu', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -643,17 +649,17 @@ If given as a value, the parameter will stay fixed.</li>
 layer in the MLP (if None, the MLP has only the output layer);</li>
 <li><code>mlp_activation</code>: activation for the MLP layers;</li>
 <li><code>activation</code>: activation function to use;</li>
-<li><code>use_bias</code>: whether to add a bias to the linear transformation;</li>
-<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
+<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
 <li><code>bias_initializer</code>: initializer for the bias vector;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
 <li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
 <li><code>activity_regularizer</code>: regularization applied to the output;</li>
-<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/diffconv.py#L83">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/diffusion_conv.py#L83">[source]</a></span></p>
 <h4 id="diffusionconv">DiffusionConv</h4>
 <pre><code class="python">spektral.layers.DiffusionConv(channels, num_diffusion_steps=6, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None, activation='tanh')
 </code></pre>
@@ -690,12 +696,12 @@ dimension changed to <code>channels</code>.</li>
 <li><code>channels</code>: number of output channels;</li>
 <li><code>num_diffusion_steps</code>: How many diffusion steps to consider. <script type="math/tex">K</script> in paper.</li>
 <li><code>activation</code>: activation function <script type="math/tex">\sigma</script>; (<script type="math/tex">\tanh</script> by default)</li>
-<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the kernel vectors;</li>
-<li><code>kernel_constraint</code>: constraint applied to the kernel vectors;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gated_graph.py#L8">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gated_graph_conv.py#L8">[source]</a></span></p>
 <h4 id="gatedgraphconv">GatedGraphConv</h4>
 <pre><code class="python">spektral.layers.GatedGraphConv(channels, n_layers, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -730,17 +736,17 @@ changed to <code>channels</code>.</li>
 <li><code>channels</code>: integer, number of output channels;</li>
 <li><code>n_layers</code>: integer, number of iterations with the GRU cell;</li>
 <li><code>activation</code>: activation function to use;</li>
-<li><code>use_bias</code>: whether to add a bias to the linear transformation;</li>
-<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
+<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
 <li><code>bias_initializer</code>: initializer for the bias vector;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
 <li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
 <li><code>activity_regularizer</code>: regularization applied to the output;</li>
-<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/agnn.py#L8">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/agnn_conv.py#L8">[source]</a></span></p>
 <h4 id="agnnconv">AGNNConv</h4>
 <pre><code class="python">spektral.layers.AGNNConv(trainable=True, activation=None)
 </code></pre>
@@ -779,7 +785,7 @@ Otherwise, beta is fixed to 1;</li>
 <li><code>activation</code>: activation function to use;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/tag.py#L7">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/tag_conv.py#L8">[source]</a></span></p>
 <h4 id="tagconv">TAGConv</h4>
 <pre><code class="python">spektral.layers.TAGConv(channels, K=3, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -809,17 +815,103 @@ changed to <code>channels</code>.</li>
 <li><code>K</code>: the order of the layer (i.e., the layer will consider a K-hop
 neighbourhood for each node);</li>
 <li><code>activation</code>: activation function to use;</li>
-<li><code>use_bias</code>: whether to add a bias to the linear transformation;</li>
-<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
+<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
 <li><code>bias_initializer</code>: initializer for the bias vector;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
 <li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
 <li><code>activity_regularizer</code>: regularization applied to the output;</li>
-<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/mp.py#L11">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/crystal_conv.py#L7">[source]</a></span></p>
+<h4 id="crystalconv">CrystalConv</h4>
+<pre><code class="python">spektral.layers.CrystalConv(channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+</code></pre>
+
+<p>A Crystal Graph Convolutional layer as presented by
+<a href="https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.145301">Xie &amp; Grossman (2018)</a>.</p>
+<p><strong>Mode</strong>: single.</p>
+<p><strong>This layer expects a sparse adjacency matrix.</strong></p>
+<p>This layer computes for each node <script type="math/tex">i</script>:
+<script type="math/tex; mode=display">
+\H_i = \X_i +
+\sum\limits_{j \in \mathcal{N}(i)}
+\sigma \left( \z_{ij} \W^{(f)} + \b^{(f)} \right)
+\odot
+\g \left( \z_{ij} \W^{(s)} + \b^{(s)} \right)
+</script>
+where <script type="math/tex">\z_{ij} = \X_i \| \X_j \| \E_{ij} </script>, <script type="math/tex">\sigma</script> is a sigmoid
+activation, and <script type="math/tex">g</script> is the activation function (defined by the <code>activation</code>
+argument).</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>(N, F)</code>;</li>
+<li>Binary adjacency matrix of shape <code>(N, N)</code>.</li>
+<li>Edge features of shape <code>(num_edges, S)</code>.</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Node features with the same shape of the input, but the last dimension
+changed to <code>channels</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>channels</code>: integer, number of output channels;</li>
+<li><code>activation</code>: activation function to use;</li>
+<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
+<li><code>bias_initializer</code>: initializer for the bias vector;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
+<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
+<li><code>activity_regularizer</code>: regularization applied to the output;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
+<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/edge_conv.py#L8">[source]</a></span></p>
+<h4 id="edgeconv">EdgeConv</h4>
+<pre><code class="python">spektral.layers.EdgeConv(channels, mlp_hidden=None, mlp_activation='relu', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+</code></pre>
+
+<p>An Edge Convolutional layer as presented by
+<a href="https://arxiv.org/abs/1801.07829">Wang et al. (2018)</a>.</p>
+<p><strong>Mode</strong>: single.</p>
+<p><strong>This layer expects a sparse adjacency matrix.</strong></p>
+<p>This layer computes for each node <script type="math/tex">i</script>:
+<script type="math/tex; mode=display">
+\Z_i = \sum\limits_{j \in \mathcal{N}(i)} \textrm{MLP}\big( \X_i \| \X_j - \X_i \big)
+</script>
+where <script type="math/tex">\textrm{MLP}</script> is a multi-layer perceptron.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>(N, F)</code>;</li>
+<li>Binary adjacency matrix of shape <code>(N, N)</code>.</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Node features with the same shape of the input, but the last dimension
+changed to <code>channels</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>channels</code>: integer, number of output channels;</li>
+<li><code>mlp_hidden</code>: list of integers, number of hidden units for each hidden
+layer in the MLP (if None, the MLP has only the output layer);</li>
+<li><code>mlp_activation</code>: activation for the MLP layers;</li>
+<li><code>activation</code>: activation function to use;</li>
+<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
+<li><code>bias_initializer</code>: initializer for the bias vector;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
+<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
+<li><code>activity_regularizer</code>: regularization applied to the output;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
+<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/message_passing.py#L11">[source]</a></span></p>
 <h4 id="messagepassing">MessagePassing</h4>
 <pre><code class="python">spektral.layers.MessagePassing(aggregate='sum')
 </code></pre>

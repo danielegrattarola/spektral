@@ -180,7 +180,7 @@ a simple global weighted sum pooling where weights are calculated with an
 attention mechanism. </p>
 <p>See <a href="/layers/convolution">the convolutional layers page</a> for the notation. </p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/diffpool.py#L10">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/diff_pool.py#L10">[source]</a></span></p>
 <h4 id="diffpool">DiffPool</h4>
 <pre><code class="python">spektral.layers.DiffPool(k, channels=None, return_mask=False, activation=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
 </code></pre>
@@ -229,12 +229,12 @@ simply by minimizing the two auxiliary losses.</p>
 <li><code>channels</code>: number of output channels (if None, the number of output
 channels is assumed to be the same as the input);</li>
 <li><code>return_mask</code>: boolean, whether to return the cluster assignment matrix;</li>
-<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
-<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/mincut.py#L9">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/mincut_pool.py#L9">[source]</a></span></p>
 <h4 id="mincutpool">MinCutPool</h4>
 <pre><code class="python">spektral.layers.MinCutPool(k, mlp_hidden=None, mlp_activation='relu', return_mask=False, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -284,12 +284,12 @@ layer in the MLP used to compute cluster assignments (if None, the MLP has
 only the output layer);</li>
 <li><code>mlp_activation</code>: activation for the MLP layers;</li>
 <li><code>return_mask</code>: boolean, whether to return the cluster assignment matrix;</li>
-<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
-<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/topk.py#L8">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/topk_pool.py#L8">[source]</a></span></p>
 <h4 id="topkpool">TopKPool</h4>
 <pre><code class="python">spektral.layers.TopKPool(ratio, return_mask=False, sigmoid_gating=False, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
 </code></pre>
@@ -337,12 +337,12 @@ operation.</p>
 <li><code>return_mask</code>: boolean, whether to return the binary mask used for pooling;</li>
 <li><code>sigmoid_gating</code>: boolean, use a sigmoid gating activation instead of a
 tanh;</li>
-<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
-<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/sagpool.py#L6">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/sag_pool.py#L6">[source]</a></span></p>
 <h4 id="sagpool">SAGPool</h4>
 <pre><code class="python">spektral.layers.SAGPool(ratio, return_mask=False, sigmoid_gating=False, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
 </code></pre>
@@ -388,12 +388,12 @@ operation.</p>
 <li><code>return_mask</code>: boolean, whether to return the binary mask used for pooling;</li>
 <li><code>sigmoid_gating</code>: boolean, use a sigmoid gating activation instead of a
 tanh;</li>
-<li><code>kernel_initializer</code>: initializer for the kernel matrix;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the kernel matrix;</li>
-<li><code>kernel_constraint</code>: constraint applied to the kernel matrix;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/globalpool.py#L51">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L51">[source]</a></span></p>
 <h4 id="globalsumpool">GlobalSumPool</h4>
 <pre><code class="python">spektral.layers.GlobalSumPool()
 </code></pre>
@@ -414,7 +414,7 @@ be <code>(1, F)</code>).</li>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/globalpool.py#L80">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L80">[source]</a></span></p>
 <h4 id="globalavgpool">GlobalAvgPool</h4>
 <pre><code class="python">spektral.layers.GlobalAvgPool()
 </code></pre>
@@ -435,7 +435,7 @@ be <code>(1, F)</code>).</li>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/globalpool.py#L109">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L109">[source]</a></span></p>
 <h4 id="globalmaxpool">GlobalMaxPool</h4>
 <pre><code class="python">spektral.layers.GlobalMaxPool()
 </code></pre>
@@ -456,7 +456,7 @@ be <code>(1, F)</code>).</li>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/globalpool.py#L138">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L138">[source]</a></span></p>
 <h4 id="globalattentionpool">GlobalAttentionPool</h4>
 <pre><code class="python">spektral.layers.GlobalAttentionPool(channels, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -489,7 +489,7 @@ shape will be <code>(1, channels)</code>).</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vectors.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/globalpool.py#L250">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L250">[source]</a></span></p>
 <h4 id="globalattnsumpool">GlobalAttnSumPool</h4>
 <pre><code class="python">spektral.layers.GlobalAttnSumPool(attn_kernel_initializer='glorot_uniform', attn_kernel_regularizer=None, attn_kernel_constraint=None)
 </code></pre>
@@ -516,14 +516,14 @@ be <code>(1, F)</code>).</li>
 </ul>
 <p><strong>Arguments</strong></p>
 <ul>
-<li><code>attn_kernel_initializer</code>: initializer for the attention kernel matrix;</li>
+<li><code>attn_kernel_initializer</code>: initializer for the attention weights;</li>
 <li><code>attn_kernel_regularizer</code>: regularization applied to the attention kernel
 matrix;</li>
 <li><code>attn_kernel_constraint</code>: constraint applied to the attention kernel
 matrix;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/globalpool.py#L345">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L345">[source]</a></span></p>
 <h4 id="sortpool">SortPool</h4>
 <pre><code class="python">spektral.layers.SortPool(k)
 </code></pre>
