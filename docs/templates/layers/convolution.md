@@ -15,6 +15,7 @@ The message-passing layers from these papers are available in Spektral:
 - [Attention-based Graph Neural Network for Semi-supervised Learning](https://arxiv.org/abs/1803.03735)
 - [Topology Adaptive Graph Convolutional Networks](https://arxiv.org/abs/1710.10370)
 - [Crystal Graph Convolutional Neural Networks for an Accurate and Interpretable Prediction of Material Properties](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.145301)
+- [Dynamic Graph CNN for Learning on Point Clouds](https://arxiv.org/abs/1801.07829)
 
 Notation:
 

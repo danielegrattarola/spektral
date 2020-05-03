@@ -5,6 +5,7 @@ from .cheb_conv import ChebConv
 from .crystal_conv import CrystalConv
 from .diffusion_conv import DiffusionConv
 from .ecc_conv import EdgeConditionedConv
+from .edge_conv import EdgeConv
 from .gated_graph_conv import GatedGraphConv
 from .gin_conv import GINConv
 from .graph_attention import GraphAttention
