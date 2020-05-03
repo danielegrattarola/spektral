@@ -41,13 +41,13 @@ class GINConv(MessagePassing):
     layer in the MLP (if None, the MLP has only the output layer);
     - `mlp_activation`: activation for the MLP layers;
     - `activation`: activation function to use;
-    - `use_bias`: whether to add a bias to the linear transformation;
-    - `kernel_initializer`: initializer for the kernel matrix;
+    - `use_bias`: bool, add a bias vector to the output;
+    - `kernel_initializer`: initializer for the weights;
     - `bias_initializer`: initializer for the bias vector;
-    - `kernel_regularizer`: regularization applied to the kernel matrix;
+    - `kernel_regularizer`: regularization applied to the weights;
     - `bias_regularizer`: regularization applied to the bias vector;
     - `activity_regularizer`: regularization applied to the output;
-    - `kernel_constraint`: constraint applied to the kernel matrix;
+    - `kernel_constraint`: constraint applied to the weights;
     - `bias_constraint`: constraint applied to the bias vector.
     """
 

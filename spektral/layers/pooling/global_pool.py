@@ -274,7 +274,7 @@ class GlobalAttnSumPool(GlobalPooling):
 
     **Arguments**
 
-    - `attn_kernel_initializer`: initializer for the attention kernel matrix;
+    - `attn_kernel_initializer`: initializer for the attention weights;
     - `attn_kernel_regularizer`: regularization applied to the attention kernel
     matrix;
     - `attn_kernel_constraint`: constraint applied to the attention kernel
