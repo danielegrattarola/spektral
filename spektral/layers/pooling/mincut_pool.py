@@ -122,7 +122,7 @@ class MinCutPool(Layer):
             I = None
 
         # Check if the layer is operating in batch mode (X and A have rank 3)
-        batch_mode = K.ndim(A) == 3
+        batch_mode = K.ndim(X) == 3
 
         # Compute cluster assignment matrix
         S = self.mlp(X)
