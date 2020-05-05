@@ -78,8 +78,8 @@ def matmul_A_B(a, b):
         output = mixed_mode_dot(a, b)
     elif mode == modes.iMIXED:
         # Inverted mixed (rank(a)=3, rank(b)=2)
-        _, s_1_a, s_2_a = K.int_shape(a)
-        _, s_1_b = K.int_shape(b)
+        s_1_a, s_2_a = tf.shape(a)[1], tf.shape(a)[2]
+        s_1_b = tf.shape(b)[1]
         a_flat = ops.reshape(a, (-1, s_2_a))
         output = dot(a_flat, b)
         output = ops.reshape(output, (-1, s_1_a, s_1_b))
