@@ -191,6 +191,8 @@ by zero-padding all X, A and E matrices to have the same node dimensions
 (<code>N_max</code>).</p>
 <p>Each entry i of the lists should be associated to the same graph, i.e.,
 <code>X_list[i].shape[0] == A_list[i].shape[0] == E_list[i].shape[0]</code>.</p>
+<p>Note that if <code>A_list</code> contains sparse matrices, they will be converted to
+dense np.arrays, which can be expensice.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
 <li>
