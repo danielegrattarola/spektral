@@ -58,6 +58,8 @@ def load_data(dataset_name, clean=False):
     # Read data
     A_list, X_list, y = _read_graphs(dataset_name)
 
+    print('Successfully loaded {}.'.format(dataset_name))
+
     return A_list, X_list, y
 
 

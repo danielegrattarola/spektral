@@ -346,11 +346,10 @@ class SortPool(Layer):
     r"""
     SortPool layer pooling the top \(k\) most relevant nodes as described by
     [Zhang et al.](https://www.cse.wustl.edu/~muhan/papers/AAAI_2018_DGCNN.pdf)
-
     This layers takes a graph signal \(\mathbf{X}\) and sorts the rows by the
     elements of its last column. It then keeps the top \(k\) rows.
-    Should \(\mathbf{X}\) have less than \(k\) rows, it sorts and then adds rows
-    full of zeros until \(\mathbf{X}\) has \(k\) rows.
+    Should \(\mathbf{X}\) have less than \(k\) rows, it sorts and then adds
+    rows full of zeros until \(\mathbf{X}\) has \(k\) rows.
 
     **Mode**: single, batch.
 
@@ -363,9 +362,7 @@ class SortPool(Layer):
     - Pooled node features of shape `([batch], k, F)`;
 
     **Arguments**
-
     - `k`: number of nodes to keep;
-
     """
 
     def __init__(self, k: int):
@@ -387,6 +384,9 @@ class SortPool(Layer):
                 self.data_mode = 'single'
             else:
                 self.data_mode = 'batch'
+
+        # store number of features
+        self.F = input_shape[-1]
 
     def call(self, inputs):
 
@@ -439,7 +439,17 @@ class SortPool(Layer):
         if self.data_mode == 'single':
             X_out = tf.squeeze(X_out, [0])
 
-        return X_out
+            # set shape manually, as tf is not able
+            # to infer the dimensions
+            X_out.set_shape((self.k, self.F))
+            return X_out
+
+        elif self.data_mode == 'batch':
+
+            # set shape manually, as tf is not able
+            # to infer the dimensions
+            X_out.set_shape((None, self.k, self.F))
+            return X_out
 
     def get_config(self):
         config = {
@@ -450,6 +460,6 @@ class SortPool(Layer):
 
     def compute_output_shape(self, input_shape):
         if self.data_mode == 'single':
-            return (self.k, input_shape[-1])
+            return (self.k, self.F)
         elif self.data_mode == 'batch':
-            return (input_shape[0], self.k, input_shape[-1])
+            return (input_shape[0], self.k, self.F)
