@@ -99,7 +99,7 @@ class InnerProduct(Layer):
     :param trainable_kernel: add a trainable square matrix between the inner
     product (e.g., `X @ W @ X.T`);
     :param activation: activation function to use;
-    :param kernel_initializer: initializer for the kernel matrix;
+    :param kernel_initializer: initializer for the weights;
     :param kernel_regularizer: regularization applied to the kernel;
     :param kernel_constraint: constraint applied to the kernel;
     """

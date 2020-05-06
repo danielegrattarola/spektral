@@ -1,6 +1,6 @@
 import tensorflow as tf
 import tensorflow.keras.layers as layers
-from spektral.layers.convolutional.gcn import GraphConv
+from spektral.layers.convolutional.graph_conv import GraphConv
 
 
 class DiffuseFeatures(layers.Layer):
@@ -23,7 +23,7 @@ class DiffuseFeatures(layers.Layer):
     **Arguments**
 
     - `num_diffusion_steps`: How many diffusion steps to consider. \(K\) in paper.
-    - `kernel_initializer`: initializer for the kernel matrix;
+    - `kernel_initializer`: initializer for the weights;
     - `kernel_regularizer`: regularization applied to the kernel vectors;
     - `kernel_constraint`: constraint applied to the kernel vectors;
     """
@@ -116,9 +116,9 @@ class DiffusionConv(GraphConv):
     - `channels`: number of output channels;
     - `num_diffusion_steps`: How many diffusion steps to consider. \(K\) in paper.
     - `activation`: activation function \(\sigma\); (\(\tanh\) by default)
-    - `kernel_initializer`: initializer for the kernel matrix;
-    - `kernel_regularizer`: regularization applied to the kernel vectors;
-    - `kernel_constraint`: constraint applied to the kernel vectors;
+    - `kernel_initializer`: initializer for the weights;
+    - `kernel_regularizer`: regularization applied to the weights;
+    - `kernel_constraint`: constraint applied to the weights;
     """
 
     def __init__(

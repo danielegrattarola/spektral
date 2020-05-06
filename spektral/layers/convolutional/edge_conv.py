@@ -1,47 +1,41 @@
-from tensorflow.keras import activations
-from tensorflow.keras.layers import Dropout, Dense
+from tensorflow.keras import activations, backend as K
+from tensorflow.keras.layers import Dense
 from tensorflow.keras.models import Sequential
 
-from spektral.layers import ops
-from spektral.layers.convolutional.graph_conv import GraphConv
+from spektral.layers.convolutional.message_passing import MessagePassing
 
 
-class APPNP(GraphConv):
+class EdgeConv(MessagePassing):
     r"""
-    A graph convolutional layer implementing the APPNP operator, as presented by
-    [Klicpera et al. (2019)](https://arxiv.org/abs/1810.05997).
+    An Edge Convolutional layer as presented by
+    [Wang et al. (2018)](https://arxiv.org/abs/1801.07829).
 
-    This layer computes:
-    $$
-        \Z^{(0)} = \textrm{MLP}(\X); \\
-        \Z^{(K)} = (1 - \alpha) \hat \D^{-1/2} \hat \A \hat \D^{-1/2} \Z^{(K - 1)} +
-                   \alpha \Z^{(0)},
-    $$
-    where \(\alpha\) is the _teleport_ probability and \(\textrm{MLP}\) is a
-    multi-layer perceptron.
+    **Mode**: single.
 
-    **Mode**: single, mixed, batch.
+    **This layer expects a sparse adjacency matrix.**
+
+    This layer computes for each node \(i\):
+    $$
+        \Z_i = \sum\limits_{j \in \mathcal{N}(i)} \textrm{MLP}\big( \X_i \| \X_j - \X_i \big)
+    $$
+    where \(\textrm{MLP}\) is a multi-layer perceptron.
 
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
-    - Modified Laplacian of shape `([batch], N, N)`; can be computed with
-    `spektral.utils.convolution.localpooling_filter`.
+    - Node features of shape `(N, F)`;
+    - Binary adjacency matrix of shape `(N, N)`.
 
     **Output**
 
-    - Node features with the same shape as the input, but with the last
-    dimension changed to `channels`.
+    - Node features with the same shape of the input, but the last dimension
+    changed to `channels`.
 
     **Arguments**
 
-    - `channels`: number of output channels;
-    - `alpha`: teleport probability during propagation;
-    - `propagations`: number of propagation steps;
+    - `channels`: integer, number of output channels;
     - `mlp_hidden`: list of integers, number of hidden units for each hidden
     layer in the MLP (if None, the MLP has only the output layer);
     - `mlp_activation`: activation for the MLP layers;
-    - `dropout_rate`: dropout rate for Laplacian and MLP layers;
     - `activation`: activation function to use;
     - `use_bias`: bool, add a bias vector to the output;
     - `kernel_initializer`: initializer for the weights;
@@ -55,11 +49,8 @@ class APPNP(GraphConv):
 
     def __init__(self,
                  channels,
-                 alpha=0.2,
-                 propagations=1,
                  mlp_hidden=None,
                  mlp_activation='relu',
-                 dropout_rate=0.0,
                  activation=None,
                  use_bias=True,
                  kernel_initializer='glorot_uniform',
@@ -70,7 +61,7 @@ class APPNP(GraphConv):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        super().__init__(channels,
+        super().__init__(aggregate='sum',
                          activation=activation,
                          use_bias=use_bias,
                          kernel_initializer=kernel_initializer,
@@ -81,11 +72,9 @@ class APPNP(GraphConv):
                          kernel_constraint=kernel_constraint,
                          bias_constraint=bias_constraint,
                          **kwargs)
+        self.channels = self.output_dim = channels
         self.mlp_hidden = mlp_hidden if mlp_hidden else []
-        self.alpha = alpha
-        self.propagations = propagations
         self.mlp_activation = activations.get(mlp_activation)
-        self.dropout_rate = dropout_rate
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
@@ -97,43 +86,25 @@ class APPNP(GraphConv):
             kernel_constraint=self.kernel_constraint,
             bias_constraint=self.bias_constraint
         )
-        mlp_layers = []
-        for i, channels in enumerate(self.mlp_hidden):
-            mlp_layers.extend([
-                Dropout(self.dropout_rate),
-                Dense(channels, self.mlp_activation, **layer_kwargs)
-            ])
-        mlp_layers.append(
-            Dense(self.channels, 'linear', **layer_kwargs)
-        )
-        self.mlp = Sequential(mlp_layers)
+
+        self.mlp = Sequential([
+            Dense(channels, self.mlp_activation, **layer_kwargs)
+            for channels in self.mlp_hidden
+        ] + [Dense(self.channels, self.activation, use_bias=self.use_bias, **layer_kwargs)])
+
         self.built = True
 
-    def call(self, inputs):
-        features = inputs[0]
-        fltr = inputs[1]
-
-        # Compute MLP hidden features
-        mlp_out = self.mlp(features)
-
-        # Propagation
-        Z = mlp_out
-        for k in range(self.propagations):
-            Z = (1 - self.alpha) * ops.filter_dot(fltr, Z) + self.alpha * mlp_out
-
-        if self.activation is not None:
-            output = self.activation(Z)
-        else:
-            output = Z
-        return output
+    def message(self, X, **kwargs):
+        X_i = self.get_i(X)
+        X_j = self.get_j(X)
+        return self.mlp(K.concatenate((X_i, X_j - X_i)))
 
     def get_config(self):
         config = {
-            'alpha': self.alpha,
-            'propagations': self.propagations,
+            'channels': self.channels,
             'mlp_hidden': self.mlp_hidden,
-            'mlp_activation': activations.serialize(self.mlp_activation),
-            'dropout_rate': self.dropout_rate,
+            'mlp_activation': self.mlp_activation
         }
         base_config = super().get_config()
-        return dict(list(base_config.items()) + list(config.items()))
+        base_config.pop('aggregate')  # Remove it because it's defined by constructor
+        return {**base_config, **config}

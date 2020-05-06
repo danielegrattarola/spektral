@@ -33,23 +33,27 @@ class MessagePassing(Layer):
 
     **API:**
 
-    - `propagate(X, A, E=None)`: propagate the messages and computes embeddings
-    for each node in the graph.
-    - `message(X_j)`: computes messages for each node j. `X_j` is rank 2 tensor
-    obtained by gathering the node features of each node's neighbours, i.e.,
-    `X_j = X[A.indices[1]]`. This is equivalent to \(\phi\) in the definition
-    (support for X_i and E_ij can be obtained by extending this layer and
-    re-implementing the `message` and `propagate` functions).
-    - `aggregate(messages, indices, N)`: aggregates the messages according to
-    `indices` (usually `indices = A.indices[0]`, i.e., the messages from each
-    node's neighbours are aggregated). This is equivalent to \(\square\) in
-    the definition. The behaviour of this function can also be controlled using
-    the `aggregate` keyword in the constructor of the layer (supported
-    aggregations: sum, mean, max, min, prod).
-    - `update(embeddings)`: updates the aggregated messages. This is equivalent
-    to \(\gamma\) in the definition (support for X_i can be obtained by
-    extending this layer and re-implementing the `update` and `propagate`
-    functions).
+    - `propagate(X, A, E=None, **kwargs)`: propagate the messages and computes
+    embeddings for each node in the graph. `kwargs` will be propagated as
+    keyword arguments to `message()`, `aggregate()` and `update()`.
+    - `message(X, **kwargs)`: computes messages, equivalent to \(\phi\) in the
+    definition.
+    Any extra keyword argument of this function will be  populated by
+    `propagate()` if a matching keyword is found.
+    Use `self.get_i()` and  `self.get_j()` to gather the elements using the
+    indices `i` or `j` of the adjacency matrix (e.g, `self.get_j(X)` will get
+    the features of the neighbours).
+    - `aggregate(messages, **kwargs)`: aggregates the messages, equivalent to
+    \(\square\) in the definition.
+    The behaviour of this function can also be controlled using the `aggregate`
+    keyword in the constructor of the layer (supported aggregations: sum, mean,
+    max, min, prod).
+    Any extra keyword argument of this function will be  populated by
+    `propagate()` if a matching keyword is found.
+    - `update(embeddings, **kwargs)`: updates the aggregated messages to obtain
+    the final node embeddings, equivalent to \(\gamma\) in the definition.
+    Any extra keyword argument of this function will be  populated by
+    `propagate()` if a matching keyword is found.
 
     **Arguments**:
 

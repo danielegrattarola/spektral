@@ -48,6 +48,8 @@ PAGES = [
             layers.GatedGraphConv,
             layers.AGNNConv,
             layers.TAGConv,
+            layers.CrystalConv,
+            layers.EdgeConv,
             layers.MessagePassing,
         ]
     },
@@ -210,7 +212,7 @@ PAGES = [
     }
 ]
 
-ROOT = 'https://spektral.graphneural.network/'
+ROOT = 'https://graphneural.network/'
 
 
 def get_function_signature(function, method=True):
