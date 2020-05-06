@@ -4,7 +4,7 @@ from tensorflow.keras import Model, Input
 
 from spektral.layers import GraphConv, ChebConv, EdgeConditionedConv, GraphAttention, \
     GraphConvSkip, ARMAConv, APPNP, GraphSageConv, GINConv, DiffusionConv, \
-    GatedGraphConv, AGNNConv, TAGConv, MessagePassing
+    GatedGraphConv, AGNNConv, TAGConv, CrystalConv, MessagePassing, EdgeConv
 from spektral.layers.ops import sp_matrix_to_sp_tensor
 
 tf.keras.backend.set_floatx('float64')
@@ -17,6 +17,8 @@ S = 3
 A = np.ones((N, N))
 X = np.random.normal(size=(N, F))
 E = np.random.normal(size=(N, N, S))
+E_single = np.random.normal(size=(N * N, S))
+
 
 """
 Each entry in TESTS represent a test to be run for a particular Layer.
@@ -124,6 +126,17 @@ TESTS = [
         KWARGS_K_: {'channels': F, 'K': 3, 'sparse': [True]}
     },
     {
+        LAYER_K_: CrystalConv,
+        MODES_K_: [SINGLE],
+        KWARGS_K_: {'channels': F, 'edges': True, 'sparse': [True]}
+    },
+    {
+        LAYER_K_: EdgeConv,
+        MODES_K_: [SINGLE],
+        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'mlp_hidden': [16],
+                    'sparse': [True]}
+    },
+    {
         LAYER_K_: MessagePassing,
         MODES_K_: [SINGLE],
         KWARGS_K_: {'channels': F, 'sparse': [True]}
@@ -142,9 +155,9 @@ def _test_single_mode(layer, **kwargs):
         input_data = [X, A]
 
     if kwargs.pop('edges', None):
-        E_in = Input(shape=(None, S))
+        E_in = Input(shape=(S, ))
         inputs.append(E_in)
-        input_data.append(E)
+        input_data.append(E_single)
 
     layer_instance = layer(**kwargs)
     output = layer_instance(inputs)

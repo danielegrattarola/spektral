@@ -1,6 +1,6 @@
 from tensorflow.keras import backend as K
 
-from spektral.layers.pooling.topk import ops, TopKPool
+from spektral.layers.pooling.topk_pool import ops, TopKPool
 
 
 class SAGPool(TopKPool):
@@ -50,9 +50,9 @@ class SAGPool(TopKPool):
     - `return_mask`: boolean, whether to return the binary mask used for pooling;
     - `sigmoid_gating`: boolean, use a sigmoid gating activation instead of a
         tanh;
-    - `kernel_initializer`: initializer for the kernel matrix;
-    - `kernel_regularizer`: regularization applied to the kernel matrix;
-    - `kernel_constraint`: constraint applied to the kernel matrix;
+    - `kernel_initializer`: initializer for the weights;
+    - `kernel_regularizer`: regularization applied to the weights;
+    - `kernel_constraint`: constraint applied to the weights;
     """
 
     def __init__(self,

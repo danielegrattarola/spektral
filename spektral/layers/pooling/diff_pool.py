@@ -56,9 +56,9 @@ class DiffPool(Layer):
     - `channels`: number of output channels (if None, the number of output
     channels is assumed to be the same as the input);
     - `return_mask`: boolean, whether to return the cluster assignment matrix;
-    - `kernel_initializer`: initializer for the kernel matrix;
-    - `kernel_regularizer`: regularization applied to the kernel matrix;
-    - `kernel_constraint`: constraint applied to the kernel matrix;
+    - `kernel_initializer`: initializer for the weights;
+    - `kernel_regularizer`: regularization applied to the weights;
+    - `kernel_constraint`: constraint applied to the weights;
     """
 
     def __init__(self,

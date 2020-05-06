@@ -46,6 +46,9 @@ def numpy_to_batch(X_list, A_list, E_list=None):
     Each entry i of the lists should be associated to the same graph, i.e.,
     `X_list[i].shape[0] == A_list[i].shape[0] == E_list[i].shape[0]`.
 
+    Note that if `A_list` contains sparse matrices, they will be converted to
+    dense np.arrays, which can be expensice.
+
     :param X_list: a list of np.arrays of shape `(N, F)`;
     :param A_list: a list of np.arrays or sparse matrices of shape `(N, N)`;
     :param E_list: a list of np.arrays of shape `(N, N, S)`;
@@ -57,6 +60,9 @@ def numpy_to_batch(X_list, A_list, E_list=None):
     """
     N_max = max([a.shape[-1] for a in A_list])
     X_out = pad_jagged_array(X_list, (N_max, -1))
+    # Convert sparse matrices to dense
+    if hasattr(A_list[0], 'toarray'):
+        A_list = [a.toarray() for a in A_list]
     A_out = pad_jagged_array(A_list, (N_max, N_max))
     if E_list is not None:
         E_out = pad_jagged_array(E_list, (N_max, N_max, -1))
