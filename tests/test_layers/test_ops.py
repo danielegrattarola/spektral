@@ -205,3 +205,25 @@ def test_misc_ops():
     k = 4
     expected_output = np.array([np.linalg.matrix_power(a, k) for a in A])
     _check_op(ops.matrix_power, [A], expected_output, convert_to_sparse, k=k)
+
+
+def test_disjoint_to_batch_signal():
+
+    # setting test signal and adjacency
+    X = [[1, 0], [0, 1], [1, 1], [0, 0], [1, 2]]
+    I = [0, 0, 0, 1, 1]
+
+    expected_result = np.array([
+        [[1., 0.],
+        [0., 1.],
+        [1., 1.]],
+       [[0., 0.],
+        [1., 2.],
+        [0., 0.]]])
+
+    result = ops.disjoint_to_batch(X, I)
+    result = np.array(result)
+
+    assert expected_result.shape == result.shape
+    assert np.allclose(expected_result, result) is True
+
