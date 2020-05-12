@@ -13,7 +13,7 @@ class MessagePassing(Layer):
     A general class for message passing as presented by
     [Gilmer et al. (2017)](https://arxiv.org/abs/1704.01212).
 
-    **Mode**: single/disjoint.
+    **Mode**: single, disjoint.
 
     **This layer and all of its extensions expect a sparse adjacency matrix.**
 

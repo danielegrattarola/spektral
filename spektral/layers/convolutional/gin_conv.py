@@ -10,7 +10,7 @@ class GINConv(MessagePassing):
     A Graph Isomorphism Network (GIN) as presented by
     [Xu et al. (2018)](https://arxiv.org/abs/1810.00826).
 
-    **Mode**: single.
+    **Mode**: single, disjoint.
 
     **This layer expects a sparse adjacency matrix.**
 

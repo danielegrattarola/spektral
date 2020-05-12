@@ -10,7 +10,7 @@ class TAGConv(MessagePassing):
     A Topology Adaptive Graph Convolutional layer (TAG) as presented by
     [Du et al. (2017)](https://arxiv.org/abs/1710.10370).
 
-    **Mode**: single.
+    **Mode**: single, disjoint.
 
     **This layer expects a sparse adjacency matrix.**
 

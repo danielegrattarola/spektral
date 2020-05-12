@@ -13,7 +13,7 @@ class GraphAttention(GraphConv):
     A graph attention layer (GAT) as presented by
     [Velickovic et al. (2017)](https://arxiv.org/abs/1710.10903).
 
-    **Mode**: single, mixed, batch.
+    **Mode**: single, disjoint, mixed, batch.
 
     **This layer expects dense inputs when working in batch mode.**
 

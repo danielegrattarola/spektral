@@ -11,7 +11,7 @@ class GraphConv(Layer):
     A graph convolutional layer (GCN) as presented by
     [Kipf & Welling (2016)](https://arxiv.org/abs/1609.02907).
 
-    **Mode**: single, mixed, batch.
+    **Mode**: single, disjoint, mixed, batch.
 
     This layer computes:
     $$

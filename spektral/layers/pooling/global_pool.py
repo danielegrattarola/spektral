@@ -53,7 +53,7 @@ class GlobalSumPool(GlobalPooling):
     A global sum pooling layer. Pools a graph by computing the sum of its node
     features.
 
-    **Mode**: single, mixed, batch, disjoint.
+    **Mode**: single, disjoint, mixed, batch.
 
     **Input**
 
@@ -82,7 +82,7 @@ class GlobalAvgPool(GlobalPooling):
     An average pooling layer. Pools a graph by computing the average of its node
     features.
 
-    **Mode**: single, mixed, batch, disjoint.
+    **Mode**: single, disjoint, mixed, batch.
 
     **Input**
 
@@ -111,7 +111,7 @@ class GlobalMaxPool(GlobalPooling):
     A max pooling layer. Pools a graph by computing the maximum of its node
     features.
 
-    **Mode**: single, mixed, batch, disjoint.
+    **Mode**: single, disjoint, mixed, batch.
 
     **Input**
 
@@ -146,7 +146,7 @@ class GlobalAttentionPool(GlobalPooling):
     $$
     where \(\sigma\) is the sigmoid activation function.
 
-    **Mode**: single, mixed, batch, disjoint.
+    **Mode**: single, disjoint, mixed, batch.
 
     **Input**
 
@@ -260,7 +260,7 @@ class GlobalAttnSumPool(GlobalPooling):
     where \(\a \in \mathbb{R}^F\) is a trainable vector. Note that the softmax
     is applied across nodes, and not across features.
 
-    **Mode**: single, mixed, batch, disjoint.
+    **Mode**: single, disjoint, mixed, batch.
 
     **Input**
 

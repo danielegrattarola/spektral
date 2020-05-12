@@ -10,7 +10,7 @@ class ChebConv(GraphConv):
     A Chebyshev convolutional layer as presented by
     [Defferrard et al. (2016)](https://arxiv.org/abs/1606.09375).
 
-    **Mode**: single, mixed, batch.
+    **Mode**: single, disjoint, mixed, batch.
 
     This layer computes:
     $$

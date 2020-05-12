@@ -11,7 +11,7 @@ class ARMAConv(GraphConv):
     A graph convolutional layer with ARMA\(_K\) filters, as presented by
     [Bianchi et al. (2019)](https://arxiv.org/abs/1901.01343).
 
-    **Mode**: single, mixed, batch.
+    **Mode**: single, disjoint, mixed, batch.
 
     This layer computes:
     $$

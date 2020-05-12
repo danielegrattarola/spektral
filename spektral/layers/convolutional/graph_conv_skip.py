@@ -9,7 +9,7 @@ class GraphConvSkip(GraphConv):
     r"""
     A simple convolutional layer with a skip connection.
 
-    **Mode**: single, mixed, batch.
+    **Mode**: single, disjoint, mixed, batch.
 
     This layer computes:
     $$

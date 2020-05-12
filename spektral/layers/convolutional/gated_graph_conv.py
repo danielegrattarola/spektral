@@ -10,7 +10,7 @@ class GatedGraphConv(MessagePassing):
     A gated graph convolutional layer as presented by
     [Li et al. (2018)](https://arxiv.org/abs/1511.05493).
 
-    **Mode**: single.
+    **Mode**: single, disjoint.
 
     **This layer expects a sparse adjacency matrix.**
 
