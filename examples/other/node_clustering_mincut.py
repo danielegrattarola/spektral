@@ -4,10 +4,6 @@ from the paper:
 
 Mincut pooling in Graph Neural Networks (https://arxiv.org/abs/1907.00481)
 Filippo Maria Bianchi, Daniele Grattarola, Cesare Alippi
-
-Note that the main training loop is written in Tensorflow, so that we can have
-an in-depth look at what is going on in the unsupervised loss and study the
-clustring found by the model.
 """
 
 import matplotlib.pyplot as plt
@@ -36,14 +32,14 @@ def train_step(inputs):
 
 
 np.random.seed(1)
-epochs = 5000        # Training iterations
-lr = 5e-4            # Learning rate
+epochs = 5000  # Training iterations
+lr = 5e-4      # Learning rate
 
 ################################################################################
 # LOAD DATASET
 ################################################################################
 A, X, y, _, _, _ = citation.load_data('cora')
-A_norm = normalized_adjacency(A)  # Normalize adjacency matrix
+A_norm = normalized_adjacency(A)
 X = X.todense()
 F = X.shape[-1]
 y = np.argmax(y, axis=-1)
@@ -59,15 +55,11 @@ X_1 = GraphConvSkip(16, activation='elu')([X_in, A_in])
 X_1, A_1, S = MinCutPool(n_clusters, return_mask=True)([X_1, A_in])
 
 model = Model([X_in, A_in], [X_1, S])
-model.compile('adam', None)
 
 ################################################################################
 # TRAINING
 ################################################################################
 # Setup
-loss = model.total_loss        # The full unsupervised loss of MinCutPool
-mincut_loss = model.losses[0]  # The minCUT loss of MinCutPool
-ortho_loss = model.losses[1]   # The orthogonality loss of MinCutPool
 inputs = [X, sp_matrix_to_sp_tensor(A_norm)]
 opt = tf.keras.optimizers.Adam(learning_rate=lr)
 
