@@ -10,7 +10,7 @@ class EdgeConv(MessagePassing):
     An Edge Convolutional layer as presented by
     [Wang et al. (2018)](https://arxiv.org/abs/1801.07829).
 
-    **Mode**: single.
+    **Mode**: single, disjoint.
 
     **This layer expects a sparse adjacency matrix.**
 

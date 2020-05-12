@@ -20,7 +20,7 @@ class APPNP(GraphConv):
     where \(\alpha\) is the _teleport_ probability and \(\textrm{MLP}\) is a
     multi-layer perceptron.
 
-    **Mode**: single, mixed, batch.
+    **Mode**: single, disjoint, mixed, batch.
 
     **Input**
 

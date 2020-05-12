@@ -84,7 +84,7 @@ class DiffusionConv(GraphConv):
     r"""Applies Graph Diffusion Convolution as descibed by
     [Li et al. (2016)](https://arxiv.org/pdf/1707.01926.pdf)
 
-    **Mode**: single, mixed, batch.
+    **Mode**: single, disjoint, mixed, batch.
 
     **This layer expects a dense adjacency matrix.**
 

@@ -9,7 +9,7 @@ class CrystalConv(MessagePassing):
     A Crystal Graph Convolutional layer as presented by
     [Xie & Grossman (2018)](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.145301).
 
-    **Mode**: single.
+    **Mode**: single, disjoint.
 
     **This layer expects a sparse adjacency matrix.**
 

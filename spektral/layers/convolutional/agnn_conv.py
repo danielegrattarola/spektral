@@ -10,7 +10,7 @@ class AGNNConv(MessagePassing):
     An Attention-based Graph Neural Network (AGNN) as presented by
     [Thekumparampil et al. (2018)](https://arxiv.org/abs/1803.03735).
 
-    **Mode**: single.
+    **Mode**: single, disjoint.
 
     **This layer expects a sparse adjacency matrix.**
 

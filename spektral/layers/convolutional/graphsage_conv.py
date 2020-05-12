@@ -10,7 +10,7 @@ class GraphSageConv(GraphConv):
     A GraphSAGE layer as presented by
     [Hamilton et al. (2017)](https://arxiv.org/abs/1706.02216).
 
-    **Mode**: single.
+    **Mode**: single, disjoint.
 
     This layer computes:
     $$
