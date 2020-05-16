@@ -4,7 +4,7 @@ from tensorflow.python.framework import smart_cond
 from tensorflow.keras import activations, initializers, regularizers, constraints
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Layer
-
+from spektral.layers import ops
 
 LAYER_KWARGS = {'activation', 'use_bias', 'kernel_initializer', 'bias_initializer',
                 'kernel_initializer=', 'bias_initializer', 'kernel_regularizer',
@@ -53,10 +53,10 @@ class SparseDropout(Layer):
 
         def dropped_inputs():
             return self.sparse_dropout(
-              inputs,
-              noise_shape=self._get_noise_shape(inputs),
-              seed=self.seed,
-              rate=self.rate
+                inputs,
+                noise_shape=self._get_noise_shape(inputs),
+                seed=self.seed,
+                rate=self.rate
             )
 
         output = smart_cond.smart_cond(training,
@@ -111,6 +111,7 @@ class InnerProduct(Layer):
     :param kernel_regularizer: regularization applied to the kernel;
     :param kernel_constraint: constraint applied to the kernel;
     """
+
     def __init__(self,
                  trainable_kernel=False,
                  activation=None,
@@ -150,7 +151,7 @@ class InnerProduct(Layer):
         if len(input_shape) == 2:
             return (None, None)
         else:
-            return input_shape[:-1] + (input_shape[-2], )
+            return input_shape[:-1] + (input_shape[-2],)
 
     def get_config(self, **kwargs):
         config = {
@@ -190,6 +191,7 @@ class MinkowskiProduct(Layer):
     output shape for your layer.
     :param activation: activation function to use;
     """
+
     def __init__(self,
                  input_dim_1=None,
                  activation=None,
@@ -224,7 +226,7 @@ class MinkowskiProduct(Layer):
             else:
                 return (self.input_dim_1, self.input_dim_1)
         else:
-            return input_shape[:-1] + (input_shape[-2], )
+            return input_shape[:-1] + (input_shape[-2],)
 
     def get_config(self, **kwargs):
         config = {
@@ -233,3 +235,27 @@ class MinkowskiProduct(Layer):
         }
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
+
+
+class Disjoint2Batch(Layer):
+    def __init__(self, **kwargs):
+        super(Disjoint2Batch, self).__init__()
+
+    def call(self, inputs, **kwargs):
+        # inputs should be a disjoint signal, its adjacency and the
+        # segment IDs
+        X, A, I = inputs
+
+        # turn signals to batches
+        batch_X = ops.disjoint_signal_to_batch(X, I)
+
+        # turn adjacency to (dense) batch
+        if K.is_sparse(A):
+            A = tf.sparse.to_dense(A)
+        batch_A = ops.disjoint_adjacency_to_batch(A, I)
+
+        # ensure that the channel dim is known
+        batch_X.set_shape((None, None, X.shape[-1]))
+        batch_A.set_shape((None, None, A.shape[-1]))
+
+        return batch_X, batch_A

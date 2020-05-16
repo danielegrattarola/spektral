@@ -1,7 +1,10 @@
 import numpy as np
+from scipy.sparse import coo_matrix
 import tensorflow as tf
+import tensorflow.keras as keras
 
-from spektral.layers import ops
+from spektral.layers import ops, GraphConv, SortPool
+from spektral.layers.base import Disjoint2Batch
 from spektral.utils import convolution
 
 batch_size = 10
@@ -206,12 +209,19 @@ def test_misc_ops():
     expected_output = np.array([np.linalg.matrix_power(a, k) for a in A])
     _check_op(ops.matrix_power, [A], expected_output, convert_to_sparse, k=k)
 
+# Test data
+X = np.array([[1, 0], [0, 1], [1, 1], [0, 0], [1, 2]])
+I = np.array([0, 0, 0, 1, 1])
 
-def test_disjoint_to_batch_signal():
+# create sparse adjacency
+A_data = [1, 1, 1, 1, 1]
+A_row = [0, 1, 2, 3, 4]
+A_col = [1, 0, 1, 4, 3]
+A_sparse = coo_matrix((A_data, (A_row, A_col)), shape=(5, 5))
+A_sparse_tensor = ops.sp_matrix_to_sp_tensor(A_sparse)
 
-    # setting test signal and adjacency
-    X = [[1, 0], [0, 1], [1, 1], [0, 0], [1, 2]]
-    I = [0, 0, 0, 1, 1]
+
+def test_disjoint_signal_to_batch():
 
     expected_result = np.array([
         [[1., 0.],
@@ -221,9 +231,101 @@ def test_disjoint_to_batch_signal():
         [1., 2.],
         [0., 0.]]])
 
-    result = ops.disjoint_to_batch(X, I)
+    result = ops.disjoint_signal_to_batch(X, I)
     result = np.array(result)
 
     assert expected_result.shape == result.shape
     assert np.allclose(expected_result, result) is True
 
+
+def test_get_graph_id_and_size():
+    node_id_1 = np.array([0])
+    node_id_2 = np.array([4])
+    node_id_3 = np.array([9])
+    node_id_4 = np.array([23])
+    node_array = np.array([0, 4, 9, 23])
+    graph_sizes = np.array([5, 5, 11, 20])
+
+    assert np.array(ops.get_graph_id(node_id_1, graph_sizes)) == 0
+    assert np.array(ops.get_graph_id(node_id_2, graph_sizes)) == 0
+    assert np.array(ops.get_graph_id(node_id_3, graph_sizes)) == 1
+    assert np.array(ops.get_graph_id(node_id_4, graph_sizes)) == 3
+
+    assert np.array(ops.get_cum_graph_size(node_id_1, graph_sizes)) == 0
+    assert np.array(ops.get_cum_graph_size(node_id_2, graph_sizes)) == 0
+    assert np.array(ops.get_cum_graph_size(node_id_3, graph_sizes)) == 5
+    assert np.array(ops.get_cum_graph_size(node_id_4, graph_sizes)) == 21
+
+    assert np.allclose(np.array(ops.vectorised_get_cum_graph_size(node_array, graph_sizes)), [0, 0, 5, 21])
+
+
+def test_disjoint_adjacency_to_batch():
+
+    expected_result = np.array([[[0., 1., 0.],
+        [1., 0., 0.],
+        [0., 1., 0.]],
+
+       [[0., 1., 0.],
+        [1., 0., 0.],
+        [0., 0., 0.]]])
+
+    result = ops.disjoint_adjacency_to_batch(A_sparse_tensor, I)
+    result = np.array(result)
+
+    assert expected_result.shape == result.shape
+    assert np.allclose(expected_result, result) is True
+
+
+def test_Disjoint2Batch_as_layer():
+
+    # initiate layer
+    layer = Disjoint2Batch()
+
+    A_dense = A_sparse.todense()
+
+    expected_X = np.array([[[1., 0.],
+        [0., 1.],
+        [1., 1.]],
+
+       [[0., 0.],
+        [1., 2.],
+        [0., 0.]]])
+    
+    expected_A = np.array([[[0., 1., 0.],
+        [1., 0., 0.],
+        [0., 1., 0.]],
+
+       [[0., 0., 1.],
+        [0., 1., 0.],
+        [0., 0., 0.]]])
+
+    result_X, result_A = layer((X, A_sparse_tensor, I))
+
+    assert np.allclose(result_A, expected_A)
+    assert np.allclose(result_X, expected_X)
+
+    # test on dense adjacencies
+    result_X, result_A = layer((X, A_dense, I))
+
+    assert np.allclose(result_A, expected_A)
+    assert np.allclose(result_X, expected_X)
+
+
+def test_Disjoint2Batch_model():
+
+    A_dense = A_sparse.todense()
+
+    # now check if it works in models
+    in_adj = keras.Input(shape=(5,), sparse=True)
+    in_x = keras.Input(shape=(2,))
+    in_id = keras.Input(shape=())
+
+    batch = Disjoint2Batch()([in_x, in_adj, in_id])
+
+    test_model = keras.Model(inputs=[in_x, in_adj, in_id], outputs=batch)
+    test_model.summary()
+    test_model.compile(optimizer="Adam", loss="mse", metrics=["mae", "acc"])
+    print(test_model([X, A_sparse_tensor, I]))
+
+
+    # TODO finish testing Disjoint2Batch in real models
