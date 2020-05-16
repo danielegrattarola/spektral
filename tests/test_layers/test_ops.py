@@ -281,8 +281,6 @@ def test_Disjoint2Batch_as_layer():
     # initiate layer
     layer = Disjoint2Batch()
 
-    A_dense = A_sparse.todense()
-
     expected_X = np.array([[[1., 0.],
         [0., 1.],
         [1., 1.]],
@@ -295,8 +293,8 @@ def test_Disjoint2Batch_as_layer():
         [1., 0., 0.],
         [0., 1., 0.]],
 
-       [[0., 0., 1.],
-        [0., 1., 0.],
+       [[0., 1., 0.],
+        [1., 0., 0.],
         [0., 0., 0.]]])
 
     result_X, result_A = layer((X, A_sparse_tensor, I))
@@ -304,14 +302,8 @@ def test_Disjoint2Batch_as_layer():
     assert np.allclose(result_A, expected_A)
     assert np.allclose(result_X, expected_X)
 
-    # test on dense adjacencies
-    result_X, result_A = layer((X, A_dense, I))
 
-    assert np.allclose(result_A, expected_A)
-    assert np.allclose(result_X, expected_X)
-
-
-def test_Disjoint2Batch_model():
+def Disjoint2Batch_model():
 
     A_dense = A_sparse.todense()
 

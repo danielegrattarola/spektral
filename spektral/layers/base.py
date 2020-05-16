@@ -246,16 +246,12 @@ class Disjoint2Batch(Layer):
         # segment IDs
         X, A, I = inputs
 
-        # turn signals to batches
+        # turn signals and adjacencies to batches
         batch_X = ops.disjoint_signal_to_batch(X, I)
-
-        # turn adjacency to (dense) batch
-        if K.is_sparse(A):
-            A = tf.sparse.to_dense(A)
         batch_A = ops.disjoint_adjacency_to_batch(A, I)
 
         # ensure that the channel dim is known
         batch_X.set_shape((None, None, X.shape[-1]))
-        batch_A.set_shape((None, None, A.shape[-1]))
+        batch_A.set_shape((None, None, None))
 
         return batch_X, batch_A
