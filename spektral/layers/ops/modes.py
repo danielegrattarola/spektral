@@ -172,7 +172,7 @@ def disjoint_adjacency_to_batch(A: tf.Tensor, I: tf.Tensor) -> tf.Tensor:
 
     # reshape to be batched
     batch = tf.reshape(dense_adjacency, (n_graphs, max_n_nodes, max_n_nodes))
-
+    batch = tf.cast(batch, tf.float32)
     return batch
 
 def autodetect_mode(a, b):

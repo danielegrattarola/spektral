@@ -3,7 +3,7 @@ from scipy.sparse import coo_matrix
 import tensorflow as tf
 import tensorflow.keras as keras
 
-from spektral.layers import ops, GraphConv, SortPool
+from spektral.layers import ops
 from spektral.layers.base import Disjoint2Batch
 from spektral.utils import convolution
 
@@ -303,9 +303,7 @@ def test_Disjoint2Batch_as_layer():
     assert np.allclose(result_X, expected_X)
 
 
-def Disjoint2Batch_model():
-
-    A_dense = A_sparse.todense()
+def test_Disjoint2Batch_model():
 
     # now check if it works in models
     in_adj = keras.Input(shape=(5,), sparse=True)
@@ -316,7 +314,7 @@ def Disjoint2Batch_model():
 
     test_model = keras.Model(inputs=[in_x, in_adj, in_id], outputs=batch)
     test_model.summary()
-    test_model.compile(optimizer="Adam", loss="mse", metrics=["mae", "acc"])
+    test_model.compile(optimizer="Adam", loss="mse")
     print(test_model([X, A_sparse_tensor, I]))
 
 
