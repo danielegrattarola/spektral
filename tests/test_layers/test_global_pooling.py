@@ -84,6 +84,20 @@ def _test_sortpool_batched(layer, k):
     assert output.shape == (batch_size, k, F)
     assert output.shape == layer_instance.compute_output_shape(X.shape)
 
+def _test_sortpool_disjoint(layer, k):
+    X = np.random.normal(size=(batch_size * N, F))
+    S = np.repeat(np.arange(batch_size), N).astype(np.int)
+    X_in = Input(shape=(F,))
+    S_in = Input(shape=(), dtype=S.dtype)
+    layer_instance = layer(k=k, disjoint=True)
+    output = layer_instance([X_in, S_in])
+    model = Model([X_in, S_in], output)
+    output = model([X, S])
+    assert output.shape == (batch_size, k, F)
+    # When creating actual graph, the batch dimension is None
+    assert output.shape[1:] == layer_instance.compute_output_shape([X.shape, S.shape])[
+        1:]
+
 
 def test_global_sum_pool():
     _test_single_mode(GlobalSumPool)
@@ -120,3 +134,4 @@ def test_global_attention_pool():
 def test_global_sort_pool():
     _test_sortpool_single(SortPool, k=6)
     _test_sortpool_batched(SortPool, k=6)
+    _test_sortpool_disjoint(SortPool, k=6)

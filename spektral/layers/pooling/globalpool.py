@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras import backend as K, initializers, regularizers, constraints
 from tensorflow.keras.layers import Layer, Dense
+from spektral.layers import ops
 
 
 class GlobalPooling(Layer):
@@ -351,21 +352,27 @@ class SortPool(Layer):
     Should \(\mathbf{X}\) have less than \(k\) rows, it sorts and then adds
     rows full of zeros until \(\mathbf{X}\) has \(k\) rows.
     
-    **Mode**: single, batch.
+    **Mode**: single, batch, disjoint.
     
     **Input**
     
     - Node features of shape `([batch], N, F)`;
+    - If the the signal is disjoint then we require a list of [signal, segment_id] where
+    signal is a (nodes, features) signal tensor and segment_id is a (nodes,) tensor containing
+    the graph id of each node;
     
     **Output**
     
     - Pooled node features of shape `([batch], k, F)`;
+    - For internal reasons disjoint signals are converted to batched signals;
     
     **Arguments**
+
     - `k`: number of nodes to keep;
+    - `disjoint`: whether or not the signal is in disjoint mode (default: False)
     """
 
-    def __init__(self, k: int):
+    def __init__(self, k: int, disjoint: bool = False):
         super(SortPool, self).__init__()
 
         # Number of nodes to be kept (k in paper)
@@ -374,11 +381,17 @@ class SortPool(Layer):
             raise ValueError("K must be a positive integer")
         self.k = k
 
+        # save whether we have a disjoint signal or not
+        self.is_disjoint = disjoint
+
     def build(self, input_shape):
 
         # check what mode we are in
-        if isinstance(input_shape, list) and len(input_shape) == 2:
-            raise NotImplementedError("Disjoint mode not supported.")
+        if isinstance(input_shape, list):
+            if len(input_shape) == 2 and self.is_disjoint:
+                self.data_mode = 'disjoint'
+            else:
+                raise ValueError('Expect either [batched] signal or list containing [signal, segment IDs].')
         else:
             if len(input_shape) == 2:
                 self.data_mode = 'single'
@@ -386,14 +399,20 @@ class SortPool(Layer):
                 self.data_mode = 'batch'
         
         # store number of features
-        self.F = input_shape[-1]
+        self.F = input_shape[0][-1] if self.is_disjoint else input_shape[-1]
 
     def call(self, inputs):
 
         # Takes the (ideally concatenated & convolved) graph signal X
-        X = inputs
+        if self.data_mode != 'disjoint':
+            X = inputs
+        else:
+            X, segment_ids = inputs
 
-        # turn to trivial batch if in "single" mode
+            # we convert the disjoint signal to a batched signal
+            X = ops.disjoint_signal_to_batch(X, segment_ids)
+
+        # Turn to trivial batch if in "single" mode
         # (N, F) -> (1, N, F)
         if self.data_mode == 'single':
             X = tf.expand_dims(X, 0)
@@ -417,9 +436,9 @@ class SortPool(Layer):
             """
 
             # trim number of nodes to k if k < n
-            X_out = X_sorted[..., : self.k, :]
+            _X_out = X_sorted[..., : self.k, :]
 
-            return X_out
+            return _X_out
 
         def pad():
             """If we have less nodes than we would like to keep,
@@ -429,9 +448,9 @@ class SortPool(Layer):
             padding = [[0, 0], [0, self.k - n], [0, 0]]
 
             # padded output
-            X_out = tf.pad(X_sorted, padding)
+            _X_out = tf.pad(X_sorted, padding)
 
-            return X_out
+            return _X_out
 
         X_out = tf.cond(tf.less_equal(self.k, n), truncate, pad)
 
@@ -444,7 +463,7 @@ class SortPool(Layer):
             X_out.set_shape((self.k, self.F))
             return X_out
 
-        elif self.data_mode == 'batch':
+        elif self.data_mode == 'batch' or self.data_mode == 'disjoint':
 
             # set shape manually, as tf is not able
             # to infer the dimensions
@@ -453,13 +472,14 @@ class SortPool(Layer):
 
     def get_config(self):
         config = {
-            'k': self.k
+            'k': self.k,
+            'disjoint': self.is_disjoint,
         }
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
     def compute_output_shape(self, input_shape):
         if self.data_mode == 'single':
-            return (self.k, self.F)
-        elif self.data_mode == 'batch':
-            return (input_shape[0], self.k, self.F)
+            return self.k, self.F
+        elif self.data_mode == 'batch' or self.data_mode == 'disjoint':
+            return input_shape[0], self.k, self.F
