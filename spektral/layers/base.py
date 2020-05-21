@@ -4,7 +4,7 @@ from tensorflow.python.framework import smart_cond
 from tensorflow.keras import activations, initializers, regularizers, constraints
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Layer
-
+from spektral.layers import ops
 
 class SparseDropout(Layer):
     """Applies Dropout to the input.
@@ -45,10 +45,10 @@ class SparseDropout(Layer):
 
         def dropped_inputs():
             return self.sparse_dropout(
-              inputs,
-              noise_shape=self._get_noise_shape(inputs),
-              seed=self.seed,
-              rate=self.rate
+                inputs,
+                noise_shape=self._get_noise_shape(inputs),
+                seed=self.seed,
+                rate=self.rate
             )
 
         output = smart_cond.smart_cond(training,
@@ -103,6 +103,7 @@ class InnerProduct(Layer):
     :param kernel_regularizer: regularization applied to the kernel;
     :param kernel_constraint: constraint applied to the kernel;
     """
+
     def __init__(self,
                  trainable_kernel=False,
                  activation=None,
@@ -142,7 +143,7 @@ class InnerProduct(Layer):
         if len(input_shape) == 2:
             return (None, None)
         else:
-            return input_shape[:-1] + (input_shape[-2], )
+            return input_shape[:-1] + (input_shape[-2],)
 
     def get_config(self, **kwargs):
         config = {
@@ -182,6 +183,7 @@ class MinkowskiProduct(Layer):
     output shape for your layer.
     :param activation: activation function to use;
     """
+
     def __init__(self,
                  input_dim_1=None,
                  activation=None,
@@ -216,7 +218,7 @@ class MinkowskiProduct(Layer):
             else:
                 return (self.input_dim_1, self.input_dim_1)
         else:
-            return input_shape[:-1] + (input_shape[-2], )
+            return input_shape[:-1] + (input_shape[-2],)
 
     def get_config(self, **kwargs):
         config = {
@@ -225,3 +227,96 @@ class MinkowskiProduct(Layer):
         }
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
+
+
+class Disjoint2Batch(Layer):
+    r"""Utility layer that converts disjoint data to batch data. By splitting each connected component
+    into its own graph and padding with dummy zero nodes until all graphs have the same order.
+
+    **Mode**: disjoint.
+
+    **This layer expects a sparse adjacency matrix.**
+
+    **Input / Output**
+
+    There are 3 ways to use this layer.
+
+    For converting disjoint signals to batched signals:
+
+    - Input: `[signal (nodes, features), segment_ids (nodes,)]`;
+    - Output: batched signal `(batch, max_nodes, features)`;
+
+
+    Converting disjoint adjacencies into batched adjacencies:
+
+    - Input: `[adjacency (nodes, nodes), segment_ids (nodes,)]`;
+    - In this case pass the parameter `only_adjacency=True`;
+    - Output: batched adjacency `(batch, max_nodes, max_nodes)`;
+
+    Converting both signal and adjacency into batch mode:
+
+    - Input: `[signal (nodes, features), adjacency (nodes, nodes), segment_id (nodes,)]`;
+    - Output: `[signal (batch, max_nodes, features), adjacency (batch, max_nodes, max_nodes)]`;
+
+    **Arguments**
+
+    - `only_adjacency`: Set to true if you are only converting a disjoint adjacency.
+    """
+    def __init__(self, only_adjaceny: bool = False):
+        super(Disjoint2Batch, self).__init__()
+        self.only_adjacency = only_adjaceny
+
+    def build(self, input_shape):
+
+        # check what mode we are in
+        if isinstance(input_shape, (list, tuple)):
+            if len(input_shape) == 3:
+                self.data_mode = 'both'
+            elif len(input_shape) == 2:
+                if self.only_adjacency:
+                    self.data_mode = 'adjacency'
+                else:
+                    self.data_mode = 'signal'
+        else:
+            raise ValueError('Expect signal and/or adjacency together + segment_ids as a list.')
+
+    def call(self, inputs, **kwargs):
+
+        if self.data_mode == 'both':
+
+            # grab signals, adjacencies and the segment_ids
+            X, A, I = inputs
+
+            # turn signals and adjacencies to batches
+            batch_X = ops.disjoint_signal_to_batch(X, I)
+            batch_A = ops.disjoint_adjacency_to_batch(A, I)
+
+            # ensure that the channel dim is known
+            batch_X.set_shape((None, None, X.shape[-1]))
+            batch_A.set_shape((None, None, None))
+
+            return batch_X, batch_A
+        elif self.data_mode == 'signal':
+
+            # grab signal and segment_ids
+            X, I = inputs
+
+            # turn signals to batches
+            batch_X = ops.disjoint_signal_to_batch(X, I)
+
+            # ensure that the channel dim is known
+            batch_X.set_shape((None, None, X.shape[-1]))
+
+            return batch_X
+        elif self.data_mode == 'adjacency':
+
+            # grab sparse adjacencies and segment_ids
+            A, I = inputs
+
+            # turn adjacencies to dense batches
+            batch_A = ops.disjoint_adjacency_to_batch(A, I)
+
+            # ensure that the channel dim is known
+            batch_A.set_shape((None, None, None))
+
+            return batch_A
