@@ -278,9 +278,6 @@ def test_disjoint_adjacency_to_batch():
 
 def test_Disjoint2Batch_as_layer():
 
-    # initiate layer
-    layer = Disjoint2Batch()
-
     expected_X = np.array([[[1., 0.],
         [0., 1.],
         [1., 1.]],
@@ -297,25 +294,18 @@ def test_Disjoint2Batch_as_layer():
         [1., 0., 0.],
         [0., 0., 0.]]])
 
-    result_X, result_A = layer((X, A_sparse_tensor, I))
+    # check mode 1
+    result_X = Disjoint2Batch()((X, I))
+    assert np.allclose(result_X, expected_X)
 
+    # check mode 2
+    result_A = Disjoint2Batch(only_adjaceny=True)((A_sparse_tensor, I))
+    assert np.allclose(result_A, expected_A)
+
+    # check mode 3
+    result_X, result_A = Disjoint2Batch()((X, A_sparse_tensor, I))
     assert np.allclose(result_A, expected_A)
     assert np.allclose(result_X, expected_X)
 
+    # TODO: Test in real models.
 
-def test_Disjoint2Batch_model():
-
-    # now check if it works in models
-    in_adj = keras.Input(shape=(5,), sparse=True)
-    in_x = keras.Input(shape=(2,))
-    in_id = keras.Input(shape=())
-
-    batch = Disjoint2Batch()([in_x, in_adj, in_id])
-
-    test_model = keras.Model(inputs=[in_x, in_adj, in_id], outputs=batch)
-    test_model.summary()
-    test_model.compile(optimizer="Adam", loss="mse")
-    print(test_model([X, A_sparse_tensor, I]))
-
-
-    # TODO finish testing Disjoint2Batch in real models

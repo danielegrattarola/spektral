@@ -72,7 +72,8 @@ PAGES = [
         'methods': [],
         'classes': [
             layers.InnerProduct,
-            layers.MinkowskiProduct
+            layers.MinkowskiProduct,
+            layers.Disjoint2Batch,
         ]
     },
     # Datasets #################################################################

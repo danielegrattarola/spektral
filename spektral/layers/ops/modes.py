@@ -23,7 +23,6 @@ def disjoint_signal_to_batch(X: tf.Tensor, I: tf.Tensor) -> tf.Tensor:
     :return batch: Batched version of X now with shape (batch, max_nodes, features)
     """
 
-    # TODO: Use this op to generalise SortPool to disjoint graphs
     I = tf.cast(I, tf.int32)
     X = tf.cast(X, tf.float32)
 
