@@ -1,10 +1,12 @@
 import numpy as np
 import tensorflow as tf
-from tensorflow.python.framework import smart_cond
 from tensorflow.keras import activations, initializers, regularizers, constraints
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Layer
+from tensorflow.python.framework import smart_cond
+
 from spektral.layers import ops
+
 
 class SparseDropout(Layer):
     """Applies Dropout to the input.
@@ -230,93 +232,40 @@ class MinkowskiProduct(Layer):
 
 
 class Disjoint2Batch(Layer):
-    r"""Utility layer that converts disjoint data to batch data. By splitting each connected component
-    into its own graph and padding with dummy zero nodes until all graphs have the same order.
+    r"""Utility layer that converts data from disjoint mode to batch mode by
+    zero-padding the node features and adjacency matrices.
 
     **Mode**: disjoint.
 
     **This layer expects a sparse adjacency matrix.**
 
-    **Input / Output**
+    **Input**
 
-    There are 3 ways to use this layer.
+    - Node features of shape `(N, F)`;
+    - Binary adjacency matrix of shape `(N, N)`;
+    - Graph IDs of shape `(N, )`;
 
-    For converting disjoint signals to batched signals:
+    **Output**
 
-    - Input: `[signal (nodes, features), segment_ids (nodes,)]`;
-    - Output: batched signal `(batch, max_nodes, features)`;
-
-
-    Converting disjoint adjacencies into batched adjacencies:
-
-    - Input: `[adjacency (nodes, nodes), segment_ids (nodes,)]`;
-    - In this case pass the parameter `only_adjacency=True`;
-    - Output: batched adjacency `(batch, max_nodes, max_nodes)`;
-
-    Converting both signal and adjacency into batch mode:
-
-    - Input: `[signal (nodes, features), adjacency (nodes, nodes), segment_id (nodes,)]`;
-    - Output: `[signal (batch, max_nodes, features), adjacency (batch, max_nodes, max_nodes)]`;
-
-    **Arguments**
-
-    - `only_adjacency`: Set to true if you are only converting a disjoint adjacency.
+    - Batched node features of shape `(batch, N_max, F)`;
+    - Batched adjacency matrix of shape `(batch, N_max, N_max)`;
     """
-    def __init__(self, only_adjaceny: bool = False):
+
+    def __init__(self):
         super(Disjoint2Batch, self).__init__()
-        self.only_adjacency = only_adjaceny
 
     def build(self, input_shape):
-
-        # check what mode we are in
-        if isinstance(input_shape, (list, tuple)):
-            if len(input_shape) == 3:
-                self.data_mode = 'both'
-            elif len(input_shape) == 2:
-                if self.only_adjacency:
-                    self.data_mode = 'adjacency'
-                else:
-                    self.data_mode = 'signal'
-        else:
-            raise ValueError('Expect signal and/or adjacency together + segment_ids as a list.')
+        assert len(input_shape) >= 2
+        self.built = True
 
     def call(self, inputs, **kwargs):
+        X, A, I = inputs
 
-        if self.data_mode == 'both':
+        batch_X = ops.disjoint_signal_to_batch(X, I)
+        batch_A = ops.disjoint_adjacency_to_batch(A, I)
 
-            # grab signals, adjacencies and the segment_ids
-            X, A, I = inputs
+        # Ensure that the channel dimension is known
+        batch_X.set_shape((None, None, X.shape[-1]))
+        batch_A.set_shape((None, None, None))
 
-            # turn signals and adjacencies to batches
-            batch_X = ops.disjoint_signal_to_batch(X, I)
-            batch_A = ops.disjoint_adjacency_to_batch(A, I)
-
-            # ensure that the channel dim is known
-            batch_X.set_shape((None, None, X.shape[-1]))
-            batch_A.set_shape((None, None, None))
-
-            return batch_X, batch_A
-        elif self.data_mode == 'signal':
-
-            # grab signal and segment_ids
-            X, I = inputs
-
-            # turn signals to batches
-            batch_X = ops.disjoint_signal_to_batch(X, I)
-
-            # ensure that the channel dim is known
-            batch_X.set_shape((None, None, X.shape[-1]))
-
-            return batch_X
-        elif self.data_mode == 'adjacency':
-
-            # grab sparse adjacencies and segment_ids
-            A, I = inputs
-
-            # turn adjacencies to dense batches
-            batch_A = ops.disjoint_adjacency_to_batch(A, I)
-
-            # ensure that the channel dim is known
-            batch_A.set_shape((None, None, None))
-
-            return batch_A
+        return batch_X, batch_A

@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras import backend as K, initializers, regularizers, constraints
 from tensorflow.keras.layers import Layer, Dense
+
 from spektral.layers import ops
 
 
@@ -63,7 +64,7 @@ class GlobalSumPool(GlobalPooling):
 
     **Output**
 
-    - Pooled node features of shape `([batch], F)` (if single mode, shape will
+    - Pooled node features of shape `(batch, F)` (if single mode, shape will
     be `(1, F)`).
 
     **Arguments**
@@ -92,7 +93,7 @@ class GlobalAvgPool(GlobalPooling):
 
     **Output**
 
-    - Pooled node features of shape `([batch], F)` (if single mode, shape will
+    - Pooled node features of shape `(batch, F)` (if single mode, shape will
     be `(1, F)`).
 
     **Arguments**
@@ -121,7 +122,7 @@ class GlobalMaxPool(GlobalPooling):
 
     **Output**
 
-    - Pooled node features of shape `([batch], F)` (if single mode, shape will
+    - Pooled node features of shape `(batch, F)` (if single mode, shape will
     be `(1, F)`).
 
     **Arguments**
@@ -156,7 +157,7 @@ class GlobalAttentionPool(GlobalPooling):
 
     **Output**
 
-    - Pooled node features of shape `([batch], channels)` (if single mode,
+    - Pooled node features of shape `(batch, channels)` (if single mode,
     shape will be `(1, channels)`).
 
     **Arguments**
@@ -270,7 +271,7 @@ class GlobalAttnSumPool(GlobalPooling):
 
     **Output**
 
-    - Pooled node features of shape `([batch], F)` (if single mode, shape will
+    - Pooled node features of shape `(batch, F)` (if single mode, shape will
     be `(1, F)`).
 
     **Arguments**
@@ -345,135 +346,82 @@ class GlobalAttnSumPool(GlobalPooling):
 
 class SortPool(Layer):
     r"""
-    SortPool layer pooling the top \(k\) most relevant nodes as described by
-    [Zhang et al.](https://www.cse.wustl.edu/~muhan/papers/AAAI_2018_DGCNN.pdf)
-    This layers takes a graph signal \(\mathbf{X}\) and sorts the rows by the
-    elements of its last column. It then keeps the top \(k\) rows.
-    Should \(\mathbf{X}\) have less than \(k\) rows, it sorts and then adds
-    rows full of zeros until \(\mathbf{X}\) has \(k\) rows.
+    A SortPool layer as described by
+    [Zhang et al](https://www.cse.wustl.edu/~muhan/papers/AAAI_2018_DGCNN.pdf).
+    This layers takes a graph signal \(\mathbf{X}\) and returns the topmost k
+    rows according to the last column.
+    If \(\mathbf{X}\) has less than k rows, the result is zero-padded to k.
     
-    **Mode**: single, batch, disjoint.
+    **Mode**: single, disjoint, batch.
     
     **Input**
 
     - Node features of shape `([batch], N, F)`;
-    - If the the signal is disjoint then we require a list of [signal, segment_id] where
-    signal is a (nodes, features) signal tensor and segment_id is a (nodes,) tensor containing
-    the graph id of each node;
+    - Graph IDs of shape `(N, )` (only in disjoint mode);
 
     **Output**
 
-    - Pooled node features of shape `([batch], k, F)`;
-    - For internal reasons disjoint signals are converted to batched signals;
+    - Pooled node features of shape `(batch, k, F)` (if single mode, shape will
+    be `(1, k, F)`).
 
     **Arguments**
 
-    - `k`: number of nodes to keep;
-    - `disjoint`: whether or not the signal is in disjoint mode (default: False)
+    - `k`: integer, number of nodes to keep;
     """
 
-    def __init__(self, k: int, disjoint: bool = False):
+    def __init__(self, k):
         super(SortPool, self).__init__()
-
-        # Number of nodes to be kept (k in paper)
         k = int(k)
         if k <= 0:
             raise ValueError("K must be a positive integer")
         self.k = k
 
-        # save whether we have a disjoint signal or not
-        self.is_disjoint = disjoint
-
     def build(self, input_shape):
-
-        # check what mode we are in
-        if isinstance(input_shape, list):
-            if len(input_shape) == 2 and self.is_disjoint:
-                self.data_mode = 'disjoint'
-            else:
-                raise ValueError('Expect either [batched] signal or list containing [signal, segment IDs].')
+        if isinstance(input_shape, list) and len(input_shape) == 2:
+            self.data_mode = 'disjoint'
+            self.F = input_shape[0][-1]
         else:
             if len(input_shape) == 2:
                 self.data_mode = 'single'
             else:
                 self.data_mode = 'batch'
-
-        # store number of features
-        self.F = input_shape[0][-1] if self.is_disjoint else input_shape[-1]
+            self.F = input_shape[-1]
 
     def call(self, inputs):
-
-        # Takes the (ideally concatenated & convolved) graph signal X
-        if self.data_mode != 'disjoint':
-            X = inputs
+        if self.data_mode == 'disjoint':
+            X, I = inputs
+            X = ops.disjoint_signal_to_batch(X, I)
         else:
-            X, segment_ids = inputs
+            X = inputs
+            if self.data_mode == 'single':
+                X = tf.expand_dims(X, 0)
 
-            # we convert the disjoint signal to a batched signal
-            X = ops.disjoint_signal_to_batch(X, segment_ids)
-
-        # Turn to trivial batch if in "single" mode
-        # (N, F) -> (1, N, F)
-        if self.data_mode == 'single':
-            X = tf.expand_dims(X, 0)
-
-        # get number of nodes
-        n = tf.shape(X)[-2]
-
-        # Sort last column and return permutation of indices
+        N = tf.shape(X)[-2]
         sort_perm = tf.argsort(X[..., -1], direction='DESCENDING')
-
-        # Gather rows according to the sorting permutation
-        # thus sorting the rows according to the last column
         X_sorted = tf.gather(X, sort_perm, axis=-2, batch_dims=1)
 
-        # cast X_sorted into float32
-        X_sorted = tf.cast(X_sorted, tf.float32)
-
         def truncate():
-            """If we have more nodes than we want to keep,
-            then we simply truncate.
-            """
-
-            # trim number of nodes to k if k < n
             _X_out = X_sorted[..., : self.k, :]
-
             return _X_out
 
         def pad():
-            """If we have less nodes than we would like to keep,
-            then we simply pad with empty nodes.
-            """
-
-            padding = [[0, 0], [0, self.k - n], [0, 0]]
-
-            # padded output
+            padding = [[0, 0], [0, self.k - N], [0, 0]]
             _X_out = tf.pad(X_sorted, padding)
-
             return _X_out
 
-        X_out = tf.cond(tf.less_equal(self.k, n), truncate, pad)
+        X_out = tf.cond(tf.less_equal(self.k, N), truncate, pad)
 
-        # undo trivial batching if in "single" mode
         if self.data_mode == 'single':
             X_out = tf.squeeze(X_out, [0])
-
-            # set shape manually, as tf is not able
-            # to infer the dimensions
             X_out.set_shape((self.k, self.F))
-            return X_out
-
         elif self.data_mode == 'batch' or self.data_mode == 'disjoint':
-
-            # set shape manually, as tf is not able
-            # to infer the dimensions
             X_out.set_shape((None, self.k, self.F))
-            return X_out
+
+        return X_out
 
     def get_config(self):
         config = {
             'k': self.k,
-            'disjoint': self.is_disjoint,
         }
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))

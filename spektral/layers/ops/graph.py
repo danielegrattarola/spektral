@@ -65,5 +65,5 @@ def degree_matrix(A, return_sparse_batch=False):
         dense_shape = (N, N)
 
     indices = tf.cast(indices, tf.int64)
-    values = tf.reshape(D, (-1, ))
+    values = tf.reshape(D, (-1,))
     return tf.SparseTensor(indices, values, dense_shape)
