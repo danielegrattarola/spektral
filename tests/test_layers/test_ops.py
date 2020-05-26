@@ -1,10 +1,8 @@
 import numpy as np
-from scipy.sparse import coo_matrix
 import tensorflow as tf
-import tensorflow.keras as keras
+from scipy.sparse import coo_matrix
 
 from spektral.layers import ops
-from spektral.layers.base import Disjoint2Batch
 from spektral.utils import convolution
 
 batch_size = 10
@@ -209,103 +207,38 @@ def test_misc_ops():
     expected_output = np.array([np.linalg.matrix_power(a, k) for a in A])
     _check_op(ops.matrix_power, [A], expected_output, convert_to_sparse, k=k)
 
-# Test data
-X = np.array([[1, 0], [0, 1], [1, 1], [0, 0], [1, 2]])
-I = np.array([0, 0, 0, 1, 1])
 
-# create sparse adjacency
-A_data = [1, 1, 1, 1, 1]
-A_row = [0, 1, 2, 3, 4]
-A_col = [1, 0, 1, 4, 3]
-A_sparse = coo_matrix((A_data, (A_row, A_col)), shape=(5, 5))
-A_sparse_tensor = ops.sp_matrix_to_sp_tensor(A_sparse)
+def test_modes_ops():
+    X = np.array([[1, 0], [0, 1], [1, 1], [0, 0], [1, 2]])
+    I = np.array([0, 0, 0, 1, 1])
 
+    A_data = [1, 1, 1, 1, 1]
+    A_row = [0, 1, 2, 3, 4]
+    A_col = [1, 0, 1, 4, 3]
+    A_sparse = coo_matrix((A_data, (A_row, A_col)), shape=(5, 5))
+    A_sparse_tensor = ops.sp_matrix_to_sp_tensor(A_sparse)
 
-def test_disjoint_signal_to_batch():
-
-    expected_result = np.array([
-        [[1., 0.],
-        [0., 1.],
-        [1., 1.]],
-       [[0., 0.],
-        [1., 2.],
-        [0., 0.]]])
-
-    result = ops.disjoint_signal_to_batch(X, I)
-    result = np.array(result)
+    # Disjoint signal to batch
+    expected_result = np.array([[[1., 0.],
+                                 [0., 1.],
+                                 [1., 1.]],
+                                [[0., 0.],
+                                 [1., 2.],
+                                 [0., 0.]]])
+    result = ops.disjoint_signal_to_batch(X, I).numpy()
 
     assert expected_result.shape == result.shape
-    assert np.allclose(expected_result, result) is True
+    assert np.allclose(expected_result, result)
 
-
-def test_get_graph_id_and_size():
-    node_id_1 = np.array([0])
-    node_id_2 = np.array([4])
-    node_id_3 = np.array([9])
-    node_id_4 = np.array([23])
-    node_array = np.array([0, 4, 9, 23])
-    graph_sizes = np.array([5, 5, 11, 20])
-
-    assert np.array(ops.get_graph_id(node_id_1, graph_sizes)) == 0
-    assert np.array(ops.get_graph_id(node_id_2, graph_sizes)) == 0
-    assert np.array(ops.get_graph_id(node_id_3, graph_sizes)) == 1
-    assert np.array(ops.get_graph_id(node_id_4, graph_sizes)) == 3
-
-    assert np.array(ops.get_cum_graph_size(node_id_1, graph_sizes)) == 0
-    assert np.array(ops.get_cum_graph_size(node_id_2, graph_sizes)) == 0
-    assert np.array(ops.get_cum_graph_size(node_id_3, graph_sizes)) == 5
-    assert np.array(ops.get_cum_graph_size(node_id_4, graph_sizes)) == 21
-
-    assert np.allclose(np.array(ops.vectorised_get_cum_graph_size(node_array, graph_sizes)), [0, 0, 5, 21])
-
-
-def test_disjoint_adjacency_to_batch():
-
+    # Disjoint adjacency to batch
     expected_result = np.array([[[0., 1., 0.],
-        [1., 0., 0.],
-        [0., 1., 0.]],
+                                 [1., 0., 0.],
+                                 [0., 1., 0.]],
+                                [[0., 1., 0.],
+                                 [1., 0., 0.],
+                                 [0., 0., 0.]]])
 
-       [[0., 1., 0.],
-        [1., 0., 0.],
-        [0., 0., 0.]]])
-
-    result = ops.disjoint_adjacency_to_batch(A_sparse_tensor, I)
-    result = np.array(result)
+    result = ops.disjoint_adjacency_to_batch(A_sparse_tensor, I).numpy()
 
     assert expected_result.shape == result.shape
-    assert np.allclose(expected_result, result) is True
-
-
-def test_Disjoint2Batch_as_layer():
-
-    expected_X = np.array([[[1., 0.],
-        [0., 1.],
-        [1., 1.]],
-
-       [[0., 0.],
-        [1., 2.],
-        [0., 0.]]])
-    
-    expected_A = np.array([[[0., 1., 0.],
-        [1., 0., 0.],
-        [0., 1., 0.]],
-
-       [[0., 1., 0.],
-        [1., 0., 0.],
-        [0., 0., 0.]]])
-
-    # check mode 1
-    result_X = Disjoint2Batch()((X, I))
-    assert np.allclose(result_X, expected_X)
-
-    # check mode 2
-    result_A = Disjoint2Batch(only_adjaceny=True)((A_sparse_tensor, I))
-    assert np.allclose(result_A, expected_A)
-
-    # check mode 3
-    result_X, result_A = Disjoint2Batch()((X, A_sparse_tensor, I))
-    assert np.allclose(result_A, expected_A)
-    assert np.allclose(result_X, expected_X)
-
-    # TODO: Test in real models.
-
+    assert np.allclose(expected_result, result)

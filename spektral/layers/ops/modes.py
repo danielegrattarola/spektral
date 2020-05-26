@@ -1,58 +1,32 @@
-from tensorflow.keras import backend as K
 import tensorflow as tf
-from typing import Union
-import numpy as np
+from tensorflow.keras import backend as K
 
-SINGLE  = 1   # Single         (rank(a)=2, rank(b)=2)
-MIXED   = 2   # Mixed          (rank(a)=2, rank(b)=3)
-iMIXED  = 3   # Inverted mixed (rank(a)=3, rank(b)=2)
-BATCH   = 4   # Batch          (rank(a)=3, rank(b)=3)
+SINGLE = 1    # Single         (rank(a)=2, rank(b)=2)
+MIXED = 2     # Mixed          (rank(a)=2, rank(b)=3)
+iMIXED = 3    # Inverted mixed (rank(a)=3, rank(b)=2)
+BATCH = 4     # Batch          (rank(a)=3, rank(b)=3)
 UNKNOWN = -1  # Unknown
 
 
-def disjoint_signal_to_batch(X: tf.Tensor, I: tf.Tensor) -> tf.Tensor:
+def disjoint_signal_to_batch(X, I):
     """
-    Given an disjoint graph signal X and its segment IDs I, this op converts
-    it to a batched graph signal.
+    Converts a disjoint graph signal to batch node by zero-padding.
 
-    If the graphs have different orders, then we pad the node dimension with 0
-    rows until they all have the same size.
-
-    :param tf.Tensor X: Disjoint graph signal or adjacency of shape (nodes, features).
-    :param I: A rank 1 Tensor with segment IDs for X;
-    :return batch: Batched version of X now with shape (batch, max_nodes, features)
+    :param X: Tensor, node features of shape (nodes, features).
+    :param I: Tensor, graph IDs of shape `(N, )`;
+    :return batch: Tensor, batched node features of shape (batch, N_max, F)
     """
-
     I = tf.cast(I, tf.int32)
-    X = tf.cast(X, tf.float32)
-
-    # Number of nodes in each graph
     num_nodes = tf.math.segment_sum(tf.ones_like(I), I)
-
-    # Getting starting index of each graph
     start_index = tf.cumsum(num_nodes, exclusive=True)
-
-    # Number of graphs in batch
     n_graphs = tf.shape(num_nodes)[0]
-
-    # Size of biggest graph in batch
     max_n_nodes = tf.reduce_max(num_nodes)
-
-    # Number of overall nodes in batch
     batch_n_nodes = tf.shape(I)[0]
-
-    # Get feature dim
     feature_dim = tf.shape(X)[-1]
 
-    # index of non zero rows
     index = tf.range(batch_n_nodes)
     index = (index - tf.gather(start_index, I)) + (I * max_n_nodes)
-
-    # initial zero batch signal of correct shape
-
-    dense = tf.zeros((n_graphs * max_n_nodes, feature_dim))
-
-    # empty_var is a variable with unknown shape defined in the elsewhere
+    dense = tf.zeros((n_graphs * max_n_nodes, feature_dim), dtype=X.dtype)
     dense = tf.tensor_scatter_nd_update(dense, index[..., None], X)
 
     batch = tf.reshape(dense, (n_graphs, max_n_nodes, feature_dim))
@@ -60,47 +34,7 @@ def disjoint_signal_to_batch(X: tf.Tensor, I: tf.Tensor) -> tf.Tensor:
     return batch
 
 
-def get_graph_id(node: Union[tf.Tensor, np.array],
-                 graph_sizes: Union[tf.Tensor, np.array]) -> Union[tf.Tensor, np.array]:
-    """
-    Given a node (index) and the vector of graph sizes, this function returns the ID of the graph
-    containing the node.
-
-    :param node: tf.Tensor of shape (,)
-    :param graph_sizes: tf.Tensor of shape (num_graphs,) containing the sizes of the graphs ordered
-    by segment ID.
-    :return: tf.Tensor of shape (,). The segment ID containing the node.
-    """
-
-    cum_graph_sizes = tf.cumsum(graph_sizes, exclusive=True)
-
-    indicator_if_smaller = tf.cast(node - cum_graph_sizes >= 0,
-                                   tf.int32)
-
-    index_of_max_min = tf.reduce_sum(indicator_if_smaller) - 1
-
-    return index_of_max_min
-
-
-def get_cum_graph_size(node: Union[tf.Tensor, np.array],
-                       graph_sizes: Union[tf.Tensor, np.array]) -> Union[tf.Tensor, np.array]:
-    """
-    Returns the number of nodes contained inside graphs with smaller segment ID then node.
-
-    :param node: tf.Tensor of shape (,). Node ID
-    :param graph_sizes: tf.Tensor of shape (num_graphs,) containing the sizes of the graphs ordered
-    by segment ID.
-    :return: tf.Tensor of shape (,). The number of nodes contained in graphs with smaller segment ID.
-    """
-
-    graph_id = get_graph_id(node, graph_sizes)
-
-    return tf.cumsum(graph_sizes, exclusive=True)[graph_id]
-
-
-def vectorised_get_cum_graph_size(
-            nodes: Union[tf.Tensor, np.array],
-            graph_sizes: Union[tf.Tensor, np.array]) -> Union[tf.Tensor, np.array]:
+def _vectorised_get_cum_graph_size(nodes, graph_sizes):
     """
     Takes a list of node ids and graph sizes ordered by segment ID and returns the
     number of nodes contained in graphs with smaller segment ID.
@@ -111,24 +45,22 @@ def vectorised_get_cum_graph_size(
     :return: A list of shape (nodes) where each entry corresponds to the number of nodes contained in graphs
     with smaller segment ID for each node.
     """
+    def get_cum_graph_size(node):
+        cum_graph_sizes = tf.cumsum(graph_sizes, exclusive=True)
+        indicator_if_smaller = tf.cast(node - cum_graph_sizes >= 0, tf.int32)
+        graph_id = tf.reduce_sum(indicator_if_smaller) - 1
+        return tf.cumsum(graph_sizes, exclusive=True)[graph_id]
 
-    def fixed_cum_graph_size(node: Union[tf.Tensor, np.array]) -> Union[tf.Tensor, np.array]:
-        return get_cum_graph_size(node, graph_sizes)
-
-    return tf.map_fn(fixed_cum_graph_size, nodes)
+    return tf.map_fn(get_cum_graph_size, nodes)
 
 
-def disjoint_adjacency_to_batch(A: tf.Tensor, I: tf.Tensor) -> tf.Tensor:
+def disjoint_adjacency_to_batch(A, I):
     """
-    Given an disjoint adjacency A and its segment IDs I, this op converts
-    it to a batched adjacency.
+    Converts a disjoint adjacency matrix to batch node by zero-padding.
 
-    If the graphs have different orders, then we pad the node dimension with 0
-    rows until they all have the same size.
-
-    :param tf.Tensor A: Disjoint graph sparse adjacency of shape (nodes, nodes).
-    :param I: A rank 1 Tensor with segment IDs for X;
-    :return batch: Batched version of A now with shape (batch, max_nodes, max_nodes)
+    :param A: Tensor, binary adjacency matrix of shape `(N, N)`;
+    :param I: Tensor, graph IDs of shape `(N, )`;
+    :return: Tensor, batched adjacency matrix of shape `(batch, N_max, N_max)`;
     """
     I = tf.cast(I, tf.int64)
     A = tf.cast(A, tf.float32)
@@ -136,43 +68,25 @@ def disjoint_adjacency_to_batch(A: tf.Tensor, I: tf.Tensor) -> tf.Tensor:
     values = tf.cast(A.values, tf.int64)
     i_nodes, j_nodes = indices[:, 0], indices[:, 1]
 
-    # Number of nodes in each graph
     graph_sizes = tf.math.segment_sum(tf.ones_like(I), I)
-
-    # Size of biggest graph in batch
     max_n_nodes = tf.reduce_max(graph_sizes)
-
-    # Number of graphs in batch
     n_graphs = tf.shape(graph_sizes)[0]
-
-    # j nodes projected to be within the range of 0 to max_n_nodes relative to their
-    # connected component
-    relative_j_nodes = j_nodes - vectorised_get_cum_graph_size(j_nodes, graph_sizes)
-
-    # i nodes projected to be within the range of 0 to max_n_nodes relative to their
-    # connected component
-    relative_i_nodes = i_nodes - vectorised_get_cum_graph_size(i_nodes, graph_sizes)
-
-    # Now put the i nodes in the right place relative to previous graphs who now all
-    # have an order of max_n_nodes
-    spaced_i_nodes = I*max_n_nodes + relative_i_nodes
-
-    # Zip the nodes together
+    relative_j_nodes = j_nodes - _vectorised_get_cum_graph_size(j_nodes, graph_sizes)
+    relative_i_nodes = i_nodes - _vectorised_get_cum_graph_size(i_nodes, graph_sizes)
+    spaced_i_nodes = I * max_n_nodes + relative_i_nodes
     new_indices = tf.transpose(tf.stack([spaced_i_nodes, relative_j_nodes]))
 
-    # casting to same format
     new_indices = tf.cast(new_indices, tf.int32)
     n_graphs = tf.cast(n_graphs, tf.int32)
     max_n_nodes = tf.cast(max_n_nodes, tf.int32)
 
-    # Fill in the values into a newly shaped batched adjacency
-    dense_adjacency = tf.scatter_nd(new_indices, values,
-                                    (n_graphs * max_n_nodes, max_n_nodes))
-
-    # reshape to be batched
+    dense_adjacency = tf.scatter_nd(
+        new_indices, values, (n_graphs * max_n_nodes, max_n_nodes)
+    )
     batch = tf.reshape(dense_adjacency, (n_graphs, max_n_nodes, max_n_nodes))
     batch = tf.cast(batch, tf.float32)
     return batch
+
 
 def autodetect_mode(a, b):
     """

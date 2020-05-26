@@ -3,7 +3,8 @@ import scipy.sparse as sp
 import tensorflow as tf
 from tensorflow.keras import Input, Model
 
-from spektral.layers import TopKPool, MinCutPool, DiffPool, SAGPool, SortPool
+from spektral.layers import TopKPool, MinCutPool, DiffPool, SAGPool
+
 tf.keras.backend.set_floatx('float64')
 
 SINGLE, BATCH, DISJOINT = 1, 2, 3  # Single, batch, disjoint
@@ -56,7 +57,7 @@ def _test_single_mode(layer, **kwargs):
     X = np.random.normal(size=(N, F))
     sparse = kwargs.pop('sparse', None) is not None
 
-    A_in = Input(shape=(None, ), sparse=sparse)
+    A_in = Input(shape=(None,), sparse=sparse)
     X_in = Input(shape=(F,))
 
     layer_instance = layer(**kwargs)
@@ -121,7 +122,7 @@ def _test_disjoint_mode(layer, **kwargs):
     I = np.array([0] * N1 + [1] * N2 + [2] * N3).astype(int)
     sparse = kwargs.pop('sparse', None) is not None
 
-    A_in = Input(shape=(None, ), sparse=sparse)
+    A_in = Input(shape=(None,), sparse=sparse)
     X_in = Input(shape=(F,))
     I_in = Input(shape=(), dtype=tf.int32)
 
@@ -132,8 +133,8 @@ def _test_disjoint_mode(layer, **kwargs):
     X_pool, A_pool, I_pool, mask = output
 
     N_pool_expected = np.ceil(kwargs['ratio'] * N1) + \
-        np.ceil(kwargs['ratio'] * N2) + \
-        np.ceil(kwargs['ratio'] * N3)
+                      np.ceil(kwargs['ratio'] * N2) + \
+                      np.ceil(kwargs['ratio'] * N3)
     N_pool_expected = int(N_pool_expected)
     N_pool_true = A_pool.shape[0]
 
@@ -141,7 +142,7 @@ def _test_disjoint_mode(layer, **kwargs):
 
     assert X_pool.shape == (N_pool_expected, F)
     assert A_pool.shape == (N_pool_expected, N_pool_expected)
-    assert I_pool.shape == (N_pool_expected, )
+    assert I_pool.shape == (N_pool_expected,)
 
     output_shape = [o.shape for o in output]
     _check_output_and_model_output_shapes(output_shape, model.output_shape)
