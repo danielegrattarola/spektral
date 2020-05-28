@@ -27,15 +27,26 @@ def dot(a, b, transpose_a=False, transpose_b=False):
     """
     Dot product between a and b along innermost dimensions, for a and b with
     same rank. Supports both dense and sparse multiplication (including
-    sparse-sparse).
+    sparse-sparse). The innermost dimension of a must match the outermost
+    dimension of b, unless there is a shared batch size.
     :param a: Tensor or SparseTensor with rank 2 or 3.
-    :param b: Tensor or SparseTensor with same rank as a.
+    :param b: Tensor or SparseTensor with rank 2 or 3.
     :param transpose_a: bool, transpose innermost two dimensions of a.
     :param transpose_b: bool, transpose innermost two dimensions of b.
     :return: Tensor or SparseTensor with rank 2 or 3.
     """
     a_is_sparse_tensor = isinstance(a, tf.SparseTensor)
     b_is_sparse_tensor = isinstance(b, tf.SparseTensor)
+    # Handle case where we can use faster sparse-dense matmul
+    if K.ndim(a) == 2 and K.ndim(b) == 2:
+        if a_is_sparse_tensor and not b_is_sparse_tensor:
+            return tf.sparse.sparse_dense_matmul(a, b)
+        elif not a_is_sparse_tensor and b_is_sparse_tensor:
+            return ops.transpose(
+                tf.sparse.sparse_dense_matmul(ops.transpose(b), ops.transpose(a))
+            )
+    # Fallthrough to tfsp implementation (defaults to tf.matmul if neither is
+    # sparse)
     if a_is_sparse_tensor:
         a = tfsp.CSRSparseMatrix(a)
     if b_is_sparse_tensor:
