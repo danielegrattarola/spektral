@@ -6,29 +6,14 @@ from . import modes as modes
 from . import ops as ops
 
 
-def filter_dot(fltr, features):
-    """
-    Wrapper for matmul_A_B, specifically used to compute the matrix multiplication
-    between a graph filter and node features.
-    :param fltr:
-    :param features: the node features (N x F in single mode, batch x N x F in
-    mixed and batch mode).
-    :return: the filtered features.
-    """
-    mode = modes.autodetect_mode(fltr, features)
-    if mode == modes.SINGLE or mode == modes.BATCH:
-        return dot(fltr, features)
-    else:
-        # Mixed mode
-        return mixed_mode_dot(fltr, features)
-
-
 def dot(a, b, transpose_a=False, transpose_b=False):
     """
-    Dot product between a and b along innermost dimensions, for a and b with
-    same rank. Supports both dense and sparse multiplication (including
-    sparse-sparse). The innermost dimension of a must match the outermost
-    dimension of b, unless there is a shared batch size.
+    Dot product between `a` and `b`, with automatic handling of batch dimensions.
+    Supports both dense and sparse multiplication (including sparse-sparse).
+    The innermost dimension of `a` must match the outermost dimension of `b`,
+    unless there is a shared batch dimension.
+    Note that doing sparse-sparse multiplication of any rank and sparse-dense
+    multiplication with rank higher than 2 may result in slower computations.
     :param a: Tensor or SparseTensor with rank 2 or 3.
     :param b: Tensor or SparseTensor with rank 2 or 3.
     :param transpose_a: bool, transpose innermost two dimensions of a.
@@ -37,16 +22,22 @@ def dot(a, b, transpose_a=False, transpose_b=False):
     """
     a_is_sparse_tensor = isinstance(a, tf.SparseTensor)
     b_is_sparse_tensor = isinstance(b, tf.SparseTensor)
+
     # Handle case where we can use faster sparse-dense matmul
     if K.ndim(a) == 2 and K.ndim(b) == 2:
+        if transpose_a:
+            a = ops.transpose(a)
+        if transpose_b:
+            b = ops.transpose(b)
         if a_is_sparse_tensor and not b_is_sparse_tensor:
             return tf.sparse.sparse_dense_matmul(a, b)
         elif not a_is_sparse_tensor and b_is_sparse_tensor:
             return ops.transpose(
                 tf.sparse.sparse_dense_matmul(ops.transpose(b), ops.transpose(a))
             )
-    # Fallthrough to tfsp implementation (defaults to tf.matmul if neither is
-    # sparse)
+
+    # Fallthrough to tfsp implementation
+    # Defaults to tf.matmul if neither is sparse
     if a_is_sparse_tensor:
         a = tfsp.CSRSparseMatrix(a)
     if b_is_sparse_tensor:
@@ -61,10 +52,10 @@ def dot(a, b, transpose_a=False, transpose_b=False):
 def mixed_mode_dot(a, b):
     """
     Computes the equivalent of `tf.einsum('ij,bjk->bik', a, b)`, but
-    works for both dense and sparse input filters.
-    :param a: rank 2 Tensor or SparseTensor.
-    :param b: rank 3 Tensor or SparseTensor.
-    :return: rank 3 Tensor or SparseTensor.
+    works for both dense and sparse inputs.
+    :param a: Tensor or SparseTensor with rank 2.
+    :param b: Tensor or SparseTensor with rank 3.
+    :return: Tensor or SparseTensor with rank 3.
     """
     s_0_, s_1_, s_2_ = K.int_shape(b)
     B_T = ops.transpose(b, (1, 2, 0))
@@ -74,6 +65,21 @@ def mixed_mode_dot(a, b):
     output = ops.transpose(output, (2, 0, 1))
 
     return output
+
+
+def filter_dot(fltr, features):
+    """
+    Computes the matrix multiplication between a graph filter and node features,
+    automatically handling data modes.
+    :param fltr: Tensor or SparseTensor of rank 2 or 3.
+    :param features: Tensor or SparseTensor of rank 2 or 3.
+    :return: Tensor or SparseTensor with rank = max(rank(a), rank(b)).
+    """
+    mode = modes.autodetect_mode(fltr, features)
+    if mode == modes.SINGLE or mode == modes.BATCH:
+        return dot(fltr, features)
+    else:
+        return mixed_mode_dot(fltr, features)
 
 
 def matmul_A_B(a, b):
@@ -89,6 +95,7 @@ def matmul_A_B(a, b):
         output = mixed_mode_dot(a, b)
     elif mode == modes.iMIXED:
         # Inverted mixed (rank(a)=3, rank(b)=2)
+        # This implementation is faster than using rank 3 sparse matmul with tfsp
         s_1_a, s_2_a = tf.shape(a)[1], tf.shape(a)[2]
         s_1_b = tf.shape(b)[1]
         a_flat = ops.reshape(a, (-1, s_2_a))
