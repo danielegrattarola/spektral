@@ -21,15 +21,15 @@ class EdgeConditionedConv(GraphConv):
 
     For each node \( i \), this layer computes:
     $$
-        \Z_i =  \frac{1}{\mathcal{N}(i)} \sum\limits_{j \in \mathcal{N}(i)} \textrm{MLP}(\E_{ji}) \X_{j} + \b
+        \Z_i = \X_{i} \W_{\textrm{root}} + \sum\limits_{j \in \mathcal{N}(i)} \X_{j} \textrm{MLP}(\E_{ji}) + \b
     $$
-    where \(\textrm{MLP}\) is a multi-layer perceptron that outputs the
-    convolutional kernel \(\W\) as a function of edge attributes.
+    where \(\textrm{MLP}\) is a multi-layer perceptron that outputs an
+    edge-specific weight as a function of edge attributes.
 
     **Input**
 
     - Node features of shape `([batch], N, F)`;
-    - Binary adjacency matrices with self-loops, of shape `([batch], N, N)`;
+    - Binary adjacency matrices of shape `([batch], N, N)`;
     - Edge features. In single mode, shape `(num_edges, S)`; in batch mode, shape
     `(batch, N, N, S)`.
 
@@ -43,6 +43,8 @@ class EdgeConditionedConv(GraphConv):
     - `channels`: integer, number of output channels;
     - `kernel_network`: a list of integers representing the hidden neurons of
     the kernel-generating network;
+    - 'root': if False, the layer will not consider the root node for computing
+    the message passing (first term in equation above), but only the neighbours.
     - `activation`: activation function to use;
     - `use_bias`: bool, add a bias vector to the output;
     - `kernel_initializer`: initializer for the weights;
@@ -102,12 +104,13 @@ class EdgeConditionedConv(GraphConv):
                           bias_constraint=self.bias_constraint)
                 )
         self.kernel_network_layers.append(Dense(F_ * F, name='FGN_out'))
+
         if self.root:
             self.root_kernel = self.add_weight(name='root_kernel',
-                                              shape=(F, F_),
-                                              initializer=self.kernel_initializer,
-                                              regularizer=self.kernel_regularizer,
-                                              constraint=self.kernel_constraint)
+                                               shape=(F, F_),
+                                               initializer=self.kernel_initializer,
+                                               regularizer=self.kernel_regularizer,
+                                               constraint=self.kernel_constraint)
         else:
             self.root_kernel = None
         if self.use_bias:
@@ -134,9 +137,6 @@ class EdgeConditionedConv(GraphConv):
         F = K.int_shape(X)[-1]
         F_ = self.channels
 
-        # Normalize adjacency matrix
-        A = ops.normalize_A(A)
-
         # Filter network
         kernel_network = E
         for l in self.kernel_network_layers:
@@ -148,6 +148,8 @@ class EdgeConditionedConv(GraphConv):
         output = kernel * A[..., None, None]
         output = tf.einsum('abicf,aif->abc', output, X)
 
+        if self.root:
+            output += ops.dot(X, self.root_kernel)
         if self.use_bias:
             output = K.bias_add(output, self.bias)
         if self.activation is not None:
@@ -178,15 +180,15 @@ class EdgeConditionedConv(GraphConv):
         kernel = tf.reshape(kernel_network, target_shape)
 
         # Propagation
-        targets = A.indices[:, -2]
-        sources = A.indices[:, -1]
-        messages = tf.gather(X, sources)
+        index_i = A.indices[:, -2]
+        index_j = A.indices[:, -1]
+        messages = tf.gather(X, index_j)
         messages = ops.dot(messages[:, None, :], kernel)[:, 0, :]
-        aggregated = ops.scatter_sum(messages, targets, N)
+        aggregated = ops.scatter_sum(messages, index_i, N)
 
         # Update
         output = aggregated
-        if self.root_kernel is not None:
+        if self.root:
             output += ops.dot(X, self.root_kernel)
         if self.use_bias:
             output = K.bias_add(output, self.bias)
@@ -198,6 +200,7 @@ class EdgeConditionedConv(GraphConv):
     def get_config(self):
         config = {
             'kernel_network': self.kernel_network,
+            'root': self.root,
         }
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
