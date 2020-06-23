@@ -393,14 +393,14 @@ tanh;</li>
 <li><code>kernel_constraint</code>: constraint applied to the weights;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L51">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L53">[source]</a></span></p>
 <h4 id="globalsumpool">GlobalSumPool</h4>
 <pre><code class="python">spektral.layers.GlobalSumPool()
 </code></pre>
 
 <p>A global sum pooling layer. Pools a graph by computing the sum of its node
 features.</p>
-<p><strong>Mode</strong>: single, mixed, batch, disjoint.</p>
+<p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
 <p><strong>Input</strong></p>
 <ul>
 <li>Node features of shape <code>([batch], N, F)</code>;</li>
@@ -408,20 +408,20 @@ features.</p>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li>Pooled node features of shape <code>([batch], F)</code> (if single mode, shape will
+<li>Pooled node features of shape <code>(batch, F)</code> (if single mode, shape will
 be <code>(1, F)</code>).</li>
 </ul>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L80">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L82">[source]</a></span></p>
 <h4 id="globalavgpool">GlobalAvgPool</h4>
 <pre><code class="python">spektral.layers.GlobalAvgPool()
 </code></pre>
 
 <p>An average pooling layer. Pools a graph by computing the average of its node
 features.</p>
-<p><strong>Mode</strong>: single, mixed, batch, disjoint.</p>
+<p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
 <p><strong>Input</strong></p>
 <ul>
 <li>Node features of shape <code>([batch], N, F)</code>;</li>
@@ -429,20 +429,20 @@ features.</p>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li>Pooled node features of shape <code>([batch], F)</code> (if single mode, shape will
+<li>Pooled node features of shape <code>(batch, F)</code> (if single mode, shape will
 be <code>(1, F)</code>).</li>
 </ul>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L109">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L111">[source]</a></span></p>
 <h4 id="globalmaxpool">GlobalMaxPool</h4>
 <pre><code class="python">spektral.layers.GlobalMaxPool()
 </code></pre>
 
 <p>A max pooling layer. Pools a graph by computing the maximum of its node
 features.</p>
-<p><strong>Mode</strong>: single, mixed, batch, disjoint.</p>
+<p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
 <p><strong>Input</strong></p>
 <ul>
 <li>Node features of shape <code>([batch], N, F)</code>;</li>
@@ -450,13 +450,13 @@ features.</p>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li>Pooled node features of shape <code>([batch], F)</code> (if single mode, shape will
+<li>Pooled node features of shape <code>(batch, F)</code> (if single mode, shape will
 be <code>(1, F)</code>).</li>
 </ul>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L138">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L140">[source]</a></span></p>
 <h4 id="globalattentionpool">GlobalAttentionPool</h4>
 <pre><code class="python">spektral.layers.GlobalAttentionPool(channels, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -468,7 +468,7 @@ be <code>(1, F)</code>).</li>
 \X' = \sum\limits_{i=1}^{N} (\sigma(\X \W_1 + \b_1) \odot (\X \W_2 + \b_2))_i
 </script>
 where <script type="math/tex">\sigma</script> is the sigmoid activation function.</p>
-<p><strong>Mode</strong>: single, mixed, batch, disjoint.</p>
+<p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
 <p><strong>Input</strong></p>
 <ul>
 <li>Node features of shape <code>([batch], N, F)</code>;</li>
@@ -476,7 +476,7 @@ where <script type="math/tex">\sigma</script> is the sigmoid activation function
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li>Pooled node features of shape <code>([batch], channels)</code> (if single mode,
+<li>Pooled node features of shape <code>(batch, channels)</code> (if single mode,
 shape will be <code>(1, channels)</code>).</li>
 </ul>
 <p><strong>Arguments</strong></p>
@@ -489,7 +489,7 @@ shape will be <code>(1, channels)</code>).</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vectors.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L250">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L252">[source]</a></span></p>
 <h4 id="globalattnsumpool">GlobalAttnSumPool</h4>
 <pre><code class="python">spektral.layers.GlobalAttnSumPool(attn_kernel_initializer='glorot_uniform', attn_kernel_regularizer=None, attn_kernel_constraint=None)
 </code></pre>
@@ -503,7 +503,7 @@ coefficients to sum node features.</p>
 </script>
 where <script type="math/tex">\a \in \mathbb{R}^F</script> is a trainable vector. Note that the softmax
 is applied across nodes, and not across features.</p>
-<p><strong>Mode</strong>: single, mixed, batch, disjoint.</p>
+<p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
 <p><strong>Input</strong></p>
 <ul>
 <li>Node features of shape <code>([batch], N, F)</code>;</li>
@@ -511,7 +511,7 @@ is applied across nodes, and not across features.</p>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li>Pooled node features of shape <code>([batch], F)</code> (if single mode, shape will
+<li>Pooled node features of shape <code>(batch, F)</code> (if single mode, shape will
 be <code>(1, F)</code>).</li>
 </ul>
 <p><strong>Arguments</strong></p>
@@ -523,29 +523,30 @@ matrix;</li>
 matrix;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L345">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L347">[source]</a></span></p>
 <h4 id="sortpool">SortPool</h4>
 <pre><code class="python">spektral.layers.SortPool(k)
 </code></pre>
 
-<p>SortPool layer pooling the top <script type="math/tex">k</script> most relevant nodes as described by
-<a href="https://www.cse.wustl.edu/~muhan/papers/AAAI_2018_DGCNN.pdf">Zhang et al.</a></p>
-<p>This layers takes a graph signal <script type="math/tex">\mathbf{X}</script> and sorts the rows by the
-elements of its last column. It then keeps the top <script type="math/tex">k</script> rows.
-Should <script type="math/tex">\mathbf{X}</script> have less than <script type="math/tex">k</script> rows, it sorts and then adds rows
-full of zeros until <script type="math/tex">\mathbf{X}</script> has <script type="math/tex">k</script> rows.</p>
-<p><strong>Mode</strong>: single, batch.</p>
+<p>A SortPool layer as described by
+<a href="https://www.cse.wustl.edu/~muhan/papers/AAAI_2018_DGCNN.pdf">Zhang et al</a>.
+This layers takes a graph signal <script type="math/tex">\mathbf{X}</script> and returns the topmost k
+rows according to the last column.
+If <script type="math/tex">\mathbf{X}</script> has less than k rows, the result is zero-padded to k.</p>
+<p><strong>Mode</strong>: single, disjoint, batch.</p>
 <p><strong>Input</strong></p>
 <ul>
 <li>Node features of shape <code>([batch], N, F)</code>;</li>
+<li>Graph IDs of shape <code>(N, )</code> (only in disjoint mode);</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li>Pooled node features of shape <code>([batch], k, F)</code>;</li>
+<li>Pooled node features of shape <code>(batch, k, F)</code> (if single mode, shape will
+be <code>(1, k, F)</code>).</li>
 </ul>
 <p><strong>Arguments</strong></p>
 <ul>
-<li><code>k</code>: number of nodes to keep;</li>
+<li><code>k</code>: integer, number of nodes to keep;</li>
 </ul>
               
             </div>

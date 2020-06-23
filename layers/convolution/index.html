@@ -229,7 +229,7 @@
 
 <p>A graph convolutional layer (GCN) as presented by
 <a href="https://arxiv.org/abs/1609.02907">Kipf &amp; Welling (2016)</a>.</p>
-<p><strong>Mode</strong>: single, mixed, batch.</p>
+<p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
 <p>This layer computes:
 <script type="math/tex; mode=display">
 \Z = \hat \D^{-1/2} \hat \A \hat \D^{-1/2} \X \W + \b
@@ -268,7 +268,7 @@ dimension changed to <code>channels</code>.</li>
 
 <p>A Chebyshev convolutional layer as presented by
 <a href="https://arxiv.org/abs/1606.09375">Defferrard et al. (2016)</a>.</p>
-<p><strong>Mode</strong>: single, mixed, batch.</p>
+<p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
 <p>This layer computes:
 <script type="math/tex; mode=display">
 \Z = \sum \limits_{k=0}^{K - 1} \T^{(k)} \W^{(k)}  + \b^{(k)},
@@ -319,7 +319,7 @@ dimension changed to <code>channels</code>.</li>
 
 <p>A GraphSAGE layer as presented by
 <a href="https://arxiv.org/abs/1706.02216">Hamilton et al. (2017)</a>.</p>
-<p><strong>Mode</strong>: single.</p>
+<p><strong>Mode</strong>: single, disjoint.</p>
 <p>This layer computes:
 <script type="math/tex; mode=display">
 \Z = \big[ \textrm{AGGREGATE}(\X) \| \X \big] \W + \b; \\
@@ -361,7 +361,7 @@ dimension changed to <code>channels</code>.</li>
 
 <p>A graph convolutional layer with ARMA<script type="math/tex">_K</script> filters, as presented by
 <a href="https://arxiv.org/abs/1901.01343">Bianchi et al. (2019)</a>.</p>
-<p><strong>Mode</strong>: single, mixed, batch.</p>
+<p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
 <p>This layer computes:
 <script type="math/tex; mode=display">
 \Z = \frac{1}{K} \sum\limits_{k=1}^K \bar\X_k^{(T)},
@@ -418,21 +418,21 @@ stack;</li>
 
 <p>An edge-conditioned convolutional layer (ECC) as presented by
 <a href="https://arxiv.org/abs/1704.02901">Simonovsky &amp; Komodakis (2017)</a>.</p>
-<p><strong>Mode</strong>: single, batch.</p>
+<p><strong>Mode</strong>: single, disjoint, batch.</p>
 <p><strong>Notes</strong>:
 - This layer expects dense inputs and self-loops when working in batch mode.
 - In single mode, if the adjacency matrix is dense it will be converted
 to a SparseTensor automatically (which is an expensive operation).</p>
 <p>For each node <script type="math/tex"> i </script>, this layer computes:
 <script type="math/tex; mode=display">
-\Z_i =  \frac{1}{\mathcal{N}(i)} \sum\limits_{j \in \mathcal{N}(i)} \textrm{MLP}(\E_{ji}) \X_{j} + \b
+\Z_i = \X_{i} \W_{\textrm{root}} + \sum\limits_{j \in \mathcal{N}(i)} \X_{j} \textrm{MLP}(\E_{ji}) + \b
 </script>
-where <script type="math/tex">\textrm{MLP}</script> is a multi-layer perceptron that outputs the
-convolutional kernel <script type="math/tex">\W</script> as a function of edge attributes.</p>
+where <script type="math/tex">\textrm{MLP}</script> is a multi-layer perceptron that outputs an
+edge-specific weight as a function of edge attributes.</p>
 <p><strong>Input</strong></p>
 <ul>
 <li>Node features of shape <code>([batch], N, F)</code>;</li>
-<li>Binary adjacency matrices with self-loops, of shape <code>([batch], N, N)</code>;</li>
+<li>Binary adjacency matrices of shape <code>([batch], N, N)</code>;</li>
 <li>Edge features. In single mode, shape <code>(num_edges, S)</code>; in batch mode, shape
 <code>(batch, N, N, S)</code>.</li>
 </ul>
@@ -446,6 +446,8 @@ changed to <code>channels</code>.</li>
 <li><code>channels</code>: integer, number of output channels;</li>
 <li><code>kernel_network</code>: a list of integers representing the hidden neurons of
 the kernel-generating network;</li>
+<li>'root': if False, the layer will not consider the root node for computing
+the message passing (first term in equation above), but only the neighbours.</li>
 <li><code>activation</code>: activation function to use;</li>
 <li><code>use_bias</code>: bool, add a bias vector to the output;</li>
 <li><code>kernel_initializer</code>: initializer for the weights;</li>
@@ -464,7 +466,7 @@ the kernel-generating network;</li>
 
 <p>A graph attention layer (GAT) as presented by
 <a href="https://arxiv.org/abs/1710.10903">Velickovic et al. (2017)</a>.</p>
-<p><strong>Mode</strong>: single, mixed, batch.</p>
+<p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
 <p><strong>This layer expects dense inputs when working in batch mode.</strong></p>
 <p>This layer computes a convolution similar to <code>layers.GraphConv</code>, but
 uses the attention mechanism to weight the adjacency matrix instead of
@@ -536,7 +538,7 @@ the given input (one N x N matrix for each head).</li>
 </code></pre>
 
 <p>A simple convolutional layer with a skip connection.</p>
-<p><strong>Mode</strong>: single, mixed, batch.</p>
+<p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
 <p>This layer computes:
 <script type="math/tex; mode=display">
 \Z = \D^{-1/2} \A \D^{-1/2} \X \W_1 + \X \W_2 + \b
@@ -582,7 +584,7 @@ dimension changed to <code>channels</code>.</li>
 </script>
 where <script type="math/tex">\alpha</script> is the <em>teleport</em> probability and <script type="math/tex">\textrm{MLP}</script> is a
 multi-layer perceptron.</p>
-<p><strong>Mode</strong>: single, mixed, batch.</p>
+<p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
 <p><strong>Input</strong></p>
 <ul>
 <li>Node features of shape <code>([batch], N, F)</code>;</li>
@@ -621,7 +623,7 @@ layer in the MLP (if None, the MLP has only the output layer);</li>
 
 <p>A Graph Isomorphism Network (GIN) as presented by
 <a href="https://arxiv.org/abs/1810.00826">Xu et al. (2018)</a>.</p>
-<p><strong>Mode</strong>: single.</p>
+<p><strong>Mode</strong>: single, disjoint.</p>
 <p><strong>This layer expects a sparse adjacency matrix.</strong></p>
 <p>This layer computes for each node <script type="math/tex">i</script>:
 <script type="math/tex; mode=display">
@@ -666,7 +668,7 @@ layer in the MLP (if None, the MLP has only the output layer);</li>
 
 <p>Applies Graph Diffusion Convolution as descibed by
 <a href="https://arxiv.org/pdf/1707.01926.pdf">Li et al. (2016)</a></p>
-<p><strong>Mode</strong>: single, mixed, batch.</p>
+<p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
 <p><strong>This layer expects a dense adjacency matrix.</strong></p>
 <p>Given a number of diffusion steps <script type="math/tex">K</script> and a row normalized adjacency matrix <script type="math/tex">\hat \A </script>,
 this layer calculates the q'th channel as:
@@ -708,7 +710,7 @@ dimension changed to <code>channels</code>.</li>
 
 <p>A gated graph convolutional layer as presented by
 <a href="https://arxiv.org/abs/1511.05493">Li et al. (2018)</a>.</p>
-<p><strong>Mode</strong>: single.</p>
+<p><strong>Mode</strong>: single, disjoint.</p>
 <p><strong>This layer expects a sparse adjacency matrix.</strong></p>
 <p>This layer repeatedly applies a GRU cell <script type="math/tex">L</script> times to the node attributes
 <script type="math/tex; mode=display">
@@ -753,7 +755,7 @@ changed to <code>channels</code>.</li>
 
 <p>An Attention-based Graph Neural Network (AGNN) as presented by
 <a href="https://arxiv.org/abs/1803.03735">Thekumparampil et al. (2018)</a>.</p>
-<p><strong>Mode</strong>: single.</p>
+<p><strong>Mode</strong>: single, disjoint.</p>
 <p><strong>This layer expects a sparse adjacency matrix.</strong></p>
 <p>This layer computes:
 <script type="math/tex; mode=display">
@@ -792,7 +794,7 @@ Otherwise, beta is fixed to 1;</li>
 
 <p>A Topology Adaptive Graph Convolutional layer (TAG) as presented by
 <a href="https://arxiv.org/abs/1710.10370">Du et al. (2017)</a>.</p>
-<p><strong>Mode</strong>: single.</p>
+<p><strong>Mode</strong>: single, disjoint.</p>
 <p><strong>This layer expects a sparse adjacency matrix.</strong></p>
 <p>This layer computes:
 <script type="math/tex; mode=display">
@@ -832,7 +834,7 @@ neighbourhood for each node);</li>
 
 <p>A Crystal Graph Convolutional layer as presented by
 <a href="https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.145301">Xie &amp; Grossman (2018)</a>.</p>
-<p><strong>Mode</strong>: single.</p>
+<p><strong>Mode</strong>: single, disjoint.</p>
 <p><strong>This layer expects a sparse adjacency matrix.</strong></p>
 <p>This layer computes for each node <script type="math/tex">i</script>:
 <script type="math/tex; mode=display">
@@ -877,7 +879,7 @@ changed to <code>channels</code>.</li>
 
 <p>An Edge Convolutional layer as presented by
 <a href="https://arxiv.org/abs/1801.07829">Wang et al. (2018)</a>.</p>
-<p><strong>Mode</strong>: single.</p>
+<p><strong>Mode</strong>: single, disjoint.</p>
 <p><strong>This layer expects a sparse adjacency matrix.</strong></p>
 <p>This layer computes for each node <script type="math/tex">i</script>:
 <script type="math/tex; mode=display">
@@ -918,7 +920,7 @@ layer in the MLP (if None, the MLP has only the output layer);</li>
 
 <p>A general class for message passing as presented by
 <a href="https://arxiv.org/abs/1704.01212">Gilmer et al. (2017)</a>.</p>
-<p><strong>Mode</strong>: single/disjoint.</p>
+<p><strong>Mode</strong>: single, disjoint.</p>
 <p><strong>This layer and all of its extensions expect a sparse adjacency matrix.</strong></p>
 <p>This layer computes:
 <script type="math/tex; mode=display">

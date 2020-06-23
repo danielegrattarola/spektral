@@ -83,6 +83,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#minkowskiproduct">MinkowskiProduct</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#disjoint2batch">Disjoint2Batch</a>
+    </li>
     </ul>
                     </li>
                 </ul>
@@ -152,7 +154,7 @@
               
                 <h2 id="base-layers">Base layers</h2>
 <p>This module contains a miscellany of layers that are not specifically for graph neural networks. </p>
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L82">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L84">[source]</a></span></p>
 <h4 id="innerproduct">InnerProduct</h4>
 <pre><code class="python">spektral.layers.InnerProduct(trainable_kernel=False, activation=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
 </code></pre>
@@ -191,7 +193,7 @@ product (e.g., <code>X @ W @ X.T</code>);</p>
 </li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L159">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L162">[source]</a></span></p>
 <h4 id="minkowskiproduct">MinkowskiProduct</h4>
 <pre><code class="python">spektral.layers.MinkowskiProduct(input_dim_1=None, activation=None)
 </code></pre>
@@ -224,6 +226,27 @@ output shape for your layer.</p>
 <li>
 <p><code>activation</code>: activation function to use;</p>
 </li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L234">[source]</a></span></p>
+<h4 id="disjoint2batch">Disjoint2Batch</h4>
+<pre><code class="python">spektral.layers.Disjoint2Batch()
+</code></pre>
+
+<p>Utility layer that converts data from disjoint mode to batch mode by
+zero-padding the node features and adjacency matrices.</p>
+<p><strong>Mode</strong>: disjoint.</p>
+<p><strong>This layer expects a sparse adjacency matrix.</strong></p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>(N, F)</code>;</li>
+<li>Binary adjacency matrix of shape <code>(N, N)</code>;</li>
+<li>Graph IDs of shape <code>(N, )</code>;</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Batched node features of shape <code>(batch, N_max, F)</code>;</li>
+<li>Batched adjacency matrix of shape <code>(batch, N_max, N_max)</code>;</li>
 </ul>
               
             </div>
