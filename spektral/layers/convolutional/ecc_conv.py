@@ -12,7 +12,7 @@ class EdgeConditionedConv(GraphConv):
     An edge-conditioned convolutional layer (ECC) as presented by
     [Simonovsky & Komodakis (2017)](https://arxiv.org/abs/1704.02901).
 
-    **Mode**: single, disjoint, disjoint, batch.
+    **Mode**: single, disjoint, batch.
 
     **Notes**:
         - This layer expects dense inputs and self-loops when working in batch mode.
