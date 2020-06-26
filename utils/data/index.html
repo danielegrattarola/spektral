@@ -161,6 +161,7 @@
 <a href="https://danielegrattarola.github.io/spektral/data/#disjoint-mode">disjoint mode</a>.</p>
 <p>Each entry i of the lists should be associated to the same graph, i.e.,
 <code>X_list[i].shape[0] == A_list[i].shape[0] == E_list[i].shape[0]</code>.</p>
+<p>The method also computes the batch index <code>I</code>.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
 <li>
@@ -179,6 +180,7 @@
 <li><code>A_out</code>: a rank 2 array of shape <code>(n_nodes, n_nodes)</code>;</li>
 <li><code>E_out</code>: (only if <code>E_list</code> is given) a rank 2 array of shape
 <code>(n_edges, S)</code>;</li>
+<li><code>I_out</code>: a rank 1 array of shape <code>(n_nodes, )</code>;</li>
 </ul>
 <hr />
 <h4 id="numpy_to_batch">numpy_to_batch</h4>
