@@ -70,13 +70,13 @@ def load_data(nf_keys=None, ef_keys=None, auto_pad=True, self_loops=False,
     labels = load_csv(labels_file)
     if amount is not None:
         labels = labels[:amount]
-    if return_type is 'sdf':
+    if return_type == 'sdf':
         return data, labels
     else:
         # Convert to Networkx
         data = [sdf_to_nx(_) for _ in data]
 
-    if return_type is 'numpy':
+    if return_type == 'numpy':
         if nf_keys is not None:
             if isinstance(nf_keys, str):
                 nf_keys = [nf_keys]
@@ -92,7 +92,7 @@ def load_data(nf_keys=None, ef_keys=None, auto_pad=True, self_loops=False,
                                   auto_pad=auto_pad, self_loops=self_loops,
                                   nf_keys=nf_keys, ef_keys=ef_keys)
         return adj, nf, ef, labels
-    elif return_type is 'networkx':
+    elif return_type == 'networkx':
         return data, labels
     else:
         # Should not get here
