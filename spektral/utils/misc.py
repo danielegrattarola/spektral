@@ -142,7 +142,7 @@ def int_to_one_hot(x, n=None):
                                  'n ({}), therefore 1-of-n encoding is not '
                                  'possible'.format(np.max(x), n))
         x = np.array(x, dtype=np.int)
-        if x.ndim is 1:
+        if x.ndim == 1:
             x = x[:, None]
         orig_shp = x.shape
         x = np.reshape(x, (-1, orig_shp[-1]))
