@@ -98,9 +98,9 @@ def generate_data(classes=0, n_samples_in_class=1000, n_nodes=7, support_low=0.,
     if one_hot_labels:
         labels = label_to_one_hot(labels, labels=classes)
 
-    if return_type is 'numpy':
+    if return_type == 'numpy':
         return adjacency, node_features, labels
-    elif return_type is 'networkx':
+    elif return_type == 'networkx':
         graphs = numpy_to_nx(adjacency, node_features=node_features, nf_name='coords')
         return graphs, labels
     else:
