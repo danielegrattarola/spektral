@@ -28,6 +28,9 @@ The difference between the four data modes can be easily seen in how `A`, `X`, a
 
 
 ## Single mode
+
+<img src="https://danielegrattarola.github.io/spektral/img/single_mode.svg" width="50%"/>
+
 In **single mode** the data describes a single graph where:
 
 - `A` is a sparse matrix of shape `(N, N)`;
@@ -48,6 +51,8 @@ Loading cora dataset
 ```
 
 ## Disjoint mode
+
+<img src="https://danielegrattarola.github.io/spektral/img/disjoint_mode.svg" width="50%"/>
 
 **Disjoint mode** is a smart way of representing a set of graphs as a single graph.
 In particular, the disjoint union of a batch is a graph where 
@@ -84,6 +89,9 @@ array([0, 0, 1, 1, 1])
 ```
 
 ## Batch mode
+
+<img src="https://danielegrattarola.github.io/spektral/img/batch_mode.svg" width="50%"/>
+
 In **batch mode**, graphs have the same number of nodes and are stacked in tensors of shape `(batch, N, ...)`. 
 Due to the general lack of support for sparse higher-order tensors both in Scipy and TensorFlow, `A` and `X` will be dense tensors.
 
@@ -110,6 +118,9 @@ Reading SDF
 ```
 
 ## Mixed mode
+
+<img src="https://danielegrattarola.github.io/spektral/img/mixed_mode.svg" width="50%"/>
+
 In **mixed mode** we consider a single adjacency matrix that acts as the support for different node attributes (also sometimes called "signals").
 
 In this case we have that: 

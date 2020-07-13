@@ -12,6 +12,8 @@ def numpy_to_disjoint(X_list, A_list, E_list=None):
     Each entry i of the lists should be associated to the same graph, i.e.,
     `X_list[i].shape[0] == A_list[i].shape[0] == E_list[i].shape[0]`.
 
+    The method also computes the batch index `I`.
+
     :param X_list: a list of np.arrays of shape `(N, F)`;
     :param A_list: a list of np.arrays or sparse matrices of shape `(N, N)`;
     :param E_list: a list of np.arrays of shape `(N, N, S)`;
@@ -20,6 +22,7 @@ def numpy_to_disjoint(X_list, A_list, E_list=None):
         -  `A_out`: a rank 2 array of shape `(n_nodes, n_nodes)`;
         -  `E_out`: (only if `E_list` is given) a rank 2 array of shape
         `(n_edges, S)`;
+        -  `I_out`: a rank 1 array of shape `(n_nodes, )`;
     """
     X_out = np.vstack(X_list)
     A_list = [sp.coo_matrix(a) for a in A_list]
