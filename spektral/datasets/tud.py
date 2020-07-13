@@ -16,14 +16,6 @@ from spektral.utils import io
 DATASET_URL = 'https://ls11-www.cs.tu-dortmund.de/people/morris/graphkerneldatasets'
 DATASET_CLEAN_URL = 'https://raw.githubusercontent.com/nd7141/graph_datasets/master/datasets'
 DATA_PATH = osp.expanduser('~/.spektral/datasets/')
-try:
-    AVAILABLE_DATASETS = [
-        d[:-4]
-        for d in pd.read_html(DATASET_URL)[0].Name[2:-1].values.tolist()
-    ]
-except URLError:
-    # No internet, don't panic
-    AVAILABLE_DATASETS = []
 
 
 def load_data(dataset_name, clean=False):
@@ -38,8 +30,6 @@ def load_data(dataset_name, clean=False):
     - node degrees, normalized as specified in `normalize_features`;
     - node labels, if available, one-hot encoded.
     :param dataset_name: name of the dataset to load (see `spektral.datasets.tud.AVAILABLE_DATASETS`).
-    :param normalize_features: `None`, `'zscore'` or `'ohe'`, how to normalize
-    the node features (only works for node attributes).
     :param clean: if True, return a version of the dataset with no isomorphic
     graphs.
     :return:
@@ -47,9 +37,6 @@ def load_data(dataset_name, clean=False):
     - a list of node feature matrices;
     - a numpy array containing the one-hot encoded targets.
     """
-    if AVAILABLE_DATASETS and dataset_name not in AVAILABLE_DATASETS:
-        raise ValueError('Available datasets: {}'.format(AVAILABLE_DATASETS))
-
     if clean:
         dataset_name += '_clean'
     if not osp.exists(DATA_PATH + dataset_name):
@@ -61,6 +48,18 @@ def load_data(dataset_name, clean=False):
     print('Successfully loaded {}.'.format(dataset_name))
 
     return A_list, X_list, y
+
+
+def available_datasets():
+    try:
+        return [
+            d[:-4]
+            for d in pd.read_html(DATASET_URL)[0].Name[2:-1].values.tolist()
+        ]
+    except URLError:
+        # No internet, don't panic
+        print('No connection. See {}'.format(DATASET_URL))
+        return []
 
 
 def _read_graphs(dataset_name):
@@ -110,7 +109,6 @@ def _read_graphs(dataset_name):
         X_list.append(X[start:stop])
         start = stop
 
-
     y = None
     if 'graph_attributes' in available:
         y = io.load_txt(file_prefix + '_graph_attributes.txt')
@@ -132,6 +130,10 @@ def _download_data(dataset_name):
 
     data_url = '{}/{}.zip'.format(url, true_name)
     req = requests.get(data_url)
+    if req.status_code == 404:
+        raise ValueError('Unknown dataset {}. See spektral.datasets.tud.available_datasets()'
+                         ' for a list of available datasets.'
+                         .format(dataset_name))
 
     os.makedirs(DATA_PATH, exist_ok=True)
     with open(DATA_PATH + dataset_name + '.zip', 'wb') as out_file:
