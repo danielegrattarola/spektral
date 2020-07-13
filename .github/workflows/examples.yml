@@ -10,9 +10,13 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python 3.7
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
         python-version: 3.7
+    - name: Lint Python code
+      run: |
+        pip install flake8
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
     - name: System Dependencies
       run: |
         sudo apt-get update
@@ -49,4 +53,3 @@ jobs:
           python $c_py
         done
         cd ..
-        
