@@ -8,7 +8,7 @@ import numpy as np
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.layers import Dense, Dropout
-from tensorflow.keras.losses import MeanSquaredError
+from tensorflow.keras.losses import CategoricalCrossentropy
 from tensorflow.keras.metrics import CategoricalAccuracy
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
@@ -71,7 +71,7 @@ class GIN0(Model):
 # Build model
 model = GIN0(channels, layers)
 opt = Adam(lr=learning_rate)
-loss_fn = MeanSquaredError()
+loss_fn = CategoricalCrossentropy()
 acc_fn = CategoricalAccuracy()
 
 
