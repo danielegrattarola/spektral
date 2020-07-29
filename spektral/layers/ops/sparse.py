@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 from scipy import sparse as sp
-from tensorflow.python import gen_sparse_ops
+from tensorflow.python.ops import gen_sparse_ops
 
 
 def sp_matrix_to_sp_tensor(x):
