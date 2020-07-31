@@ -32,7 +32,7 @@ def evaluate(A_list, X_list, y_list, ops_list, batch_size):
         A = ops.sp_matrix_to_sp_tensor(A)
         y = b[-1]
         pred = model([X, A, I], training=False)
-        outs = [o(pred, y) for o in ops_list]
+        outs = [o(y, pred) for o in ops_list]
         output.append(outs)
     return np.mean(output, 0)
 
