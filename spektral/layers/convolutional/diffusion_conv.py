@@ -52,6 +52,7 @@ class DiffuseFeatures(layers.Layer):
         # (theta in paper)
         self.kernel = self.add_weight(
             shape=(self.K,),
+            name="kernel",
             initializer=self.kernel_initializer,
             regularizer=self.kernel_regularizer,
             constraint=self.kernel_constraint,
