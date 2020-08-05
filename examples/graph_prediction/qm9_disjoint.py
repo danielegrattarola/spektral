@@ -1,9 +1,6 @@
 """
 This example shows how to perform regression of molecular properties with the
-QM9 database, using a simple GNN in disjoint mode .
-The main training loop is written in TensorFlow, because we need to avoid the
-restriction imposed by Keras that the input and the output have the same first
-dimension.
+QM9 database, using a simple GNN in disjoint mode.
 """
 
 import numpy as np
