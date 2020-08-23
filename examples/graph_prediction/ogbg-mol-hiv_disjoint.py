@@ -28,7 +28,7 @@ batch_size = 32       # Batch size
 ################################################################################
 # LOAD DATA
 ################################################################################
-dataset_name = 'ogbg-mol-hiv'
+dataset_name = 'ogbg-molhiv'
 dataset = GraphPropPredDataset(name=dataset_name)
 n_out = dataset.num_tasks
 
