@@ -7,7 +7,7 @@ theme:
 
 docs_dir: sources
 repo_url: 'https://github.com/danielegrattarola/spektral/'
-edit_uri: 'edit/master/docs/sources'
+edit_uri: ''
 site_author: Daniele Grattarola
 site_description: 'Spektral: Graph Neural Networks in TensorFlow 2 and Keras'
 google_analytics:

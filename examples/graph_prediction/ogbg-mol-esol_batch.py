@@ -12,7 +12,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 
 from spektral.datasets import ogb
-from spektral.layers import GINConv, MinCutPool, GlobalSumPool
+from spektral.layers import GraphConv, MinCutPool, GlobalSumPool
 from spektral.utils import pad_jagged_array
 
 ################################################################################
@@ -25,7 +25,7 @@ batch_size = 32       # Batch size
 ################################################################################
 # LOAD DATA
 ################################################################################
-dataset_name = 'ogbg-mol-esol'
+dataset_name = 'ogbg-molesol'
 dataset = GraphPropPredDataset(name=dataset_name)
 n_out = dataset.num_tasks
 N = max(g[0]['num_nodes'] for g in dataset)
@@ -48,9 +48,9 @@ X_te, A_te, y_te = X[te_idx], A[te_idx], y[te_idx]
 X_in = Input(shape=(N, F))
 A_in = Input(shape=(N, N))
 
-X_1 = GINConv(32, mlp_hidden=[32], activation='relu')([X_in, A_in])
+X_1 = GraphConv(32, activation='relu')([X_in, A_in])
 X_1, A_1 = MinCutPool(N // 2)([X_1, A_in])
-X_2 = GINConv(32, mlp_hidden=[32], activation='relu')([X_1, A_1])
+X_2 = GraphConv(32, activation='relu')([X_1, A_1])
 X_3 = GlobalSumPool()(X_2)
 output = Dense(n_out)(X_3)
 
