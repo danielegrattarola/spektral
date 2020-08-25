@@ -16,10 +16,14 @@ def graph_to_numpy(graph, dtype=None):
             `None` otherwise.
     """
     N = graph['num_nodes']
-    X = graph['node_feat'].astype(dtype)
+    X = graph['node_feat']
+    if X is not None:
+        X = X.astype(dtype)
     row, col = graph['edge_index']
     A = sp.coo_matrix((np.ones_like(row), (row, col)), shape=(N, N)).astype(dtype)
-    E = graph['edge_feat'].astype(dtype)
+    E = graph['edge_feat']
+    if E is not None:
+        E = E.astype(dtype)
 
     return X, A, E
 
