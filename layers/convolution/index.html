@@ -416,9 +416,11 @@ stack;</li>
 <p>An edge-conditioned convolutional layer (ECC) as presented by
 <a href="https://arxiv.org/abs/1704.02901">Simonovsky &amp; Komodakis (2017)</a>.</p>
 <p><strong>Mode</strong>: single, disjoint, batch.</p>
-<p><strong>Notes</strong>:
-- In single mode, if the adjacency matrix is dense it will be converted
-to a SparseTensor automatically (which is an expensive operation).</p>
+<p><strong>Notes</strong>:</p>
+<ul>
+<li>In single mode, if the adjacency matrix is dense it will be converted
+to a SparseTensor automatically (which is an expensive operation).</li>
+</ul>
 <p>For each node <script type="math/tex"> i </script>, this layer computes:
 <script type="math/tex; mode=display">
 \Z_i = \X_{i} \W_{\textrm{root}} + \sum\limits_{j \in \mathcal{N}(i)} \X_{j} \textrm{MLP}(\E_{ji}) + \b
