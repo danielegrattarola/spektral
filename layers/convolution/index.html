@@ -167,9 +167,6 @@
     <li>Convolutional Layers</li>
     <li class="wy-breadcrumbs-aside">
       
-        <a href="https://github.com/danielegrattarola/spektral/edit/master/docs/sources/layers/convolution.md"
-          class="icon icon-github"> Edit on GitHub</a>
-      
     </li>
   </ul>
   
@@ -419,10 +416,12 @@ stack;</li>
 <p>An edge-conditioned convolutional layer (ECC) as presented by
 <a href="https://arxiv.org/abs/1704.02901">Simonovsky &amp; Komodakis (2017)</a>.</p>
 <p><strong>Mode</strong>: single, disjoint, batch.</p>
-<p><strong>Notes</strong>:
-- This layer expects dense inputs and self-loops when working in batch mode.
-- In single mode, if the adjacency matrix is dense it will be converted
-to a SparseTensor automatically (which is an expensive operation).</p>
+<p><strong>Notes</strong>:</p>
+<ul>
+<li>This layer expects dense inputs and self-loops when working in batch mode.</li>
+<li>In single mode, if the adjacency matrix is dense it will be converted
+to a SparseTensor automatically (which is an expensive operation).</li>
+</ul>
 <p>For each node <script type="math/tex"> i </script>, this layer computes:
 <script type="math/tex; mode=display">
 \Z_i = \X_{i} \W_{\textrm{root}} + \sum\limits_{j \in \mathcal{N}(i)} \X_{j} \textrm{MLP}(\E_{ji}) + \b
@@ -661,7 +660,7 @@ layer in the MLP (if None, the MLP has only the output layer);</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/diffusion_conv.py#L83">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/diffusion_conv.py#L84">[source]</a></span></p>
 <h4 id="diffusionconv">DiffusionConv</h4>
 <pre><code class="python">spektral.layers.DiffusionConv(channels, num_diffusion_steps=6, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None, activation='tanh')
 </code></pre>
