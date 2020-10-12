@@ -15,7 +15,7 @@ class EdgeConditionedConv(GraphConv):
     **Mode**: single, disjoint, batch.
 
     **Notes**:
-        - This layer expects dense inputs and self-loops when working in batch mode.
+
         - In single mode, if the adjacency matrix is dense it will be converted
         to a SparseTensor automatically (which is an expensive operation).
 
