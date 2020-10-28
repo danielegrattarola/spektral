@@ -10,7 +10,7 @@ from tensorflow.keras.regularizers import l2
 from spektral.datasets import mnist
 from spektral.layers import GraphConv
 from spektral.layers.ops import sp_matrix_to_sp_tensor
-from spektral.utils import batch_iterator
+from spektral.data.utils import batch_generator
 
 # Parameters
 learning_rate = 1e-3  # Learning rate for Adam
@@ -87,7 +87,7 @@ best_val_loss = 99999
 current_patience = patience
 curent_batch = 0
 batches_in_epoch = int(np.ceil(x_tr.shape[0] / batch_size))
-batches_tr = batch_iterator([x_tr, y_tr], batch_size=batch_size, epochs=epochs)
+batches_tr = batch_generator([x_tr, y_tr], batch_size=batch_size, epochs=epochs)
 
 # Training loop
 results_tr = []
@@ -100,7 +100,7 @@ for batch in batches_tr:
     results_tr.append((l, a))
 
     if curent_batch == batches_in_epoch:
-        batches_va = batch_iterator([x_va, y_va], batch_size=batch_size)
+        batches_va = batch_generator([x_va, y_va], batch_size=batch_size)
         results_va = [evaluate(*batch) for batch in batches_va]
         results_va = np.array(results_va)
         loss_va, acc_va = results_va.mean(0)
@@ -108,7 +108,7 @@ for batch in batches_tr:
             best_val_loss = loss_va
             current_patience = patience
             # Test
-            batches_te = batch_iterator([x_te, y_te], batch_size=batch_size)
+            batches_te = batch_generator([x_te, y_te], batch_size=batch_size)
             results_te = [evaluate(*batch) for batch in batches_te]
             results_te = np.array(results_te)
         else:
