@@ -16,7 +16,7 @@ from tensorflow.keras.optimizers import Adam
 
 from spektral.datasets import ogb
 from spektral.layers import EdgeConditionedConv, ops, GlobalSumPool
-from spektral.utils import batch_iterator, numpy_to_disjoint
+from spektral.data.utils import numpy_to_disjoint, batch_generator
 
 ################################################################################
 # PARAMETERS
@@ -86,8 +86,8 @@ model_loss = 0
 batches_in_epoch = np.ceil(len(A_tr) / batch_size)
 
 print('Fitting model')
-batches_train = batch_iterator([X_tr, A_tr, E_tr, y_tr],
-                               batch_size=batch_size, epochs=epochs)
+batches_train = batch_generator([X_tr, A_tr, E_tr, y_tr],
+                                batch_size=batch_size, epochs=epochs)
 for b in batches_train:
     X_, A_, E_, I_ = numpy_to_disjoint(*b[:-1])
     A_ = ops.sp_matrix_to_sp_tensor(A_)
@@ -107,7 +107,7 @@ for b in batches_train:
 print('Testing model')
 evaluator = Evaluator(name=dataset_name)
 y_pred = []
-batches_test = batch_iterator([X_te, A_te, E_te], batch_size=batch_size)
+batches_test = batch_generator([X_te, A_te, E_te], batch_size=batch_size)
 for b in batches_test:
     X_, A_, E_, I_ = numpy_to_disjoint(*b)
     A_ = ops.sp_matrix_to_sp_tensor(A_)

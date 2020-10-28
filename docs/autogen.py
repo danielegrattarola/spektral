@@ -8,6 +8,7 @@ import re
 import shutil
 import sys
 
+import spektral.data.utils
 from spektral import chem
 from spektral import datasets
 from spektral import layers
@@ -142,9 +143,9 @@ PAGES = [
     {
         'page': 'utils/data.md',
         'functions': [
-            utils.data.numpy_to_disjoint,
-            utils.data.numpy_to_batch,
-            utils.data.batch_iterator
+            spektral.data.utils.numpy_to_disjoint,
+            spektral.data.utils.numpy_to_batch,
+            spektral.data.utils.batch_generator
         ]
     },
     {
