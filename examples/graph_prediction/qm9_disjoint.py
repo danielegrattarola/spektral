@@ -13,7 +13,7 @@ from tensorflow.keras.optimizers import Adam
 
 from spektral.datasets import qm9
 from spektral.layers import EdgeConditionedConv, ops, GlobalSumPool
-from spektral.utils import batch_iterator, numpy_to_disjoint
+from spektral.data.utils import numpy_to_disjoint, batch_generator
 from spektral.utils import label_to_one_hot
 
 ################################################################################
@@ -98,8 +98,8 @@ model_loss = 0
 batches_in_epoch = np.ceil(len(A_train) / batch_size)
 
 print('Fitting model')
-batches_train = batch_iterator([X_train, A_train, E_train, y_train],
-                               batch_size=batch_size, epochs=epochs)
+batches_train = batch_generator([X_train, A_train, E_train, y_train],
+                                batch_size=batch_size, epochs=epochs)
 for b in batches_train:
     X_, A_, E_, I_ = numpy_to_disjoint(*b[:-1])
     A_ = ops.sp_matrix_to_sp_tensor(A_)
@@ -119,7 +119,7 @@ for b in batches_train:
 print('Testing model')
 model_loss = 0
 batches_in_epoch = np.ceil(len(A_test) / batch_size)
-batches_test = batch_iterator([X_test, A_test, E_test, y_test], batch_size=batch_size)
+batches_test = batch_generator([X_test, A_test, E_test, y_test], batch_size=batch_size)
 for b in batches_test:
     X_, A_, E_, I_ = numpy_to_disjoint(*b[:-1])
     A_ = ops.sp_matrix_to_sp_tensor(A_)

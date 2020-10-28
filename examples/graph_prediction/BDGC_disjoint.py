@@ -21,11 +21,11 @@ from spektral.layers import GraphConvSkip, GlobalAvgPool
 from spektral.layers import ops
 from spektral.layers.pooling import TopKPool
 from spektral.utils.convolution import normalized_adjacency
-from spektral.utils.data import batch_iterator, numpy_to_disjoint
+from spektral.data.utils import numpy_to_disjoint, batch_generator
 
 
 def evaluate(A_list, X_list, y_list, ops_list, batch_size):
-    batches = batch_iterator([X_list, A_list, y_list], batch_size=batch_size)
+    batches = batch_generator([X_list, A_list, y_list], batch_size=batch_size)
     output = []
     for b in batches:
         X, A, I = numpy_to_disjoint(*b[:-1])
@@ -124,8 +124,8 @@ patience = es_patience
 batches_in_epoch = np.ceil(y_train.shape[0] / batch_size)
 
 print('Fitting model')
-batches = batch_iterator([X_train, A_train, y_train],
-                         batch_size=batch_size, epochs=epochs)
+batches = batch_generator([X_train, A_train, y_train],
+                          batch_size=batch_size, epochs=epochs)
 for b in batches:
     current_batch += 1
 

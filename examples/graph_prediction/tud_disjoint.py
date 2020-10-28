@@ -15,7 +15,7 @@ from tensorflow.keras.optimizers import Adam
 
 from spektral.datasets import tud
 from spektral.layers import GINConv, GlobalAvgPool, ops
-from spektral.utils import batch_iterator, numpy_to_disjoint
+from spektral.data.utils import numpy_to_disjoint, batch_generator
 
 ################################################################################
 # PARAMETERS
@@ -100,8 +100,8 @@ model_lss = model_acc = 0
 batches_in_epoch = np.ceil(len(a_train) / batch_size)
 
 print('Fitting model')
-batches_train = batch_iterator([x_train, a_train, y_train],
-                               batch_size=batch_size, epochs=epochs)
+batches_train = batch_generator([x_train, a_train, y_train],
+                                batch_size=batch_size, epochs=epochs)
 for b in batches_train:
     x_, a_, i_ = numpy_to_disjoint(*b[:-1])
     a_ = ops.sp_matrix_to_sp_tensor(a_)
@@ -124,7 +124,7 @@ for b in batches_train:
 print('Testing model')
 model_lss = model_acc = 0
 batches_in_epoch = np.ceil(len(a_test) / batch_size)
-batches_test = batch_iterator([x_test, a_test, y_test], batch_size=batch_size)
+batches_test = batch_generator([x_test, a_test, y_test], batch_size=batch_size)
 for b in batches_test:
     x_, a_, i_ = numpy_to_disjoint(*b[:-1])
     a_ = ops.sp_matrix_to_sp_tensor(a_)
