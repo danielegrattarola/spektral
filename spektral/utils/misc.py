@@ -2,7 +2,7 @@ import numpy as np
 from scipy import sparse as sp
 
 
-def pad_jagged_array(x, target_shape, dtype=np.float):
+def pad_jagged_array(x, target_shape):
     """
     Given a jagged array of arbitrary dimensions, zero-pads all elements in the
     array to match the provided `target_shape`.
@@ -13,12 +13,12 @@ def pad_jagged_array(x, target_shape, dtype=np.float):
     If `target_shape[i] = -1`, it will be automatically converted to X.shape[i], 
     so that passing a target shape of e.g. (-1, n, m) will leave the first 
     dimension of each element untouched (note that the creation of the output
-    array may fail if the result is again a jagged array). 
-    :param dtype: the dtype of the returned np.array
+    array may fail if the result is again a jagged array).
     :return: a zero-padded np.array of shape `(X.shape[0], ) + target_shape`
     """
     if isinstance(x, list):
-        x = np.array(x)
+        x = np.array(x, dtype=object)
+
     for i in range(len(x)):
         shapes = []
         for j in range(len(target_shape)):
@@ -30,6 +30,7 @@ def pad_jagged_array(x, target_shape, dtype=np.float):
         else:
             x = np.pad(x, [(0, 0)] + [(0, ts - cs) for ts, cs in shapes], 'constant')
 
+    dtype = x[0].dtype if len(x) > 0 else None
     try:
         return np.array(x, dtype=dtype)
     except ValueError:
