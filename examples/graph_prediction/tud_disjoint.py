@@ -15,7 +15,7 @@ from tensorflow.keras.optimizers import Adam
 
 from spektral.datasets import tud
 from spektral.layers import GINConv, GlobalAvgPool, ops
-from spektral.data.utils import numpy_to_disjoint, batch_generator
+from spektral.data.utils import to_disjoint, batch_generator
 
 ################################################################################
 # PARAMETERS
@@ -103,7 +103,7 @@ print('Fitting model')
 batches_train = batch_generator([x_train, a_train, y_train],
                                 batch_size=batch_size, epochs=epochs)
 for b in batches_train:
-    x_, a_, i_ = numpy_to_disjoint(*b[:-1])
+    x_, a_, i_ = to_disjoint(*b[:-1])
     a_ = ops.sp_matrix_to_sp_tensor(a_)
     y_ = b[-1]
     lss, acc = train_step(x_, a_, i_, y_)
@@ -126,7 +126,7 @@ model_lss = model_acc = 0
 batches_in_epoch = np.ceil(len(a_test) / batch_size)
 batches_test = batch_generator([x_test, a_test, y_test], batch_size=batch_size)
 for b in batches_test:
-    x_, a_, i_ = numpy_to_disjoint(*b[:-1])
+    x_, a_, i_ = to_disjoint(*b[:-1])
     a_ = ops.sp_matrix_to_sp_tensor(a_)
     y_ = b[-1]
     predictions = model([x_, a_, i_], training=False)

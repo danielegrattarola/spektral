@@ -70,10 +70,10 @@ Hierarchical pooling layers will return a reduced version of `I` along with the 
 Utilities for creating the disjoint union of a list of graphs are provided in `spektral.utils.data`:
 
 ```py
->>> from spektral.utils.data import numpy_to_disjoint
+>>> from spektral.utils.data import to_disjoint
 >>> A_list = [np.ones((2, 2)), np.ones((3, 3))]  # One graph has 2 nodes, the other has 3
 >>> X_list = [np.random.randn(2, 4), np.random.randn(3, 4)]  # F = 4
->>> X, A, I = numpy_to_disjoint(X_list, A_list)
+>>> X, A, I = to_disjoint(X_list, A_list)
 >>> X.shape
 (5, 4)
 >>> A.shape

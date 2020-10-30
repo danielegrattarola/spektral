@@ -5,6 +5,8 @@ import tensorflow as tf
 from spektral.data import Graph
 from spektral.data.utils import get_spec
 
+import numpy as np
+
 
 class Dataset:
     """
@@ -88,10 +90,11 @@ class Dataset:
         return signature
 
     def __getitem__(self, key):
-        if not (isinstance(key, (int, slice, list, tuple))):
+        if not (np.issubdtype(type(key), np.integer) or
+                isinstance(key, (slice, list, tuple))):
             raise ValueError('Unsupported key type: {}'.format(type(key)))
-        if isinstance(key, int):
-            return self.graphs[key]
+        if np.issubdtype(type(key), np.integer):
+            return self.graphs[int(key)]
         else:
             dataset = copy.copy(self)
             if isinstance(key, slice):

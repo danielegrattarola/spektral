@@ -21,14 +21,14 @@ from spektral.layers import GraphConvSkip, GlobalAvgPool
 from spektral.layers import ops
 from spektral.layers.pooling import TopKPool
 from spektral.utils.convolution import normalized_adjacency
-from spektral.data.utils import numpy_to_disjoint, batch_generator
+from spektral.data.utils import to_disjoint, batch_generator
 
 
 def evaluate(A_list, X_list, y_list, ops_list, batch_size):
     batches = batch_generator([X_list, A_list, y_list], batch_size=batch_size)
     output = []
     for b in batches:
-        X, A, I = numpy_to_disjoint(*b[:-1])
+        X, A, I = to_disjoint(*b[:-1])
         A = ops.sp_matrix_to_sp_tensor(A)
         y = b[-1]
         pred = model([X, A, I], training=False)
@@ -129,7 +129,7 @@ batches = batch_generator([X_train, A_train, y_train],
 for b in batches:
     current_batch += 1
 
-    X_, A_, I_ = numpy_to_disjoint(*b[:-1])
+    X_, A_, I_ = to_disjoint(*b[:-1])
     A_ = ops.sp_matrix_to_sp_tensor(A_)
     y_ = b[-1]
     outs = train_step(X_, A_, I_, y_)

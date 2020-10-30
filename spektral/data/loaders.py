@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 from scipy import sparse as sp
 
-from spektral.data.utils import prepend_none, output_signature, numpy_to_disjoint, numpy_to_batch, batch_generator
+from spektral.data.utils import prepend_none, output_signature, to_disjoint, to_batch, batch_generator
 from spektral.layers.ops import sp_matrix_to_sp_tensor
 
 version = tf.__version__.split('.')
@@ -63,7 +63,7 @@ class BatchLoader(Loader):
     def collate(self, data_list):
         data_packed = self._pack(data_list)
         y = np.array(data_packed[-1])
-        ret = numpy_to_batch(*data_packed[:-1])
+        ret = to_batch(*data_packed[:-1])
 
         return ret, y
 
@@ -95,7 +95,7 @@ class DisjointLoader(Loader):
     def collate(self, data_list):
         data_packed = self._pack(data_list)
         y = np.array(data_packed[-1])
-        ret = numpy_to_disjoint(*data_packed[:-1])
+        ret = to_disjoint(*data_packed[:-1])
         ret = list(ret)
         for i in range(len(ret)):
             if sp.issparse(ret[i]):
