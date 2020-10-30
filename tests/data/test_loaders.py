@@ -3,6 +3,7 @@ import numpy as np
 from spektral.data import DisjointLoader, BatchLoader
 from spektral.data.dataset import Dataset
 from spektral.data.graph import Graph
+from spektral.data.loaders import PackedBatchLoader
 
 n_graphs = 10
 ns = np.random.randint(3, 8, n_graphs)
@@ -47,6 +48,19 @@ def test_batch():
 
     (x, a, e), y = batches[-1]
     n = max(ns[-graphs_in_batch:])
+    assert x.shape == (graphs_in_batch, n, f)
+    assert a.shape == (graphs_in_batch, n, n)
+    assert e.shape == (graphs_in_batch, n, n, s)
+    assert y.shape == (graphs_in_batch, 2)
+
+
+def test_fast_batch():
+    data = TestDataset()
+    loader = PackedBatchLoader(data, batch_size=batch_size)
+    batches = [b for b in loader]
+
+    (x, a, e), y = batches[-1]
+    n = max(ns)
     assert x.shape == (graphs_in_batch, n, f)
     assert a.shape == (graphs_in_batch, n, n)
     assert e.shape == (graphs_in_batch, n, n, s)

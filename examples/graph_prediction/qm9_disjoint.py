@@ -5,18 +5,14 @@ QM9 database, using a simple GNN in disjoint mode.
 
 import numpy as np
 import tensorflow as tf
-from sklearn.model_selection import train_test_split
 from tensorflow.keras.layers import Input, Dense
 from tensorflow.keras.losses import MeanSquaredError
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 
 from spektral.data import DisjointLoader
-from spektral.datasets import qm9
 from spektral.datasets.qm9 import QM9
-from spektral.layers import EdgeConditionedConv, ops, GlobalSumPool
-from spektral.data.utils import to_disjoint, batch_generator
-from spektral.utils import label_to_one_hot
+from spektral.layers import EdgeConditionedConv, GlobalSumPool
 
 ################################################################################
 # PARAMETERS
@@ -59,6 +55,9 @@ opt = Adam(lr=learning_rate)
 loss_fn = MeanSquaredError()
 
 
+################################################################################
+# FIT MODEL
+################################################################################
 @tf.function(
     input_signature=((tf.TensorSpec((None, F), dtype=tf.float64),
                       tf.SparseTensorSpec((None, None), dtype=tf.int64),
@@ -76,14 +75,10 @@ def train_step(inputs, target):
     return loss
 
 
-################################################################################
-# FIT MODEL
-################################################################################
+print('Fitting model')
 current_batch = 0
 model_loss = 0
-
-print('Fitting model')
-loader_tr = DisjointLoader(dataset_tr, batch_size=batch_size, epochs=epochs, shuffle=True)
+loader_tr = DisjointLoader(dataset_tr, batch_size=batch_size, epochs=epochs)
 for batch in loader_tr:
     outs = train_step(*batch)
 
@@ -99,7 +94,7 @@ for batch in loader_tr:
 ################################################################################
 print('Testing model')
 model_loss = 0
-loader_te = DisjointLoader(dataset_te, batch_size=batch_size)
+loader_te = DisjointLoader(dataset_te, batch_size=batch_size, epochs=1)
 for batch in loader_te:
     inputs, target = batch
     predictions = model(inputs, training=False)
