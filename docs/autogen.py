@@ -143,8 +143,8 @@ PAGES = [
     {
         'page': 'utils/data.md',
         'functions': [
-            spektral.data.utils.numpy_to_disjoint,
-            spektral.data.utils.numpy_to_batch,
+            spektral.data.utils.to_disjoint,
+            spektral.data.utils.to_batch,
             spektral.data.utils.batch_generator
         ]
     },

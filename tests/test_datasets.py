@@ -1,4 +1,5 @@
 from spektral.datasets import delaunay, qm9, citation, graphsage, mnist, tud
+from spektral.data import DisjointLoader, BatchLoader
 
 
 def correctly_padded(adj, nf, ef):
@@ -39,13 +40,12 @@ def test_mnist():
 
 
 def test_qm9():
-    adj, nf, ef, labels = qm9.load_data(return_type='numpy', amount=1000)
-    correctly_padded(adj, nf, ef)
-    assert adj.shape[0] == labels.shape[0]
+    dataset = qm9.QM9(amount=100)
+    dl = DisjointLoader(dataset, batch_size=3)
+    dl.__next__()
 
-    # Test that it doesn't crash
-    qm9.load_data(return_type='networkx', amount=1000)
-    qm9.load_data(return_type='sdf', amount=1000)
+    bl = BatchLoader(dataset, batch_size=3)
+    bl.__next__()
 
 
 def test_tud():

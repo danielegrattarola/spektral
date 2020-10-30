@@ -1,22 +1,24 @@
 import numpy as np
 
 from spektral.data import Dataset, Graph
-from spektral.data.utils import numpy_to_disjoint, numpy_to_batch, batch_generator
+from spektral.data.utils import to_disjoint, to_batch, batch_generator
 from spektral.datasets import tud
 
 a_list, x_list, y = tud.load_data('ENZYMES', clean=True)
 
 
-def test_numpy_to_batch():
-    x, a = numpy_to_batch(x_list, a_list)
+def test_to_batch():
+    # TODO test e_list
+    x, a = to_batch(x_list, a_list)
     assert x.ndim == 3
     assert a.ndim == 3
     assert x.shape[0] == a.shape[0]
     assert x.shape[1] == a.shape[1] == a.shape[2]
 
 
-def test_numpy_to_disjoint():
-    x, a, i = numpy_to_disjoint(x_list, a_list)
+def test_to_disjoint():
+    # TODO test e_list
+    x, a, i = to_disjoint(x_list, a_list)
     assert x.ndim == 2
     assert a.ndim == 2
     assert x.shape[0] == a.shape[0] == a.shape[1]

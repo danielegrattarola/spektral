@@ -9,7 +9,9 @@ from tensorflow.keras.layers import Input, Dense
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 
+from spektral.data import BatchLoader
 from spektral.datasets import qm9
+from spektral.datasets.qm9 import QM9
 from spektral.layers import EdgeConditionedConv, GlobalSumPool
 from spektral.utils import label_to_one_hot
 
@@ -18,45 +20,29 @@ from spektral.utils import label_to_one_hot
 ################################################################################
 learning_rate = 1e-3  # Learning rate
 epochs = 10           # Number of training epochs
-batch_size = 32           # Batch size
+batch_size = 32       # Batch size
 
 ################################################################################
 # LOAD DATA
 ################################################################################
-A, X, E, y = qm9.load_data(return_type='numpy',
-                           nf_keys='atomic_num',
-                           ef_keys='type',
-                           self_loops=True,
-                           amount=1000)  # Set to None to train on whole dataset
-y = y[['cv']].values  # Heat capacity at 298.15K
-
-# Preprocessing
-X_uniq = np.unique(X)
-X_uniq = X_uniq[X_uniq != 0]
-E_uniq = np.unique(E)
-E_uniq = E_uniq[E_uniq != 0]
-
-X = label_to_one_hot(X, X_uniq)
-E = label_to_one_hot(E, E_uniq)
+dataset = QM9(amount=1000)  # Set amount=None to train on whole dataset
 
 # Parameters
-N = X.shape[-2]       # Number of nodes in the graphs
-F = X[0].shape[-1]    # Dimension of node features
-S = E[0].shape[-1]    # Dimension of edge features
-n_out = y.shape[-1]   # Dimension of the target
+F = dataset.F          # Dimension of node features
+S = dataset.S          # Dimension of edge features
+n_out = dataset.n_out  # Dimension of the target
 
 # Train/test split
-A_train, A_test, \
-X_train, X_test, \
-E_train, E_test, \
-y_train, y_test = train_test_split(A, X, E, y, test_size=0.1, random_state=0)
+idxs = np.random.permutation(len(dataset))
+split = int(0.9 * len(dataset))
+dataset_tr, dataset_te = dataset[:split], dataset[split:]
 
 ################################################################################
 # BUILD MODEL
 ################################################################################
-X_in = Input(shape=(N, F))
-A_in = Input(shape=(N, N))
-E_in = Input(shape=(N, N, S))
+X_in = Input(shape=(None, F))
+A_in = Input(shape=(None, None))
+E_in = Input(shape=(None, None, S))
 
 X_1 = EdgeConditionedConv(32, activation='relu')([X_in, A_in, E_in])
 X_2 = EdgeConditionedConv(32, activation='relu')([X_1, A_in, E_in])
@@ -72,16 +58,15 @@ model.summary()
 ################################################################################
 # FIT MODEL
 ################################################################################
-model.fit([X_train, A_train, E_train],
-          y_train,
-          batch_size=batch_size,
+loader_tr = BatchLoader(dataset_tr, batch_size=batch_size, epochs=epochs)
+model.fit(loader_tr,
+          steps_per_epoch=loader_tr.steps_per_epoch,
           epochs=epochs)
 
 ################################################################################
 # EVALUATE MODEL
 ################################################################################
 print('Testing model')
-model_loss = model.evaluate([X_test, A_test, E_test],
-                            y_test,
-                            batch_size=batch_size)
+loader_te = BatchLoader(dataset_te, batch_size=batch_size)
+model_loss = model.evaluate(loader_te)
 print('Done. Test loss: {}'.format(model_loss))
