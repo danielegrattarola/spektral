@@ -86,9 +86,9 @@ model_loss = 0
 batches_in_epoch = np.ceil(len(A_tr) / batch_size)
 
 print('Fitting model')
-batches_train = batch_generator([X_tr, A_tr, E_tr, y_tr],
-                                batch_size=batch_size, epochs=epochs)
-for b in batches_train:
+batches_tr = batch_generator([X_tr, A_tr, E_tr, y_tr],
+                             batch_size=batch_size, epochs=epochs)
+for b in batches_tr:
     X_, A_, E_, I_ = to_disjoint(*b[:-1])
     A_ = ops.sp_matrix_to_sp_tensor(A_)
     y_ = b[-1]
@@ -107,8 +107,8 @@ for b in batches_train:
 print('Testing model')
 evaluator = Evaluator(name=dataset_name)
 y_pred = []
-batches_test = batch_generator([X_te, A_te, E_te], batch_size=batch_size)
-for b in batches_test:
+batches_te = batch_generator([X_te, A_te, E_te], batch_size=batch_size, epochs=1)
+for b in batches_te:
     X_, A_, E_, I_ = to_disjoint(*b)
     A_ = ops.sp_matrix_to_sp_tensor(A_)
     p = model([X_, A_, E_, I_], training=False)

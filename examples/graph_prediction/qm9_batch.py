@@ -4,16 +4,13 @@ QM9 database, using a GNN based on edge-conditioned convolutions in batch mode.
 """
 
 import numpy as np
-from sklearn.model_selection import train_test_split
 from tensorflow.keras.layers import Input, Dense
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 
 from spektral.data import BatchLoader
-from spektral.datasets import qm9
 from spektral.datasets.qm9 import QM9
 from spektral.layers import EdgeConditionedConv, GlobalSumPool
-from spektral.utils import label_to_one_hot
 
 ################################################################################
 # PARAMETERS
@@ -58,7 +55,7 @@ model.summary()
 ################################################################################
 # FIT MODEL
 ################################################################################
-loader_tr = BatchLoader(dataset_tr, batch_size=batch_size, epochs=epochs)
+loader_tr = BatchLoader(dataset_tr, batch_size=batch_size)
 model.fit(loader_tr,
           steps_per_epoch=loader_tr.steps_per_epoch,
           epochs=epochs)
@@ -68,5 +65,5 @@ model.fit(loader_tr,
 ################################################################################
 print('Testing model')
 loader_te = BatchLoader(dataset_te, batch_size=batch_size)
-model_loss = model.evaluate(loader_te)
+model_loss = model.evaluate(loader_te, steps=loader_tr.steps_per_epoch)
 print('Done. Test loss: {}'.format(model_loss))

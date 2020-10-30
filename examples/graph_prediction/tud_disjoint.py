@@ -101,7 +101,7 @@ batches_in_epoch = np.ceil(len(a_train) / batch_size)
 
 print('Fitting model')
 batches_train = batch_generator([x_train, a_train, y_train],
-                                batch_size=batch_size, epochs=epochs)
+                                batch_size=batch_size, epoch=epochs)
 for b in batches_train:
     x_, a_, i_ = to_disjoint(*b[:-1])
     a_ = ops.sp_matrix_to_sp_tensor(a_)
@@ -124,7 +124,8 @@ for b in batches_train:
 print('Testing model')
 model_lss = model_acc = 0
 batches_in_epoch = np.ceil(len(a_test) / batch_size)
-batches_test = batch_generator([x_test, a_test, y_test], batch_size=batch_size)
+batches_test = batch_generator([x_test, a_test, y_test], batch_size=batch_size,
+                               epochs=1)
 for b in batches_test:
     x_, a_, i_ = to_disjoint(*b[:-1])
     a_ = ops.sp_matrix_to_sp_tensor(a_)

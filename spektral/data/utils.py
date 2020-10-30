@@ -118,7 +118,7 @@ def to_batch(x_list, a_list, e_list=None):
         return x_out, a_out
 
 
-def batch_generator(data, batch_size=32, epochs=1, shuffle=True):
+def batch_generator(data, batch_size=32, epochs=None, shuffle=True):
     """
     Iterates over the data for the given number of epochs, yielding batches of
     size `batch_size`.
@@ -128,22 +128,25 @@ def batch_generator(data, batch_size=32, epochs=1, shuffle=True):
     :param shuffle: whether to shuffle the data at the beginning of each epoch
     :return: batches of size `batch_size`.
     """
-    if not isinstance(data, list):
+    if not isinstance(data, (list, tuple)):
         data = [data]
     if len(data) < 1:
         raise ValueError('data cannot be empty')
     if len(set([len(item) for item in data])) > 1:
         raise ValueError('All inputs must have the same __len__')
 
+    if epochs is None or epochs == -1:
+        epochs = np.inf
     len_data = len(data[0])
     batches_per_epoch = int(np.ceil(len_data / batch_size))
-    for epochs in range(epochs):
+    epoch = 0
+    while epoch < epochs:
+        epoch += 1
         if shuffle:
             shuffle_inplace(*data)
         for batch in range(batches_per_epoch):
             start = batch * batch_size
             stop = min(start + batch_size, len_data)
-
             to_yield = [item[start:stop] for item in data]
             if len(data) == 1:
                 to_yield = to_yield[0]

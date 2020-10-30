@@ -100,7 +100,7 @@ for batch in batches_tr:
     results_tr.append((l, a))
 
     if curent_batch == batches_in_epoch:
-        batches_va = batch_generator([x_va, y_va], batch_size=batch_size)
+        batches_va = batch_generator([x_va, y_va], batch_size=batch_size, epochs=1)
         results_va = [evaluate(*batch) for batch in batches_va]
         results_va = np.array(results_va)
         loss_va, acc_va = results_va.mean(0)
@@ -108,7 +108,7 @@ for batch in batches_tr:
             best_val_loss = loss_va
             current_patience = patience
             # Test
-            batches_te = batch_generator([x_te, y_te], batch_size=batch_size)
+            batches_te = batch_generator([x_te, y_te], batch_size=batch_size, epochs=1)
             results_te = [evaluate(*batch) for batch in batches_te]
             results_te = np.array(results_te)
         else:
