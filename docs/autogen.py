@@ -100,11 +100,11 @@ PAGES = [
     },
     {
         'page': 'datasets.md',
-        'functions': [
-            datasets.tud.load_data
-        ],
+        'functions': [],
         'methods': [],
-        'classes': []
+        'classes': [
+            datasets.tudataset.TUDataset
+        ]
     },
     {
         'page': 'datasets.md',
@@ -117,11 +117,11 @@ PAGES = [
     },
     {
         'page': 'datasets.md',
-        'functions': [
-            datasets.qm9.load_data
-        ],
+        'functions': [],
         'methods': [],
-        'classes': []
+        'classes': [
+            datasets.qm9.QM9
+        ]
     },
     {
         'page': 'datasets.md',
@@ -146,6 +146,14 @@ PAGES = [
             spektral.data.utils.to_disjoint,
             spektral.data.utils.to_batch,
             spektral.data.utils.batch_generator
+        ],
+        'classes': [
+            spektral.data.Graph,
+            spektral.data.Dataset,
+            spektral.data.Loader,
+            spektral.data.DisjointLoader,
+            spektral.data.BatchLoader,
+            spektral.data.PackedBatchLoader
         ]
     },
     {

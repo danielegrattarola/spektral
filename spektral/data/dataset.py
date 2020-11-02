@@ -1,11 +1,12 @@
 import copy
+import os.path as osp
 
+import numpy as np
 import tensorflow as tf
 
 from spektral.data import Graph
 from spektral.data.utils import get_spec
-
-import numpy as np
+from spektral.datasets.utils import DATASET_FOLDER
 
 
 class Dataset:
@@ -44,6 +45,8 @@ class Dataset:
     implementing a custom Loader for your dataset.
     """
     def __init__(self, **kwargs):
+        if not osp.exists(self.path):
+            self.download()
         self.graphs = self.read()
         # Make sure that we always have at least one graph
         if len(self.graphs) == 0:
@@ -57,7 +60,14 @@ class Dataset:
         for k, v in kwargs.items():
             setattr(self, k, v)
 
+    @property
+    def path(self):
+        return osp.join(DATASET_FOLDER, self.__class__.__name__)
+
     def read(self):
+        raise NotImplementedError
+
+    def download(self):
         raise NotImplementedError
 
     def _signature(self):

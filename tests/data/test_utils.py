@@ -2,9 +2,9 @@ import numpy as np
 
 from spektral.data import Dataset, Graph
 from spektral.data.utils import to_disjoint, to_batch, batch_generator
-from spektral.datasets import tud
+from spektral.datasets import tudataset
 
-a_list, x_list, y = tud.load_data('ENZYMES', clean=True)
+a_list, x_list, y = tudataset.load_data('ENZYMES', clean=True)
 
 
 def test_to_batch():
