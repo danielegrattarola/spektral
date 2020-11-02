@@ -1,4 +1,5 @@
 import os
+import os.path as osp
 
 import numpy as np
 import scipy.sparse as sp
@@ -7,9 +8,6 @@ from tensorflow.keras.utils import get_file
 from spektral.data import Dataset, Graph
 from spektral.utils import label_to_one_hot
 from spektral.utils.io import load_csv, load_sdf
-
-DATA_PATH = os.path.expanduser('~/.spektral/datasets/qm9/')
-DATASET_URL = 'http://deepchem.io.s3-website-us-west-1.amazonaws.com/datasets/gdb9.tar.gz'
 
 ATOM_TYPES = [1, 6, 7, 8, 9]
 BOND_TYPES = [1, 2, 3, 4]
@@ -42,17 +40,20 @@ class QM9(Dataset):
     - `amount`: int, load this many molecules instead of the full dataset
     (useful for debugging).
     """
+    url = 'http://deepchem.io.s3-website-us-west-1.amazonaws.com/datasets/gdb9.tar.gz'
+
     def __init__(self, amount=None, **kwargs):
         self.amount = amount
         super().__init__(**kwargs)
 
-    def read(self):
-        if not os.path.exists(DATA_PATH):
-            _download_data()  # Try to download dataset
+    def download(self):
+        get_file('qm9.tar.gz', self.url, extract=True, cache_dir=self.path,
+                 cache_subdir=self.path)
+        os.remove(osp.join(self.path, 'qm9.tar.gz'))
 
-        # Load molecular graphs
+    def read(self):
         print('Loading QM9 dataset.')
-        sdf_file = os.path.join(DATA_PATH, 'qm9.sdf')
+        sdf_file = osp.join(self.path, 'gdb9.sdf')
         data = load_sdf(sdf_file, amount=self.amount)  # Internal SDF format
 
         x_list, a_list, e_list = [], [], []
@@ -64,7 +65,7 @@ class QM9(Dataset):
             e_list += [e]
 
         # Load labels
-        labels_file = os.path.join(DATA_PATH, 'qm9.sdf.csv')
+        labels_file = osp.join(self.path, 'gdb9.sdf.csv')
         labels = load_csv(labels_file)
         labels = labels.set_index('mol_id').values[:, 1:]
         if self.amount is not None:
@@ -95,11 +96,3 @@ def mol_to_adj(mol):
     edge_attr = np.array([label_to_one_hot(e, BOND_TYPES)
                           for e in edge_attr])
     return a, edge_attr
-
-
-def _download_data():
-    _ = get_file('qm9.tar.gz', DATASET_URL, extract=True, cache_dir=DATA_PATH,
-                 cache_subdir=DATA_PATH)
-    os.rename(DATA_PATH + 'gdb9.sdf', DATA_PATH + 'qm9.sdf')
-    os.rename(DATA_PATH + 'gdb9.sdf.csv', DATA_PATH + 'qm9.sdf.csv')
-    os.remove(DATA_PATH + 'qm9.tar.gz')

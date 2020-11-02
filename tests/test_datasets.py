@@ -1,5 +1,7 @@
-from spektral.datasets import delaunay, qm9, citation, graphsage, mnist, tud
+from spektral.datasets import delaunay, qm9, citation, graphsage, mnist, tudataset
 from spektral.data import DisjointLoader, BatchLoader
+
+batch_size = 3
 
 
 def correctly_padded(adj, nf, ef):
@@ -41,13 +43,26 @@ def test_mnist():
 
 def test_qm9():
     dataset = qm9.QM9(amount=100)
-    dl = DisjointLoader(dataset, batch_size=3)
+    dl = DisjointLoader(dataset, batch_size=batch_size)
     dl.__next__()
 
-    bl = BatchLoader(dataset, batch_size=3)
+    bl = BatchLoader(dataset, batch_size=batch_size)
     bl.__next__()
 
 
 def test_tud():
-    tud.load_data('PROTEINS', clean=False)
-    tud.load_data('ENZYMES', clean=True)
+    # Edge labels + edge attributes
+    dataset = tudataset.TUDataset('BZR_MD', clean=False)
+    dl = DisjointLoader(dataset, batch_size=batch_size)
+    dl.__next__()
+
+    bl = BatchLoader(dataset, batch_size=batch_size)
+    bl.__next__()
+
+    # Node labels + node attributes + clean version
+    dataset = tudataset.TUDataset('ENZYMES', clean=True)
+    dl = DisjointLoader(dataset, batch_size=batch_size)
+    dl.__next__()
+
+    bl = BatchLoader(dataset, batch_size=batch_size)
+    bl.__next__()

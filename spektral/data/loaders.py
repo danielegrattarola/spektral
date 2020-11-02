@@ -13,6 +13,15 @@ tf_loader_available = major > 2 and minor > 3
 
 
 class Loader:
+    """
+    **Arguments**
+
+    - `dataset`: a Dataset object to load.
+    - `batch_size`: size of the mini-batches.
+    - `epochs`: number of epochs to iterate over the datset. By default (`None`)
+    iterates indefinitely.
+    - `shuffle`: whether to shuffle the data at the start of each epoch.
+    """
     def __init__(self, dataset, batch_size=1, epochs=None, shuffle=True):
         self.dataset = dataset
         self.batch_size = batch_size
@@ -43,6 +52,9 @@ class Loader:
 
 
 class DisjointLoader(Loader):
+    """
+    A [Loader](https://graphneural.network/) for disjoint mode.
+    """
     def collate(self, batch):
         packed = self._pack(batch)
         y = np.array(packed[-1])
@@ -80,6 +92,9 @@ class DisjointLoader(Loader):
 
 
 class BatchLoader(Loader):
+    """
+    A [Loader](https://graphneural.network/) for batch mode.
+    """
     def collate(self, batch):
         packed = self._pack(batch)
         y = np.array(packed[-1])
@@ -108,6 +123,14 @@ class BatchLoader(Loader):
 
 
 class PackedBatchLoader(BatchLoader):
+    """
+    A [Loader](https://graphneural.network/) for batch mode, that pre-pads all
+    graphs to have the same number of nodes.
+    While using more memory than `BatchLoader`, this loader should reduce the
+    overhead due to padding each batch independently.
+    Use this loader if you have graphs of similar sizes and no outliers (i.e.,
+    anomalous graphs with many more nodes than average).
+    """
     def __init__(self, dataset, batch_size=1, epochs=None, shuffle=True):
         super().__init__(dataset, batch_size=batch_size, epochs=epochs, shuffle=shuffle)
         # Drop the Dataset container and work on packed tensors directly
