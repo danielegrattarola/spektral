@@ -101,7 +101,7 @@ class Dataset:
 
     def __getitem__(self, key):
         if not (np.issubdtype(type(key), np.integer) or
-                isinstance(key, (slice, list, tuple))):
+                isinstance(key, (slice, list, tuple, np.ndarray))):
             raise ValueError('Unsupported key type: {}'.format(type(key)))
         if np.issubdtype(type(key), np.integer):
             return self.graphs[int(key)]
