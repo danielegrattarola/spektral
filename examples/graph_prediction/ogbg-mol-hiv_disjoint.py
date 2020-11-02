@@ -14,9 +14,9 @@ from tensorflow.keras.losses import BinaryCrossentropy
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 
-from spektral.datasets import ogb
-from spektral.layers import EdgeConditionedConv, ops, GlobalSumPool
-from spektral.data.utils import to_disjoint, batch_generator
+from spektral.data import DisjointLoader
+from spektral.datasets.ogb import OGB
+from spektral.layers import EdgeConditionedConv, GlobalSumPool
 
 ################################################################################
 # PARAMETERS
@@ -29,18 +29,20 @@ batch_size = 32       # Batch size
 # LOAD DATA
 ################################################################################
 dataset_name = 'ogbg-molhiv'
-dataset = GraphPropPredDataset(name=dataset_name)
-n_out = dataset.num_tasks
+ogb_dataset = GraphPropPredDataset(name=dataset_name)
+dataset = OGB(ogb_dataset)
 
-idx = dataset.get_idx_split()
+# Parameters
+F = dataset.F          # Dimension of node features
+S = dataset.S          # Dimension of edge features
+n_out = dataset.n_out  # Dimension of the target
+
+# Train/test split
+idx = ogb_dataset.get_idx_split()
 tr_idx, va_idx, te_idx = idx["train"], idx["valid"], idx["test"]
-
-X_tr, A_tr, E_tr, y_tr = ogb.dataset_to_numpy(dataset, tr_idx, dtype='f8')
-X_va, A_va, E_va, y_va = ogb.dataset_to_numpy(dataset, va_idx, dtype='f8')
-X_te, A_te, E_te, y_te = ogb.dataset_to_numpy(dataset, te_idx, dtype='f8')
-
-F = X_tr[0].shape[-1]
-S = E_tr[0].shape[-1]
+dataset_tr = dataset[tr_idx]
+dataset_va = dataset[va_idx]
+dataset_te = dataset[te_idx]
 
 ################################################################################
 # BUILD MODEL
@@ -61,43 +63,37 @@ opt = Adam(lr=learning_rate)
 loss_fn = BinaryCrossentropy()
 
 
+################################################################################
+# FIT MODEL
+################################################################################
 @tf.function(
-    input_signature=(tf.TensorSpec((None, F), dtype=tf.float64),
-                     tf.SparseTensorSpec((None, None), dtype=tf.float64),
-                     tf.TensorSpec((None, S), dtype=tf.float64),
-                     tf.TensorSpec((None,), dtype=tf.int32),
+    input_signature=((tf.TensorSpec((None, F), dtype=tf.float64),
+                      tf.SparseTensorSpec((None, None), dtype=tf.int64),
+                      tf.TensorSpec((None, S), dtype=tf.float64),
+                      tf.TensorSpec((None,), dtype=tf.int64)),
                      tf.TensorSpec((None, n_out), dtype=tf.float64)),
     experimental_relax_shapes=True)
-def train_step(X_, A_, E_, I_, y_):
+def train_step(inputs, target):
     with tf.GradientTape() as tape:
-        predictions = model([X_, A_, E_, I_], training=True)
-        loss = loss_fn(y_, predictions)
+        predictions = model(inputs, training=True)
+        loss = loss_fn(target, predictions)
         loss += sum(model.losses)
     gradients = tape.gradient(loss, model.trainable_variables)
     opt.apply_gradients(zip(gradients, model.trainable_variables))
     return loss
 
 
-################################################################################
-# FIT MODEL
-################################################################################
+print('Fitting model')
 current_batch = 0
 model_loss = 0
-batches_in_epoch = np.ceil(len(A_tr) / batch_size)
+loader_tr = DisjointLoader(dataset_tr, batch_size=batch_size, epochs=epochs)
+for batch in loader_tr:
+    outs = train_step(*batch)
 
-print('Fitting model')
-batches_tr = batch_generator([X_tr, A_tr, E_tr, y_tr],
-                             batch_size=batch_size, epochs=epochs)
-for b in batches_tr:
-    X_, A_, E_, I_ = to_disjoint(*b[:-1])
-    A_ = ops.sp_matrix_to_sp_tensor(A_)
-    y_ = b[-1]
-    outs = train_step(X_, A_, E_, I_, y_)
-
-    model_loss += outs.numpy()
+    model_loss += outs
     current_batch += 1
-    if current_batch == batches_in_epoch:
-        print('Loss: {}'.format(model_loss / batches_in_epoch))
+    if current_batch == loader_tr.steps_per_epoch:
+        print('Loss: {}'.format(model_loss / loader_tr.steps_per_epoch))
         model_loss = 0
         current_batch = 0
 
@@ -106,17 +102,19 @@ for b in batches_tr:
 ################################################################################
 print('Testing model')
 evaluator = Evaluator(name=dataset_name)
+y_true = []
 y_pred = []
-batches_te = batch_generator([X_te, A_te, E_te], batch_size=batch_size, epochs=1)
-for b in batches_te:
-    X_, A_, E_, I_ = to_disjoint(*b)
-    A_ = ops.sp_matrix_to_sp_tensor(A_)
-    p = model([X_, A_, E_, I_], training=False)
+loader_te = DisjointLoader(dataset_te, batch_size=batch_size, epochs=1)
+for batch in loader_te:
+    inputs, target = batch
+    p = model(inputs, training=False)
+    y_true.append(target)
     y_pred.append(p.numpy())
 
+y_true = np.vstack(y_true)
 y_pred = np.vstack(y_pred)
-model_loss = loss_fn(y_te, y_pred)
-ogb_score = evaluator.eval({'y_true': y_te, 'y_pred': y_pred})
+model_loss = loss_fn(y_true, y_pred)
+ogb_score = evaluator.eval({'y_true': y_true, 'y_pred': y_pred})
 
 print('Done. Test loss: {:.4f}. ROC-AUC: {:.2f}'
       .format(model_loss, ogb_score['rocauc']))
