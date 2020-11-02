@@ -84,7 +84,7 @@ def rescale_laplacian(L, lmax=None):
     :param L: rank 2 array or sparse matrix;
     :param lmax: if None, compute largest eigenvalue with scipy.linalg.eisgh.
     If the eigendecomposition fails, lmax is set to 2 automatically.
-    If scalar, use this value as largest eignevalue when rescaling.
+    If scalar, use this value as largest eigenvalue when rescaling.
     :return:
     """
     if lmax is None:
@@ -161,7 +161,8 @@ def chebyshev_filter(A, k, symmetric=True):
     in [Defferrard et at. (2016)](https://arxiv.org/abs/1606.09375).
     :param A: rank 2 array or sparse matrix;
     :param k: integer, the order of the Chebyshev polynomial;
-    :param symmetric: boolean, whether to normalize the adjacency matrix as
+    :param symmetric: boolean, whether to normalize the 
+    matrix as
     \(\D^{-\frac{1}{2}}\A\D^{-\frac{1}{2}}\) or as \(\D^{-1}\A\);
     :return: a list of k + 1 arrays or sparse matrices with one element for each
     degree of the polynomial.
