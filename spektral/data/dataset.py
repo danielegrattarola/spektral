@@ -52,6 +52,10 @@ class Dataset:
         if len(self.graphs) == 0:
             raise ValueError('Datasets cannot be empty')
 
+        if len(self.graphs) == 1 or len(set([g.N for g in self.graphs])) == 1:
+            self.N = self.graphs[0].N
+        else:
+            self.N = None
         self.F = None
         self.S = None
         self.n_out = None
@@ -65,9 +69,11 @@ class Dataset:
         if transforms is not None:
             if not isinstance(transforms, (list, tuple)) and callable(transforms):
                 transforms = [transforms]
-            else:
+            elif not all([callable(t) for t in transforms]):
                 raise ValueError('transforms must be a list of callables or '
                                  'a callable.')
+            else:
+                pass
             for t in transforms:
                 self.apply(t)
 

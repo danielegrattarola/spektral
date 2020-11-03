@@ -9,7 +9,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 
 from spektral.data import BatchLoader
-from spektral.datasets.qm9 import QM9
+from spektral.datasets import QM9
 from spektral.layers import EdgeConditionedConv, GlobalSumPool
 
 ################################################################################

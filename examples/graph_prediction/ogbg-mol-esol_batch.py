@@ -13,7 +13,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 
 from spektral.data import BatchLoader
-from spektral.datasets.ogb import OGB
+from spektral.datasets import OGB
 from spektral.layers import GraphConv, MinCutPool, GlobalSumPool
 
 ################################################################################
