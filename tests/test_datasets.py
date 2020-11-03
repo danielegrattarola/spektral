@@ -4,22 +4,10 @@ from spektral.datasets import qm9, citation, graphsage, mnist, tudataset
 batch_size = 3
 
 
-def correctly_padded(adj, nf, ef):
-    assert adj.ndim == 3
-    assert adj.shape[-1] == adj.shape[-2]
-    if nf is not None:
-        assert nf.ndim == 3
-        assert adj.shape[-1] == nf.shape[-2]
-    if ef is not None:
-        assert ef.ndim == 4
-        assert adj.shape[-1] == ef.shape[-2]
-        assert adj.shape[-1] == ef.shape[-3]
-
-
 def test_citation():
-    for dataset_name in ['cora', 'citeseer', 'pubmed']:
-        citation.load_data(dataset_name)
-        citation.load_data(dataset_name, random_split=True)
+    dataset = citation.Citation('cora')
+    dataset = citation.Citation('citeseer', random_split=True)
+    dataset = citation.Citation('pubmed', normalize_x=True)
 
 
 def test_graphsage():

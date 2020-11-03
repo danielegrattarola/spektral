@@ -13,7 +13,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 
 from spektral.data import DisjointLoader
-from spektral.datasets import tudataset
+from spektral.datasets import TUDataset
 from spektral.layers import GINConv, GlobalAvgPool
 
 ################################################################################
@@ -28,7 +28,7 @@ batch_size = 32       # Batch size
 ################################################################################
 # LOAD DATA
 ################################################################################
-dataset = tudataset.TUDataset('PROTEINS', clean=True)
+dataset = TUDataset('PROTEINS', clean=True)
 
 # Parameters
 F = dataset.F          # Dimension of node features

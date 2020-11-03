@@ -11,31 +11,30 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
 
-from spektral.datasets import citation
+from spektral.data.loaders import SingleLoader
+from spektral.datasets.citation import Citation
 from spektral.layers import ARMAConv
+from spektral.transforms import LayerPreprocess, AdjToSpTensor
 
 # Load data
-dataset = 'cora'
-A, X, y, train_mask, val_mask, test_mask = citation.load_data(dataset)
+dataset = Citation('cora',
+                   transforms=[LayerPreprocess(ARMAConv), AdjToSpTensor()])
+mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
 
 # Parameters
-channels = 16           # Number of channels in the first layer
-iterations = 1          # Number of iterations to approximate each ARMA(1)
-order = 2               # Order of the ARMA filter (number of parallel stacks)
-share_weights = True    # Share weights in each ARMA stack
-N = X.shape[0]          # Number of nodes in the graph
-F = X.shape[1]          # Original feature dimensionality
-n_classes = y.shape[1]  # Number of classes
-dropout = 0.5           # Dropout rate applied between layers
-dropout_skip = 0.75     # Dropout rate for the internal skip connection of ARMA
-l2_reg = 5e-5           # L2 regularization rate
-learning_rate = 1e-2    # Learning rate
-epochs = 20000          # Number of training epochs
-es_patience = 100       # Patience for early stopping
-
-# Preprocessing operations
-fltr = ARMAConv.preprocess(A).astype('f4')
-X = X.toarray()
+channels = 16          # Number of channels in the first layer
+iterations = 1         # Number of iterations to approximate each ARMA(1)
+order = 2              # Order of the ARMA filter (number of parallel stacks)
+share_weights = True   # Share weights in each ARMA stack
+N = dataset.N          # Number of nodes in the graph
+F = dataset.F          # Original size of node features
+n_out = dataset.n_out  # Number of classes
+dropout = 0.5          # Dropout rate for the features
+dropout_skip = 0.75    # Dropout rate for the internal skip connection of ARMA
+l2_reg = 5e-5          # L2 regularization rate
+learning_rate = 1e-2   # Learning rate
+epochs = 20000         # Number of training epochs
+patience = 100         # Patience for early stopping
 
 # Model definition
 X_in = Input(shape=(F, ))
@@ -50,7 +49,7 @@ gc_1 = ARMAConv(channels,
                 gcn_activation='elu',
                 kernel_regularizer=l2(l2_reg))([X_in, fltr_in])
 gc_2 = Dropout(dropout)(gc_1)
-gc_2 = ARMAConv(n_classes,
+gc_2 = ARMAConv(n_out,
                 iterations=1,
                 order=1,
                 share_weights=share_weights,
@@ -68,24 +67,19 @@ model.compile(optimizer=optimizer,
 model.summary()
 
 # Train model
-validation_data = ([X, fltr], y, val_mask)
-model.fit([X, fltr],
-          y,
-          sample_weight=train_mask,
+loader_tr = SingleLoader(dataset, sample_weights=mask_tr)
+loader_va = SingleLoader(dataset, sample_weights=mask_va)
+model.fit(loader_tr.tf(),
+          steps_per_epoch=loader_tr.steps_per_epoch,
+          validation_data=loader_va.tf(),
+          validation_steps=loader_va.steps_per_epoch,
           epochs=epochs,
-          batch_size=N,
-          validation_data=validation_data,
-          shuffle=False,  # Shuffling data means shuffling the whole graph
-          callbacks=[
-              EarlyStopping(patience=es_patience,  restore_best_weights=True)
-          ])
+          callbacks=[EarlyStopping(patience=patience, restore_best_weights=True)])
 
 # Evaluate model
 print('Evaluating model.')
-eval_results = model.evaluate([X, fltr],
-                              y,
-                              sample_weight=test_mask,
-                              batch_size=N)
+loader_te = SingleLoader(dataset, sample_weights=mask_te)
+eval_results = model.evaluate(loader_te.tf(), steps=loader_te.steps_per_epoch)
 print('Done.\n'
       'Test loss: {}\n'
       'Test accuracy: {}'.format(*eval_results))

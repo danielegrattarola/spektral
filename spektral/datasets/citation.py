@@ -1,137 +1,133 @@
-"""
-The MIT License
-
-Copyright (c) 2016 Thomas Kipf
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-This code was taken almost verbatim from https://github.com/tkipf/gcn/ and
-adapted to work in Spektral.
-"""
 import os
+import os.path as osp
 
 import networkx as nx
 import numpy as np
 import requests
 import scipy.sparse as sp
 
+from spektral.data import Dataset, Graph
 from spektral.utils.io import load_binary
 
-DATA_URL = 'https://github.com/tkipf/gcn/raw/master/gcn/data/{}'
-DATA_PATH = os.path.expanduser('~/.spektral/datasets/')
-AVAILABLE_DATASETS = {'cora', 'citeseer', 'pubmed'}
 
-
-def load_data(dataset_name='cora', normalize_features=True, random_split=False):
+class Citation(Dataset):
     """
-    Loads a citation dataset (Cora, Citeseer or Pubmed) using the "Planetoid"
-    splits intialliy defined in [Yang et al. (2016)](https://arxiv.org/abs/1603.08861).
-    The train, test, and validation splits are given as binary masks.
+    The citation datasets Cora, Citeseer and Pubmed.
 
     Node attributes are bag-of-words vectors representing the most common words
     in the text document associated to each node.
     Two papers are connected if either one cites the other.
     Labels represent the class of the paper.
+    The train, test, and validation splits are given as binary masks and are
+    accessible with the `mask_tr`, `mask_va`, and `mask_te` respectively.
 
-    :param dataset_name: name of the dataset to load (`'cora'`, `'citeseer'`, or
+    **Arguments**
+
+    - `name`: name of the dataset to load (`'cora'`, `'citeseer'`, or
     `'pubmed'`);
-    :param normalize_features: if True, the node features are normalized;
-    :param random_split: if True, return a randomized split (20 nodes per class
+    - `random_split`: if True, return a randomized split (20 nodes per class
     for training, 30 nodes per class for validation and the remaining nodes for
-    testing, [Shchur et al. (2018)](https://arxiv.org/abs/1811.05868)).
-    :return:
-        - Adjacency matrix;
-        - Node features;
-        - Labels;
-        - Three binary masks for train, validation, and test splits.
+    testing, as recommended by [Shchur et al. (2018)](https://arxiv.org/abs/1811.05868)).
+    If False (default), return the "Planetoid" public splits defined by
+    [Yang et al. (2016)](https://arxiv.org/abs/1603.08861).
+    - `normalize_x`: if True, normalize the features.
     """
-    if dataset_name not in AVAILABLE_DATASETS:
-        raise ValueError('Available datasets: {}'.format(AVAILABLE_DATASETS))
+    url = 'https://github.com/tkipf/gcn/raw/master/gcn/data/{}'
+    suffixes = ['x', 'y', 'tx', 'ty', 'allx', 'ally', 'graph', 'test.index']
 
-    if not os.path.exists(DATA_PATH + dataset_name):
-        _download_data(dataset_name)
+    def __init__(self, name, random_split=False, normalize_x=False, **kwargs):
+        self.name = name.lower()
+        if self.name not in self.available_datasets():
+            raise ValueError('Unknown dataset {}. See Citation.available_datasets() '
+                             'for a list of available datasets.')
+        self.random_split = random_split
+        self.normalize_x = normalize_x
+        self.mask_tr = self.mask_va = self.mask_te = None
+        super().__init__(**kwargs)
 
-    print('Loading {} dataset'.format(dataset_name))
+    @property
+    def path(self):
+        return osp.join(super(Citation, self).path, self.name)
 
-    names = ['x', 'y', 'tx', 'ty', 'allx', 'ally', 'graph']
-    objects = []
-    data_path = os.path.join(DATA_PATH, dataset_name)
-    for n in names:
-        filename = os.path.join(data_path, 'ind.{}.{}'.format(dataset_name, n))
-        objects.append(load_binary(filename))
+    def read(self):
+        objects = [_read_file(self.path, self.name, s) for s in self.suffixes]
+        objects = [o.A if sp.issparse(o) else o for o in objects]
+        x, y, tx, ty, allx, ally, graph, idx_te = objects
 
-    x, y, tx, ty, allx, ally, graph = tuple(objects)
-    adj = nx.adjacency_matrix(nx.from_dict_of_lists(graph))
-    test_idx_reorder = _parse_index_file(
-        os.path.join(data_path, "ind.{}.test.index".format(dataset_name)))
-    test_idx_range = np.sort(test_idx_reorder)
+        # Public Planetoid splits. This is the default
+        idx_tr = np.arange(y.shape[0])
+        idx_va = np.arange(y.shape[0], y.shape[0] + 500)
+        idx_te = idx_te.astype(int)
+        idx_te_sort = np.sort(idx_te)
 
-    if dataset_name == 'citeseer':
-        test_idx_range_full = range(min(test_idx_reorder),
-                                    max(test_idx_reorder) + 1)
-        tx_extended = sp.lil_matrix((len(test_idx_range_full), x.shape[1]))
-        tx_extended[test_idx_range - min(test_idx_range), :] = tx
-        tx = tx_extended
-        ty_extended = np.zeros((len(test_idx_range_full), y.shape[1]))
-        ty_extended[test_idx_range - min(test_idx_range), :] = ty
-        ty = ty_extended
+        # Fix disconnected nodes in Citeseer
+        if self.name == 'citeseer':
+            idx_te_len = idx_te.max() - idx_te.min() + 1
+            tx_ext = np.zeros((idx_te_len, x.shape[1]))
+            tx_ext[idx_te_sort - idx_te.min(), :] = tx
+            tx = tx_ext
+            ty_ext = np.zeros((idx_te_len, y.shape[1]))
+            ty_ext[idx_te_sort - idx_te.min(), :] = ty
+            ty = ty_ext
 
-    features = sp.vstack((allx, tx)).tolil()
-    features[test_idx_reorder, :] = features[test_idx_range, :]
+        x = np.vstack((allx, tx))
+        y = np.vstack((ally, ty))
+        x[idx_te, :] = x[idx_te_sort, :]
+        y[idx_te, :] = y[idx_te_sort, :]
 
-    # Row-normalize the features
-    if normalize_features:
-        print('Pre-processing node features')
-        features = _preprocess_features(features)
+        # Row-normalize the features
+        if self.normalize_x:
+            print('Pre-processing node features')
+            x = _preprocess_features(x)
 
-    labels = np.vstack((ally, ty))
-    labels[test_idx_reorder, :] = labels[test_idx_range, :]
+        if self.random_split:
+            # Throw away public splits and compute random ones like Shchur et al.
+            from sklearn.model_selection import train_test_split
+            indices = np.arange(y.shape[0])
+            n_classes = y.shape[1]
+            idx_tr, idx_te, y_tr, y_te = train_test_split(
+                indices, y, train_size=20 * n_classes, stratify=y)
+            idx_va, idx_te, y_va, y_te = train_test_split(
+                idx_te, y_te, train_size=30 * n_classes, stratify=y_te)
 
-    # Data splits
-    if random_split:
-        from sklearn.model_selection import train_test_split
-        indices = np.arange(labels.shape[0])
-        n_classes = labels.shape[1]
-        idx_train, idx_test, y_train, y_test = train_test_split(
-            indices, labels, train_size=20 * n_classes, stratify=labels)
-        idx_val, idx_test, y_val, y_test = train_test_split(
-            idx_test, y_test, train_size=30 * n_classes, stratify=y_test)
+        # Adjacency matrix
+        adj = nx.adjacency_matrix(nx.from_dict_of_lists(graph))
+        adj.setdiag(0)
+        adj.eliminate_zeros()
+
+        # Train/valid/test masks
+        self.mask_tr = _idx_to_mask(idx_tr, y.shape[0])
+        self.mask_va = _idx_to_mask(idx_va, y.shape[0])
+        self.mask_te = _idx_to_mask(idx_te, y.shape[0])
+
+        return [Graph(x=x, adj=adj, y=y)]
+
+    def download(self):
+        print('Downloading {} dataset.'.format(self.name))
+        os.makedirs(self.path, exist_ok=True)
+        for n in self.suffixes:
+            f_name = 'ind.{}.{}'.format(self.name, n)
+            req = requests.get(self.url.format(f_name))
+            if req.status_code == 404:
+                raise ValueError('Cannot download dataset ({} returned 404).'
+                                 .format(self.url.format(f_name)))
+            with open(os.path.join(self.path, f_name), 'wb') as out_file:
+                out_file.write(req.content)
+
+    @staticmethod
+    def available_datasets():
+        return ['cora', 'citeseer', 'pubmed']
+
+
+def _read_file(path, name, suffix):
+    full_fname = os.path.join(path, 'ind.{}.{}'.format(name, suffix))
+    if suffix == 'test.index':
+        return np.loadtxt(full_fname)
     else:
-        idx_test = test_idx_range.tolist()
-        idx_train = range(len(y))
-        idx_val = range(len(y), len(y) + 500)
-
-    train_mask = _sample_mask(idx_train, labels.shape[0])
-    val_mask = _sample_mask(idx_val, labels.shape[0])
-    test_mask = _sample_mask(idx_test, labels.shape[0])
-
-    return adj, features, labels, train_mask, val_mask, test_mask
+        return load_binary(full_fname)
 
 
-def _parse_index_file(filename):
-    index = []
-    for line in open(filename):
-        index.append(int(line.strip()))
-    return index
-
-
-def _sample_mask(idx, l):
+def _idx_to_mask(idx, l):
     mask = np.zeros(l)
     mask[idx] = 1
     return np.array(mask, dtype=np.bool)
@@ -144,17 +140,3 @@ def _preprocess_features(features):
     r_mat_inv = sp.diags(r_inv)
     features = r_mat_inv.dot(features)
     return features
-
-
-def _download_data(dataset_name):
-    names = ['x', 'y', 'tx', 'ty', 'allx', 'ally', 'graph', 'test.index']
-
-    os.makedirs(os.path.join(DATA_PATH, dataset_name))
-
-    print('Downloading', dataset_name, 'from', DATA_URL[:-2])
-    for n in names:
-        f_name = 'ind.{}.{}'.format(dataset_name, n)
-        req = requests.get(DATA_URL.format(f_name))
-
-        with open(os.path.join(DATA_PATH, dataset_name, f_name), 'wb') as out_file:
-            out_file.write(req.content)

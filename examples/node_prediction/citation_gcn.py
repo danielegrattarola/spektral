@@ -11,27 +11,26 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
 
-from spektral.datasets import citation
+from spektral.data.loaders import SingleLoader
+from spektral.datasets.citation import Citation
 from spektral.layers import GraphConv
+from spektral.transforms import LayerPreprocess, AdjToSpTensor
 
 # Load data
-dataset = 'cora'
-A, X, y, train_mask, val_mask, test_mask = citation.load_data(dataset)
+dataset = Citation('cora',
+                   transforms=[LayerPreprocess(GraphConv), AdjToSpTensor()])
+mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
 
 # Parameters
-channels = 16           # Number of channels in the first layer
-N = X.shape[0]          # Number of nodes in the graph
-F = X.shape[1]          # Original size of node features
-n_classes = y.shape[1]  # Number of classes
-dropout = 0.5           # Dropout rate for the features
-l2_reg = 5e-4 / 2       # L2 regularization rate
-learning_rate = 1e-2    # Learning rate
-epochs = 200            # Number of training epochs
-es_patience = 10        # Patience for early stopping
-
-# Preprocessing operations
-fltr = GraphConv.preprocess(A).astype('f4')
-X = X.toarray()
+channels = 16          # Number of channels in the first layer
+N = dataset.N          # Number of nodes in the graph
+F = dataset.F          # Original size of node features
+n_out = dataset.n_out  # Number of classes
+dropout = 0.5          # Dropout rate for the features
+l2_reg = 5e-4 / 2      # L2 regularization rate
+learning_rate = 1e-2   # Learning rate
+epochs = 200           # Number of training epochs
+patience = 10          # Patience for early stopping
 
 # Model definition
 X_in = Input(shape=(F, ))
@@ -43,7 +42,7 @@ graph_conv_1 = GraphConv(channels,
                          kernel_regularizer=l2(l2_reg),
                          use_bias=False)([dropout_1, fltr_in])
 dropout_2 = Dropout(dropout)(graph_conv_1)
-graph_conv_2 = GraphConv(n_classes,
+graph_conv_2 = GraphConv(n_out,
                          activation='softmax',
                          use_bias=False)([dropout_2, fltr_in])
 
@@ -56,24 +55,19 @@ model.compile(optimizer=optimizer,
 model.summary()
 
 # Train model
-validation_data = ([X, fltr], y, val_mask)
-model.fit([X, fltr],
-          y,
-          sample_weight=train_mask,
+loader_tr = SingleLoader(dataset, sample_weights=mask_tr)
+loader_va = SingleLoader(dataset, sample_weights=mask_va)
+model.fit(loader_tr.tf(),
+          steps_per_epoch=loader_tr.steps_per_epoch,
+          validation_data=loader_va.tf(),
+          validation_steps=loader_va.steps_per_epoch,
           epochs=epochs,
-          batch_size=N,
-          validation_data=validation_data,
-          shuffle=False,  # Shuffling data means shuffling the whole graph
-          callbacks=[
-              EarlyStopping(patience=es_patience,  restore_best_weights=True)
-          ])
+          callbacks=[EarlyStopping(patience=patience, restore_best_weights=True)])
 
 # Evaluate model
 print('Evaluating model.')
-eval_results = model.evaluate([X, fltr],
-                              y,
-                              sample_weight=test_mask,
-                              batch_size=N)
+loader_te = SingleLoader(dataset, sample_weights=mask_te)
+eval_results = model.evaluate(loader_te.tf(), steps=loader_te.steps_per_epoch)
 print('Done.\n'
       'Test loss: {}\n'
       'Test accuracy: {}'.format(*eval_results))

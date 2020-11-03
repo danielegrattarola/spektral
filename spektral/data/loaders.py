@@ -51,6 +51,31 @@ class Loader:
         return [list(elem) for elem in zip(*[g.numpy() for g in batch])]
 
 
+class SingleLoader(Loader):
+    """
+    A [Loader]() for single mode.
+    """
+    def __init__(self, dataset, epochs=None, sample_weights=None):
+        self.sample_weights = sample_weights
+        super().__init__(dataset, batch_size=1, epochs=epochs, shuffle=False)
+
+    def collate(self, batch):
+        graph = batch[0]
+        output = graph.numpy()
+        output = [output[:-1], output[-1]]
+        if self.sample_weights is not None:
+            output += [self.sample_weights]
+        return tuple(output)
+
+    def tf(self):
+        graph = self.dataset[0]
+        tensors = [(graph.x, graph.adj), graph.y]
+        if self.sample_weights is not None:
+            tensors += [self.sample_weights]
+        tensors = tuple(tensors)
+        return tf.data.Dataset.from_tensors(tensors).repeat(self.epochs)
+
+
 class DisjointLoader(Loader):
     """
     A [Loader](https://graphneural.network/) for disjoint mode.
@@ -73,7 +98,7 @@ class DisjointLoader(Loader):
                                'or greater.')
         signature = copy.deepcopy(self.dataset.signature)
         if 'y' in signature:
-            # Edge attributes have an extra None dimension in batch mode
+            # Targets have an extra None dimension in batch mode
             signature['y']['shape'] = prepend_none(signature['y']['shape'])
 
         if 'a' in signature:
