@@ -2,9 +2,14 @@ import numpy as np
 
 from spektral.data import Dataset, Graph
 from spektral.data.utils import to_disjoint, to_batch, batch_generator
-from spektral.datasets import tudataset
+import scipy.sparse as sp
+import numpy as np
 
-a_list, x_list, y = tudataset.load_data('ENZYMES', clean=True)
+ns = np.random.randint(3, 10, 10)
+f = 3
+a_list = [sp.coo_matrix(np.ones((n, n))) for n in ns]
+x_list = [np.random.rand(n, f) for n in ns]
+y = [[0, 1]] * len(ns)
 
 
 def test_to_batch():

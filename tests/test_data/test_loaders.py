@@ -1,9 +1,10 @@
 import numpy as np
+import scipy.sparse as sp
 
 from spektral.data import DisjointLoader, BatchLoader
 from spektral.data.dataset import Dataset
 from spektral.data.graph import Graph
-from spektral.data.loaders import PackedBatchLoader
+from spektral.data.loaders import PackedBatchLoader, SingleLoader
 
 n_graphs = 10
 ns = np.random.randint(3, 8, n_graphs)
@@ -16,20 +17,51 @@ graphs_in_batch = n_graphs % batch_size
 assert graphs_in_batch != 0
 
 
+class TestDatasetSingle(Dataset):
+    """
+    A dataset with a single graph.
+    """
+    def read(self):
+        n = 10
+        return [
+            Graph(x=np.random.rand(n, f),
+                  adj=sp.coo_matrix(np.random.randint(0, 2, (n, n))),
+                  edge_attr=np.random.rand(n, n, s),
+                  y=np.array(n * [[0., 1.]]))
+        ]
+
+
 class TestDataset(Dataset):
+    """
+    A dataset with many graphs
+    """
     def read(self):
         return [
             Graph(x=np.random.rand(n, f),
-                  adj=np.random.randint(0, 2, (n, n)),
+                  adj=sp.coo_matrix(np.random.randint(0, 2, (n, n))),
                   edge_attr=np.random.rand(n, n, s),
                   y=np.array([0., 1.]))
             for n in ns
         ]
 
 
+def test_single():
+    data = TestDatasetSingle()
+    n = data.N
+    loader = SingleLoader(data, sample_weights=np.ones(n), epochs=1)
+    batches = [b for b in loader]
+    assert len(batches) == 1
+
+    (x, a, e), y, sw = batches[0]
+    assert x.shape == (n, f)
+    assert a.shape == (n, n)
+    assert len(e.shape) == 3 and e.shape[-1] == s  # Avoid counting edges
+    assert y.shape == (n, 2)
+
+
 def test_disjoint():
     data = TestDataset()
-    loader = DisjointLoader(data, batch_size=batch_size)
+    loader = DisjointLoader(data, batch_size=batch_size, epochs=1, shuffle=False)
     batches = [b for b in loader]
 
     (x, a, e, i), y = batches[-1]
@@ -43,7 +75,7 @@ def test_disjoint():
 
 def test_batch():
     data = TestDataset()
-    loader = BatchLoader(data, batch_size=batch_size)
+    loader = BatchLoader(data, batch_size=batch_size, epochs=1, shuffle=False)
     batches = [b for b in loader]
 
     (x, a, e), y = batches[-1]
@@ -56,7 +88,7 @@ def test_batch():
 
 def test_fast_batch():
     data = TestDataset()
-    loader = PackedBatchLoader(data, batch_size=batch_size)
+    loader = PackedBatchLoader(data, batch_size=batch_size, epochs=1, shuffle=False)
     batches = [b for b in loader]
 
     (x, a, e), y = batches[-1]
