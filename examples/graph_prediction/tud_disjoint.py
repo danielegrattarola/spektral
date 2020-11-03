@@ -37,7 +37,8 @@ n_out = dataset.n_out  # Dimension of the target
 # Train/test split
 idxs = np.random.permutation(len(dataset))
 split = int(0.9 * len(dataset))
-dataset_tr, dataset_te = dataset[:split], dataset[split:]
+idx_tr, idx_te = np.split(idxs, [split])
+dataset_tr, dataset_te = dataset[idx_tr], dataset[idx_te]
 
 
 ################################################################################

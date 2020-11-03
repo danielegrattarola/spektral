@@ -165,7 +165,7 @@ PAGES = [
             utils.convolution.laplacian,
             utils.convolution.normalized_laplacian,
             utils.convolution.rescale_laplacian,
-            utils.convolution.localpooling_filter,
+            utils.convolution.gcn_filter,
             utils.convolution.chebyshev_polynomial,
             utils.convolution.chebyshev_filter
         ],

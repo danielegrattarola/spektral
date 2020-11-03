@@ -44,13 +44,14 @@ class Dataset:
     graphs is stored in `dataset.signature`. This can be useful when
     implementing a custom Loader for your dataset.
     """
-    def __init__(self, **kwargs):
+    def __init__(self, transforms=None, **kwargs):
         if not osp.exists(self.path):
             self.download()
         self.graphs = self.read()
         # Make sure that we always have at least one graph
         if len(self.graphs) == 0:
             raise ValueError('Datasets cannot be empty')
+
         self.F = None
         self.S = None
         self.n_out = None
@@ -60,6 +61,16 @@ class Dataset:
         for k, v in kwargs.items():
             setattr(self, k, v)
 
+        # Apply transforms
+        if transforms is not None:
+            if not isinstance(transforms, (list, tuple)) and callable(transforms):
+                transforms = [transforms]
+            else:
+                raise ValueError('transforms must be a list of callables or '
+                                 'a callable.')
+            for t in transforms:
+                self.apply(t)
+
     @property
     def path(self):
         return osp.join(DATASET_FOLDER, self.__class__.__name__)
@@ -68,7 +79,18 @@ class Dataset:
         raise NotImplementedError
 
     def download(self):
-        raise NotImplementedError
+        pass
+
+    def apply(self, transform):
+        for i in range(len(self.graphs)):
+            self.graphs[i] = transform(self.graphs[i])
+
+    def map(self, transform, reduce=None):
+        out = [transform(g) for g in self.graphs]
+        if reduce is not None and callable(reduce):
+            return reduce(out)
+        else:
+            return out
 
     def _signature(self):
         signature = {}

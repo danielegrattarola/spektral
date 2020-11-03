@@ -109,73 +109,63 @@ def sub_eye_jagged(x):
     return x_out
 
 
-def int_to_one_hot(x, n=None):
+def one_hot(x, depth):
     """
-    Encodes x in a 1-of-n array. 
-    :param x: an integer or array of integers, such that x < n
-    :param n: an integer
-    :return: an array of shape (x.shape[0], n) if x is an array, (n, ) if
-    x is an integer
+    One-hot encodes the integer array `x` in an array of length `depth`.
+    :param x: a np.array of integers.
+    :param depth: size of the one-hot vectors.
+    :return: an array of shape `x.shape + (depth, )`
     """
-    if isinstance(x, int):
-        if n is None:
-            raise ValueError('n is required to one-hot encode a single integer')
-        if x >= n:
-            raise ValueError('x must be smaller than n in order to one-hot encode')
-        output = np.zeros((n,))
-        output[x] = 1
+    x = np.array(x).astype(int)
+    out = np.eye(depth)[x]
+
+    return out
+
+
+def label_to_one_hot(x, labels):
+    """
+    One-hot encodes the integer array `x` according to the given `labels`.
+
+    :param x: a np.array of integers. Each value must be contained in `labels`.
+    :param labels: list/tuple/np.array of labels.
+    :return: an array of shape `x.shape + (len(labels), )`
+    """
+    if not isinstance(labels, (list, tuple, np.ndarray)):
+        raise ValueError('labels must be list, tuple, or np.ndarray')
+    if not np.all(np.in1d(x, labels)):
+        raise ValueError('All values in x must be contained in labels')
+    depth = len(labels)
+    x = np.array(x).astype(int)
+    out = x.copy()
+    for i, label in enumerate(labels):
+        out[x == label] = i
+
+    return one_hot(out, depth)
+
+
+def add_self_loops(a, value=1):
+    """
+    Sets the inner diagonals of `a` to `value`.
+    :param a: a np.array or scipy.sparse matrix, the innermost two dimensions
+    must be equal.
+    :param value: value to set the diagonals to.
+    :return: a np.array or scipy.sparse matrix with the same shape as `a`.
+    """
+    a = a.copy()
+    if len(a.shape) < 2:
+        raise ValueError('a must have at least rank 2')
+    n = a.shape[-1]
+    if n != a.shape[-2]:
+        raise ValueError('Innermost two dimensions must be equal. Got {}'
+                         .format(a.shape))
+    if sp.issparse(a):
+        a = a.tolil()
+        a.setdiag(value)
+        return a.tocsr()
     else:
-        if n is None:
-            n = int(np.max(x) + 1)
-        else:
-            if np.max(x) >= n:
-                raise ValueError('The maximum value in x ({}) is greater than '
-                                 'n ({}), therefore 1-of-n encoding is not '
-                                 'possible'.format(np.max(x), n))
-        x = np.array(x, dtype=np.int)
-        if x.ndim == 1:
-            x = x[:, None]
-        orig_shp = x.shape
-        x = np.reshape(x, (-1, orig_shp[-1]))
-        output = np.zeros((x.shape[0], n))
-        output[np.arange(x.shape[0]), x.squeeze()] = 1
-        output = output.reshape(orig_shp[:-1] + (n,))
-
-    return output
-
-
-def label_to_one_hot(x, labels=None):
-    """
-    Encodes x in a 1-of-n array. 
-    :param x: any object or array of objects s.t. x is contained in `labels`. 
-    The function may behave unexpectedly if x is a single object but 
-    `hasattr(x, '__len__')`, and works best with integers or discrete entities.
-    :param labels: a list of n labels to compute the one-hot vector 
-    :return: an array of shape (x.shape[0], n) if x is an array, (n, ) if
-    x is a single object
-    """
-    n = len(labels)
-    labels_idx = {l: i for i, l in enumerate(labels)}
-    if not hasattr(x, '__len__'):
-        output = np.zeros((n,))
-        output[labels_idx[x]] = 1
-    else:
-        x = np.array(x, dtype=np.int)
-        orig_shp = x.shape
-        x = np.reshape(x, (-1))
-        output = np.zeros((x.shape[0], n))
-        for i in range(len(x)):
-            try:
-                output[i, labels_idx[x[i]]] = 1
-            except KeyError:
-                pass
-        if len(orig_shp) == 1:
-            output_shape = orig_shp + (n,)
-        else:
-            output_shape = orig_shp[:-1] + (n,)
-        output = output.reshape(output_shape)
-
-    return output
+        idx = np.arange(n)
+        a[..., idx, idx] = value
+        return a
 
 
 def flatten_list_gen(alist):
@@ -186,7 +176,7 @@ def flatten_list_gen(alist):
                   arbitrarily nested.
     """
     for item in alist:
-        if isinstance(item, list) or isinstance(item, np.ndarray):
+        if isinstance(item, (list, tuple, np.ndarray)):
             for i in flatten_list_gen(item):
                 yield i
         else:

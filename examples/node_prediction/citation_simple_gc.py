@@ -13,7 +13,7 @@ from tensorflow.keras.regularizers import l2
 
 from spektral.datasets import citation
 from spektral.layers import GraphConv
-from spektral.utils.convolution import localpooling_filter
+from spektral.utils.convolution import gcn_filter
 
 # Load data
 dataset = 'cora'
@@ -30,7 +30,7 @@ epochs = 20000          # Number of training epochs
 es_patience = 200       # Patience for early stopping
 
 # Preprocessing operations
-fltr = localpooling_filter(A).astype('f4')
+fltr = gcn_filter(A).astype('f4')
 X = X.toarray()
 
 # Pre-compute propagation
