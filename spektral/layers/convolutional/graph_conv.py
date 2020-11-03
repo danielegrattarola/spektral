@@ -3,7 +3,7 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Layer
 
 from spektral.layers import ops
-from spektral.utils import localpooling_filter
+from spektral.utils import gcn_filter
 
 
 class GraphConv(Layer):
@@ -24,7 +24,7 @@ class GraphConv(Layer):
 
     - Node features of shape `([batch], N, F)`;
     - Modified Laplacian of shape `([batch], N, N)`; can be computed with
-    `spektral.utils.convolution.localpooling_filter`.
+    `spektral.utils.convolution.gcn_filter`.
 
     **Output**
 
@@ -124,4 +124,4 @@ class GraphConv(Layer):
 
     @staticmethod
     def preprocess(A):
-        return localpooling_filter(A)
+        return gcn_filter(A)

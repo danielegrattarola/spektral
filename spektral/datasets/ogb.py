@@ -20,10 +20,6 @@ class OGB(Dataset):
     def read(self):
         return [Graph(*_elem_to_numpy(elem)) for elem in self.dataset]
 
-    def download(self):
-        # Download is handled by OGB
-        pass
-
 
 def _elem_to_numpy(elem):
     graph, label = elem

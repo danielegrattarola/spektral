@@ -101,7 +101,7 @@ def rescale_laplacian(L, lmax=None):
     return L_scaled
 
 
-def localpooling_filter(A, symmetric=True):
+def gcn_filter(A, symmetric=True):
     r"""
     Computes the graph filter described in
     [Kipf & Welling (2017)](https://arxiv.org/abs/1609.02907).

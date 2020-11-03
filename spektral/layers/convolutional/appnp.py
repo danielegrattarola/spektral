@@ -26,7 +26,7 @@ class APPNP(GraphConv):
 
     - Node features of shape `([batch], N, F)`;
     - Modified Laplacian of shape `([batch], N, N)`; can be computed with
-    `spektral.utils.convolution.localpooling_filter`.
+    `spektral.utils.convolution.gcn_filter`.
 
     **Output**
 

@@ -39,10 +39,10 @@ n_out = dataset.n_out  # Dimension of the target
 
 # Train/test split
 idx = ogb_dataset.get_idx_split()
-tr_idx, va_idx, te_idx = idx["train"], idx["valid"], idx["test"]
-dataset_tr = dataset[tr_idx]
-dataset_va = dataset[va_idx]
-dataset_te = dataset[te_idx]
+idx_tr, idx_va, idx_te = idx["train"], idx["valid"], idx["test"]
+dataset_tr = dataset[idx_tr]
+dataset_va = dataset[idx_va]
+dataset_te = dataset[idx_te]
 
 ################################################################################
 # BUILD MODEL
