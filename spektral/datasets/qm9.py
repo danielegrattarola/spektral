@@ -7,7 +7,7 @@ from spektral.utils import nx_to_numpy
 from spektral.utils.io import load_csv, load_sdf
 
 DATA_PATH = os.path.expanduser('~/.spektral/datasets/qm9/')
-DATASET_URL = 'http://deepchem.io.s3-website-us-west-1.amazonaws.com/datasets/gdb9.tar.gz'
+DATASET_URL = 'https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/gdb9.tar.gz'
 RETURN_TYPES = {'numpy', 'networkx', 'sdf'}
 NODE_FEATURES = ['atomic_num', 'charge', 'coords', 'iso']
 EDGE_FEATURES = ['type', 'stereo']
