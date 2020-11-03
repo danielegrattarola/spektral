@@ -28,7 +28,7 @@ from tensorflow.keras.optimizers import Adam
 from spektral.data import Dataset, Graph, DisjointLoader
 from spektral.layers import GraphConvSkip, GlobalAvgPool
 from spektral.layers.pooling import TopKPool
-from spektral.utils.convolution import normalized_adjacency
+from spektral.transforms.normalize_adj import NormalizeAdj
 
 ################################################################################
 # PARAMETERS
@@ -81,15 +81,11 @@ class MyDataset(Dataset):
         return [make_graph() for _ in range(self.n_graphs)]
 
 
-dataset = MyDataset(1000)
+dataset = MyDataset(1000, transforms=NormalizeAdj())
 
 # Parameters
 F = dataset.F          # Dimension of node features
 n_out = dataset.n_out  # Dimension of the target
-
-# Preprocessing
-for g in dataset.graphs:
-    g.adj = normalized_adjacency(g.adj)
 
 # Train/valid/test split
 idxs = np.random.permutation(len(dataset))
