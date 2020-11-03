@@ -60,6 +60,7 @@ class SingleLoader(Loader):
         super().__init__(dataset, batch_size=1, epochs=epochs, shuffle=False)
 
     def collate(self, batch):
+        # TODO how to deal with edge attrs
         graph = batch[0]
         output = graph.numpy()
         output = [output[:-1], output[-1]]
@@ -68,12 +69,8 @@ class SingleLoader(Loader):
         return tuple(output)
 
     def tf(self):
-        graph = self.dataset[0]
-        tensors = [(graph.x, graph.adj), graph.y]
-        if self.sample_weights is not None:
-            tensors += [self.sample_weights]
-        tensors = tuple(tensors)
-        return tf.data.Dataset.from_tensors(tensors).repeat(self.epochs)
+        output = self.collate(self.dataset)
+        return tf.data.Dataset.from_tensors(output).repeat(self.epochs)
 
 
 class DisjointLoader(Loader):
