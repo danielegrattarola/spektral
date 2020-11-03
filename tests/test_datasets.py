@@ -1,5 +1,5 @@
-from spektral.datasets import delaunay, qm9, citation, graphsage, mnist, tudataset
 from spektral.data import DisjointLoader, BatchLoader
+from spektral.datasets import qm9, citation, graphsage, mnist, tudataset
 
 batch_size = 3
 
@@ -26,15 +26,6 @@ def test_graphsage():
     for dataset_name in ['ppi']:
         # Test only PPI because Travis otherwise fails
         graphsage.load_data(dataset_name)
-
-
-def test_delaunay():
-    adj, nf, labels = delaunay.generate_data(return_type='numpy', classes=[0, 1, 2])
-    correctly_padded(adj, nf, None)
-    assert adj.shape[0] == labels.shape[0]
-
-    # Test that it doesn't crash
-    delaunay.generate_data(return_type='networkx')
 
 
 def test_mnist():

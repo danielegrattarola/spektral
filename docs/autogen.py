@@ -131,14 +131,6 @@ PAGES = [
         'methods': [],
         'classes': []
     },
-    {
-        'page': 'datasets.md',
-        'functions': [
-            datasets.delaunay.generate_data
-        ],
-        'methods': [],
-        'classes': []
-    },
     # Utils ####################################################################
     {
         'page': 'utils/data.md',
