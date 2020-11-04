@@ -17,7 +17,7 @@ class Citation(Dataset):
     Node attributes are bag-of-words vectors representing the most common words
     in the text document associated to each node.
     Two papers are connected if either one cites the other.
-    Labels represent the class of the paper.
+    Labels represent the subject area of the paper.
     The train, test, and validation splits are given as binary masks and are
     accessible with the `mask_tr`, `mask_va`, and `mask_te` respectively.
 
