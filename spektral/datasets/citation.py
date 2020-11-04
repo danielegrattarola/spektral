@@ -7,6 +7,7 @@ import requests
 import scipy.sparse as sp
 
 from spektral.data import Dataset, Graph
+from spektral.datasets.utils import DATASET_FOLDER
 from spektral.utils.io import load_binary
 
 
@@ -47,7 +48,7 @@ class Citation(Dataset):
 
     @property
     def path(self):
-        return osp.join(super(Citation, self).path, self.name)
+        return osp.join(DATASET_FOLDER, 'Citation', self.name)
 
     def read(self):
         objects = [_read_file(self.path, self.name, s) for s in self.suffixes]
@@ -117,6 +118,33 @@ class Citation(Dataset):
     @staticmethod
     def available_datasets():
         return ['cora', 'citeseer', 'pubmed']
+
+
+class Cora(Citation):
+    """
+    Alias for `Citation('cora')`.
+    """
+    def __init__(self, random_split=False, normalize_x=False, **kwargs):
+        super().__init__('cora', random_split=random_split,
+                         normalize_x=normalize_x, **kwargs)
+
+
+class Citeseer(Citation):
+    """
+    Alias for `Citation('citeseer')`.
+    """
+    def __init__(self, random_split=False, normalize_x=False, **kwargs):
+        super().__init__('citeseer', random_split=random_split,
+                         normalize_x=normalize_x, **kwargs)
+
+
+class Pubmed(Citation):
+    """
+    Alias for `Citation('pubmed')`.
+    """
+    def __init__(self, random_split=False, normalize_x=False, **kwargs):
+        super().__init__('pubmed', random_split=random_split,
+                         normalize_x=normalize_x, **kwargs)
 
 
 def _read_file(path, name, suffix):

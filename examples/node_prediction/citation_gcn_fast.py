@@ -2,8 +2,7 @@
 This script is a proof of concept to train GCN as fast as possible and with as
 little lines of code as possible.
 It uses a custom training function instead of the standard Keras fit(), and
-can train GCN for 200 epochs in a few tenths of a second (0.32s on a GTX 1050).
-In total, this script has 34 SLOC.
+can train GCN for 200 epochs in a few tenths of a second (~0.20 on a GTX 1050).
 """
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Dropout
@@ -12,14 +11,13 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
 
-from spektral.datasets.citation import Citation
+from spektral.datasets.citation import Cora
 from spektral.layers import GraphConv
 from spektral.transforms import LayerPreprocess, AdjToSpTensor
 from spektral.utils import tic, toc
 
 # Load data
-dataset = Citation('cora',
-                   transforms=[LayerPreprocess(GraphConv), AdjToSpTensor()])
+dataset = Cora(transforms=[LayerPreprocess(GraphConv), AdjToSpTensor()])
 graph = dataset[0]
 x, a, y = graph.x, graph.adj, graph.y
 mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
