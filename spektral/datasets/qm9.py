@@ -40,7 +40,7 @@ class QM9(Dataset):
     - `amount`: int, load this many molecules instead of the full dataset
     (useful for debugging).
     """
-    url = 'http://deepchem.io.s3-website-us-west-1.amazonaws.com/datasets/gdb9.tar.gz'
+    url = 'https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/gdb9.tar.gz'
 
     def __init__(self, amount=None, **kwargs):
         self.amount = amount
