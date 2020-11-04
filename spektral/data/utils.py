@@ -57,7 +57,7 @@ def to_disjoint(x_list, a_list, e_list=None):
     # Edge attributes
     if e_list is not None:
         if e_list[0].ndim == 3:  # Convert dense to sparse
-            e_list = [e[a.row, a.col] for e, a in zip(e_list, a_list)]
+            e_list = [e[sp.find(a)[:-1]] for e, a in zip(e_list, a_list)]
         e_out = np.vstack(e_list)
         return x_out, a_out, e_out, i_out
     else:
