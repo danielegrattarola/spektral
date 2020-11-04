@@ -10,16 +10,12 @@ def sp_matrix_to_sp_tensor(x):
     :param x: a Scipy sparse matrix.
     :return: a SparseTensor.
     """
-    if not hasattr(x, 'tocoo'):
-        try:
-            x = sp.coo_matrix(x)
-        except:
-            raise TypeError('x must be convertible to scipy.coo_matrix')
-    else:
-        x = x.tocoo()
+    if len(x.shape) != 2:
+        raise ValueError('x must have rank 2')
+    row, col, values = sp.find(x)
     out = tf.SparseTensor(
-        indices=np.array([x.row, x.col]).T,
-        values=x.data,
+        indices=np.array([row, col]).T,
+        values=values,
         dense_shape=x.shape
     )
     return tf.sparse.reorder(out)
@@ -33,9 +29,7 @@ def sp_batch_to_sp_tensor(a_list):
     """
     tensor_data = []
     for i, a in enumerate(a_list):
-        values = a.tocoo().data
-        row = a.row
-        col = a.col
+        row, col, values = sp.find(a)
         batch = np.ones_like(col) * i
         tensor_data.append((values, batch, row, col))
     tensor_data = list(map(np.concatenate, zip(*tensor_data)))

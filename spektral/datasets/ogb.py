@@ -18,7 +18,11 @@ class OGB(Dataset):
         super().__init__(**kwargs)
 
     def read(self):
-        return [Graph(*_elem_to_numpy(elem)) for elem in self.dataset]
+        if len(self.dataset) > 1:
+            return [Graph(*_elem_to_numpy(elem)) for elem in self.dataset]
+        else:
+            # OGB crashed if we try to iterate over a NodePropPredDataset
+            return [Graph(*_elem_to_numpy(self.dataset[0]))]
 
 
 def _elem_to_numpy(elem):

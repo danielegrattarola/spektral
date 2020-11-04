@@ -23,14 +23,14 @@ mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
 
 # Parameters
 channels = 16          # Number of channels in the first layer
-N = dataset.N          # Number of nodes in the graph
-F = dataset.F          # Original size of node features
-n_out = dataset.n_out  # Number of classes
 dropout = 0.5          # Dropout rate for the features
 l2_reg = 5e-4 / 2      # L2 regularization rate
 learning_rate = 1e-2   # Learning rate
 epochs = 200           # Number of training epochs
 patience = 10          # Patience for early stopping
+N = dataset.N          # Number of nodes in the graph
+F = dataset.F          # Original size of node features
+n_out = dataset.n_out  # Number of classes
 
 # Model definition
 X_in = Input(shape=(F, ))
