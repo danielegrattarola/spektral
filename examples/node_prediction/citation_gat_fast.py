@@ -12,14 +12,13 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
 
-from spektral.datasets.citation import Citation
+from spektral.datasets.citation import Cora
 from spektral.layers import GraphAttention
 from spektral.transforms import LayerPreprocess, AdjToSpTensor
 from spektral.utils import tic, toc
 
 # Load data
-dataset = Citation('cora',
-                   transforms=[LayerPreprocess(GraphAttention), AdjToSpTensor()])
+dataset = Cora(transforms=[LayerPreprocess(GraphAttention), AdjToSpTensor()])
 graph = dataset[0]
 x, a, y = graph.x, graph.adj, graph.y
 mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
