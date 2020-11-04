@@ -30,7 +30,7 @@ def _elem_to_numpy(elem):
     n = graph['num_nodes']
     x = graph['node_feat']
     row, col = graph['edge_index']
-    a = sp.coo_matrix((np.ones_like(row), (row, col)), shape=(n, n))
+    a = sp.coo_matrix((np.ones_like(row), (row, col)), shape=(n, n)).tocsr()
     e = graph['edge_feat']
 
     return x, a, e, label
