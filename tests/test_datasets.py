@@ -11,9 +11,8 @@ def test_citation():
 
 
 def test_graphsage():
-    for dataset_name in ['ppi']:
-        # Test only PPI because Travis otherwise fails
-        graphsage.load_data(dataset_name)
+    # Test only PPI because Travis otherwise runs into memory errors
+    dataset = graphsage.PPI()
 
 
 def test_mnist():
