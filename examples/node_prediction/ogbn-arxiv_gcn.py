@@ -21,7 +21,16 @@ ogb_dataset = NodePropPredDataset(dataset_name)
 dataset = OGB(ogb_dataset, transforms=[GCNFilter(), AdjToSpTensor()])
 graph = dataset[0]
 x, adj, y = graph.x, graph.adj, graph.y
-N = dataset.N
+
+# Parameters
+channels = 256                   # Number of channels for GCN layers
+dropout = 0.5                    # Dropout rate for the features
+learning_rate = 1e-2             # Learning rate
+epochs = 200                     # Number of training epochs
+
+N = dataset.N                    # Number of nodes in the graph
+F = dataset.F                    # Original size of node features
+n_out = ogb_dataset.num_classes  # OGB labels are sparse indices
 
 # Data splits
 idx = ogb_dataset.get_idx_split()
@@ -33,14 +42,6 @@ mask_tr[idx_tr] = True
 mask_va[idx_va] = True
 mask_te[idx_te] = True
 masks = [mask_tr, mask_va, mask_te]
-
-# Parameters
-channels = 256
-dropout = 0.5                    # Dropout rate for the features
-learning_rate = 1e-2             # Learning rate
-epochs = 200                     # Number of training epochs
-F = dataset.F                    # Original size of node features
-n_out = ogb_dataset.num_classes  # OGB labels are sparse indices
 
 # Model definition
 X_in = Input(shape=(F, ))

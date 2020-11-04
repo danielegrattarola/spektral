@@ -41,13 +41,14 @@ dataset = Citation('cora',
 mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
 
 # Parameters
-N = dataset.N          # Number of nodes in the graph
-F = dataset.F          # Original size of node features
-n_out = dataset.n_out  # Number of classes
 l2_reg = 5e-6          # L2 regularization rate
 learning_rate = 0.2    # Learning rate
 epochs = 20000         # Number of training epochs
 patience = 200         # Patience for early stopping
+
+N = dataset.N          # Number of nodes in the graph
+F = dataset.F          # Original size of node features
+n_out = dataset.n_out  # Number of classes
 
 # Model definition
 X_in = Input(shape=(F, ))

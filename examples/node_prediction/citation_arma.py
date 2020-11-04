@@ -26,15 +26,16 @@ channels = 16          # Number of channels in the first layer
 iterations = 1         # Number of iterations to approximate each ARMA(1)
 order = 2              # Order of the ARMA filter (number of parallel stacks)
 share_weights = True   # Share weights in each ARMA stack
-N = dataset.N          # Number of nodes in the graph
-F = dataset.F          # Original size of node features
-n_out = dataset.n_out  # Number of classes
-dropout = 0.5          # Dropout rate for the features
 dropout_skip = 0.75    # Dropout rate for the internal skip connection of ARMA
+dropout = 0.5          # Dropout rate for the features
 l2_reg = 5e-5          # L2 regularization rate
 learning_rate = 1e-2   # Learning rate
 epochs = 20000         # Number of training epochs
 patience = 100         # Patience for early stopping
+
+N = dataset.N          # Number of nodes in the graph
+F = dataset.F          # Original size of node features
+n_out = dataset.n_out  # Number of classes
 
 # Model definition
 X_in = Input(shape=(F, ))

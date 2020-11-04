@@ -24,15 +24,15 @@ mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
 # Parameters
 channels = 8           # Number of channels in each head of the first GAT layer
 n_attn_heads = 8       # Number of attention heads in first GAT layer
-N = dataset.N          # Number of nodes in the graph
-F = dataset.F          # Original size of node features
-n_out = dataset.n_out  # Number of classes
 dropout = 0.6          # Dropout rate for the features and adjacency matrix
 l2_reg = 5e-6          # L2 regularization rate
 learning_rate = 5e-3   # Learning rate
 epochs = 20000         # Number of training epochs
 patience = 100         # Patience for early stopping
 
+N = dataset.N          # Number of nodes in the graph
+F = dataset.F          # Original size of node features
+n_out = dataset.n_out  # Number of classes
 
 # Model definition
 X_in = Input(shape=(F, ))
