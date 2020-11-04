@@ -36,7 +36,7 @@ class Dataset:
 
     ```
     >>> dataset.F
-    >>> dataset.S
+    >>> dataset.s_1
     >>> dataset.n_out
     ```
 
@@ -115,9 +115,9 @@ class Dataset:
         if graph.edge_attr is not None:
             signature['e'] = dict()
             signature['e']['spec'] = get_spec(graph.edge_attr)
-            signature['e']['shape'] = (None, graph.S)
+            signature['e']['shape'] = (None, graph.s_1)
             signature['e']['dtype'] = tf.as_dtype(graph.edge_attr.dtype)
-            self.S = graph.S
+            self.S = graph.s_1
         if graph.y is not None:
             signature['y'] = dict()
             signature['y']['spec'] = get_spec(graph.y)
