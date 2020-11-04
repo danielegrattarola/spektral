@@ -60,7 +60,6 @@ class SingleLoader(Loader):
         super().__init__(dataset, batch_size=1, epochs=epochs, shuffle=False)
 
     def collate(self, batch):
-        # TODO how to deal with edge attrs
         graph = batch[0]
         output = graph.numpy()
         output = [output[:-1], output[-1]]
