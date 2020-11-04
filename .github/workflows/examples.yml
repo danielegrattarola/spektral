@@ -36,20 +36,20 @@ jobs:
     - name: Run all examples
       run: |
         cd examples/node_prediction/
-        for c_py in citation_*.py; do
-          echo "##### $c_py #####"
-          python $c_py
+        for f in *.py; do
+          echo "##### $f #####"
+          python $f
         done
         cd ..
         cd graph_prediction/
-        for c_py in qm9_*.py; do
-          echo "##### $c_py #####"
-          python $c_py
+        for f in *.py; do
+          echo "##### $f #####"
+          python $f
         done
         cd ..
         cd other/
-        for c_py in *.py; do
-          echo "##### $c_py #####"
-          python $c_py
+        for f in *.py; do
+          echo "##### $f #####"
+          python $f
         done
         cd ..

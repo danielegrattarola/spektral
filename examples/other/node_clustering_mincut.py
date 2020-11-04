@@ -14,7 +14,7 @@ from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 from tqdm import tqdm
 
-from spektral.datasets import citation
+from spektral.datasets.citation import Cora
 from spektral.layers.convolutional import GraphConvSkip
 from spektral.layers.ops import sp_matrix_to_sp_tensor
 from spektral.layers.pooling import MinCutPool
@@ -38,29 +38,30 @@ lr = 5e-4      # Learning rate
 ################################################################################
 # LOAD DATASET
 ################################################################################
-A, X, y, _, _, _ = citation.load_data('cora')
-A_norm = normalized_adjacency(A)
-X = X.todense()
-F = X.shape[-1]
+dataset = Cora()
+adj, x, y = dataset[0].adj, dataset[0].x, dataset[0].y
+a_norm = normalized_adjacency(adj)
+a_norm = sp_matrix_to_sp_tensor(a_norm)
+F = dataset.F
 y = np.argmax(y, axis=-1)
 n_clusters = y.max() + 1
 
 ################################################################################
 # MODEL
 ################################################################################
-X_in = Input(shape=(F,), name='X_in')
-A_in = Input(shape=(None, ), name='A_in', sparse=True)
+x_in = Input(shape=(F,), name='X_in')
+a_in = Input(shape=(None,), name='A_in', sparse=True)
 
-X_1 = GraphConvSkip(16, activation='elu')([X_in, A_in])
-X_1, A_1, S = MinCutPool(n_clusters, return_mask=True)([X_1, A_in])
+x_1 = GraphConvSkip(16, activation='elu')([x_in, a_in])
+x_1, a_1, s_1 = MinCutPool(n_clusters, return_mask=True)([x_1, a_in])
 
-model = Model([X_in, A_in], [X_1, S])
+model = Model([x_in, a_in], [x_1, s_1])
 
 ################################################################################
 # TRAINING
 ################################################################################
 # Setup
-inputs = [X, sp_matrix_to_sp_tensor(A_norm)]
+inputs = [x, a_norm]
 opt = tf.keras.optimizers.Adam(learning_rate=lr)
 
 # Fit model
@@ -70,18 +71,18 @@ for _ in tqdm(range(epochs)):
     outs = train_step(inputs)
     outs = [o.numpy() for o in outs]
     loss_history.append((outs[0], outs[1], (outs[0] + outs[1])))
-    s = np.argmax(outs[2], axis=-1)
-    nmi_history.append(v_measure_score(y, s))
+    s_out = np.argmax(outs[2], axis=-1)
+    nmi_history.append(v_measure_score(y, s_out))
 loss_history = np.array(loss_history)
 
 ################################################################################
 # RESULTS
 ################################################################################
-_, S_ = model(inputs, training=False)
-s = np.argmax(S_, axis=-1)
-hom = homogeneity_score(y, s)
-com = completeness_score(y, s)
-nmi = v_measure_score(y, s)
+_, s_out = model(inputs, training=False)
+s_out = np.argmax(s_out, axis=-1)
+hom = homogeneity_score(y, s_out)
+com = completeness_score(y, s_out)
+nmi = v_measure_score(y, s_out)
 print('Homogeneity: {:.3f}; Completeness: {:.3f}; NMI: {:.3f}'.format(hom, com, nmi))
 
 # Plots
