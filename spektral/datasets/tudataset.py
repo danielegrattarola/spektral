@@ -63,24 +63,21 @@ class TUDataset(Dataset):
     def download(self):
         print('Downloading {} dataset{}.'
               .format(self.name, ' (clean)' if self.clean else ''))
-
         url = '{}/{}.zip'.format(self.url_clean if self.clean else self.url, self.name)
-
         req = requests.get(url)
         if req.status_code == 404:
-            raise ValueError('Unknown dataset {}. See TUD.available_datasets()'
-                             ' for a list of available datasets.'
-                             .format(self.name))
-
+            raise ValueError('Cannot download dataset ({} returned 404).'
+                             .format(self.url))
         os.makedirs(self.path, exist_ok=True)
-        ofname = osp.join(self.path, '{}.zip'.format(self.name))
-        with open(ofname, 'wb') as of:
-            of.write(req.content)
-        with zipfile.ZipFile(ofname, 'r') as of:
-            of.extractall(self.path)
-        os.remove(ofname)
 
-        # TUD datasets are zipped in a folder: unpack them
+        fname = osp.join(self.path, self.name + '.zip')
+        with open(fname, 'wb') as of:
+            of.write(req.content)
+        with zipfile.ZipFile(fname, 'r') as of:
+            of.extractall(self.path)
+        os.remove(fname)
+
+        # Datasets are zipped in a folder: unpack them
         parent = self.path
         subfolder = osp.join(self.path, self.name)
         for filename in os.listdir(subfolder):

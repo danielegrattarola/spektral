@@ -78,9 +78,12 @@ class GraphSage(Dataset):
         return [Graph(x=x, adj=adj, y=y)]
 
     def download(self):
-        print('Dowloading', self.name, 'dataset.')
+        print('Downloading {} dataset.'.format(self.name))
         url = self.url.format(self.name)
         req = requests.get(url)
+        if req.status_code == 404:
+            raise ValueError('Cannot download dataset ({} returned 404).'
+                             .format(self.url))
         os.makedirs(self.path, exist_ok=True)
 
         fname = osp.join(self.path, self.name + '.zip')
