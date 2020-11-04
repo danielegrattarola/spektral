@@ -5,9 +5,9 @@ batch_size = 3
 
 
 def test_citation():
-    dataset = citation.Citation('cora')
-    dataset = citation.Citation('citeseer', random_split=True)
-    dataset = citation.Citation('pubmed', normalize_x=True)
+    dataset = citation.Cora()
+    dataset = citation.Citeseer(random_split=True)
+    dataset = citation.Pubmed(normalize_x=True)
 
 
 def test_graphsage():
