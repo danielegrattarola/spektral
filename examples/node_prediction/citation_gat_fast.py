@@ -83,7 +83,7 @@ best_test_acc = 0
 current_patience = patience = 100
 epochs = 999999
 tic()
-for epoch in range(1, epochs):
+for epoch in range(1, epochs + 1):
     train()
     l, a = evaluate()
     print('Loss tr: {:.4f}, Acc tr: {:.4f}, '
