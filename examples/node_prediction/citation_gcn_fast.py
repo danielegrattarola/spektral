@@ -12,25 +12,27 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
 
-from spektral.datasets import citation
-from spektral.layers import GraphConv, ops
+from spektral.datasets.citation import Citation
+from spektral.layers import GraphConv
+from spektral.transforms import LayerPreprocess, AdjToSpTensor
 from spektral.utils import tic, toc
 
 # Load data
-A, X, y, train_mask, val_mask, test_mask = citation.load_data('cora')
-fltr = GraphConv.preprocess(A).astype('f4')
-fltr = ops.sp_matrix_to_sp_tensor(fltr)
-X = X.toarray()
+dataset = Citation('cora',
+                   transforms=[LayerPreprocess(GraphConv), AdjToSpTensor()])
+graph = dataset[0]
+x, a, y = graph.x, graph.adj, graph.y
+mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
 
 # Define model
-X_in = Input(shape=(X.shape[1],))
-fltr_in = Input((X.shape[0],), sparse=True)
-X_1 = GraphConv(16, 'relu', True, kernel_regularizer=l2(5e-4))([X_in, fltr_in])
-X_1 = Dropout(0.5)(X_1)
-X_2 = GraphConv(y.shape[1], 'softmax', True)([X_1, fltr_in])
+x_in = Input(shape=(dataset.F,))
+a_in = Input((dataset.F,), sparse=True)
+x_1 = GraphConv(16, 'relu', True, kernel_regularizer=l2(5e-4))([x_in, a_in])
+x_1 = Dropout(0.5)(x_1)
+x_2 = GraphConv(y.shape[1], 'softmax', True)([x_1, a_in])
 
 # Build model
-model = Model(inputs=[X_in, fltr_in], outputs=X_2)
+model = Model(inputs=[x_in, a_in], outputs=x_2)
 optimizer = Adam(lr=1e-2)
 loss_fn = CategoricalCrossentropy()
 
@@ -39,8 +41,8 @@ loss_fn = CategoricalCrossentropy()
 @tf.function
 def train():
     with tf.GradientTape() as tape:
-        predictions = model([X, fltr], training=True)
-        loss = loss_fn(y[train_mask], predictions[train_mask])
+        predictions = model([x, a], training=True)
+        loss = loss_fn(y[mask_tr], predictions[mask_tr])
         loss += sum(model.losses)
     gradients = tape.gradient(loss, model.trainable_variables)
     optimizer.apply_gradients(zip(gradients, model.trainable_variables))

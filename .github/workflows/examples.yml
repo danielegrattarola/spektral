@@ -38,7 +38,7 @@ jobs:
         cd examples/node_prediction/
         for c_py in citation_*.py; do
           echo "##### $c_py #####"
-          python $c_py 
+          python $c_py
         done
         cd ..
         cd graph_prediction/

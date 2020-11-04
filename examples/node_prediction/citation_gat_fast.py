@@ -12,41 +12,42 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
 
-from spektral.datasets import citation
+from spektral.datasets.citation import Citation
 from spektral.layers import GraphAttention
-from spektral.layers import ops
+from spektral.transforms import LayerPreprocess, AdjToSpTensor
 from spektral.utils import tic, toc
 
 # Load data
-A, X, y, train_mask, val_mask, test_mask = citation.load_data('cora')
-fltr = A.astype('f4')
-fltr = ops.sp_matrix_to_sp_tensor(fltr)
-X = X.toarray()
+dataset = Citation('cora',
+                   transforms=[LayerPreprocess(GraphAttention), AdjToSpTensor()])
+graph = dataset[0]
+x, a, y = graph.x, graph.adj, graph.y
+mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
 
 # Define model
-X_in = Input(shape=(X.shape[1], ))
-fltr_in = Input(shape=(X.shape[0], ), sparse=True)
-X_1 = Dropout(0.6)(X_in)
-X_1 = GraphAttention(8,
+x_in = Input(shape=(dataset.F,))
+a_in = Input(shape=(None,), sparse=True)
+x_1 = Dropout(0.6)(x_in)
+x_1 = GraphAttention(8,
                      attn_heads=8,
                      concat_heads=True,
                      dropout_rate=0.6,
                      activation='elu',
                      kernel_regularizer=l2(5e-4),
                      attn_kernel_regularizer=l2(5e-4),
-                     bias_regularizer=l2(5e-4))([X_1, fltr_in])
-X_2 = Dropout(0.6)(X_1)
-X_2 = GraphAttention(y.shape[1],
+                     bias_regularizer=l2(5e-4))([x_1, a_in])
+x_2 = Dropout(0.6)(x_1)
+x_2 = GraphAttention(dataset.n_out,
                      attn_heads=1,
                      concat_heads=True,
                      dropout_rate=0.6,
                      activation='softmax',
                      kernel_regularizer=l2(5e-4),
                      attn_kernel_regularizer=l2(5e-4),
-                     bias_regularizer=l2(5e-4))([X_2, fltr_in])
+                     bias_regularizer=l2(5e-4))([x_2, a_in])
 
 # Build model
-model = Model(inputs=[X_in, fltr_in], outputs=X_2)
+model = Model(inputs=[x_in, a_in], outputs=x_2)
 optimizer = Adam(lr=5e-3)
 loss_fn = CategoricalCrossentropy()
 acc_fn = CategoricalAccuracy()
@@ -56,8 +57,8 @@ acc_fn = CategoricalAccuracy()
 @tf.function
 def train():
     with tf.GradientTape() as tape:
-        predictions = model([X, fltr], training=True)
-        loss = loss_fn(y[train_mask], predictions[train_mask])
+        predictions = model([x, a], training=True)
+        loss = loss_fn(y[mask_tr], predictions[mask_tr])
         loss += sum(model.losses)
     gradients = tape.gradient(loss, model.trainable_variables)
     optimizer.apply_gradients(zip(gradients, model.trainable_variables))
@@ -66,10 +67,10 @@ def train():
 
 @tf.function
 def evaluate():
-    predictions = model([X, fltr], training=False)
+    predictions = model([x, a], training=False)
     losses = []
     accuracies = []
-    for mask in [train_mask, val_mask, test_mask]:
+    for mask in [mask_tr, mask_va, mask_te]:
         loss = loss_fn(y[mask], predictions[mask])
         loss += sum(model.losses)
         losses.append(loss)
