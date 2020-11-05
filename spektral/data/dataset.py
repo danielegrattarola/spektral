@@ -88,33 +88,6 @@ class Dataset:
     def filter(self, function):
         self.graphs = [g for g in self.graphs if function(g)]
 
-    def signature(self):
-        signature = {}
-        graph = self.graphs[0]  # This is always non-empty
-        if graph.x is not None:
-            signature['x'] = dict()
-            signature['x']['spec'] = get_spec(graph.x)
-            signature['x']['shape'] = (None, graph.F)
-            signature['x']['dtype'] = tf.as_dtype(graph.x.dtype)
-        if graph.adj is not None:
-            signature['a'] = dict()
-            signature['a']['spec'] = get_spec(graph.adj)
-            signature['a']['shape'] = (None, None)
-            signature['a']['dtype'] = tf.as_dtype(graph.adj.dtype)
-        if graph.edge_attr is not None:
-            signature['e'] = dict()
-            signature['e']['spec'] = get_spec(graph.edge_attr)
-            signature['e']['shape'] = (None, graph.S)
-            signature['e']['dtype'] = tf.as_dtype(graph.edge_attr.dtype)
-        if graph.y is not None:
-            signature['y'] = dict()
-            signature['y']['spec'] = get_spec(graph.y)
-            signature['y']['shape'] = (self.n_out, )
-            signature['y']['dtype'] = tf.as_dtype(np.array(graph.y).dtype)
-
-
-        return signature
-
     def __getitem__(self, key):
         if not (np.issubdtype(type(key), np.integer) or
                 isinstance(key, (slice, list, tuple, np.ndarray))):
@@ -184,3 +157,28 @@ class Dataset:
                 return 1
             else:
                 return shp[-1]
+
+    def signature(self):
+        signature = {}
+        graph = self.graphs[0]  # This is always non-empty
+        if graph.x is not None:
+            signature['x'] = dict()
+            signature['x']['spec'] = get_spec(graph.x)
+            signature['x']['shape'] = (None, graph.F)
+            signature['x']['dtype'] = tf.as_dtype(graph.x.dtype)
+        if graph.adj is not None:
+            signature['a'] = dict()
+            signature['a']['spec'] = get_spec(graph.adj)
+            signature['a']['shape'] = (None, None)
+            signature['a']['dtype'] = tf.as_dtype(graph.adj.dtype)
+        if graph.edge_attr is not None:
+            signature['e'] = dict()
+            signature['e']['spec'] = get_spec(graph.edge_attr)
+            signature['e']['shape'] = (None, graph.S)
+            signature['e']['dtype'] = tf.as_dtype(graph.edge_attr.dtype)
+        if graph.y is not None:
+            signature['y'] = dict()
+            signature['y']['spec'] = get_spec(graph.y)
+            signature['y']['shape'] = (self.n_out, )
+            signature['y']['dtype'] = tf.as_dtype(np.array(graph.y).dtype)
+        return signature

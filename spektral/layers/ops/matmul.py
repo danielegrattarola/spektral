@@ -37,9 +37,11 @@ def dot(a, b, transpose_a=False, transpose_b=False):
             )
 
     # Fallthrough to sp-sp and d-d implementations
-    if a_is_sparse_tensor and b_is_sparse_tensor:
+    if a_is_sparse_tensor:
         a = tfsp.CSRSparseMatrix(a)
+    if b_is_sparse_tensor:
         b = tfsp.CSRSparseMatrix(b)
+    if a_is_sparse_tensor or b_is_sparse_tensor:
         out = tfsp.matmul(a, b, transpose_a=transpose_a, transpose_b=transpose_b)
         if hasattr(out, 'to_sparse_tensor'):
             return out.to_sparse_tensor()
