@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 from scipy import sparse as sp
 
-from spektral.data.utils import prepend_none, output_signature, to_disjoint, to_batch, batch_generator
+from spektral.data.utils import prepend_none, to_tf_signature, to_disjoint, to_batch, batch_generator
 from spektral.layers.ops import sp_matrix_to_sp_tensor
 
 version = tf.__version__.split('.')
@@ -28,7 +28,6 @@ class Loader:
         self.epochs = epochs
         self.shuffle = shuffle
         self._generator = self.generator()
-        self.steps_per_epoch = int(np.ceil(len(self.dataset) / self.batch_size))
 
     def __iter__(self):
         return self
@@ -47,8 +46,15 @@ class Loader:
     def tf(self):
         raise NotImplementedError
 
+    def tf_signature(self):
+        raise NotImplementedError
+
     def _pack(self, batch):
         return [list(elem) for elem in zip(*[g.numpy() for g in batch])]
+
+    @property
+    def steps_per_epoch(self):
+        return int(np.ceil(len(self.dataset) / self.batch_size))
 
 
 class SingleLoader(Loader):
@@ -71,6 +77,9 @@ class SingleLoader(Loader):
         output = self.collate(self.dataset)
         return tf.data.Dataset.from_tensors(output).repeat(self.epochs)
 
+    def tf_signature(self):
+        pass
+
 
 class DisjointLoader(Loader):
     """
@@ -92,24 +101,22 @@ class DisjointLoader(Loader):
         if not tf_loader_available:
             raise RuntimeError('Calling Loader.tf() requires TensorFlow 2.4 '
                                'or greater.')
-        signature = copy.deepcopy(self.dataset.signature)
-        if 'y' in signature:
-            # Targets have an extra None dimension in batch mode
-            signature['y']['shape'] = prepend_none(signature['y']['shape'])
+        return tf.data.Dataset.from_generator(
+            lambda: (_ for _ in self), output_signature=self.tf_signature())
 
+    def tf_signature(self):
+        signature = self.dataset.signature()
+        if 'y' in signature:
+            signature['y']['shape'] = prepend_none(signature['y']['shape'])
         if 'a' in signature:
-            # Adjacency matrix in batch mode is sparse
             signature['a']['spec'] = tf.SparseTensorSpec
 
         signature['i'] = dict()
         signature['i']['spec'] = tf.TensorSpec
-        signature['i']['shape'] = (None, )
+        signature['i']['shape'] = (None,)
         signature['i']['dtype'] = tf.as_dtype(tf.int64)
 
-        return tf.data.Dataset.from_generator(
-            lambda: (_ for _ in self),
-            output_signature=output_signature(signature)
-        )
+        return to_tf_signature(signature)
 
 
 class BatchLoader(Loader):
@@ -127,7 +134,11 @@ class BatchLoader(Loader):
         if not tf_loader_available:
             raise RuntimeError('Calling Loader.tf() requires TensorFlow 2.4 '
                                'or greater.')
-        signature = copy.deepcopy(self.dataset.signature)
+        return tf.data.Dataset.from_generator(
+            lambda: (_ for _ in self), output_signature=self.tf_signature())
+
+    def tf_signature(self):
+        signature = self.dataset.signature()
         for k in signature:
             signature[k]['shape'] = prepend_none(signature[k]['shape'])
         if 'a' in signature:
@@ -137,10 +148,7 @@ class BatchLoader(Loader):
             # Edge attributes have an extra None dimension in batch mode
             signature['e']['shape'] = prepend_none(signature['e']['shape'])
 
-        return tf.data.Dataset.from_generator(
-            lambda: (_ for _ in self),
-            output_signature=output_signature(signature)
-        )
+        return to_tf_signature(signature)
 
 
 class PackedBatchLoader(BatchLoader):

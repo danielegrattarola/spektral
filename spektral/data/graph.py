@@ -1,3 +1,6 @@
+import numpy as np
+import scipy.sparse as sp
+
 class Graph:
     """
     A container to represent a graph with:
@@ -30,17 +33,17 @@ class Graph:
         self.adj = adj
         self.edge_attr = edge_attr
         self.y = y
+
         # Read extra kwargs
         for k, v in kwargs.items():
             self[k] = v
 
-        self.N = None if self.x is None else self.x.shape[-2]
-        self.F = None if self.x is None else self.x.shape[-1]
-        self.S = None if self.edge_attr is None else self.edge_attr.shape[-1]
-
     def numpy(self):
         return tuple(ret for ret in [self.x, self.adj, self.edge_attr, self.y]
                      if ret is not None)
+
+    def __setitem__(self, key, value):
+        setattr(self, key, value)
 
     def __getitem__(self, key):
         return getattr(self, key, None)
@@ -48,3 +51,26 @@ class Graph:
     def __repr__(self):
         return 'Graph(N={}, F={}, S={}, y={}'\
                .format(self.N, self.F, self.S, self.y)
+
+    @property
+    def N(self):
+        if self.x is not None:
+            return self.x.shape[-2]
+        elif self.adj is not None:
+            return self.adj.shape[-1]
+        else:
+            return None
+
+    @property
+    def F(self):
+        if self.x is not None:
+            return self.x.shape[-1]
+        else:
+            return None
+
+    @property
+    def S(self):
+        if self.edge_attr is not None:
+            return self.edge_attr.shape[-1]
+        else:
+            return None

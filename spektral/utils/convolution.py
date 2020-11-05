@@ -1,4 +1,5 @@
 import copy
+import warnings
 
 import numpy as np
 from scipy import sparse as sp
@@ -29,7 +30,9 @@ def degree_power(A, k):
     :return: if A is a dense array, a dense array; if A is sparse, a sparse
     matrix in DIA format.
     """
-    degrees = np.power(np.array(A.sum(1)), k).ravel()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        degrees = np.power(np.array(A.sum(1)), k).ravel()
     degrees[np.isinf(degrees)] = 0.
     if sp.issparse(A):
         D = sp.diags(degrees)
@@ -118,7 +121,9 @@ def gcn_filter(A, symmetric=True):
             out[i] = normalized_adjacency(out[i], symmetric=symmetric)
     else:
         out = out.tocsr()
-        out[np.diag_indices_from(out)] += 1
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            out[np.diag_indices_from(out)] += 1
         out = normalized_adjacency(out, symmetric=symmetric)
 
     if sp.issparse(out):
