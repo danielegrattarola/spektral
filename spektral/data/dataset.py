@@ -39,10 +39,6 @@ class Dataset:
     >>> dataset.S
     >>> dataset.n_out
     ```
-
-    The general shape, dtype, and `tf.TypeSpec` of the matrices composing the
-    graphs is stored in `dataset.signature`. This can be useful when
-    implementing a custom Loader for your dataset.
     """
     def __init__(self, transforms=None, **kwargs):
         if not osp.exists(self.path):
@@ -51,15 +47,6 @@ class Dataset:
         # Make sure that we always have at least one graph
         if len(self.graphs) == 0:
             raise ValueError('Datasets cannot be empty')
-
-        if len(self.graphs) == 1 or len(set([g.N for g in self.graphs])) == 1:
-            self.N = self.graphs[0].N
-        else:
-            self.N = None
-        self.F = None
-        self.S = None
-        self.n_out = None
-        self.signature = self._signature()
 
         # Read extra kwargs
         for k, v in kwargs.items():
@@ -98,7 +85,10 @@ class Dataset:
         else:
             return out
 
-    def _signature(self):
+    def filter(self, function):
+        self.graphs = [g for g in self.graphs if function(g)]
+
+    def signature(self):
         signature = {}
         graph = self.graphs[0]  # This is always non-empty
         if graph.x is not None:
@@ -106,7 +96,6 @@ class Dataset:
             signature['x']['spec'] = get_spec(graph.x)
             signature['x']['shape'] = (None, graph.F)
             signature['x']['dtype'] = tf.as_dtype(graph.x.dtype)
-            self.F = graph.F
         if graph.adj is not None:
             signature['a'] = dict()
             signature['a']['spec'] = get_spec(graph.adj)
@@ -117,13 +106,12 @@ class Dataset:
             signature['e']['spec'] = get_spec(graph.edge_attr)
             signature['e']['shape'] = (None, graph.S)
             signature['e']['dtype'] = tf.as_dtype(graph.edge_attr.dtype)
-            self.S = graph.S
         if graph.y is not None:
             signature['y'] = dict()
             signature['y']['spec'] = get_spec(graph.y)
-            signature['y']['shape'] = (graph.y.shape[-1], )
-            signature['y']['dtype'] = tf.as_dtype(graph.y.dtype)
-            self.n_out = graph.y.shape[-1]
+            signature['y']['shape'] = (self.n_out, )
+            signature['y']['dtype'] = tf.as_dtype(np.array(graph.y).dtype)
+
 
         return signature
 
@@ -168,5 +156,31 @@ class Dataset:
         return len(self.graphs)
 
     def __repr__(self):
-        return 'Dataset(len={}, signature="{}")'\
-            .format(self.__len__(), ', '.join(self.signature.keys()))
+        return '{}({})'.format(self.__class__.__name__, self.__len__())
+
+    @property
+    def N(self):
+        if len(self.graphs) == 1 or len(set([g.N for g in self.graphs])) == 1:
+            return self.graphs[0].N
+        else:
+            return None
+
+    @property
+    def F(self):
+        return self.graphs[0].F
+
+    @property
+    def S(self):
+        return self.graphs[0].S
+
+    @property
+    def n_out(self):
+        y = self.graphs[0].y
+        if y is None:
+            return None
+        else:
+            shp = np.shape(y)
+            if len(shp) == 0:
+                return 1
+            else:
+                return shp[-1]

@@ -2,6 +2,7 @@ import numpy as np
 import tensorflow as tf
 from scipy import sparse as sp
 
+from spektral.layers.ops import sp_batch_to_sp_tensor
 from spektral.utils import pad_jagged_array
 
 
@@ -172,7 +173,7 @@ def prepend_none(t):
     return (None, ) + t
 
 
-def output_signature(signature):
+def to_tf_signature(signature):
     output = []
     keys = ['x', 'a', 'e', 'i']
     for k in keys:

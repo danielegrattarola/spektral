@@ -27,9 +27,9 @@ def test_dataset():
     assert d.S == s
     assert d.n_out == 2
 
-    # _signature
+    # signature
     for k in ['x', 'a', 'e', 'y']:
-        assert k in d.signature
+        assert k in d.signature()
 
     # __getitem__
     assert isinstance(d[0], Graph)
