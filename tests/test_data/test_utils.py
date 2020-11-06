@@ -7,7 +7,7 @@ import numpy as np
 
 ns = np.random.randint(3, 10, 10)
 f = 3
-a_list = [sp.coo_matrix(np.ones((n, n))) for n in ns]
+a_list = [sp.csr_matrix(np.ones((n, n))) for n in ns]
 x_list = [np.random.rand(n, f) for n in ns]
 y = [[0, 1]] * len(ns)
 

@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-from scipy.sparse import coo_matrix
+from scipy.sparse import csr_matrix
 
 from spektral.layers import ops
 from spektral.utils import convolution
@@ -215,7 +215,7 @@ def test_modes_ops():
     A_data = [1, 1, 1, 1, 1]
     A_row = [0, 1, 2, 3, 4]
     A_col = [1, 0, 1, 4, 3]
-    A_sparse = coo_matrix((A_data, (A_row, A_col)), shape=(5, 5))
+    A_sparse = csr_matrix((A_data, (A_row, A_col)), shape=(5, 5))
     A_sparse_tensor = ops.sp_matrix_to_sp_tensor(A_sparse)
 
     # Disjoint signal to batch

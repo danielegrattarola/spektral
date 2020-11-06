@@ -92,7 +92,7 @@ class Citation(Dataset):
                 idx_te, y_te, train_size=30 * n_classes, stratify=y_te)
 
         # Adjacency matrix
-        adj = nx.adjacency_matrix(nx.from_dict_of_lists(graph))
+        adj = nx.adjacency_matrix(nx.from_dict_of_lists(graph))  # CSR
         adj.setdiag(0)
         adj.eliminate_zeros()
 

@@ -25,7 +25,7 @@ class TestDatasetSingle(Dataset):
         n = 10
         return [
             Graph(x=np.random.rand(n, f),
-                  adj=sp.coo_matrix(np.random.randint(0, 2, (n, n))),
+                  adj=sp.csr_matrix(np.random.randint(0, 2, (n, n))),
                   edge_attr=np.random.rand(n, n, s),
                   y=np.array(n * [[0., 1.]]))
         ]
@@ -38,7 +38,7 @@ class TestDataset(Dataset):
     def read(self):
         return [
             Graph(x=np.random.rand(n, f),
-                  adj=sp.coo_matrix(np.random.randint(0, 2, (n, n))),
+                  adj=sp.csr_matrix(np.random.randint(0, 2, (n, n))),
                   edge_attr=np.random.rand(n, n, s),
                   y=np.array([0., 1.]))
             for n in ns
