@@ -66,7 +66,7 @@ class GraphSage(Dataset):
         npz_file = osp.join(self.path, self.name) + '.npz'
         data = np.load(npz_file)
         x = data['x']
-        adj = sp.coo_matrix(
+        adj = sp.csr_matrix(
             (data['adj_data'], (data['adj_row'], data['adj_col'])),
             shape=data['adj_shape']
         )
@@ -163,9 +163,9 @@ def preprocess_data(path, name):
              for edge in G.edges()
              if edge[0] in id_map and edge[1] in id_map]
     edges = np.array(edges, dtype=np.int32)
-    adj = sp.coo_matrix((np.ones((edges.shape[0]), dtype=np.float32),
+    adj = sp.csr_matrix((np.ones((edges.shape[0]), dtype=np.float32),
                          (edges[:, 0], edges[:, 1])), shape=(n, n))
-    adj = adj.maximum(adj.transpose()).tocoo()
+    adj = adj.maximum(adj.transpose())
 
     # Process labels
     if isinstance(list(class_map.values())[0], list):

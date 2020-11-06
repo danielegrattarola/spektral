@@ -110,7 +110,7 @@ class TUDataset(Dataset):
         edge_lists = np.split(edges - n_nodes_cum[edge_batch_idx, None], n_edges_cum)
         # Create sparse adjacency matrices
         a_list = [
-            sp.coo_matrix(
+            sp.csr_matrix(
                 (np.ones_like(el[:, 0]), (el[:, 0], el[:, 1])),
                 shape=(n_nodes[i], n_nodes[i])
             )
