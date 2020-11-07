@@ -32,14 +32,15 @@ l2_reg = 5e-5          # L2 regularization rate
 learning_rate = 1e-2   # Learning rate
 epochs = 20000         # Number of training epochs
 patience = 100         # Patience for early stopping
+a_dtype = dataset[0].adj.dtype  # Only needed for TF 2.1
 
 N = dataset.N          # Number of nodes in the graph
 F = dataset.F          # Original size of node features
 n_out = dataset.n_out  # Number of classes
 
 # Model definition
-X_in = Input(shape=(F, ))
-fltr_in = Input((N, ), sparse=True)
+x_in = Input(shape=(F,))
+a_in = Input((N,), sparse=True, dtype=a_dtype)
 
 gc_1 = ARMAConv(channels,
                 iterations=iterations,
@@ -48,7 +49,7 @@ gc_1 = ARMAConv(channels,
                 dropout_rate=dropout_skip,
                 activation='elu',
                 gcn_activation='elu',
-                kernel_regularizer=l2(l2_reg))([X_in, fltr_in])
+                kernel_regularizer=l2(l2_reg))([x_in, a_in])
 gc_2 = Dropout(dropout)(gc_1)
 gc_2 = ARMAConv(n_out,
                 iterations=1,
@@ -57,10 +58,10 @@ gc_2 = ARMAConv(n_out,
                 dropout_rate=dropout_skip,
                 activation='softmax',
                 gcn_activation=None,
-                kernel_regularizer=l2(l2_reg))([gc_2, fltr_in])
+                kernel_regularizer=l2(l2_reg))([gc_2, a_in])
 
 # Build model
-model = Model(inputs=[X_in, fltr_in], outputs=gc_2)
+model = Model(inputs=[x_in, a_in], outputs=gc_2)
 optimizer = Adam(learning_rate=learning_rate)
 model.compile(optimizer=optimizer,
               loss='categorical_crossentropy',

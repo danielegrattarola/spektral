@@ -45,21 +45,23 @@ l2_reg = 5e-6          # L2 regularization rate
 learning_rate = 0.2    # Learning rate
 epochs = 20000         # Number of training epochs
 patience = 200         # Patience for early stopping
+a_dtype = dataset[0].adj.dtype  # Only needed for TF 2.1
 
 N = dataset.N          # Number of nodes in the graph
 F = dataset.F          # Original size of node features
 n_out = dataset.n_out  # Number of classes
 
 # Model definition
-X_in = Input(shape=(F, ))
-fltr_in = Input((N, ), sparse=True)
+x_in = Input(shape=(F,))
+a_in = Input((N,), sparse=True, dtype=a_dtype)
+
 output = GraphConv(n_out,
                    activation='softmax',
                    kernel_regularizer=l2(l2_reg),
-                   use_bias=False)([X_in, fltr_in])
+                   use_bias=False)([x_in, a_in])
 
 # Build model
-model = Model(inputs=[X_in, fltr_in], outputs=output)
+model = Model(inputs=[x_in, a_in], outputs=output)
 optimizer = Adam(lr=learning_rate)
 model.compile(optimizer=optimizer,
               loss='categorical_crossentropy',
