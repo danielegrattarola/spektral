@@ -15,6 +15,7 @@ from spektral.data.loaders import SingleLoader
 from spektral.datasets.citation import Citation
 from spektral.layers import GraphConv
 from spektral.transforms import LayerPreprocess, AdjToSpTensor
+import tensorflow as tf
 
 # Load data
 dataset = Citation('cora',
@@ -28,27 +29,28 @@ l2_reg = 5e-4 / 2      # L2 regularization rate
 learning_rate = 1e-2   # Learning rate
 epochs = 200           # Number of training epochs
 patience = 10          # Patience for early stopping
+a_dtype = dataset[0].adj.dtype  # Only needed for TF 2.1
 
 N = dataset.N          # Number of nodes in the graph
 F = dataset.F          # Original size of node features
 n_out = dataset.n_out  # Number of classes
 
 # Model definition
-X_in = Input(shape=(F, ))
-fltr_in = Input((N, ), sparse=True)
+x_in = Input(shape=(F,))
+a_in = Input((N,), sparse=True, dtype=a_dtype)
 
-dropout_1 = Dropout(dropout)(X_in)
-graph_conv_1 = GraphConv(channels,
-                         activation='relu',
-                         kernel_regularizer=l2(l2_reg),
-                         use_bias=False)([dropout_1, fltr_in])
-dropout_2 = Dropout(dropout)(graph_conv_1)
-graph_conv_2 = GraphConv(n_out,
-                         activation='softmax',
-                         use_bias=False)([dropout_2, fltr_in])
+do_1 = Dropout(dropout)(x_in)
+gc_1 = GraphConv(channels,
+                 activation='relu',
+                 kernel_regularizer=l2(l2_reg),
+                 use_bias=False)([do_1, a_in])
+do_2 = Dropout(dropout)(gc_1)
+gc_2 = GraphConv(n_out,
+                 activation='softmax',
+                 use_bias=False)([do_2, a_in])
 
 # Build model
-model = Model(inputs=[X_in, fltr_in], outputs=graph_conv_2)
+model = Model(inputs=[x_in, a_in], outputs=gc_2)
 optimizer = Adam(lr=learning_rate)
 model.compile(optimizer=optimizer,
               loss='categorical_crossentropy',

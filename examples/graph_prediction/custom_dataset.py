@@ -95,6 +95,10 @@ dataset_tr = dataset[idx_tr]
 dataset_va = dataset[idx_va]
 dataset_te = dataset[idx_te]
 
+loader_tr = DisjointLoader(dataset_tr, batch_size=batch_size, epochs=epochs)
+loader_va = DisjointLoader(dataset_va, batch_size=batch_size)
+loader_te = DisjointLoader(dataset_te, batch_size=batch_size)
+
 ################################################################################
 # BUILD (unnecessarily big) MODEL
 ################################################################################
@@ -120,12 +124,7 @@ acc_fn = CategoricalAccuracy()
 ################################################################################
 # FIT MODEL
 ################################################################################
-@tf.function(
-    input_signature=((tf.TensorSpec((None, F), dtype=tf.float64),
-                      tf.SparseTensorSpec((None, None), dtype=tf.float64),
-                      tf.TensorSpec((None,), dtype=tf.int64)),
-                     tf.TensorSpec((None, n_out), dtype=tf.float64)),
-    experimental_relax_shapes=True)
+@tf.function(input_signature=loader_tr.tf_signature(), experimental_relax_shapes=True)
 def train_step(inputs, target):
     with tf.GradientTape() as tape:
         predictions = model(inputs, training=True)
@@ -158,8 +157,6 @@ best_val_loss = np.inf
 best_weights = None
 patience = es_patience
 
-loader_tr = DisjointLoader(dataset_tr, batch_size=batch_size, epochs=epochs)
-loader_va = DisjointLoader(dataset_va, batch_size=batch_size)
 for batch in loader_tr:
     outs = train_step(*batch)
 
@@ -196,6 +193,5 @@ for batch in loader_tr:
 ################################################################################
 print('Testing model')
 model.set_weights(best_weights)  # Load best model
-loader_te = DisjointLoader(dataset_te, batch_size=batch_size)
 test_loss, test_acc = evaluate(loader_te, [loss_fn, acc_fn])
 print('Done. Test loss: {:.4f}. Test acc: {:.2f}'.format(test_loss, test_acc))

@@ -44,6 +44,9 @@ dataset_tr = dataset[idx_tr]
 dataset_va = dataset[idx_va]
 dataset_te = dataset[idx_te]
 
+loader_tr = DisjointLoader(dataset_tr, batch_size=batch_size, epochs=epochs)
+loader_te = DisjointLoader(dataset_te, batch_size=batch_size, epochs=1)
+
 ################################################################################
 # BUILD MODEL
 ################################################################################
@@ -86,10 +89,8 @@ def train_step(inputs, target):
 print('Fitting model')
 current_batch = 0
 model_loss = 0
-loader_tr = DisjointLoader(dataset_tr, batch_size=batch_size, epochs=epochs)
 for batch in loader_tr:
     outs = train_step(*batch)
-
     model_loss += outs
     current_batch += 1
     if current_batch == loader_tr.steps_per_epoch:
@@ -104,7 +105,6 @@ print('Testing model')
 evaluator = Evaluator(name=dataset_name)
 y_true = []
 y_pred = []
-loader_te = DisjointLoader(dataset_te, batch_size=batch_size, epochs=1)
 for batch in loader_te:
     inputs, target = batch
     p = model(inputs, training=False)

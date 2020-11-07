@@ -44,18 +44,18 @@ mask_te[idx_te] = True
 masks = [mask_tr, mask_va, mask_te]
 
 # Model definition
-X_in = Input(shape=(F, ))
-fltr_in = Input((N, ), sparse=True)
-X_1 = GraphConv(channels, activation='relu')([X_in, fltr_in])
-X_1 = BatchNormalization()(X_1)
-X_1 = Dropout(dropout)(X_1)
-X_2 = GraphConv(channels, activation='relu')([X_1, fltr_in])
-X_2 = BatchNormalization()(X_2)
-X_2 = Dropout(dropout)(X_2)
-X_3 = GraphConv(n_out, activation='softmax')([X_2, fltr_in])
+x_in = Input(shape=(F,))
+a_in = Input((N,), sparse=True)
+x_1 = GraphConv(channels, activation='relu')([x_in, a_in])
+x_1 = BatchNormalization()(x_1)
+x_1 = Dropout(dropout)(x_1)
+x_2 = GraphConv(channels, activation='relu')([x_1, a_in])
+x_2 = BatchNormalization()(x_2)
+x_2 = Dropout(dropout)(x_2)
+x_3 = GraphConv(n_out, activation='softmax')([x_2, a_in])
 
 # Build model
-model = Model(inputs=[X_in, fltr_in], outputs=X_3)
+model = Model(inputs=[x_in, a_in], outputs=x_3)
 optimizer = Adam(lr=learning_rate)
 model.compile(optimizer=optimizer, loss=SparseCategoricalCrossentropy())
 model.summary()
@@ -63,8 +63,8 @@ model.summary()
 
 # Evaluation with OGB
 evaluator = Evaluator(dataset_name)
-def evaluate(X, fltr, y, model, masks, evaluator):
-    p = model.predict_on_batch([X, fltr])
+def evaluate(x, a, y, model, masks, evaluator):
+    p = model.predict_on_batch([x, a])
     p = p.argmax(-1)[:, None]
     tr_mask, va_mask, te_mask = masks
     tr_auc = evaluator.eval({'y_true': y[tr_mask], 'y_pred': p[tr_mask]})['acc']

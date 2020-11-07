@@ -37,6 +37,8 @@ split = int(0.9 * len(dataset))
 idx_tr, idx_te = np.split(idxs, [split])
 dataset_tr, dataset_te = dataset[idx_tr], dataset[idx_te]
 
+loader_tr = DisjointLoader(dataset_tr, batch_size=batch_size, epochs=epochs)
+loader_te = DisjointLoader(dataset_te, batch_size=batch_size, epochs=1)
 
 ################################################################################
 # BUILD MODEL
@@ -60,13 +62,7 @@ loss_fn = MeanSquaredError()
 ################################################################################
 # FIT MODEL
 ################################################################################
-@tf.function(
-    input_signature=((tf.TensorSpec((None, F), dtype=tf.float64),
-                      tf.SparseTensorSpec((None, None), dtype=tf.int64),
-                      tf.TensorSpec((None, S), dtype=tf.float64),
-                      tf.TensorSpec((None,), dtype=tf.int64)),
-                     tf.TensorSpec((None, n_out), dtype=tf.float64)),
-    experimental_relax_shapes=True)
+@tf.function(input_signature=loader_tr.tf_signature(), experimental_relax_shapes=True)
 def train_step(inputs, target):
     with tf.GradientTape() as tape:
         predictions = model(inputs, training=True)
@@ -80,7 +76,6 @@ def train_step(inputs, target):
 print('Fitting model')
 current_batch = 0
 model_loss = 0
-loader_tr = DisjointLoader(dataset_tr, batch_size=batch_size, epochs=epochs)
 for batch in loader_tr:
     outs = train_step(*batch)
 
@@ -96,7 +91,6 @@ for batch in loader_tr:
 ################################################################################
 print('Testing model')
 model_loss = 0
-loader_te = DisjointLoader(dataset_te, batch_size=batch_size, epochs=1)
 for batch in loader_te:
     inputs, target = batch
     predictions = model(inputs, training=False)
