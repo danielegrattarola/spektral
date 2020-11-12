@@ -105,7 +105,7 @@ class DisjointLoader(Loader):
             lambda: (_ for _ in self), output_signature=self.tf_signature())
 
     def tf_signature(self):
-        signature = self.dataset.signature()
+        signature = self.dataset.signature
         if 'y' in signature:
             signature['y']['shape'] = prepend_none(signature['y']['shape'])
         if 'a' in signature:
@@ -138,7 +138,7 @@ class BatchLoader(Loader):
             lambda: (_ for _ in self), output_signature=self.tf_signature())
 
     def tf_signature(self):
-        signature = self.dataset.signature()
+        signature = self.dataset.signature
         for k in signature:
             signature[k]['shape'] = prepend_none(signature[k]['shape'])
         if 'a' in signature:

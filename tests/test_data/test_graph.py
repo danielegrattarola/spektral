@@ -10,8 +10,8 @@ n_out = 2
 
 def _check_graph(x, a, e, y):
     g = Graph(x=x)
-    g = Graph(adj=a)
-    g = Graph(x=x, adj=a, edge_attr=e, y=y)
+    g = Graph(a=a)
+    g = Graph(x=x, a=a, e=e, y=y)
 
     # numpy
     g_np = g.numpy()

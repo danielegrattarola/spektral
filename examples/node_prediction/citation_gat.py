@@ -29,7 +29,7 @@ l2_reg = 5e-6          # L2 regularization rate
 learning_rate = 5e-3   # Learning rate
 epochs = 20000         # Number of training epochs
 patience = 100         # Patience for early stopping
-a_dtype = dataset[0].adj.dtype  # Only needed for TF 2.1
+a_dtype = dataset[0].a.dtype  # Only needed for TF 2.1
 
 N = dataset.N          # Number of nodes in the graph
 F = dataset.F          # Original size of node features

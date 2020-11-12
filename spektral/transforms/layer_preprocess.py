@@ -12,7 +12,7 @@ class LayerPreprocess(object):
         self.layer_class = layer_class
 
     def __call__(self, graph):
-        if graph.adj is not None and hasattr(self.layer_class, 'preprocess'):
-            graph.adj = self.layer_class.preprocess(graph.adj)
+        if graph.a is not None and hasattr(self.layer_class, 'preprocess'):
+            graph.a = self.layer_class.preprocess(graph.a)
 
         return graph

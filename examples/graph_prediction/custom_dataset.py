@@ -75,7 +75,7 @@ class MyDataset(Dataset):
             color_counts = x.sum(0)
             y[np.argmax(color_counts)] = 1
 
-            return Graph(x=x, adj=a, y=y)
+            return Graph(x=x, a=a, y=y)
 
         # We must return a list of Graph objects
         return [make_graph() for _ in range(self.n_graphs)]

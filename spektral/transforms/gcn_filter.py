@@ -6,7 +6,7 @@ class GCNFilter(object):
         self.symmetric = symmetric
 
     def __call__(self, graph):
-        if graph.adj is not None:
-            graph.adj = gcn_filter(graph.adj, self.symmetric)
+        if graph.a is not None:
+            graph.a = gcn_filter(graph.a, self.symmetric)
 
         return graph

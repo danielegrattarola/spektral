@@ -14,59 +14,102 @@ class Dataset:
     A container for Graph objects. This class can be extended to represent a
     graph dataset.
 
-    To extend this class, you must implement the `Dataset.read()` method, which
+    Datasets can be accessed with indices (`dataset[0]` returns a `Graph`),
+    iterables  (`dataset[[1, 2, 3]]` returns a `Dataset`) or slices
+    (`dataset[start:stop]` also returns a `Dataset`).
+    They can also be shuffled (`np.random.shuffle(dataset)` shuffles in-place),
+    and iterated over (`for graph in dataset: ...`).
+
+    They should generally behave like Numpy arrays for any operation that uses
+    simple 1D indexing.
+
+    Datasets have the following properties that automatically computed from the
+    graphs:
+
+        - `N`: the number of nodes in the dataset (returns `None` if the number
+        changes between graphs);
+        - `F`: the size of the node features (returns `None` if the size changes
+        between graphs or is not defined);
+        - `S`: the size of the edge features (returns `None` if the size changes
+        between graphs or is not defined);
+        - `n_labels`: the size of the labels (returns `None` if the size changes
+        between graphs or is not defined); this is computed as the innermost
+        dimension of the labels (i.e., `y.shape[-1]`).
+
+    Any additional `kwargs` passed to the constructor will be automatically
+    assigned as instance attributes of the dataset.
+
+    Datasets also offer three main manipulation functions to apply callables to
+    their graphs:
+
+    - `apply(transform)`: replaces each graph with the output of
+    `transform(graph)`. This should always be a `Graph` object, although no
+    checks are made to ensure it (to give you more flexibility). See
+    `spektral.transforms` for some ready-to-use transforms.
+    For example: `apply(spektral.transforms.NormalizeAdj())` normalizes the
+    adjacency matrix of each graph in the dataset.
+    - `map(transform, reduce=None)`: returns a list containing the output
+    of `transform(graph)` for each graph. If `reduce` is a `callable`, then
+    returns `reduce(output_list)` instead of just `output_list`.
+    For instance: `map(lambda: g.N, reduce=np.mean)` will return the average
+    number of nodes in the dataset.
+    - `filter(function)`: removes from the dataset any graph for which
+    `function(graph)` returns `False`.
+    For example: `filter(lambda: g.N < 100)` removes from the dataset all graphs
+    bigger than 100 nodes.
+
+    You can extend this class to create your own dataset.
+    To create a `Dataset`, you must implement the `Dataset.read()` method, which
     must return a list of `spektral.data.Graph` objects, e.g.,
 
     ```
     class MyDataset(Dataset):
         def read(self):
-            return [
-                Graph(x=np.random.rand(n, 2),
-                      adj=np.random.randint(0, 2, (n, n)),
-                      y=np.array([0., 1.]))
-                for n in range(size)
-            ]
+            return [Graph(x=x, adj=adj, y=y) for x, adj, y in some_magic_list]
     ```
 
-    Datasets can be sliced (`dataset[start:stop]`), shuffled
-    (`np.random.shuffle(dataset)`), and iterated (`for graph in dataset: ...`).
+    The class also offers a `download()` method that is automatically called
+    if the path returned by the `Dataset.path` attribute does not exists.
+    This defaults to `~/.spektral/datasets/ClassName/'.
 
-    The size of the node features, edge features and targets is shared by all
-    graphs in a dataset and can be accessed respectively with:
+    You can implement this however you like, knowing that `download()` will be
+    called before `read()`. You can also override the `path` attribute to
+    whatever fits your needs.
 
-    ```
-    >>> dataset.F
-    >>> dataset.S
-    >>> dataset.n_out
-    ```
+    Have a look at the `spektral.datasets` module for examples of popular
+    datasets already implemented.
+
+    **Arguments**
+
+    - `transforms`: a callable or list of callables that are automatically
+    applied to the graphs after loading the dataset.
     """
     def __init__(self, transforms=None, **kwargs):
-        if not osp.exists(self.path):
-            self.download()
-        self.graphs = self.read()
-        # Make sure that we always have at least one graph
-        if len(self.graphs) == 0:
-            raise ValueError('Datasets cannot be empty')
 
         # Read extra kwargs
         for k, v in kwargs.items():
             setattr(self, k, v)
+
+        # Download data
+        if not osp.exists(self.path):
+            self.download()
+
+        # Read graphs
+        self.graphs = self.read()
+        if len(self.graphs) == 0:
+            raise ValueError('Datasets cannot be empty')
 
         # Apply transforms
         if transforms is not None:
             if not isinstance(transforms, (list, tuple)) and callable(transforms):
                 transforms = [transforms]
             elif not all([callable(t) for t in transforms]):
-                raise ValueError('transforms must be a list of callables or '
-                                 'a callable.')
+                raise ValueError('`transforms` must be a callable or list of '
+                                 'callables')
             else:
                 pass
             for t in transforms:
                 self.apply(t)
-
-    @property
-    def path(self):
-        return osp.join(DATASET_FOLDER, self.__class__.__name__)
 
     def read(self):
         raise NotImplementedError
@@ -75,17 +118,24 @@ class Dataset:
         pass
 
     def apply(self, transform):
+        if not callable(transform):
+            raise ValueError('`transform` must be callable')
+
         for i in range(len(self.graphs)):
             self.graphs[i] = transform(self.graphs[i])
 
     def map(self, transform, reduce=None):
+        if not callable(transform):
+            raise ValueError('`transform` must be callable')
+        if reduce is not None and not callable(reduce):
+            raise ValueError('`reduce` must be callable')
+
         out = [transform(g) for g in self.graphs]
-        if reduce is not None and callable(reduce):
-            return reduce(out)
-        else:
-            return out
+        return reduce(out) if reduce is not None else out
 
     def filter(self, function):
+        if not callable(function):
+            raise ValueError('`function` must be callable')
         self.graphs = [g for g in self.graphs if function(g)]
 
     def __getitem__(self, key):
@@ -132,6 +182,10 @@ class Dataset:
         return '{}({})'.format(self.__class__.__name__, self.__len__())
 
     @property
+    def path(self):
+        return osp.join(DATASET_FOLDER, self.__class__.__name__)
+
+    @property
     def N(self):
         if len(self.graphs) == 1 or len(set([g.N for g in self.graphs])) == 1:
             return self.graphs[0].N
@@ -140,42 +194,50 @@ class Dataset:
 
     @property
     def F(self):
-        return self.graphs[0].F
+        if len(self.graphs) == 1 or len(set([g.F for g in self.graphs])) == 1:
+            return self.graphs[0].F
+        else:
+            return None
 
     @property
     def S(self):
-        return self.graphs[0].S
+        if len(self.graphs) == 1 or len(set([g.S for g in self.graphs])) == 1:
+            return self.graphs[0].S
+        else:
+            return None
 
     @property
     def n_out(self):
-        y = self.graphs[0].y
-        if y is None:
-            return None
+        if len(self.graphs) == 1 or len(set([g.n_labels for g in self.graphs])) == 1:
+            return self.graphs[0].n_labels
         else:
-            shp = np.shape(y)
-            if len(shp) == 0:
-                return 1
-            else:
-                return shp[-1]
+            return None
 
+    @property
     def signature(self):
+        """
+        This property computes the signature of the dataset, which can be
+        passed to `spektral.data.utils.to_tf_signature(signature)` to compute
+        the TensorFlow signature. You can safely ignore this property unless
+        you are creating a custom `Loader`.
+        """
         signature = {}
         graph = self.graphs[0]  # This is always non-empty
         if graph.x is not None:
             signature['x'] = dict()
             signature['x']['spec'] = get_spec(graph.x)
-            signature['x']['shape'] = (None, graph.F)
+            signature['x']['shape'] = (None, self.F)
             signature['x']['dtype'] = tf.as_dtype(graph.x.dtype)
-        if graph.adj is not None:
+        if graph.a is not None:
             signature['a'] = dict()
-            signature['a']['spec'] = get_spec(graph.adj)
+            signature['a']['spec'] = get_spec(graph.a)
             signature['a']['shape'] = (None, None)
-            signature['a']['dtype'] = tf.as_dtype(graph.adj.dtype)
-        if graph.edge_attr is not None:
+            signature['a']['dtype'] = tf.as_dtype(graph.a.dtype)
+        if graph.e is not None:
             signature['e'] = dict()
-            signature['e']['spec'] = get_spec(graph.edge_attr)
-            signature['e']['shape'] = (None, graph.S)
-            signature['e']['dtype'] = tf.as_dtype(graph.edge_attr.dtype)
+            signature['e']['spec'] = get_spec(graph.e)
+            signature['e']['shape'] = (None, self.S)
+            signature['e']['dtype'] = tf.as_dtype(graph.e.dtype)
         if graph.y is not None:
             signature['y'] = dict()
             signature['y']['spec'] = get_spec(graph.y)

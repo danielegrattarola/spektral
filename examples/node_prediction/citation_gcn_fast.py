@@ -19,7 +19,7 @@ from spektral.utils import tic, toc
 # Load data
 dataset = Cora(transforms=[LayerPreprocess(GraphConv), AdjToSpTensor()])
 graph = dataset[0]
-x, a, y = graph.x, graph.adj, graph.y
+x, a, y = graph.x, graph.a, graph.y
 mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
 
 # Define model
