@@ -39,7 +39,7 @@ lr = 5e-4      # Learning rate
 # LOAD DATASET
 ################################################################################
 dataset = Cora()
-adj, x, y = dataset[0].adj, dataset[0].x, dataset[0].y
+adj, x, y = dataset[0].a, dataset[0].x, dataset[0].y
 a_norm = normalized_adjacency(adj)
 a_norm = sp_matrix_to_sp_tensor(a_norm)
 F = dataset.F

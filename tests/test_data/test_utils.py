@@ -38,9 +38,7 @@ def test_batch_generator():
     class TestDataset(Dataset):
         def read(self):
             return [
-                Graph(x=np.random.rand(n, 2),
-                      adj=np.random.randint(0, 2, (n, n)),
-                      y=np.array([0., 1.]))
+                Graph(x=np.random.rand(n, 2), a=np.random.randint(0, 2, (n, n)), y=np.array([0., 1.]))
                 for n in range(size)
             ]
 

@@ -20,7 +20,7 @@ dataset_name = 'ogbn-arxiv'
 ogb_dataset = NodePropPredDataset(dataset_name)
 dataset = OGB(ogb_dataset, transforms=[GCNFilter(), AdjToSpTensor()])
 graph = dataset[0]
-x, adj, y = graph.x, graph.adj, graph.y
+x, adj, y = graph.x, graph.a, graph.y
 
 # Parameters
 channels = 256                   # Number of channels for GCN layers

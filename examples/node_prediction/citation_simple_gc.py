@@ -26,11 +26,11 @@ class SGCN:
         self.K = K
 
     def __call__(self, graph):
-        out = graph.adj
+        out = graph.a
         for i in range(self.K - 1):
             out = out.dot(out)
         out.sort_indices()
-        graph.adj = out
+        graph.a = out
         return graph
 
 
@@ -45,7 +45,7 @@ l2_reg = 5e-6          # L2 regularization rate
 learning_rate = 0.2    # Learning rate
 epochs = 20000         # Number of training epochs
 patience = 200         # Patience for early stopping
-a_dtype = dataset[0].adj.dtype  # Only needed for TF 2.1
+a_dtype = dataset[0].a.dtype  # Only needed for TF 2.1
 
 N = dataset.N          # Number of nodes in the graph
 F = dataset.F          # Original size of node features

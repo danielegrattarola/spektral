@@ -8,7 +8,7 @@ class Degree(object):
         self.max_degree = max_degree
 
     def __call__(self, graph):
-        degree = graph.adj.sum(1)
+        degree = graph.a.sum(1)
         degree = one_hot(degree, self.max_degree + 1)
         if graph.x is None:
             graph.x = degree
@@ -20,4 +20,4 @@ class Degree(object):
 
 class MaxDegree(object):
     def __call__(self, graph):
-        return graph.adj.sum(1).max()
+        return graph.a.sum(1).max()

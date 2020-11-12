@@ -66,7 +66,7 @@ class GraphSage(Dataset):
         npz_file = osp.join(self.path, self.name) + '.npz'
         data = np.load(npz_file)
         x = data['x']
-        adj = sp.csr_matrix(
+        a = sp.csr_matrix(
             (data['adj_data'], (data['adj_row'], data['adj_col'])),
             shape=data['adj_shape']
         )
@@ -75,7 +75,7 @@ class GraphSage(Dataset):
         self.mask_va = data['mask_va']
         self.mask_te = data['mask_te']
 
-        return [Graph(x=x, adj=adj, y=y)]
+        return [Graph(x=x, a=a, y=y)]
 
     def download(self):
         print('Downloading {} dataset.'.format(self.name))

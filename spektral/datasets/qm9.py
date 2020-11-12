@@ -71,7 +71,7 @@ class QM9(Dataset):
         if self.amount is not None:
             labels = labels[:self.amount]
 
-        return [Graph(x=x, adj=a, edge_attr=e, y=y)
+        return [Graph(x=x, a=a, e=e, y=y)
                 for x, a, e, y in zip(x_list, a_list, e_list, labels)]
 
 
