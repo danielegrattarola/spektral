@@ -58,9 +58,9 @@ class AGNNConv(MessagePassing):
         self.built = True
 
     def call(self, inputs, **kwargs):
-        X, A, E = self.get_inputs(inputs)
-        X_norm = K.l2_normalize(X, axis=-1)
-        output = self.propagate(X, A, E, X_norm=X_norm)
+        x, a, _ = self.get_inputs(inputs)
+        X_norm = K.l2_normalize(x, axis=-1)
+        output = self.propagate(x, a, X_norm=X_norm)
         output = self.activation(output)
 
         return output

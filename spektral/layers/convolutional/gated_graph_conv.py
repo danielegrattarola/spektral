@@ -101,14 +101,14 @@ class GatedGraphConv(MessagePassing):
         self.built = True
 
     def call(self, inputs):
-        X, A, E = self.get_inputs(inputs)
-        F = K.int_shape(X)[-1]
+        x, a, _ = self.get_inputs(inputs)
+        F = K.int_shape(x)[-1]
 
         to_pad = self.channels - F
-        output = tf.pad(X, [[0, 0], [0, to_pad]])
+        output = tf.pad(x, [[0, 0], [0, to_pad]])
         for i in range(self.n_layers):
             m = tf.matmul(output, self.kernel[i])
-            m = self.propagate(m, A)
+            m = self.propagate(m, a)
             output = self.rnn(m, [output])[0]
 
         output = self.activation(output)
