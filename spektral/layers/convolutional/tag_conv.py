@@ -87,12 +87,12 @@ class TAGConv(MessagePassing):
         self.built = True
 
     def call(self, inputs, **kwargs):
-        X, A, E = self.get_inputs(inputs)
-        edge_weight = A.values
+        x, a, _ = self.get_inputs(inputs)
+        edge_weight = a.values
 
-        output = [X]
+        output = [x]
         for k in range(self.K):
-            output.append(self.propagate(X, A, E, edge_weight=edge_weight))
+            output.append(self.propagate(x, a, edge_weight=edge_weight))
         output = K.concatenate(output)
 
         return self.linear(output)

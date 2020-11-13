@@ -109,8 +109,8 @@ class GINConv(MessagePassing):
         self.built = True
 
     def call(self, inputs):
-        X, A, E = self.get_inputs(inputs)
-        output = self.mlp((1.0 + self.eps) * X + self.propagate(X, A, E))
+        x, a, _ = self.get_inputs(inputs)
+        output = self.mlp((1.0 + self.eps) * x + self.propagate(x, a))
 
         return output
 
