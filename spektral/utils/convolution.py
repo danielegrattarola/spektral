@@ -191,3 +191,26 @@ def chebyshev_filter(A, k, symmetric=True):
     return T_k
 
 
+def add_self_loops(a, value=1):
+    """
+    Sets the inner diagonals of `a` to `value`.
+    :param a: a np.array or scipy.sparse matrix, the innermost two dimensions
+    must be equal.
+    :param value: value to set the diagonals to.
+    :return: a np.array or scipy.sparse matrix with the same shape as `a`.
+    """
+    a = a.copy()
+    if len(a.shape) < 2:
+        raise ValueError('a must have at least rank 2')
+    n = a.shape[-1]
+    if n != a.shape[-2]:
+        raise ValueError('Innermost two dimensions must be equal. Got {}'
+                         .format(a.shape))
+    if sp.issparse(a):
+        a = a.tolil()
+        a.setdiag(value)
+        return a.tocsr()
+    else:
+        idx = np.arange(n)
+        a[..., idx, idx] = value
+        return a

@@ -1,5 +1,4 @@
 import numpy as np
-from scipy import sparse as sp
 
 
 def pad_jagged_array(x, target_shape):
@@ -25,88 +24,6 @@ def pad_jagged_array(x, target_shape):
         output[slc] = x[i]
 
     return output
-
-
-def add_eye(x):
-    """
-    Adds the identity matrix to the given matrix.
-    :param x: a rank 2 np.array or scipy.sparse matrix
-    :return: a rank 2 np.array or scipy.sparse matrix
-    """
-    if x.ndim != 2:
-        raise ValueError('X must be of rank 2 but has rank {}.'.format(x.ndim))
-    if sp.issparse(x):
-        eye = sp.eye(x.shape[0])
-    else:
-        eye = np.eye(x.shape[0])
-    return x + eye
-
-
-def sub_eye(x):
-    """
-    Subtracts the identity matrix from the given matrix.
-    :param x: a rank 2 np.array or scipy.sparse matrix
-    :return: a rank 2 np.array or scipy.sparse matrix
-    """
-    if x.ndim != 2:
-        raise ValueError('x must be of rank 2 but has rank {}.'.format(x.ndim))
-    if sp.issparse(x):
-        eye = sp.eye(x.shape[0])
-    else:
-        eye = np.eye(x.shape[0])
-    return x - eye
-
-
-def add_eye_batch(x):
-    """
-    Adds the identity matrix to each submatrix of the given rank 3 array.
-    :param x: a rank 3 np.array
-    :return: a rank 3 np.array
-    """
-    if x.ndim != 3:
-        raise ValueError('x must be of rank 3 but has rank {}.'.format(x.ndim))
-    return x + np.eye(x.shape[1])[None, ...]
-
-
-def sub_eye_batch(x):
-    """
-    Subtracts the identity matrix from each submatrix of the given rank 3
-    array.
-    :param x: a rank 3 np.array
-    :return: a rank 3 np.array
-    """
-    if x.ndim != 3:
-        raise ValueError('x must be of rank 3 but has rank {}.'.format(x.ndim))
-    return x - np.repeat(np.eye(x.shape[1])[None, ...], x.shape[0], axis=0)
-
-
-def add_eye_jagged(x):
-    """
-    Adds the identity matrix to each submatrix of the given rank 3 jagged array.
-    :param x: a rank 3 jagged np.array
-    :return: a rank 3 jagged np.array
-    """
-    x_out = x.copy()
-    for i in range(len(x)):
-        if x[i].ndim != 2:
-            raise ValueError('Jagged array must only contain 2d slices')
-        x_out[i] = add_eye(x[i])
-    return x_out
-
-
-def sub_eye_jagged(x):
-    """
-    Subtracts the identity matrix from each submatrix of the given rank 3
-    jagged array.
-    :param x: a rank 3 jagged np.array
-    :return: a rank 3 jagged np.array
-    """
-    x_out = x.copy()
-    for i in range(len(x)):
-        if x[i].ndim != 2:
-            raise ValueError('Jagged array must only contain 2d slices')
-        x_out[i] = sub_eye(x[i])
-    return x_out
 
 
 def one_hot(x, depth):
@@ -143,32 +60,7 @@ def label_to_one_hot(x, labels):
     return one_hot(out, depth)
 
 
-def add_self_loops(a, value=1):
-    """
-    Sets the inner diagonals of `a` to `value`.
-    :param a: a np.array or scipy.sparse matrix, the innermost two dimensions
-    must be equal.
-    :param value: value to set the diagonals to.
-    :return: a np.array or scipy.sparse matrix with the same shape as `a`.
-    """
-    a = a.copy()
-    if len(a.shape) < 2:
-        raise ValueError('a must have at least rank 2')
-    n = a.shape[-1]
-    if n != a.shape[-2]:
-        raise ValueError('Innermost two dimensions must be equal. Got {}'
-                         .format(a.shape))
-    if sp.issparse(a):
-        a = a.tolil()
-        a.setdiag(value)
-        return a.tocsr()
-    else:
-        idx = np.arange(n)
-        a[..., idx, idx] = value
-        return a
-
-
-def flatten_list_gen(alist):
+def _flatten_list_gen(alist):
     """
     Performs a depth-first visit of an arbitrarily nested list and yields its 
     element in order. 
@@ -177,7 +69,7 @@ def flatten_list_gen(alist):
     """
     for item in alist:
         if isinstance(item, (list, tuple, np.ndarray)):
-            for i in flatten_list_gen(item):
+            for i in _flatten_list_gen(item):
                 yield i
         else:
             yield item
@@ -191,6 +83,6 @@ def flatten_list(alist):
     :return: a 1D Python list with the flattened elements as returned by a 
              depth-first search.
     """
-    return list(flatten_list_gen(alist))
+    return list(_flatten_list_gen(alist))
 
 

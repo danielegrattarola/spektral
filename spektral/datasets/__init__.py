@@ -1,5 +1,5 @@
 from .citation import Citation
-from . import graphsage
+from .graphsage import GraphSage, PPI, Reddit
 from . import mnist
 from .ogb import OGB
 from .qm9 import QM9

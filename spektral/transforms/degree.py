@@ -4,13 +4,30 @@ from spektral.utils import one_hot
 
 
 class Degree(object):
+    """
+    Concatenates to each node attribute the one-hot degree of the corresponding
+    node.
+
+    If the graph doesn't have node attributes, then they are created and set to
+    the degree.
+
+    The adjacency matrix is expected to have integer entries and the degree is
+    cast to integer before one-hot encoding.
+
+    **Arguments**
+
+    - `max_degree`: the maximum degree of the nodes, i.e., the size of the
+    one-hot vectors.
+    """
     def __init__(self, max_degree):
         self.max_degree = max_degree
 
     def __call__(self, graph):
-        degree = graph.a.sum(1)
+        if 'a' not in graph:
+            raise ValueError('The graph must have an adjacency matrix')
+        degree = graph.a.sum(1).astype(int)
         degree = one_hot(degree, self.max_degree + 1)
-        if graph.x is None:
+        if 'x' not in graph:
             graph.x = degree
         else:
             graph.x = np.concatenate((graph.x, degree), axis=-1)

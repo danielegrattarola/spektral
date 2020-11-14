@@ -36,6 +36,7 @@ class Graph:
     matrix should have shape `(N, N)`.
 
     A Graph should always have either the node features or the adjacency matrix.
+    Empty graphs are not supported.
 
     Edge attributes can be stored in a dense format as arrays of shape
     `(N, N, S)` or in a sparse format as arrays of shape `(n_edges, S)`
@@ -78,6 +79,9 @@ class Graph:
     def __getitem__(self, key):
         return getattr(self, key, None)
 
+    def __contains__(self, key):
+        return key in self.keys
+
     def __repr__(self):
         return 'Graph(N={}, F={}, S={}, y={})'\
                .format(self.N, self.F, self.S, self.y)
@@ -113,3 +117,9 @@ class Graph:
         else:
             return None
 
+    @property
+    def keys(self):
+        keys = [key for key in self.__dict__.keys()
+                if self[key] is not None
+                and not key.startswith('__')]
+        return keys
