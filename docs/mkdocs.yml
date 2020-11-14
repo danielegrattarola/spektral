@@ -30,19 +30,19 @@ nav:
 - Home: index.md
 - Tutorials:
     - Getting started: getting-started.md
-    - Data representation: data.md
+    - Data representation: data-representation.md
     - Examples: examples.md
 - Layers:
     - Convolutional Layers: layers/convolution.md
     - Pooling Layers: layers/pooling.md
     - Base Layers: layers/base.md
 - Data:
+    - Containers: data.md
     - Datasets: datasets.md
-    - Data utils: utils/data.md
+    - Loaders: loaders.md
+    - Transforms: transforms.md
 - Utils:
     - Convolution: utils/convolution.md
     - Miscellaneous: utils/misc.md
-    - Conversion: utils/conversion.md
-- Chemistry: chem.md
 - Other:
-  - About: about.md
+    - About: about.md

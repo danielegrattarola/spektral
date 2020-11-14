@@ -42,9 +42,6 @@ You can also cite the paper introducing Spektral: [Graph Neural Networks in Tens
 Spektral is compatible with Python 3.5+, and is tested on Ubuntu 16.04+ and MacOS. 
 Other Linux distros should work as well, but Windows is not supported for now. 
 
-Some optional features of Spektral depend on [RDKit](http://www.rdkit.org/docs/index.html), 
-a library for cheminformatics and molecule manipulation (available through Anaconda).
-
 The simplest way to install Spektral is from PyPi: 
 
 ```bash
@@ -76,7 +73,7 @@ git checkout tf1
 python setup.py install  # Or 'pip install .'
 ```
 
-In the future, the TF1-compatible version of Spektral (<0.2) will receive bug fixes, but all new features will only support TensorFlow 2.   
+In the future, the TF1-compatible version of Spektral (<0.3) will receive bug fixes, but all new features will only support TensorFlow 2.   
 
 ## Contributing
 Spektral is an open source project available [on Github](https://github.com/danielegrattarola/spektral), and contributions of all types are welcome. 

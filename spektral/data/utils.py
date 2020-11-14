@@ -2,7 +2,6 @@ import numpy as np
 import tensorflow as tf
 from scipy import sparse as sp
 
-from spektral.layers.ops import sp_batch_to_sp_tensor
 from spektral.utils import pad_jagged_array
 
 
@@ -174,6 +173,11 @@ def prepend_none(t):
 
 
 def to_tf_signature(signature):
+    """
+    Converts a Dataset signature to a TensorFlow signature.
+    :param signature: a Dataset signature.
+    :return: a TensorFlow signature.
+    """
     output = []
     keys = ['x', 'a', 'e', 'i']
     for k in keys:

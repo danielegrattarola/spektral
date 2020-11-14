@@ -70,7 +70,7 @@ class Dataset:
 
     The class also offers a `download()` method that is automatically called
     if the path returned by the `Dataset.path` attribute does not exists.
-    This defaults to `~/.spektral/datasets/ClassName/'.
+    This defaults to `~/.spektral/datasets/ClassName/`.
 
     You can implement this however you like, knowing that `download()` will be
     called before `read()`. You can also override the `path` attribute to
@@ -220,6 +220,13 @@ class Dataset:
         passed to `spektral.data.utils.to_tf_signature(signature)` to compute
         the TensorFlow signature. You can safely ignore this property unless
         you are creating a custom `Loader`.
+
+        A signature consist of the TensorFlow TypeSpec, shape, and dtype of
+        all characteristic matrices of the graphs in the Dataset. This is
+        returned as a dictionary of dictionaries, with keys `x`, `a`, `e`, and
+        `y` for the four main data matrices.
+
+        Each sub-dictionary will have keys `spec`, `shape` and `dtype`.
         """
         signature = {}
         graph = self.graphs[0]  # This is always non-empty
