@@ -9,13 +9,14 @@ n_out = 2
 
 
 def _check_graph(x, a, e, y):
+    g = Graph()
     g = Graph(x=x)
     g = Graph(a=a)
     g = Graph(x=x, a=a, e=e, y=y)
 
     # numpy
     g_np = g.numpy()
-    g_gt_names = ['x', 'adj', 'edge_attr', 'y']
+    g_gt_names = ['x', 'a', 'e', 'y']
     g_gt = [x, a, e, y]
     for i in range(len(g_gt)):
         assert np.all(g_np[i] == g_gt[i])

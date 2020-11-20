@@ -48,8 +48,8 @@ class GraphAttention(GraphConv):
 
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
-    - Binary adjacency matrix of shape `([batch], N, N)`;
+    - Node features of shape `([batch], n_nodes, n_node_features)`;
+    - Binary adjacency matrix of shape `([batch], n_nodes, n_nodes)`;
 
     **Output**
 
@@ -57,7 +57,7 @@ class GraphAttention(GraphConv):
     dimension changed to `channels`;
     - if `return_attn_coef=True`, a list with the attention coefficients for
     each attention head. Each attention coefficient matrix has shape
-    `([batch], N, N)`.
+    `([batch], n_nodes, n_nodes)`.
 
     **Arguments**
 
@@ -67,7 +67,7 @@ class GraphAttention(GraphConv):
      heads instead of averaging;
     - `dropout_rate`: internal dropout rate for attention coefficients;
     - `return_attn_coef`: if True, return the attention coefficients for
-    the given input (one N x N matrix for each head).
+    the given input (one n_nodes x n_nodes matrix for each head).
     - `activation`: activation function to use;
     - `use_bias`: bool, add a bias vector to the output;
     - `kernel_initializer`: initializer for the weights;

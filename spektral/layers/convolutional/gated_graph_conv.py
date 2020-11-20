@@ -27,9 +27,9 @@ class GatedGraphConv(MessagePassing):
 
     **Input**
 
-    - Node features of shape `(N, F)`; note that `F` must be smaller or equal
+    - Node features of shape `(n_nodes, n_node_features)`; note that `n_node_features` must be smaller or equal
     than `channels`.
-    - Binary adjacency matrix of shape `(N, N)`.
+    - Binary adjacency matrix of shape `(n_nodes, n_nodes)`.
 
     **Output**
 

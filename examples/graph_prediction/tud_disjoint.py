@@ -31,8 +31,8 @@ batch_size = 32       # Batch size
 dataset = TUDataset('PROTEINS', clean=True)
 
 # Parameters
-F = dataset.F          # Dimension of node features
-n_out = dataset.n_out  # Dimension of the target
+F = dataset.n_node_features  # Dimension of node features
+n_out = dataset.n_labels     # Dimension of the target
 
 # Train/test split
 idxs = np.random.permutation(len(dataset))

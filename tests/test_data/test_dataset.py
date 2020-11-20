@@ -21,9 +21,9 @@ class TestDataset(Dataset):
 def test_dataset():
     d = TestDataset()
 
-    assert d.F == f
-    assert d.S == s
-    assert d.n_out == 2
+    assert d.n_node_features == f
+    assert d.n_edge_features == s
+    assert d.n_labels == 2
 
     # signature
     for k in ['x', 'a', 'e', 'y']:
@@ -41,15 +41,15 @@ def test_dataset():
 
     # single assignment
     d[0] = g
-    assert d[0].N == n and all([d_.N != n for d_ in d[1:]])
+    assert d[0].n_nodes == n and all([d_.n_nodes != n for d_ in d[1:]])
 
     # Slice assignment
     d[1:3] = [g] * 2
-    assert d[1].N == n and d[2].N == n and all([d_.N != n for d_ in d[3:]])
+    assert d[1].n_nodes == n and d[2].n_nodes == n and all([d_.n_nodes != n for d_ in d[3:]])
 
     # List assignment
     d[[3, 4]] = [g] * 2
-    assert d[3].N == n and d[4].N == n and all([d_.N != n for d_ in d[5:]])
+    assert d[3].n_nodes == n and d[4].n_nodes == n and all([d_.n_nodes != n for d_ in d[5:]])
 
     # __len__
     assert d.__len__() == n_graphs

@@ -21,8 +21,8 @@ class TAGConv(MessagePassing):
 
     **Input**
 
-    - Node features of shape `(N, F)`;
-    - Binary adjacency matrix of shape `(N, N)`.
+    - Node features of shape `(n_nodes, n_node_features)`;
+    - Binary adjacency matrix of shape `(n_nodes, n_nodes)`.
 
     **Output**
 

@@ -201,7 +201,7 @@ class DisjointLoader(Loader):
     The adjacency matrix will always be returned as a SparseTensor, regardless
     of the input.
     Edge attributes will be returned as a sparse edge list of shape
-    `(n_edges, S)`.
+    `(n_edges, n_edge_features)`.
 
     If `node_level=False`, the labels are interpreted as graph-level labels and
     are stacked along an additional dimension (i.e., `(n_graphs, n_labels)`)
@@ -226,7 +226,7 @@ class DisjointLoader(Loader):
     - `x`: node attributes stacked along the outermost dimension;
     - `a`: SparseTensor, the block-diagonal matrix obtained from the adjacency
     matrices of the batch;
-    - `e`: edge attributes as edge list of shape `(n_edges, S)`;
+    - `e`: edge attributes as edge list of shape `(n_edges, n_edge_features)`;
 
     If `node_level=False`, `labels` has shape `(n_graphs, n_labels)`;
     If `node_level=True`, then the labels are stacked vertically, i.e.,
@@ -282,7 +282,7 @@ class BatchLoader(Loader):
     If `n_max` is the number of nodes of the biggest graph in the batch, then
     the padding consist of adding zeros to the node features, adjacency matrix,
     and edge attributes of each graph so that they have shapes
-    `(n_max, F)`, `(n_max, n_max)`, and `(n_max, n_max, S)` respectively.
+    `(n_max, n_node_features)`, `(n_max, n_max)`, and `(n_max, n_max, n_edge_features)` respectively.
 
     The zero-padding is done batch-wise, which saves up memory at the cost of
     more computation. If latency is an issue but memory isn't, or if the
@@ -312,11 +312,11 @@ class BatchLoader(Loader):
     `inputs` is a tuple containing:
 
     - `x`: node attributes, zero-padded and stacked along an extra dimension
-    (shape `(n_graphs, n_max, F)`);
+    (shape `(n_graphs, n_max, n_node_features)`);
     - `a`: adjacency matrices (dense), zero-padded and stacked along an extra
     dimension (shape `(n_graphs, n_max, n_max)`);
     - `e`: edge attributes (dense), zero-padded and stacked along an extra
-    dimension (shape `(n_graphs, n_max, n_max, S)`).
+    dimension (shape `(n_graphs, n_max, n_max, n_edge_features)`).
 
     `labels` are also stacked along an extra dimension.
 

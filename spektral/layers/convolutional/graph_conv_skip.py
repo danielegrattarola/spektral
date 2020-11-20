@@ -19,8 +19,8 @@ class GraphConvSkip(GraphConv):
 
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
-    - Normalized adjacency matrix of shape `([batch], N, N)`; can be computed
+    - Node features of shape `([batch], n_nodes, n_node_features)`;
+    - Normalized adjacency matrix of shape `([batch], n_nodes, n_nodes)`; can be computed
     with `spektral.utils.convolution.normalized_adjacency`.
 
     **Output**

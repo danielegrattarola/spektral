@@ -33,9 +33,9 @@ ogb_dataset = GraphPropPredDataset(name=dataset_name)
 dataset = OGB(ogb_dataset)
 
 # Parameters
-F = dataset.F          # Dimension of node features
-S = dataset.S          # Dimension of edge features
-n_out = dataset.n_out  # Dimension of the target
+F = dataset.n_node_features  # Dimension of node features
+S = dataset.n_edge_features  # Dimension of edge features
+n_out = dataset.n_labels     # Dimension of the target
 
 # Train/test split
 idx = ogb_dataset.get_idx_split()

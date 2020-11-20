@@ -41,14 +41,14 @@ class DiffPool(Layer):
 
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
-    - Binary adjacency matrix of shape `([batch], N, N)`;
+    - Node features of shape `([batch], n_nodes, n_node_features)`;
+    - Binary adjacency matrix of shape `([batch], n_nodes, n_nodes)`;
 
     **Output**
 
     - Reduced node features of shape `([batch], K, channels)`;
     - Reduced adjacency matrix of shape `([batch], K, K)`;
-    - If `return_mask=True`, the soft clustering matrix of shape `([batch], N, K)`.
+    - If `return_mask=True`, the soft clustering matrix of shape `([batch], n_nodes, K)`.
 
     **Arguments**
 

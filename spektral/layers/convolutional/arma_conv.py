@@ -32,8 +32,8 @@ class ARMAConv(GraphConv):
 
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
-    - Normalized and rescaled Laplacian of shape `([batch], N, N)`; can be
+    - Node features of shape `([batch], n_nodes, n_node_features)`;
+    - Normalized and rescaled Laplacian of shape `([batch], n_nodes, n_nodes)`; can be
     computed with `spektral.utils.convolution.normalized_laplacian` and
     `spektral.utils.convolution.rescale_laplacian`.
 

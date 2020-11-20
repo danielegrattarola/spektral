@@ -13,8 +13,8 @@ def disjoint_signal_to_batch(X, I):
     Converts a disjoint graph signal to batch node by zero-padding.
 
     :param X: Tensor, node features of shape (nodes, features).
-    :param I: Tensor, graph IDs of shape `(N, )`;
-    :return batch: Tensor, batched node features of shape (batch, N_max, F)
+    :param I: Tensor, graph IDs of shape `(n_nodes, )`;
+    :return batch: Tensor, batched node features of shape (batch, N_max, n_node_features)
     """
     I = tf.cast(I, tf.int32)
     num_nodes = tf.math.segment_sum(tf.ones_like(I), I)
@@ -58,8 +58,8 @@ def disjoint_adjacency_to_batch(A, I):
     """
     Converts a disjoint adjacency matrix to batch node by zero-padding.
 
-    :param A: Tensor, binary adjacency matrix of shape `(N, N)`;
-    :param I: Tensor, graph IDs of shape `(N, )`;
+    :param A: Tensor, binary adjacency matrix of shape `(n_nodes, n_nodes)`;
+    :param I: Tensor, graph IDs of shape `(n_nodes, )`;
     :return: Tensor, batched adjacency matrix of shape `(batch, N_max, N_max)`;
     """
     I = tf.cast(I, tf.int64)

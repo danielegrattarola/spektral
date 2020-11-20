@@ -24,8 +24,8 @@ class APPNP(GraphConv):
 
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
-    - Modified Laplacian of shape `([batch], N, N)`; can be computed with
+    - Node features of shape `([batch], n_nodes, n_node_features)`;
+    - Modified Laplacian of shape `([batch], n_nodes, n_nodes)`; can be computed with
     `spektral.utils.convolution.gcn_filter`.
 
     **Output**

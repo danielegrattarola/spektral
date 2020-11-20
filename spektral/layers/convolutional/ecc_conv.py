@@ -28,10 +28,10 @@ class EdgeConditionedConv(GraphConv):
 
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
-    - Binary adjacency matrices of shape `([batch], N, N)`;
-    - Edge features. In single mode, shape `(num_edges, S)`; in batch mode, shape
-    `(batch, N, N, S)`.
+    - Node features of shape `([batch], n_nodes, n_node_features)`;
+    - Binary adjacency matrices of shape `([batch], n_nodes, n_nodes)`;
+    - Edge features. In single mode, shape `(num_edges, n_edge_features)`; in batch mode, shape
+    `(batch, n_nodes, n_nodes, n_edge_features)`.
 
     **Output**
 
@@ -124,9 +124,9 @@ class EdgeConditionedConv(GraphConv):
         self.built = True
 
     def call(self, inputs):
-        X = inputs[0]  # (batch_size, N, F)
-        A = inputs[1]  # (batch_size, N, N)
-        E = inputs[2]  # (n_edges, S) or (batch_size, N, N, S)
+        X = inputs[0]  # (batch_size, n_nodes, n_node_features)
+        A = inputs[1]  # (batch_size, n_nodes, n_nodes)
+        E = inputs[2]  # (n_edges, n_edge_features) or (batch_size, n_nodes, n_nodes, n_edge_features)
 
         mode = ops.autodetect_mode(A, X)
         if mode == modes.SINGLE:
@@ -158,10 +158,10 @@ class EdgeConditionedConv(GraphConv):
         return output
 
     def _call_single(self, inputs):
-        X = inputs[0]  # (N, F)
-        A = inputs[1]  # (N, N)
-        E = inputs[2]  # (n_edges, S)
-        assert K.ndim(E) == 2, 'In single mode, E must have shape (n_edges, S).'
+        X = inputs[0]  # (n_nodes, F)
+        A = inputs[1]  # (n_nodes, n_nodes)
+        E = inputs[2]  # (n_edges, n_edge_features)
+        assert K.ndim(E) == 2, 'In single mode, E must have shape (n_edges, n_edge_features).'
 
         # Enforce sparse representation
         if not K.is_sparse(A):

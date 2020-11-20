@@ -42,7 +42,7 @@ dataset = Cora()
 adj, x, y = dataset[0].a, dataset[0].x, dataset[0].y
 a_norm = normalized_adjacency(adj)
 a_norm = sp_matrix_to_sp_tensor(a_norm)
-F = dataset.F
+F = dataset.n_node_features
 y = np.argmax(y, axis=-1)
 n_clusters = y.max() + 1
 

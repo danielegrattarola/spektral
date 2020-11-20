@@ -26,20 +26,20 @@ def to_disjoint(x_list, a_list, e_list=None):
 
     The edge attributes of a graph can be represented as
 
-    - a dense array of shape `(N, N, S)`;
-    - a sparse edge list of shape `(n_edges, S)`;
+    - a dense array of shape `(n_nodes, n_nodes, n_edge_features)`;
+    - a sparse edge list of shape `(n_edges, n_edge_features)`;
 
     and they will always be returned as edge list for efficiency.
 
-    :param x_list: a list of np.arrays of shape `(N, F)` -- note that `N` can
+    :param x_list: a list of np.arrays of shape `(n_nodes, n_node_features)` -- note that `n_nodes` can
     change between graphs;
     :param a_list: a list of np.arrays or scipy.sparse matrices of shape
-    `(N, N)`;
-    :param e_list: a list of np.arrays of shape `(N, N, S)` or `(n_edges, S)`;
+    `(n_nodes, n_nodes)`;
+    :param e_list: a list of np.arrays of shape `(n_nodes, n_nodes, n_edge_features)` or `(n_edges, n_edge_features)`;
     :return:
-        -  `x`: np.array of shape `(n_nodes, F)`;
+        -  `x`: np.array of shape `(n_nodes, n_node_features)`;
         -  `a`: scipy.sparse matrix of shape `(n_nodes, n_nodes)`;
-        -  `e`: (optional) np.array of shape `(n_edges, S)`;
+        -  `e`: (optional) np.array of shape `(n_edges, n_edge_features)`;
         -  `i`: np.array of shape `(n_nodes, )`;
     """
     _check_input(x_list, a_list, e_list)
@@ -77,21 +77,21 @@ def to_batch(x_list, a_list, e_list=None):
 
     The edge attributes of a graph can be represented as
 
-    - a dense array of shape `(N, N, S)`;
-    - a sparse edge list of shape `(n_edges, S)`;
+    - a dense array of shape `(n_nodes, n_nodes, n_edge_features)`;
+    - a sparse edge list of shape `(n_edges, n_edge_features)`;
 
     and they will always be returned as dense arrays.
 
-    :param x_list: a list of np.arrays of shape `(N, F)` -- note that `N` can
+    :param x_list: a list of np.arrays of shape `(n_nodes, n_node_features)` -- note that `n_nodes` can
     change between graphs;
     :param a_list: a list of np.arrays or scipy.sparse matrices of shape
-    `(N, N)`;
-    :param e_list: a list of np.arrays of shape `(N, N, S)`;
+    `(n_nodes, n_nodes)`;
+    :param e_list: a list of np.arrays of shape `(n_nodes, n_nodes, n_edge_features)`;
     :return:
-        -  `x`: np.array of shape `(batch, n_max, F)`;
+        -  `x`: np.array of shape `(batch, n_max, n_node_features)`;
         -  `a`: np.array of shape `(batch, n_max, n_max)`;
         -  `e`: (only if `e_list` is given) np.array of shape
-        `(batch, n_max, n_max, S)`;
+        `(batch, n_max, n_max, n_edge_features)`;
     """
     _check_input(x_list, a_list, e_list)
     n_max = max([a.shape[-1] for a in a_list])

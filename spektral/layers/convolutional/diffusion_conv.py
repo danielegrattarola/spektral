@@ -11,9 +11,9 @@ class DiffuseFeatures(layers.Layer):
 
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
+    - Node features of shape `([batch], n_nodes, n_node_features)`;
     - Normalized adjacency or attention coef. matrix \(\hat \A \) of shape
-    `([batch], N, N)`; Use DiffusionConvolution.preprocess to normalize.
+    `([batch], n_nodes, n_nodes)`; Use DiffusionConvolution.preprocess to normalize.
 
     **Output**
 
@@ -68,7 +68,7 @@ class DiffuseFeatures(layers.Layer):
         # unstack kernel
         diffusion_matrix = tf.math.polyval(tf.unstack(self.kernel), A)
 
-        # Apply it to X to get a matrix C = [C_1, ..., C_F] (N x F)
+        # Apply it to X to get a matrix C = [C_1, ..., C_F] (n_nodes x n_node_features)
         # of diffused features
         diffused_features = tf.matmul(diffusion_matrix, X)
 
@@ -76,8 +76,8 @@ class DiffuseFeatures(layers.Layer):
         # and apply a non linearity to obtain H:,q (eq. 3 in paper)
         H = tf.math.reduce_sum(diffused_features, axis=-1)
 
-        # H has shape ([batch], N) but as it is the sum of columns
-        # we reshape it to ([batch], N, 1)
+        # H has shape ([batch], n_nodes) but as it is the sum of columns
+        # we reshape it to ([batch], n_nodes, 1)
         return tf.expand_dims(H, -1)
 
 
@@ -93,7 +93,7 @@ class DiffusionConv(GraphConv):
     this layer calculates the q'th channel as:
     $$
     \mathbf{H}_{~:,~q} = \sigma\left(
-        \sum_{f=1}^{F}
+        \sum_{f=1}^{n_node_features}
             \left(
                 \sum_{k=0}^{K-1}\theta_k {\hat \A}^k
             \right)
@@ -103,9 +103,9 @@ class DiffusionConv(GraphConv):
 
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
+    - Node features of shape `([batch], n_nodes, n_node_features)`;
     - Normalized adjacency or attention coef. matrix \(\hat \A \) of shape
-    `([batch], N, N)`; Use `DiffusionConvolution.preprocess` to normalize.
+    `([batch], n_nodes, n_nodes)`; Use `DiffusionConvolution.preprocess` to normalize.
 
     **Output**
 
@@ -149,8 +149,8 @@ class DiffusionConv(GraphConv):
     def build(self, input_shape):
 
         # We expect to receive (X, A)
-        # A - Adjacency ([batch], N, N)
-        # X - graph signal ([batch], N, F)
+        # A - Adjacency ([batch], n_nodes, n_nodes)
+        # X - graph signal ([batch], n_nodes, n_node_features)
         X_shape, A_shape = input_shape
 
         # initialise Q diffusion convolution filters
@@ -167,14 +167,14 @@ class DiffusionConv(GraphConv):
 
     def apply_filters(self, X, A):
         """Applies diffusion convolution self.Q times to get a
-        ([batch], N, Q) diffused graph signal
+        ([batch], n_nodes, Q) diffused graph signal
 
         """
 
         # This will be a list of Q diffused features.
-        # Each diffused feature is a (batch, N, 1) tensor.
+        # Each diffused feature is a (batch, n_nodes, 1) tensor.
         # Later we will concat all the features to get one
-        # (batch, N, Q) diffused graph signal
+        # (batch, n_nodes, Q) diffused graph signal
         diffused_features = []
 
         # Iterating over all Q diffusion filters
@@ -182,7 +182,7 @@ class DiffusionConv(GraphConv):
             diffused_feature = diffusion((X, A))
             diffused_features.append(diffused_feature)
 
-        # Concat them into ([batch], N, Q) diffused graph signal
+        # Concat them into ([batch], n_nodes, Q) diffused graph signal
         H = tf.concat(diffused_features, -1)
 
         return H

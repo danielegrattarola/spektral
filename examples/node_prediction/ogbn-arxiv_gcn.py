@@ -28,8 +28,8 @@ dropout = 0.5                    # Dropout rate for the features
 learning_rate = 1e-2             # Learning rate
 epochs = 200                     # Number of training epochs
 
-N = dataset.N                    # Number of nodes in the graph
-F = dataset.F                    # Original size of node features
+N = dataset.n_nodes              # Number of nodes in the graph
+F = dataset.n_node_features      # Original size of node features
 n_out = ogb_dataset.num_classes  # OGB labels are sparse indices
 
 # Data splits

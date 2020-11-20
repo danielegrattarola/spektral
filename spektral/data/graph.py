@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.sparse as sp
 
 
 class Graph:
@@ -19,9 +20,10 @@ class Graph:
     Graphs also have the following attributes that are computed automatically
     from the data:
 
-    - `N`: number of nodes;
-    - `F`: size of the node features, if available;
-    - `S`: size of the edge features, if available;
+    - `n_nodes`: number of nodes;
+    - `n_edges`: number of edges;
+    - `n_node_features`: size of the node features, if available;
+    - `n_edge_features`: size of the edge features, if available;
     - `n_labels`: size of the labels, if available;
 
     Any additional `kwargs` passed to the constructor will be automatically
@@ -32,34 +34,28 @@ class Graph:
 
     Spektral usually assumes that the different data matrices have specific
     shapes, although this is not strictly enforced to allow more flexibility.
-    In general, node attributes should have shape `(N, F)` and the adjacency
-    matrix should have shape `(N, N)`.
-
-    A Graph should always have either the node features or the adjacency matrix.
-    Empty graphs are not supported.
+    In general, node attributes should have shape `(n_nodes, n_node_features)` and the adjacency
+    matrix should have shape `(n_nodes, n_nodes)`.
 
     Edge attributes can be stored in a dense format as arrays of shape
-    `(N, N, S)` or in a sparse format as arrays of shape `(n_edges, S)`
+    `(n_nodes, n_nodes, n_edge_features)` or in a sparse format as arrays of shape `(n_edges, n_edge_features)`
     (so that you don't have to store all the zeros for missing edges). Most
     components of Spektral will know how to deal with both situations
     automatically.
 
     Labels can refer to the entire graph (shape `(n_labels, )`) or to each
-    individual node (shape `(N, n_labels)`).
+    individual node (shape `(n_nodes, n_labels)`).
 
     **Arguments**
 
-    - `x`: np.array, the node features (shape `(N, F)`);
-    - `a`: np.array or scipy.sparse matrix, the adjacency matrix (shape `(N, N)`);
-    - `e`: np.array, the edge features (shape `(N, N, S)` or `(n_edges, S)`);
-    - `y`: np.array, the node or graph labels (shape `(N, n_labels)` or `(n_labels, )`);
+    - `x`: np.array, the node features (shape `(n_nodes, n_node_features)`);
+    - `a`: np.array or scipy.sparse matrix, the adjacency matrix (shape `(n_nodes, n_nodes)`);
+    - `e`: np.array, the edge features (shape `(n_nodes, n_nodes, n_edge_features)` or `(n_edges, n_edge_features)`);
+    - `y`: np.array, the node or graph labels (shape `(n_nodes, n_labels)` or `(n_labels, )`);
 
 
     """
     def __init__(self, x=None, a=None, e=None, y=None, **kwargs):
-        if x is None and a is None:
-            raise ValueError('A Graph should have either node attributes or '
-                             'an adjacency matrix. Got both None.')
         self.x = x
         self.a = a
         self.e = e
@@ -83,11 +79,11 @@ class Graph:
         return key in self.keys
 
     def __repr__(self):
-        return 'Graph(N={}, F={}, S={}, y={})'\
-               .format(self.N, self.F, self.S, self.y)
+        return 'Graph(n_nodes={}, n_node_features={}, n_edge_features={}, y={})'\
+               .format(self.n_nodes, self.n_node_features, self.n_edge_features, self.y)
 
     @property
-    def N(self):
+    def n_nodes(self):
         if self.x is not None:
             return self.x.shape[-2]
         elif self.a is not None:
@@ -96,14 +92,23 @@ class Graph:
             return None
 
     @property
-    def F(self):
+    def n_edges(self):
+        if sp.issparse(self.a):
+            return self.a.nnz
+        elif isinstance(self.a, np.ndarray):
+            return np.nonzero(self.a)
+        else:
+            return None
+
+    @property
+    def n_node_features(self):
         if self.x is not None:
             return self.x.shape[-1]
         else:
             return None
 
     @property
-    def S(self):
+    def n_edge_features(self):
         if self.e is not None:
             return self.e.shape[-1]
         else:

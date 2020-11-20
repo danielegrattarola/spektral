@@ -59,13 +59,13 @@ class GlobalSumPool(GlobalPooling):
 
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
-    - Graph IDs of shape `(N, )` (only in disjoint mode);
+    - Node features of shape `([batch], n_nodes, n_node_features)`;
+    - Graph IDs of shape `(n_nodes, )` (only in disjoint mode);
 
     **Output**
 
-    - Pooled node features of shape `(batch, F)` (if single mode, shape will
-    be `(1, F)`).
+    - Pooled node features of shape `(batch, n_node_features)` (if single mode, shape will
+    be `(1, n_node_features)`).
 
     **Arguments**
 
@@ -88,13 +88,13 @@ class GlobalAvgPool(GlobalPooling):
 
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
-    - Graph IDs of shape `(N, )` (only in disjoint mode);
+    - Node features of shape `([batch], n_nodes, n_node_features)`;
+    - Graph IDs of shape `(n_nodes, )` (only in disjoint mode);
 
     **Output**
 
-    - Pooled node features of shape `(batch, F)` (if single mode, shape will
-    be `(1, F)`).
+    - Pooled node features of shape `(batch, n_node_features)` (if single mode, shape will
+    be `(1, n_node_features)`).
 
     **Arguments**
 
@@ -117,13 +117,13 @@ class GlobalMaxPool(GlobalPooling):
 
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
-    - Graph IDs of shape `(N, )` (only in disjoint mode);
+    - Node features of shape `([batch], n_nodes, n_node_features)`;
+    - Graph IDs of shape `(n_nodes, )` (only in disjoint mode);
 
     **Output**
 
-    - Pooled node features of shape `(batch, F)` (if single mode, shape will
-    be `(1, F)`).
+    - Pooled node features of shape `(batch, n_node_features)` (if single mode, shape will
+    be `(1, n_node_features)`).
 
     **Arguments**
 
@@ -152,8 +152,8 @@ class GlobalAttentionPool(GlobalPooling):
 
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
-    - Graph IDs of shape `(N, )` (only in disjoint mode);
+    - Node features of shape `([batch], n_nodes, n_node_features)`;
+    - Graph IDs of shape `(n_nodes, )` (only in disjoint mode);
 
     **Output**
 
@@ -266,13 +266,13 @@ class GlobalAttnSumPool(GlobalPooling):
 
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
-    - Graph IDs of shape `(N, )` (only in disjoint mode);
+    - Node features of shape `([batch], n_nodes, n_node_features)`;
+    - Graph IDs of shape `(n_nodes, )` (only in disjoint mode);
 
     **Output**
 
-    - Pooled node features of shape `(batch, F)` (if single mode, shape will
-    be `(1, F)`).
+    - Pooled node features of shape `(batch, n_node_features)` (if single mode, shape will
+    be `(1, n_node_features)`).
 
     **Arguments**
 
@@ -356,13 +356,13 @@ class SortPool(Layer):
     
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
-    - Graph IDs of shape `(N, )` (only in disjoint mode);
+    - Node features of shape `([batch], n_nodes, n_node_features)`;
+    - Graph IDs of shape `(n_nodes, )` (only in disjoint mode);
 
     **Output**
 
-    - Pooled node features of shape `(batch, k, F)` (if single mode, shape will
-    be `(1, k, F)`).
+    - Pooled node features of shape `(batch, k, n_node_features)` (if single mode, shape will
+    be `(1, k, n_node_features)`).
 
     **Arguments**
 

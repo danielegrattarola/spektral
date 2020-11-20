@@ -24,7 +24,7 @@ x, a, y = graph.x, graph.a, graph.y
 mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
 
 # Define model
-x_in = Input(shape=(dataset.F,))
+x_in = Input(shape=(dataset.n_node_features,))
 a_in = Input(shape=(None,), sparse=True)
 x_1 = Dropout(0.6)(x_in)
 x_1 = GraphAttention(8,
@@ -36,7 +36,7 @@ x_1 = GraphAttention(8,
                      attn_kernel_regularizer=l2(5e-4),
                      bias_regularizer=l2(5e-4))([x_1, a_in])
 x_2 = Dropout(0.6)(x_1)
-x_2 = GraphAttention(dataset.n_out,
+x_2 = GraphAttention(dataset.n_labels,
                      attn_heads=1,
                      concat_heads=True,
                      dropout_rate=0.6,

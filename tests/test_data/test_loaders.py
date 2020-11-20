@@ -55,7 +55,7 @@ class TestDatasetDsjNode(Dataset):
 
 def test_single():
     data = TestDatasetSingle()
-    n = data.N
+    n = data.n_nodes
     loader = SingleLoader(data, sample_weights=np.ones(n), epochs=1)
     batches = [b for b in loader]
     assert len(batches) == 1
