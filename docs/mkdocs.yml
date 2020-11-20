@@ -30,7 +30,9 @@ nav:
 - Home: index.md
 - Tutorials:
     - Getting started: getting-started.md
-    - Data representation: data-representation.md
+    - Data modes: data-modes.md
+    - Creating a Dataset: creating-dataset.md
+    - Creating a Layer: creating-layer.md
     - Examples: examples.md
 - Layers:
     - Convolutional Layers: layers/convolution.md

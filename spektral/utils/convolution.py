@@ -120,7 +120,8 @@ def gcn_filter(A, symmetric=True):
             out[i][np.diag_indices_from(out[i])] += 1
             out[i] = normalized_adjacency(out[i], symmetric=symmetric)
     else:
-        out = out.tocsr()
+        if hasattr(out, 'tocsr'):
+            out = out.tocsr()
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             out[np.diag_indices_from(out)] += 1
