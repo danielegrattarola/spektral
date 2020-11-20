@@ -32,9 +32,9 @@ epochs = 200           # Number of training epochs
 patience = 10          # Patience for early stopping
 a_dtype = dataset[0].a.dtype  # Only needed for TF 2.1
 
-N = dataset.N          # Number of nodes in the graph
-F = dataset.F          # Original size of node features
-n_out = dataset.n_out  # Number of classes
+N = dataset.n_nodes          # Number of nodes in the graph
+F = dataset.n_node_features  # Original size of node features
+n_out = dataset.n_labels     # Number of classes
 
 # Model definition
 x_in = Input(shape=(F,))

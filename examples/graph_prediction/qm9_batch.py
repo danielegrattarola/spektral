@@ -25,9 +25,9 @@ batch_size = 32       # Batch size
 dataset = QM9(amount=1000)  # Set amount=None to train on whole dataset
 
 # Parameters
-F = dataset.F          # Dimension of node features
-S = dataset.S          # Dimension of edge features
-n_out = dataset.n_out  # Dimension of the target
+F = dataset.n_node_features  # Dimension of node features
+S = dataset.n_edge_features  # Dimension of edge features
+n_out = dataset.n_labels     # Dimension of the target
 
 # Train/test split
 idxs = np.random.permutation(len(dataset))

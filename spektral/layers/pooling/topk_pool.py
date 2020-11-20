@@ -37,16 +37,16 @@ class TopKPool(Layer):
 
     **Input**
 
-    - Node features of shape `(N, F)`;
-    - Binary adjacency matrix of shape `(N, N)`;
-    - Graph IDs of shape `(N, )` (only in disjoint mode);
+    - Node features of shape `(n_nodes, n_node_features)`;
+    - Binary adjacency matrix of shape `(n_nodes, n_nodes)`;
+    - Graph IDs of shape `(n_nodes, )` (only in disjoint mode);
 
     **Output**
 
-    - Reduced node features of shape `(ratio * N, F)`;
-    - Reduced adjacency matrix of shape `(ratio * N, ratio * N)`;
-    - Reduced graph IDs of shape `(ratio * N, )` (only in disjoint mode);
-    - If `return_mask=True`, the binary pooling mask of shape `(ratio * N, )`.
+    - Reduced node features of shape `(ratio * n_nodes, n_node_features)`;
+    - Reduced adjacency matrix of shape `(ratio * n_nodes, ratio * n_nodes)`;
+    - Reduced graph IDs of shape `(ratio * n_nodes, )` (only in disjoint mode);
+    - If `return_mask=True`, the binary pooling mask of shape `(ratio * n_nodes, )`.
 
     **Arguments**
 

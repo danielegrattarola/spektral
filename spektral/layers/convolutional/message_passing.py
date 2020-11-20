@@ -60,8 +60,8 @@ class MessagePassing(Layer):
     - `aggregate`: string or callable, an aggregate function. This flag can be
     used to control the behaviour of `aggregate()` wihtout re-implementing it.
     Supported aggregations: 'sum', 'mean', 'max', 'min', 'prod'.
-    If callable, the function must have the signature `foo(updates, indices, N)`
-    and return a rank 2 tensor with shape `(N, ...)`.
+    If callable, the function must have the signature `foo(updates, indices, n_nodes)`
+    and return a rank 2 tensor with shape `(n_nodes, ...)`.
     """
     def __init__(self, aggregate='sum', **kwargs):
         super().__init__(**{k: v for k, v in kwargs.items() if is_keras_kwarg(k)})

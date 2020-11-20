@@ -31,9 +31,9 @@ class ChebConv(GraphConv):
 
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
+    - Node features of shape `([batch], n_nodes, n_node_features)`;
     - A list of K Chebyshev polynomials of shape
-    `[([batch], N, N), ..., ([batch], N, N)]`; can be computed with
+    `[([batch], n_nodes, n_nodes), ..., ([batch], n_nodes, n_nodes)]`; can be computed with
     `spektral.utils.convolution.chebyshev_filter`.
 
     **Output**

@@ -26,11 +26,11 @@ class Dataset:
     Datasets have the following properties that automatically computed from the
     graphs:
 
-        - `N`: the number of nodes in the dataset (returns `None` if the number
+        - `n_nodes`: the number of nodes in the dataset (returns `None` if the number
         changes between graphs);
-        - `F`: the size of the node features (returns `None` if the size changes
+        - `n_node_features`: the size of the node features (returns `None` if the size changes
         between graphs or is not defined);
-        - `S`: the size of the edge features (returns `None` if the size changes
+        - `n_edge_features`: the size of the edge features (returns `None` if the size changes
         between graphs or is not defined);
         - `n_labels`: the size of the labels (returns `None` if the size changes
         between graphs or is not defined); this is computed as the innermost
@@ -51,11 +51,11 @@ class Dataset:
     - `map(transform, reduce=None)`: returns a list containing the output
     of `transform(graph)` for each graph. If `reduce` is a `callable`, then
     returns `reduce(output_list)` instead of just `output_list`.
-    For instance: `map(lambda: g.N, reduce=np.mean)` will return the average
+    For instance: `map(lambda: g.n_nodes, reduce=np.mean)` will return the average
     number of nodes in the dataset.
     - `filter(function)`: removes from the dataset any graph for which
     `function(graph)` returns `False`.
-    For example: `filter(lambda: g.N < 100)` removes from the dataset all graphs
+    For example: `filter(lambda: g.n_nodes < 100)` removes from the dataset all graphs
     bigger than 100 nodes.
 
     You can extend this class to create your own dataset.
@@ -186,28 +186,28 @@ class Dataset:
         return osp.join(DATASET_FOLDER, self.__class__.__name__)
 
     @property
-    def N(self):
-        if len(self.graphs) == 1 or len(set([g.N for g in self.graphs])) == 1:
-            return self.graphs[0].N
+    def n_nodes(self):
+        if len(self.graphs) == 1 or len(set([g.n_nodes for g in self.graphs])) == 1:
+            return self.graphs[0].n_nodes
         else:
             return None
 
     @property
-    def F(self):
-        if len(self.graphs) == 1 or len(set([g.F for g in self.graphs])) == 1:
-            return self.graphs[0].F
+    def n_node_features(self):
+        if len(self.graphs) == 1 or len(set([g.n_node_features for g in self.graphs])) == 1:
+            return self.graphs[0].n_node_features
         else:
             return None
 
     @property
-    def S(self):
-        if len(self.graphs) == 1 or len(set([g.S for g in self.graphs])) == 1:
-            return self.graphs[0].S
+    def n_edge_features(self):
+        if len(self.graphs) == 1 or len(set([g.n_edge_features for g in self.graphs])) == 1:
+            return self.graphs[0].n_edge_features
         else:
             return None
 
     @property
-    def n_out(self):
+    def n_labels(self):
         if len(self.graphs) == 1 or len(set([g.n_labels for g in self.graphs])) == 1:
             return self.graphs[0].n_labels
         else:
@@ -233,7 +233,7 @@ class Dataset:
         if graph.x is not None:
             signature['x'] = dict()
             signature['x']['spec'] = get_spec(graph.x)
-            signature['x']['shape'] = (None, self.F)
+            signature['x']['shape'] = (None, self.n_node_features)
             signature['x']['dtype'] = tf.as_dtype(graph.x.dtype)
         if graph.a is not None:
             signature['a'] = dict()
@@ -243,11 +243,11 @@ class Dataset:
         if graph.e is not None:
             signature['e'] = dict()
             signature['e']['spec'] = get_spec(graph.e)
-            signature['e']['shape'] = (None, self.S)
+            signature['e']['shape'] = (None, self.n_edge_features)
             signature['e']['dtype'] = tf.as_dtype(graph.e.dtype)
         if graph.y is not None:
             signature['y'] = dict()
             signature['y']['spec'] = get_spec(graph.y)
-            signature['y']['shape'] = (self.n_out, )
+            signature['y']['shape'] = (self.n_labels,)
             signature['y']['dtype'] = tf.as_dtype(np.array(graph.y).dtype)
         return signature

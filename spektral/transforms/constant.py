@@ -16,7 +16,7 @@ class Constant(object):
         self.value = value
 
     def __call__(self, graph):
-        value = np.zeros((graph.N, 1)) + self.value
+        value = np.zeros((graph.n_nodes, 1)) + self.value
         if graph.x is None:
             graph.x = value
         else:

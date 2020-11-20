@@ -84,8 +84,8 @@ class MyDataset(Dataset):
 dataset = MyDataset(1000, transforms=NormalizeAdj())
 
 # Parameters
-F = dataset.F          # Dimension of node features
-n_out = dataset.n_out  # Dimension of the target
+F = dataset.n_node_features  # Dimension of node features
+n_out = dataset.n_labels     # Dimension of the target
 
 # Train/valid/test split
 idxs = np.random.permutation(len(dataset))

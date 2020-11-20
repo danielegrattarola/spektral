@@ -241,13 +241,13 @@ class Disjoint2Batch(Layer):
 
     **Input**
 
-    - Node features of shape `(N, F)`;
-    - Binary adjacency matrix of shape `(N, N)`;
-    - Graph IDs of shape `(N, )`;
+    - Node features of shape `(n_nodes, n_node_features)`;
+    - Binary adjacency matrix of shape `(n_nodes, n_nodes)`;
+    - Graph IDs of shape `(n_nodes, )`;
 
     **Output**
 
-    - Batched node features of shape `(batch, N_max, F)`;
+    - Batched node features of shape `(batch, N_max, n_node_features)`;
     - Batched adjacency matrix of shape `(batch, N_max, N_max)`;
     """
 

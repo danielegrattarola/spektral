@@ -27,9 +27,9 @@ class CrystalConv(MessagePassing):
 
     **Input**
 
-    - Node features of shape `(N, F)`;
-    - Binary adjacency matrix of shape `(N, N)`.
-    - Edge features of shape `(num_edges, S)`.
+    - Node features of shape `(n_nodes, n_node_features)`;
+    - Binary adjacency matrix of shape `(n_nodes, n_nodes)`.
+    - Edge features of shape `(num_edges, n_edge_features)`.
 
     **Output**
 

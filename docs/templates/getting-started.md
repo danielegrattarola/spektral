@@ -5,6 +5,33 @@ Spektral is designed according to the guiding principles of the Keras API to mak
 The most important modules of Spektral are `layers.convolutional` and `layers.pooling`, which offer a number of popular layers to start building graph neural networks (GNNs) right away.     
 Because Spektral is designed as an extension of Keras, you can plug any Spektral layer into an existing Keras `Model` without modifications. 
 
+In this page we will go over the main features of Spektral while creating a GNN for graph classification. 
+
+## Graphs
+
+A graph is a mathematical object that represents relations between objects. We call the objects "nodes" and the relations "edges". 
+
+Both the nodes and the edges can have vector attributes (or features).
+
+In Spektral, graphs are represented with instances of `spektral.data.Graph` which contain:
+
+- `a`: the **adjacency matrix** - usually a `scipy.sparse` matrix of shape `(n_nodes, n_nodes)`. 
+- `x`: the **node attributes** - represented by a `np.array` of shape `(n_nodes, n_node_attributes)`.
+- `e`: the **edge attributes** - usually represented in a sparse edge list format, with a `np.array` of shape `(n_edges, n_edge_attributes)`.
+- `y`: the **labels** - can represent anything, from graph labels to node labels, or even something else. 
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Node classification on citation networks
 
 In this example, we will build a simple [Graph Convolutional Network](https://arxiv.org/abs/1609.02907) for semi-supervised classification of nodes.

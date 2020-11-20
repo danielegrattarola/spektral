@@ -23,8 +23,8 @@ x, a, y = graph.x, graph.a, graph.y
 mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
 
 # Define model
-x_in = Input(shape=(dataset.F,))
-a_in = Input((dataset.F,), sparse=True)
+x_in = Input(shape=(dataset.n_node_features,))
+a_in = Input((dataset.n_node_features,), sparse=True)
 x_1 = GraphConv(16, 'relu', True, kernel_regularizer=l2(5e-4))([x_in, a_in])
 x_1 = Dropout(0.5)(x_1)
 x_2 = GraphConv(y.shape[1], 'softmax', True)([x_1, a_in])

@@ -48,4 +48,4 @@ def test_batch_generator():
     for batch in batches:
         a_, b_, c_ = batch
         for i in range(len(a_)):
-            assert a_[i] == b_[i] == c_[i].N
+            assert a_[i] == b_[i] == c_[i].n_nodes
