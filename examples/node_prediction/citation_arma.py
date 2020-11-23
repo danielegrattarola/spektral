@@ -71,9 +71,9 @@ model.summary()
 # Train model
 loader_tr = SingleLoader(dataset, sample_weights=mask_tr)
 loader_va = SingleLoader(dataset, sample_weights=mask_va)
-model.fit(loader_tr.tf(),
+model.fit(loader_tr.load(),
           steps_per_epoch=loader_tr.steps_per_epoch,
-          validation_data=loader_va.tf(),
+          validation_data=loader_va.load(),
           validation_steps=loader_va.steps_per_epoch,
           epochs=epochs,
           callbacks=[EarlyStopping(patience=patience, restore_best_weights=True)])
@@ -81,7 +81,7 @@ model.fit(loader_tr.tf(),
 # Evaluate model
 print('Evaluating model.')
 loader_te = SingleLoader(dataset, sample_weights=mask_te)
-eval_results = model.evaluate(loader_te.tf(), steps=loader_te.steps_per_epoch)
+eval_results = model.evaluate(loader_te.load(), steps=loader_te.steps_per_epoch)
 print('Done.\n'
       'Test loss: {}\n'
       'Test accuracy: {}'.format(*eval_results))

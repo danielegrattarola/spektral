@@ -57,7 +57,7 @@ model.summary()
 # FIT MODEL
 ################################################################################
 loader_tr = BatchLoader(dataset_tr, batch_size=batch_size)
-model.fit(loader_tr,
+model.fit(loader_tr.load(),
           steps_per_epoch=loader_tr.steps_per_epoch,
           epochs=epochs)
 
@@ -66,5 +66,5 @@ model.fit(loader_tr,
 ################################################################################
 print('Testing model')
 loader_te = BatchLoader(dataset_te, batch_size=batch_size)
-model_loss = model.evaluate(loader_te, steps=loader_tr.steps_per_epoch)
+model_loss = model.evaluate(loader_te.load(), steps=loader_te.steps_per_epoch)
 print('Done. Test loss: {}'.format(model_loss))

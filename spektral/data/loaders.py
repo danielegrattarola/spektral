@@ -46,19 +46,16 @@ class Loader:
     Additionally, a Loader should implement two main methods that simplify its
     usage within the TensorFlow/Keras training pipeline:
 
-    - `tf()`: should return a `tf.data` dataset, a generator, or a
+    - `load()`: should return a `tf.data` dataset, a generator, or a
     `keras.utils.Sequence`. Its usage pattern should be as follows:
 
-    `model.fit(loader.tf(), steps_per_epoch=loader.steps_per_epoch)`
+    `model.fit(loader.load(), steps_per_epoch=loader.steps_per_epoch)`
 
     The `steps_per_epoch` property returns the number of batches
     (as specified by the `batch_size` argument) that are in an epoch and is
     automatically computed from the data.
 
-    Note that TensorFlow 2.4 or above is required to use this method in a
-    Keras training loop.
-
-    By default, `tf()` will simply return a `tf.data.Dataset.from_generator`
+    By default, `load()` will simply return a `tf.data.Dataset.from_generator`
     dataset obtained from the Loader itself (since Loaders are also Python
     generators).
 
@@ -101,12 +98,8 @@ class Loader:
     def collate(self, batch):
         raise NotImplementedError
 
-    def tf(self):
-        if not tf_loader_available:
-            raise RuntimeError('Calling Loader.tf() requires TensorFlow 2.4 '
-                               'or greater.')
-        return tf.data.Dataset.from_generator(
-            lambda: self, output_signature=self.tf_signature())
+    def load(self):
+        return self
 
     def tf_signature(self):
         signature = self.dataset.signature
@@ -131,9 +124,6 @@ class SingleLoader(Loader):
     The loader also supports sample weights through the `sample_weights`
     argument. If given, then each batch will be a tuple
     `(inputs, labels, sample_weights)`.
-
-    The `tf()` method of this loader can be used even with TensorFlow versions
-    below 2.4.
 
     **Arguments**
 
@@ -181,7 +171,7 @@ class SingleLoader(Loader):
             output += [self.sample_weights]
         return tuple(output)
 
-    def tf(self):
+    def load(self):
         output = self.collate(self.dataset)
         return tf.data.Dataset.from_tensors(output).repeat(self.epochs)
 
@@ -207,6 +197,9 @@ class DisjointLoader(Loader):
     are stacked along an additional dimension (i.e., `(n_graphs, n_labels)`)
     If `node_level=True`, then the labels are stacked vertically (i.e.,
     `(n_nodes, n_labels)`).
+
+    Note that TensorFlow 2.4 or above is required to use this Loader's `load()`
+    method in a Keras training loop.
 
     **Arguments**
 
@@ -255,6 +248,13 @@ class DisjointLoader(Loader):
         output = tuple(output)
 
         return output, y
+
+    def load(self):
+        if not tf_loader_available:
+            raise RuntimeError('Calling DisjointLoader.load() requires '
+                               'TensorFlow 2.4 or greater.')
+        return tf.data.Dataset.from_generator(
+            lambda: self, output_signature=self.tf_signature())
 
     def tf_signature(self):
         signature = self.dataset.signature
