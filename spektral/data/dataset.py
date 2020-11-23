@@ -179,11 +179,15 @@ class Dataset:
         return len(self.graphs)
 
     def __repr__(self):
-        return '{}({})'.format(self.__class__.__name__, self.__len__())
+        return '{}(n_graphs={})'.format(self.__class__.__name__, self.n_graphs)
 
     @property
     def path(self):
         return osp.join(DATASET_FOLDER, self.__class__.__name__)
+
+    @property
+    def n_graphs(self):
+        return self.__len__()
 
     @property
     def n_nodes(self):

@@ -36,7 +36,13 @@ See how to [get started with Spektral](https://graphneural.network/getting-start
 
 The source code of the project is available on [Github](https://github.com/danielegrattarola/spektral).  
 Read the documentation [here](https://graphneural.network).  
-You can also cite the paper introducing Spektral: [Graph Neural Networks in TensorFlow and Keras with Spektral](https://arxiv.org/abs/2006.12138) (ICML 2020 - GRL+ Workshop). 
+
+If you want to cite Spektral in your work, refer to our paper: 
+
+> Graph Neural Networks in TensorFlow and Keras with Spektral  
+> D. Grattarola and C. Alippi  
+> ICML 2020 - GRL+ Workshop  
+> [https://arxiv.org/abs/2006.12138](https://arxiv.org/abs/2006.12138)  
 
 ## Installation
 Spektral is compatible with Python 3.5+, and is tested on Ubuntu 16.04+ and MacOS. 
