@@ -50,8 +50,8 @@ class MyDataset(Dataset):
     The graphs have `n_colors` colors, of at least `n_min` and at most `n_max`
     nodes connected with probability `p`.
     """
-    def __init__(self, n_graphs, n_colors=3, n_min=10, n_max=100, p=0.5, **kwargs):
-        self.n_graphs = n_graphs
+    def __init__(self, n_samples, n_colors=3, n_min=10, n_max=100, p=0.5, **kwargs):
+        self.n_samples = n_samples
         self.n_colors = n_colors
         self.n_min = n_min
         self.n_max = n_max
@@ -78,7 +78,7 @@ class MyDataset(Dataset):
             return Graph(x=x, a=a, y=y)
 
         # We must return a list of Graph objects
-        return [make_graph() for _ in range(self.n_graphs)]
+        return [make_graph() for _ in range(self.n_samples)]
 
 
 dataset = MyDataset(1000, transforms=NormalizeAdj())
