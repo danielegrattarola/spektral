@@ -31,7 +31,7 @@ class GraphSage(Dataset):
     the title and comments, the post's score and the number of comments.
 
     The train, test, and validation splits are given as binary masks and are
-    accessible with the `mask_tr`, `mask_va`, and `mask_te` respectively.
+    accessible via the `mask_tr`, `mask_va`, and `mask_te` attributes.
 
     **Arguments**
 

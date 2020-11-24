@@ -325,6 +325,8 @@ class BatchLoader(Loader):
         packed = self._pack(batch)
         y = np.array(packed[-1])
         output = to_batch(*packed[:-1])
+        if len(output) == 1:
+            output = output[0]
 
         return output, y
 
@@ -368,4 +370,7 @@ class PackedBatchLoader(BatchLoader):
         self._generator = self.generator()
 
     def collate(self, batch):
-        return batch[:-1], batch[-1]
+        if len(batch) == 2:
+            return batch[0], batch[1]
+        else:
+            return batch[:-1], batch[-1]

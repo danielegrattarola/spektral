@@ -11,11 +11,11 @@ s = 3
 
 class TestDataset(Dataset):
     def read(self):
-        return [
-            Graph(x=np.random.rand(n, f), a=np.random.randint(0, 2, (n, n)), e=np.random.rand(n, n, s),
-                  y=np.array([0., 1.]))
-            for n in Ns
-        ]
+        return [Graph(x=np.random.rand(n, f),
+                      a=np.random.randint(0, 2, (n, n)),
+                      e=np.random.rand(n, n, s),
+                      y=np.array([0., 1.]))
+                for n in Ns]
 
 
 def test_dataset():
@@ -36,7 +36,9 @@ def test_dataset():
 
     # __setitem__
     n = 100
-    g = Graph(x=np.random.rand(n, f), a=np.random.randint(0, 2, (n, n)), e=np.random.rand(n, n, s),
+    g = Graph(x=np.random.rand(n, f),
+              a=np.random.randint(0, 2, (n, n)),
+              e=np.random.rand(n, n, s),
               y=np.array([0., 1.]))
 
     # single assignment

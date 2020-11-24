@@ -1,34 +1,32 @@
 import numpy as np
-import tensorflow as tf
 from tensorflow.keras import Model
 from tensorflow.keras.layers import Dense, Flatten
-from tensorflow.keras.losses import SparseCategoricalCrossentropy
-from tensorflow.keras.metrics import SparseCategoricalAccuracy
-from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
 
-from spektral.datasets import mnist
+from spektral.data import PackedBatchLoader
+from spektral.datasets.mnist import MNIST
 from spektral.layers import GraphConv
 from spektral.layers.ops import sp_matrix_to_sp_tensor
-from spektral.data.utils import batch_generator
 
 # Parameters
-learning_rate = 1e-3  # Learning rate for Adam
-batch_size = 32       # Batch size
-epochs = 1000         # Number of training epochs
-patience = 10         # Patience for early stopping
-l2_reg = 5e-4         # Regularization rate for l2
+batch_size = 32  # Batch size
+epochs = 1000    # Number of training epochs
+patience = 10    # Patience for early stopping
+l2_reg = 5e-4    # Regularization rate for l2
 
 # Load data
-x_tr, y_tr, x_va, y_va, x_te, y_te, A = mnist.load_data()
-x_tr, x_va, x_te = x_tr[..., None], x_va[..., None], x_te[..., None]
-N = x_tr.shape[-2]    # Number of nodes in the graphs
-F = x_tr.shape[-1]    # Node features dimensionality
-n_out = 10            # Dimension of the target
+data = MNIST()
 
-# Create filter for GCN and convert to sparse tensor
-fltr = GraphConv.preprocess(A)
-fltr = sp_matrix_to_sp_tensor(fltr)
+# The adjacency matrix is stored as an attribute of the dataset.
+# Create filter for GCN and convert to sparse tensor.
+adj = data.a
+adj = GraphConv.preprocess(adj)
+adj = sp_matrix_to_sp_tensor(adj)
+
+# Train/valid/test split
+data_tr, data_te = data[:-10000], data[-10000:]
+np.random.shuffle(data_tr)
+data_tr, data_va = data_tr[:-10000], data_tr[-10000:]
 
 
 # Build model
@@ -39,78 +37,64 @@ class Net(Model):
         self.conv2 = GraphConv(32, activation='elu', kernel_regularizer=l2(l2_reg))
         self.flatten = Flatten()
         self.fc1 = Dense(512, activation='relu')
-        self.fc2 = Dense(n_out, activation='softmax')
+        self.fc2 = Dense(10, activation='softmax')  # MNIST has 10 classes
 
     def call(self, inputs):
-        x, fltr = inputs
-        x = self.conv1([x, fltr])
-        x = self.conv2([x, fltr])
+        x, a = inputs
+        x = self.conv1([x, a])
+        x = self.conv2([x, a])
         output = self.flatten(x)
         output = self.fc1(output)
         output = self.fc2(output)
 
         return output
 
-
+# Create model
 model = Net()
-optimizer = Adam(lr=learning_rate)
-loss_fn = SparseCategoricalCrossentropy()
-acc_fn = SparseCategoricalAccuracy()
+model.compile('adam', 'sparse_categorical_crossentropy',
+              metrics=['sparse_categorical_accuracy'])
 
 
-# Training step
-@tf.function
-def train(x, y):
-    with tf.GradientTape() as tape:
-        predictions = model([x, fltr], training=True)
-        loss = loss_fn(y, predictions)
-        loss += sum(model.losses)
-    acc = acc_fn(y, predictions)
-    gradients = tape.gradient(loss, model.trainable_variables)
-    optimizer.apply_gradients(zip(gradients, model.trainable_variables))
-    return loss, acc
-
-
-# Evaluation step
-@tf.function
-def evaluate(x, y):
-    predictions = model([x, fltr], training=False)
-    loss = loss_fn(y, predictions)
-    loss += sum(model.losses)
-    acc = acc_fn(y, predictions)
-
-    return loss, acc
+# Evaluation function
+def evaluate(loader):
+    step = 0
+    results = []
+    for batch in loader:
+        step += 1
+        x, y = batch
+        l, a = model.test_on_batch([x, adj], y)
+        results.append((l, a))
+        if step == loader.steps_per_epoch:
+            return np.mean(results, 0)
 
 
 # Setup training
 best_val_loss = 99999
 current_patience = patience
-curent_batch = 0
-batches_in_epoch = int(np.ceil(x_tr.shape[0] / batch_size))
-batches_tr = batch_generator([x_tr, y_tr], batch_size=batch_size, epochs=epochs)
+step = 0
+
+# We can use PackedBatchLoader because we only need to create batches of node
+# features with the same dimensions.
+loader_tr = PackedBatchLoader(data_tr, batch_size=batch_size, epochs=epochs)
+loader_va = PackedBatchLoader(data_va, batch_size=batch_size)
+loader_te = PackedBatchLoader(data_te, batch_size=batch_size)
 
 # Training loop
 results_tr = []
-results_te = np.zeros(2)
-for batch in batches_tr:
-    curent_batch += 1
+for batch in loader_tr:
+    step += 1
 
     # Training step
-    l, a = train(*batch)
+    x, y = batch
+    l, a = model.train_on_batch([x, adj], y)
     results_tr.append((l, a))
 
-    if curent_batch == batches_in_epoch:
-        batches_va = batch_generator([x_va, y_va], batch_size=batch_size, epochs=1)
-        results_va = [evaluate(*batch) for batch in batches_va]
-        results_va = np.array(results_va)
-        loss_va, acc_va = results_va.mean(0)
-        if loss_va < best_val_loss:
-            best_val_loss = loss_va
+    if step == loader_tr.steps_per_epoch:
+        results_va = evaluate(loader_va)
+        if results_va[0] < best_val_loss:
+            best_val_loss = results_va[0]
             current_patience = patience
-            # Test
-            batches_te = batch_generator([x_te, y_te], batch_size=batch_size, epochs=1)
-            results_te = [evaluate(*batch) for batch in batches_te]
-            results_te = np.array(results_te)
+            results_te = evaluate(loader_te)
         else:
             current_patience -= 1
             if current_patience == 0:
@@ -118,14 +102,12 @@ for batch in batches_tr:
                 break
 
         # Print results
-        results_tr = np.array(results_tr)
+        results_tr = np.mean(results_tr, 0)
         print('Train loss: {:.4f}, acc: {:.4f} | '
               'Valid loss: {:.4f}, acc: {:.4f} | '
               'Test loss: {:.4f}, acc: {:.4f}'
-              .format(*results_tr.mean(0),
-                      *results_va.mean(0),
-                      *results_te.mean(0)))
+              .format(*results_tr, *results_va, *results_te))
 
         # Reset epoch
         results_tr = []
-        curent_batch = 0
+        step = 0
