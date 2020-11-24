@@ -1,4 +1,4 @@
-from spektral.data import DisjointLoader, BatchLoader
+from spektral.data import DisjointLoader, BatchLoader, SingleLoader
 from spektral.datasets import qm9, citation, graphsage, mnist, tudataset
 
 batch_size = 3
@@ -8,15 +8,17 @@ def test_citation():
     dataset = citation.Cora()
     dataset = citation.Citeseer(random_split=True)
     dataset = citation.Pubmed(normalize_x=True)
+    sl = SingleLoader(dataset)
 
 
 def test_graphsage():
     # Test only PPI because Travis otherwise runs into memory errors
     dataset = graphsage.PPI()
+    sl = SingleLoader(dataset)
 
 
 def test_mnist():
-    mnist.load_data(k=8, noise_level=0.1)
+    dataset = mnist.MNIST(k=8, noise_level=0.1)
 
 
 def test_qm9():

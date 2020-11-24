@@ -1,9 +1,8 @@
 import numpy as np
+import scipy.sparse as sp
 
 from spektral.data import Dataset, Graph
 from spektral.data.utils import to_disjoint, to_batch, batch_generator
-import scipy.sparse as sp
-import numpy as np
 
 ns = np.random.randint(3, 10, 10)
 f = 3
@@ -14,6 +13,8 @@ y = [[0, 1]] * len(ns)
 
 def test_to_batch():
     # TODO test e_list
+    x = to_batch(x_list=x_list)
+    a = to_batch(a_list=a_list)
     x, a = to_batch(x_list, a_list)
     assert x.ndim == 3
     assert a.ndim == 3
@@ -23,6 +24,8 @@ def test_to_batch():
 
 def test_to_disjoint():
     # TODO test e_list
+    x, i = to_disjoint(x_list, None)
+    a, i = to_disjoint(None, a_list)
     x, a, i = to_disjoint(x_list, a_list)
     assert x.ndim == 2
     assert a.ndim == 2
