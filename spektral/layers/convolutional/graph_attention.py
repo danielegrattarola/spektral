@@ -256,6 +256,7 @@ class GraphAttention(GraphConv):
             'attn_heads': self.attn_heads,
             'concat_heads': self.concat_heads,
             'dropout_rate': self.dropout_rate,
+            'return_attn_coef': self.return_attn_coef,
             'attn_kernel_initializer': initializers.serialize(self.attn_kernel_initializer),
             'attn_kernel_regularizer': regularizers.serialize(self.attn_kernel_regularizer),
             'attn_kernel_constraint': constraints.serialize(self.attn_kernel_constraint),
