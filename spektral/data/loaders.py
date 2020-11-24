@@ -359,6 +359,9 @@ class PackedBatchLoader(BatchLoader):
     - the graphs in the dataset have similar sizes and there are no outliers in
     the dataset (i.e., anomalous graphs with many more nodes than the dataset
     average).
+
+    This loader is also useful for loading mixed-mode datsets, because it
+    allows to create "standard" batches of node features with almost no overhead.
     """
     def __init__(self, dataset, batch_size=1, epochs=None, shuffle=True):
         super().__init__(dataset, batch_size=batch_size, epochs=epochs, shuffle=shuffle)
