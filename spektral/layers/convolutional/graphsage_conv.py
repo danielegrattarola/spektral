@@ -11,6 +11,8 @@ class GraphSageConv(MessagePassing):
 
     **Mode**: single, disjoint.
 
+    **This layer expects a sparse adjacency matrix.**
+
     This layer computes:
     $$
         \Z = \big[ \textrm{AGGREGATE}(\X) \| \X \big] \W + \b; \\

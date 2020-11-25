@@ -38,6 +38,7 @@ nav:
     - Convolutional Layers: layers/convolution.md
     - Pooling Layers: layers/pooling.md
     - Base Layers: layers/base.md
+    - Models: models.md
 - Data:
     - Containers: data.md
     - Datasets: datasets.md

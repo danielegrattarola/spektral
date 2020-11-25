@@ -2,9 +2,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras import Model, Input
 
-from spektral.layers import GCNConv, ChebConv, ECCConv, GATConv, \
-    GCSConv, ARMAConv, APPNPConv, GraphSageConv, GINConv, DiffusionConv, \
-    GatedGraphConv, AGNNConv, TAGConv, CrystalConv, MessagePassing, EdgeConv
+from spektral import layers
 from spektral.layers.ops import sp_matrix_to_sp_tensor
 
 tf.keras.backend.set_floatx('float64')
@@ -55,89 +53,94 @@ The loop will check:
 
 TESTS = [
     {
-        LAYER_K_: GCNConv,
+        LAYER_K_: layers.GCNConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
         KWARGS_K_: {'channels': 8, 'activation': 'relu', 'sparse': [False, True]},
     },
     {
-        LAYER_K_: ChebConv,
+        LAYER_K_: layers.ChebConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
         KWARGS_K_: {'K': 3, 'channels': 8, 'activation': 'relu', 'sparse': [False, True]}
     },
     {
-        LAYER_K_: GraphSageConv,
+        LAYER_K_: layers.GraphSageConv,
         MODES_K_: [SINGLE],
         KWARGS_K_: {'channels': 8, 'activation': 'relu', 'sparse': [True]}
     },
     {
-        LAYER_K_: ECCConv,
+        LAYER_K_: layers.ECCConv,
         MODES_K_: [SINGLE, BATCH],
         KWARGS_K_: {'kernel_network': [8], 'channels': 8, 'activation': 'relu',
                     'edges': True, 'sparse': [False, True]}
     },
     {
-        LAYER_K_: GATConv,
+        LAYER_K_: layers.GATConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
         KWARGS_K_: {'channels': 8, 'attn_heads': 2, 'concat_heads': False,
                     'activation': 'relu', 'sparse': [False, True]}
     },
     {
-        LAYER_K_: GCSConv,
+        LAYER_K_: layers.GCSConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
         KWARGS_K_: {'channels': 8, 'activation': 'relu', 'sparse': [False, True]}
     },
     {
-        LAYER_K_: ARMAConv,
+        LAYER_K_: layers.ARMAConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
         KWARGS_K_: {'channels': 8, 'activation': 'relu', 'order': 2, 'iterations': 2,
                     'share_weights': True, 'sparse': [False, True]}
     },
     {
-        LAYER_K_: APPNPConv,
+        LAYER_K_: layers.APPNPConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
         KWARGS_K_: {'channels': 8, 'activation': 'relu', 'mlp_hidden': [16],
                     'sparse': [False, True]}
     },
     {
-        LAYER_K_: GINConv,
+        LAYER_K_: layers.GINConv,
         MODES_K_: [SINGLE],
         KWARGS_K_: {'channels': 8, 'activation': 'relu', 'mlp_hidden': [16],
                     'sparse': [True]}
     },
     {
-        LAYER_K_: DiffusionConv,
+        LAYER_K_: layers.DiffusionConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
         KWARGS_K_: {'channels': 8, 'activation': 'tanh', 'num_diffusion_steps': 5,
                     'sparse': [False]}
     },
     {
-        LAYER_K_: GatedGraphConv,
+        LAYER_K_: layers.GatedGraphConv,
         MODES_K_: [SINGLE],
         KWARGS_K_: {'channels': 10, 'n_layers': 3, 'sparse': [True]}
     },
     {
-        LAYER_K_: AGNNConv,
+        LAYER_K_: layers.AGNNConv,
         MODES_K_: [SINGLE],
         KWARGS_K_: {'channels': F, 'trainable': True, 'sparse': [True]}
     },
     {
-        LAYER_K_: TAGConv,
+        LAYER_K_: layers.TAGConv,
         MODES_K_: [SINGLE],
         KWARGS_K_: {'channels': F, 'K': 3, 'sparse': [True]}
     },
     {
-        LAYER_K_: CrystalConv,
+        LAYER_K_: layers.CrystalConv,
         MODES_K_: [SINGLE],
         KWARGS_K_: {'channels': F, 'edges': True, 'sparse': [True]}
     },
     {
-        LAYER_K_: EdgeConv,
+        LAYER_K_: layers.EdgeConv,
         MODES_K_: [SINGLE],
         KWARGS_K_: {'channels': 8, 'activation': 'relu', 'mlp_hidden': [16],
                     'sparse': [True]}
     },
     {
-        LAYER_K_: MessagePassing,
+        LAYER_K_: layers.GeneralConv,
+        MODES_K_: [SINGLE],
+        KWARGS_K_: {'channels': 256, 'sparse': [True]}
+    },
+    {
+        LAYER_K_: layers.MessagePassing,
         MODES_K_: [SINGLE],
         KWARGS_K_: {'channels': F, 'sparse': [True]}
     },
