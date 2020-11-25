@@ -4,10 +4,10 @@ from spektral.layers.convolutional.gcn_conv import GCNConv
 
 
 class DiffuseFeatures(layers.Layer):
-    r"""Utility layer calculating a single channel of the
-    diffusional convolution.
+    r"""
+    Utility layer calculating a single channel of the diffusional convolution.
 
-    Procedure is based on https://arxiv.org/abs/1707.01926
+    The procedure is based on [https://arxiv.org/abs/1707.01926](https://arxiv.org/abs/1707.01926)
 
     **Input**
 
@@ -28,49 +28,38 @@ class DiffuseFeatures(layers.Layer):
     - `kernel_constraint`: constraint applied to the kernel vectors;
     """
 
-    def __init__(
-        self,
-        num_diffusion_steps: int,
-        kernel_initializer,
-        kernel_regularizer,
-        kernel_constraint,
-        **kwargs
-    ):
-        super(DiffuseFeatures, self).__init__()
+    def __init__(self,
+                 num_diffusion_steps,
+                 kernel_initializer,
+                 kernel_regularizer,
+                 kernel_constraint,
+                 **kwargs):
+        super(DiffuseFeatures, self).__init__(**kwargs)
 
-        # number of diffusino steps (K in paper)
         self.K = num_diffusion_steps
-
-        # get regularizer, initializer and constraint for kernel
         self.kernel_initializer = kernel_initializer
         self.kernel_regularizer = kernel_regularizer
         self.kernel_constraint = kernel_constraint
 
     def build(self, input_shape):
-
-        # Initializing the kernel vector (R^K)
-        # (theta in paper)
-        self.kernel = self.add_weight(
-            shape=(self.K,),
-            name="kernel",
-            initializer=self.kernel_initializer,
-            regularizer=self.kernel_regularizer,
-            constraint=self.kernel_constraint,
-        )
+        # Initializing the kernel vector (R^K) (theta in paper)
+        self.kernel = self.add_weight(shape=(self.K,),
+                                      name="kernel",
+                                      initializer=self.kernel_initializer,
+                                      regularizer=self.kernel_regularizer,
+                                      constraint=self.kernel_constraint)
 
     def call(self, inputs):
-
-        # Get signal X and adjacency A
-        X, A = inputs
+        x, a = inputs
 
         # Calculate diffusion matrix: sum kernel_k * Attention_t^k
         # tf.polyval needs a list of tensors as the coeff. thus we
         # unstack kernel
-        diffusion_matrix = tf.math.polyval(tf.unstack(self.kernel), A)
+        diffusion_matrix = tf.math.polyval(tf.unstack(self.kernel), a)
 
         # Apply it to X to get a matrix C = [C_1, ..., C_F] (n_nodes x n_node_features)
         # of diffused features
-        diffused_features = tf.matmul(diffusion_matrix, X)
+        diffused_features = tf.matmul(diffusion_matrix, x)
 
         # Now we add all diffused features (columns of the above matrix)
         # and apply a non linearity to obtain H:,q (eq. 3 in paper)
@@ -91,6 +80,7 @@ class DiffusionConv(GCNConv):
 
     Given a number of diffusion steps \(K\) and a row normalized adjacency matrix \(\hat \A \),
     this layer calculates the q'th channel as:
+
     $$
     \mathbf{H}_{~:,~q} = \sigma\left(
         \sum_{f=1}^{n_node_features}
@@ -122,16 +112,14 @@ class DiffusionConv(GCNConv):
     - `kernel_constraint`: constraint applied to the weights;
     """
 
-    def __init__(
-        self,
-        channels: int,
-        num_diffusion_steps: int = 6,
-        kernel_initializer='glorot_uniform',
-        kernel_regularizer=None,
-        kernel_constraint=None,
-        activation='tanh',
-        ** kwargs
-    ):
+    def __init__(self,
+                 channels,
+                 num_diffusion_steps=6,
+                 activation='tanh',
+                 kernel_initializer='glorot_uniform',
+                 kernel_regularizer=None,
+                 kernel_constraint=None,
+                 **kwargs):
         super().__init__(channels,
                          activation=activation,
                          kernel_initializer=kernel_initializer,
@@ -147,30 +135,14 @@ class DiffusionConv(GCNConv):
         self.K = num_diffusion_steps + 1
 
     def build(self, input_shape):
+        self.filters = [
+            DiffuseFeatures(num_diffusion_steps=self.K,
+                            kernel_initializer=self.kernel_initializer,
+                            kernel_regularizer=self.kernel_regularizer,
+                            kernel_constraint=self.kernel_constraint)
+            for _ in range(self.Q)]
 
-        # We expect to receive (X, A)
-        # A - Adjacency ([batch], n_nodes, n_nodes)
-        # X - graph signal ([batch], n_nodes, n_node_features)
-        X_shape, A_shape = input_shape
-
-        # initialise Q diffusion convolution filters
-        self.filters = []
-
-        for _ in range(self.Q):
-            layer = DiffuseFeatures(
-                num_diffusion_steps=self.K,
-                kernel_initializer=self.kernel_initializer,
-                kernel_regularizer=self.kernel_regularizer,
-                kernel_constraint=self.kernel_constraint,
-            )
-            self.filters.append(layer)
-
-    def apply_filters(self, X, A):
-        """Applies diffusion convolution self.Q times to get a
-        ([batch], n_nodes, Q) diffused graph signal
-
-        """
-
+    def apply_filters(self, x, a):
         # This will be a list of Q diffused features.
         # Each diffused feature is a (batch, n_nodes, 1) tensor.
         # Later we will concat all the features to get one
@@ -179,25 +151,14 @@ class DiffusionConv(GCNConv):
 
         # Iterating over all Q diffusion filters
         for diffusion in self.filters:
-            diffused_feature = diffusion((X, A))
+            diffused_feature = diffusion((x, a))
             diffused_features.append(diffused_feature)
 
-        # Concat them into ([batch], n_nodes, Q) diffused graph signal
-        H = tf.concat(diffused_features, -1)
-
-        return H
+        return tf.concat(diffused_features, -1)
 
     def call(self, inputs):
+        x, a = inputs
+        h = self.apply_filters(x, a)
+        h = self.activation(h)
 
-        # Get graph signal X and adjacency tensor A
-        X, A = inputs
-
-        # 'single', 'batch' and 'mixed' mode are supported by
-        # default, since we access the dimensions from the end
-        # and everything else is broadcasted accordingly
-        # if its missing.
-
-        H = self.apply_filters(X, A)
-        H = self.activation(H)
-
-        return H
+        return h

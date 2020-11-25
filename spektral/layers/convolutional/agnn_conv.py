@@ -59,21 +59,21 @@ class AGNNConv(MessagePassing):
 
     def call(self, inputs, **kwargs):
         x, a, _ = self.get_inputs(inputs)
-        X_norm = K.l2_normalize(x, axis=-1)
-        output = self.propagate(x, a, X_norm=X_norm)
+        x_norm = K.l2_normalize(x, axis=-1)
+        output = self.propagate(x, a, x_norm=x_norm)
         output = self.activation(output)
 
         return output
 
-    def message(self, X, X_norm=None):
-        X_j = self.get_j(X)
-        X_norm_i = self.get_i(X_norm)
-        X_norm_j = self.get_j(X_norm)
-        alpha = self.beta * tf.reduce_sum(X_norm_i * X_norm_j, axis=-1)
+    def message(self, x, x_norm=None):
+        x_j = self.get_j(x)
+        x_norm_i = self.get_i(x_norm)
+        x_norm_j = self.get_j(x_norm)
+        alpha = self.beta * tf.reduce_sum(x_norm_i * x_norm_j, axis=-1)
         alpha = ops.unsorted_segment_softmax(alpha, self.index_i, self.N)
         alpha = alpha[:, None]
 
-        return alpha * X_j
+        return alpha * x_j
 
     def get_config(self):
         config = {

@@ -166,14 +166,13 @@ class GATConv(GCNConv):
         self.built = True
 
     def call(self, inputs):
-        X = inputs[0]
-        A = inputs[1]
+        x, a = inputs
 
-        mode = ops.autodetect_mode(A, X)
-        if mode == modes.SINGLE and K.is_sparse(A):
-            output, attn_coef = self._call_single(X, A)
+        mode = ops.autodetect_mode(a, x)
+        if mode == modes.SINGLE and K.is_sparse(a):
+            output, attn_coef = self._call_single(x, a)
         else:
-            output, attn_coef = self._call_dense(X, A)
+            output, attn_coef = self._call_dense(x, a)
 
         if self.concat_heads:
             shape = output.shape[:-2] + [self.attn_heads * self.channels]
@@ -192,26 +191,26 @@ class GATConv(GCNConv):
         else:
             return output
 
-    def _call_single(self, X, A):
+    def _call_single(self, x, a):
         # Reshape kernels for efficient message-passing
         kernel = tf.reshape(self.kernel, (-1, self.attn_heads * self.channels))
         attn_kernel_self = ops.transpose(self.attn_kernel_self, (2, 1, 0))
         attn_kernel_neighs = ops.transpose(self.attn_kernel_neighs, (2, 1, 0))
 
         # Prepare message-passing
-        indices = A.indices
-        N = tf.shape(X, out_type=indices.dtype)[0]
-        indices = ops.sparse_add_self_loops(indices, N)
+        indices = a.indices
+        N = tf.shape(x, out_type=indices.dtype)[0]
+        indices = ops.add_self_loops_indices(indices, N)
         targets, sources = indices[:, -2], indices[:, -1]
 
         # Update node features
-        X = ops.dot(X, kernel)
-        X = tf.reshape(X, (-1, self.attn_heads, self.channels))
+        x = ops.dot(x, kernel)
+        x = tf.reshape(x, (-1, self.attn_heads, self.channels))
 
         # Compute attention
-        attn_for_self = tf.reduce_sum(X * attn_kernel_self, -1)
+        attn_for_self = tf.reduce_sum(x * attn_kernel_self, -1)
         attn_for_self = tf.gather(attn_for_self, targets)
-        attn_for_neighs = tf.reduce_sum(X * attn_kernel_neighs, -1)
+        attn_for_neighs = tf.reduce_sum(x * attn_kernel_neighs, -1)
         attn_for_neighs = tf.gather(attn_for_neighs, sources)
 
         attn_coef = attn_for_self + attn_for_neighs
@@ -221,29 +220,29 @@ class GATConv(GCNConv):
         attn_coef = attn_coef[..., None]
 
         # Update representation
-        output = attn_coef * tf.gather(X, sources)
+        output = attn_coef * tf.gather(x, sources)
         output = ops.scatter_sum(output, targets, N)
 
         return output, attn_coef
 
-    def _call_dense(self, X, A):
-        shape = tf.shape(A)[:-1]
-        A = tf.linalg.set_diag(A, tf.zeros(shape, A.dtype))
-        A = tf.linalg.set_diag(A, tf.ones(shape, A.dtype))
-        X = tf.einsum("...NI , IHO -> ...NHO", X, self.kernel)
-        attn_for_self = tf.einsum("...NHI , IHO -> ...NHO", X, self.attn_kernel_self)
-        attn_for_neighs = tf.einsum("...NHI , IHO -> ...NHO", X, self.attn_kernel_neighs)
+    def _call_dense(self, x, a):
+        shape = tf.shape(a)[:-1]
+        a = tf.linalg.set_diag(a, tf.zeros(shape, a.dtype))
+        a = tf.linalg.set_diag(a, tf.ones(shape, a.dtype))
+        x = tf.einsum("...NI , IHO -> ...NHO", x, self.kernel)
+        attn_for_self = tf.einsum("...NHI , IHO -> ...NHO", x, self.attn_kernel_self)
+        attn_for_neighs = tf.einsum("...NHI , IHO -> ...NHO", x, self.attn_kernel_neighs)
         attn_for_neighs = tf.einsum("...ABC -> ...CBA", attn_for_neighs)
 
         attn_coef = attn_for_self + attn_for_neighs
         attn_coef = tf.nn.leaky_relu(attn_coef, alpha=0.2)
 
-        mask = -10e9 * (1.0 - A)
+        mask = -10e9 * (1.0 - a)
         attn_coef += mask[..., None, :]
         attn_coef = tf.nn.softmax(attn_coef, axis=-1)
         attn_coef_drop = self.dropout(attn_coef)
 
-        output = tf.einsum("...NHM , ...MHI -> ...NHI", attn_coef_drop, X)
+        output = tf.einsum("...NHM , ...MHI -> ...NHI", attn_coef_drop, x)
 
         return output, attn_coef
 
@@ -265,5 +264,5 @@ class GATConv(GCNConv):
         return dict(list(base_config.items()) + list(config.items()))
 
     @staticmethod
-    def preprocess(A):
-        return A
+    def preprocess(a):
+        return a

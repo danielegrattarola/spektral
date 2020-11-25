@@ -55,7 +55,43 @@ def dense_to_sparse(x):
     return tf.SparseTensor(indices, values, shape)
 
 
-def sparse_add_self_loops(indices, N=None):
+def add_self_loops(a, fill=1.):
+    """
+    Adds self-loops to the given adjacency matrix. Self-loops are added only for
+    those node that don't have a self-loop already, and are assigned a weight
+    of `fill`.
+    :param a: a square SparseTensor.
+    :param fill: the fill value for the new self-loops. It will be cast to the
+    dtype of `a`.
+    :return: a SparseTensor with the same shape as the input.
+    """
+    N = tf.shape(a)[0]
+    indices = a.indices
+    values = a.values
+
+    mask_od = indices[:, 0] != indices[:, 1]
+    mask_sl = ~mask_od
+
+    indices_od = indices[mask_od]
+    indices_sl = indices[mask_sl]
+
+    values_sl = tf.fill((N, ), tf.cast(fill, values.dtype))
+    values_sl = tf.tensor_scatter_nd_update(
+        values_sl, indices_sl[:, 0:1], values[mask_sl])
+
+    indices_sl = tf.range(N, dtype=indices.dtype)[:, None]
+    indices_sl = tf.repeat(indices_sl, 2, -1)
+    indices = tf.concat((indices_od, indices_sl), 0)
+
+    values_od = values[mask_od]
+    values = tf.concat((values_od, values_sl), 0)
+
+    out = tf.SparseTensor(indices, values, (N, N))
+
+    return tf.sparse.reorder(out)
+
+
+def add_self_loops_indices(indices, N=None):
     """
     Given the indices of a square SparseTensor, adds the diagonal entries (i, i)
     and returns the reordered indices.

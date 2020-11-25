@@ -92,15 +92,11 @@ class GCSConv(GCNConv):
         self.built = True
 
     def call(self, inputs):
-        features = inputs[0]
-        fltr = inputs[1]
+        x, a = inputs
 
-        # Convolution
-        output = K.dot(features, self.kernel_1)
-        output = ops.filter_dot(fltr, output)
-
-        # Skip connection
-        skip = K.dot(features, self.kernel_2)
+        output = K.dot(x, self.kernel_1)
+        output = ops.filter_dot(a, output)
+        skip = K.dot(x, self.kernel_2)
         output += skip
 
         if self.use_bias:
@@ -110,5 +106,5 @@ class GCSConv(GCNConv):
         return output
 
     @staticmethod
-    def preprocess(A):
-        return normalized_adjacency(A)
+    def preprocess(a):
+        return normalized_adjacency(a)

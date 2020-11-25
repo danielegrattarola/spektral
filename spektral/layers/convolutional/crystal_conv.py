@@ -90,16 +90,16 @@ class CrystalConv(MessagePassing):
 
         self.built = True
 
-    def message(self, X, E=None):
-        X_i = self.get_i(X)
-        X_j = self.get_j(X)
-        Z = K.concatenate((X_i, X_j, E), axis=-1)
-        output = self.dense_s(Z) * self.dense_f(Z)
+    def message(self, x, e=None):
+        x_i = self.get_i(x)
+        x_j = self.get_j(x)
+        z = K.concatenate((x_i, x_j, e), axis=-1)
+        output = self.dense_s(z) * self.dense_f(z)
 
         return output
 
-    def update(self, embeddings, X=None):
-        return X + embeddings
+    def update(self, embeddings, x=None):
+        return x + embeddings
 
     def get_config(self):
         config = {

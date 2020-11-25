@@ -33,7 +33,7 @@ class MessagePassing(Layer):
 
     **API:**
 
-    - `propagate(X, A, E=None, **kwargs)`: propagate the messages and computes
+    - `propagate(X, A, E=None, **kwargs)`: propagate the messages and compute
     embeddings for each node in the graph. `kwargs` will be propagated as
     keyword arguments to `message()`, `aggregate()` and `update()`.
     - `message(X, **kwargs)`: computes messages, equivalent to \(\phi\) in the
@@ -80,33 +80,33 @@ class MessagePassing(Layer):
         self.agg = deserialize_scatter(aggregate)
 
     def call(self, inputs, **kwargs):
-        X, A, E = self.get_inputs(inputs)
-        return self.propagate(X, A, E)
+        x, a, e = self.get_inputs(inputs)
+        return self.propagate(x, a, e)
 
     def build(self, input_shape):
         self.built = True
 
-    def propagate(self, X, A, E=None, **kwargs):
-        self.N = tf.shape(X)[0]
-        self.index_i = A.indices[:, 0]
-        self.index_j = A.indices[:, 1]
+    def propagate(self, x, a, e=None, **kwargs):
+        self.N = tf.shape(x)[0]
+        self.index_i = a.indices[:, 1]
+        self.index_j = a.indices[:, 0]
 
         # Message
-        msg_kwargs = self.get_kwargs(X, A, E, self.msg_signature, kwargs)
-        messages = self.message(X, **msg_kwargs)
+        msg_kwargs = self.get_kwargs(x, a, e, self.msg_signature, kwargs)
+        messages = self.message(x, **msg_kwargs)
 
         # Aggregate
-        agg_kwargs = self.get_kwargs(X, A, E, self.agg_signature, kwargs)
+        agg_kwargs = self.get_kwargs(x, a, e, self.agg_signature, kwargs)
         embeddings = self.aggregate(messages, **agg_kwargs)
 
         # Update
-        upd_kwargs = self.get_kwargs(X, A, E, self.upd_signature, kwargs)
+        upd_kwargs = self.get_kwargs(x, a, e, self.upd_signature, kwargs)
         output = self.update(embeddings, **upd_kwargs)
 
         return output
 
-    def message(self, X, **kwargs):
-        return self.get_j(X)
+    def message(self, x, **kwargs):
+        return self.get_j(x)
 
     def aggregate(self, messages, **kwargs):
         return self.agg(messages, self.index_i, self.N)
@@ -120,17 +120,17 @@ class MessagePassing(Layer):
     def get_j(self, x):
         return tf.gather(x, self.index_j)
 
-    def get_kwargs(self, X, A, E, signature, kwargs):
+    def get_kwargs(self, x, a, e, signature, kwargs):
         output = {}
         for k in signature.keys():
             if signature[k].default is inspect.Parameter.empty or k == 'kwargs':
                 pass
-            elif k == 'X':
-                output[k] = X
-            elif k == 'A':
-                output[k] = A
-            elif k == 'E':
-                output[k] = E
+            elif k == 'x':
+                output[k] = x
+            elif k == 'a':
+                output[k] = a
+            elif k == 'e':
+                output[k] = e
             elif k in kwargs:
                 output[k] = kwargs[k]
             else:
@@ -142,19 +142,19 @@ class MessagePassing(Layer):
     @staticmethod
     def get_inputs(inputs):
         if len(inputs) == 3:
-            X, A, E = inputs
-            assert K.ndim(E) == 2, 'E must have rank 2'
+            x, a, e = inputs
+            assert K.ndim(e) == 2, 'E must have rank 2'
         elif len(inputs) == 2:
-            X, A = inputs
-            E = None
+            x, a = inputs
+            e = None
         else:
             raise ValueError('Expected 2 or 3 inputs tensors (X, A, E), got {}.'
                              .format(len(inputs)))
-        assert K.ndim(X) == 2, 'X must have rank 2'
-        assert K.is_sparse(A), 'A must be a SparseTensor'
-        assert K.ndim(A) == 2, 'A must have rank 2'
+        assert K.ndim(x) == 2, 'X must have rank 2'
+        assert K.is_sparse(a), 'A must be a SparseTensor'
+        assert K.ndim(a) == 2, 'A must have rank 2'
 
-        return X, A, E
+        return x, a, e
 
     def compute_output_shape(self, input_shape):
         if self.output_dim:
@@ -173,5 +173,5 @@ class MessagePassing(Layer):
         return {**base_config, **config}
 
     @staticmethod
-    def preprocess(A):
-        return A
+    def preprocess(a):
+        return a
