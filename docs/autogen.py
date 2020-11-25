@@ -11,6 +11,7 @@ import sys
 from spektral import data
 from spektral import datasets
 from spektral import layers
+from spektral import models
 from spektral import transforms
 from spektral import utils
 
@@ -36,22 +37,23 @@ PAGES = [
     {
         'page': 'layers/convolution.md',
         'classes': [
-            layers.GCNConv,
-            layers.ChebConv,
-            layers.GraphSageConv,
-            layers.ARMAConv,
-            layers.ECCConv,
-            layers.GATConv,
-            layers.GCSConv,
-            layers.APPNPConv,
-            layers.GINConv,
-            layers.DiffusionConv,
-            layers.GatedGraphConv,
-            layers.AGNNConv,
-            layers.TAGConv,
-            layers.CrystalConv,
-            layers.EdgeConv,
             layers.MessagePassing,
+            layers.AGNNConv,
+            layers.APPNPConv,
+            layers.ARMAConv,
+            layers.ChebConv,
+            layers.CrystalConv,
+            layers.DiffusionConv,
+            layers.ECCConv,
+            layers.EdgeConv,
+            layers.GATConv,
+            layers.GatedGraphConv,
+            layers.GCNConv,
+            layers.GeneralConv,
+            layers.GCSConv,
+            layers.GINConv,
+            layers.GraphSageConv,
+            layers.TAGConv,
         ]
     },
     {
@@ -61,11 +63,11 @@ PAGES = [
         'classes': [
             layers.DiffPool,
             layers.MinCutPool,
-            layers.TopKPool,
             layers.SAGPool,
-            layers.GlobalSumPool,
+            layers.TopKPool,
             layers.GlobalAvgPool,
             layers.GlobalMaxPool,
+            layers.GlobalSumPool,
             layers.GlobalAttentionPool,
             layers.GlobalAttnSumPool,
             layers.SortPool
@@ -77,8 +79,16 @@ PAGES = [
         'methods': [],
         'classes': [
             layers.InnerProduct,
-            layers.MinkowskiProduct,
             layers.Disjoint2Batch,
+            layers.MinkowskiProduct,
+        ]
+    },
+    {
+        'page': 'models.md',
+        'functions': [],
+        'methods': [],
+        'classes': [
+            models.GeneralGNN
         ]
     },
     # Data #####################################################################

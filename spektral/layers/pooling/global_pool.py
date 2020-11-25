@@ -431,3 +431,21 @@ class SortPool(Layer):
             return self.k, self.F
         elif self.data_mode == 'batch' or self.data_mode == 'disjoint':
             return input_shape[0], self.k, self.F
+
+
+layers = {
+    'sum': GlobalSumPool,
+    'avg': GlobalAvgPool,
+    'max': GlobalMaxPool,
+    'attn': GlobalAttentionPool,
+    'attn_sum': GlobalAttnSumPool,
+    'sort': SortPool
+}
+
+
+def get(identifier):
+    if identifier not in layers:
+        raise ValueError('Unknown identifier {}. Available: {}'
+                         .format(identifier, list(layers.keys())))
+    else:
+        return layers[identifier]
