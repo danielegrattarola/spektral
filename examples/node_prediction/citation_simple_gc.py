@@ -17,7 +17,7 @@ from tensorflow.keras.regularizers import l2
 
 from spektral.data.loaders import SingleLoader
 from spektral.datasets.citation import Citation
-from spektral.layers import GraphConv
+from spektral.layers import GCNConv
 from spektral.transforms import LayerPreprocess, AdjToSpTensor
 
 
@@ -37,7 +37,7 @@ class SGCN:
 # Load data
 K = 2  # Propagation steps for SGCN
 dataset = Citation('cora',
-                   transforms=[LayerPreprocess(GraphConv), SGCN(K), AdjToSpTensor()])
+                   transforms=[LayerPreprocess(GCNConv), SGCN(K), AdjToSpTensor()])
 mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
 
 # Parameters
@@ -55,10 +55,10 @@ n_out = dataset.n_labels     # Number of classes
 x_in = Input(shape=(F,))
 a_in = Input((N,), sparse=True, dtype=a_dtype)
 
-output = GraphConv(n_out,
-                   activation='softmax',
-                   kernel_regularizer=l2(l2_reg),
-                   use_bias=False)([x_in, a_in])
+output = GCNConv(n_out,
+                 activation='softmax',
+                 kernel_regularizer=l2(l2_reg),
+                 use_bias=False)([x_in, a_in])
 
 # Build model
 model = Model(inputs=[x_in, a_in], outputs=output)

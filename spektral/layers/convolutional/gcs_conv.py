@@ -1,11 +1,11 @@
 from tensorflow.keras import backend as K
 
 from spektral.layers import ops
-from spektral.layers.convolutional.graph_conv import GraphConv
+from spektral.layers.convolutional.gcn_conv import GCNConv
 from spektral.utils import normalized_adjacency
 
 
-class GraphConvSkip(GraphConv):
+class GCSConv(GCNConv):
     r"""
     A simple convolutional layer with a skip connection.
 

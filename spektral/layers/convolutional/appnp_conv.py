@@ -3,10 +3,10 @@ from tensorflow.keras.layers import Dropout, Dense
 from tensorflow.keras.models import Sequential
 
 from spektral.layers import ops
-from spektral.layers.convolutional.graph_conv import GraphConv
+from spektral.layers.convolutional.gcn_conv import GCNConv
 
 
-class APPNP(GraphConv):
+class APPNPConv(GCNConv):
     r"""
     A graph convolutional layer implementing the APPNP operator, as presented by
     [Klicpera et al. (2019)](https://arxiv.org/abs/1810.05997).

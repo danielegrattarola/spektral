@@ -26,7 +26,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 
 from spektral.data import Dataset, Graph, DisjointLoader
-from spektral.layers import GraphConvSkip, GlobalAvgPool
+from spektral.layers import GCSConv, GlobalAvgPool
 from spektral.layers.pooling import TopKPool
 from spektral.transforms.normalize_adj import NormalizeAdj
 
@@ -106,11 +106,11 @@ X_in = Input(shape=(F, ), name='X_in')
 A_in = Input(shape=(None,), sparse=True)
 I_in = Input(shape=(), name='segment_ids_in', dtype=tf.int32)
 
-X_1 = GraphConvSkip(32, activation='relu')([X_in, A_in])
+X_1 = GCSConv(32, activation='relu')([X_in, A_in])
 X_1, A_1, I_1 = TopKPool(ratio=0.5)([X_1, A_in, I_in])
-X_2 = GraphConvSkip(32, activation='relu')([X_1, A_1])
+X_2 = GCSConv(32, activation='relu')([X_1, A_1])
 X_2, A_2, I_2 = TopKPool(ratio=0.5)([X_2, A_1, I_1])
-X_3 = GraphConvSkip(32, activation='relu')([X_2, A_2])
+X_3 = GCSConv(32, activation='relu')([X_2, A_2])
 X_3 = GlobalAvgPool()([X_3, I_2])
 output = Dense(n_out, activation='softmax')(X_3)
 

@@ -2,11 +2,11 @@ from tensorflow.keras import activations, backend as K
 from tensorflow.keras.layers import Dropout
 
 from spektral.layers import ops
-from spektral.layers.convolutional.graph_conv import GraphConv
+from spektral.layers.convolutional.gcn_conv import GCNConv
 from spektral.utils import normalized_laplacian, rescale_laplacian
 
 
-class ARMAConv(GraphConv):
+class ARMAConv(GCNConv):
     r"""
     A graph convolutional layer with ARMA\(_K\) filters, as presented by
     [Bianchi et al. (2019)](https://arxiv.org/abs/1901.01343).

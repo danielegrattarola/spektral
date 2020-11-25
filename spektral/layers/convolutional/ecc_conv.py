@@ -4,10 +4,10 @@ from tensorflow.keras.layers import Dense
 
 from spektral.layers import ops
 from spektral.layers.ops import modes
-from spektral.layers.convolutional.graph_conv import GraphConv
+from spektral.layers.convolutional.gcn_conv import GCNConv
 
 
-class EdgeConditionedConv(GraphConv):
+class ECCConv(GCNConv):
     r"""
     An edge-conditioned convolutional layer (ECC) as presented by
     [Simonovsky & Komodakis (2017)](https://arxiv.org/abs/1704.02901).

@@ -13,12 +13,12 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
 
 from spektral.datasets.citation import Cora
-from spektral.layers import GraphAttention
+from spektral.layers import GATConv
 from spektral.transforms import LayerPreprocess, AdjToSpTensor
 from spektral.utils import tic, toc
 
 # Load data
-dataset = Cora(transforms=[LayerPreprocess(GraphAttention), AdjToSpTensor()])
+dataset = Cora(transforms=[LayerPreprocess(GATConv), AdjToSpTensor()])
 graph = dataset[0]
 x, a, y = graph.x, graph.a, graph.y
 mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
@@ -27,23 +27,23 @@ mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
 x_in = Input(shape=(dataset.n_node_features,))
 a_in = Input(shape=(None,), sparse=True)
 x_1 = Dropout(0.6)(x_in)
-x_1 = GraphAttention(8,
-                     attn_heads=8,
-                     concat_heads=True,
-                     dropout_rate=0.6,
-                     activation='elu',
-                     kernel_regularizer=l2(5e-4),
-                     attn_kernel_regularizer=l2(5e-4),
-                     bias_regularizer=l2(5e-4))([x_1, a_in])
+x_1 = GATConv(8,
+              attn_heads=8,
+              concat_heads=True,
+              dropout_rate=0.6,
+              activation='elu',
+              kernel_regularizer=l2(5e-4),
+              attn_kernel_regularizer=l2(5e-4),
+              bias_regularizer=l2(5e-4))([x_1, a_in])
 x_2 = Dropout(0.6)(x_1)
-x_2 = GraphAttention(dataset.n_labels,
-                     attn_heads=1,
-                     concat_heads=True,
-                     dropout_rate=0.6,
-                     activation='softmax',
-                     kernel_regularizer=l2(5e-4),
-                     attn_kernel_regularizer=l2(5e-4),
-                     bias_regularizer=l2(5e-4))([x_2, a_in])
+x_2 = GATConv(dataset.n_labels,
+              attn_heads=1,
+              concat_heads=True,
+              dropout_rate=0.6,
+              activation='softmax',
+              kernel_regularizer=l2(5e-4),
+              attn_kernel_regularizer=l2(5e-4),
+              bias_regularizer=l2(5e-4))([x_2, a_in])
 
 # Build model
 model = Model(inputs=[x_in, a_in], outputs=x_2)

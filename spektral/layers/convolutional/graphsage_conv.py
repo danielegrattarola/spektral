@@ -2,10 +2,10 @@ import tensorflow as tf
 from tensorflow.keras import backend as K
 
 from spektral.layers import ops
-from spektral.layers.convolutional.graph_conv import GraphConv
+from spektral.layers.convolutional.gcn_conv import GCNConv
 
 
-class GraphSageConv(GraphConv):
+class GraphSageConv(GCNConv):
     r"""
     A GraphSAGE layer as presented by
     [Hamilton et al. (2017)](https://arxiv.org/abs/1706.02216).

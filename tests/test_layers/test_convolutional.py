@@ -2,8 +2,8 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras import Model, Input
 
-from spektral.layers import GraphConv, ChebConv, EdgeConditionedConv, GraphAttention, \
-    GraphConvSkip, ARMAConv, APPNP, GraphSageConv, GINConv, DiffusionConv, \
+from spektral.layers import GCNConv, ChebConv, ECCConv, GATConv, \
+    GCSConv, ARMAConv, APPNPConv, GraphSageConv, GINConv, DiffusionConv, \
     GatedGraphConv, AGNNConv, TAGConv, CrystalConv, MessagePassing, EdgeConv
 from spektral.layers.ops import sp_matrix_to_sp_tensor
 
@@ -55,7 +55,7 @@ The loop will check:
 
 TESTS = [
     {
-        LAYER_K_: GraphConv,
+        LAYER_K_: GCNConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
         KWARGS_K_: {'channels': 8, 'activation': 'relu', 'sparse': [False, True]},
     },
@@ -70,19 +70,19 @@ TESTS = [
         KWARGS_K_: {'channels': 8, 'activation': 'relu', 'sparse': [False, True]}
     },
     {
-        LAYER_K_: EdgeConditionedConv,
+        LAYER_K_: ECCConv,
         MODES_K_: [SINGLE, BATCH],
         KWARGS_K_: {'kernel_network': [8], 'channels': 8, 'activation': 'relu',
                     'edges': True, 'sparse': [False, True]}
     },
     {
-        LAYER_K_: GraphAttention,
+        LAYER_K_: GATConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
         KWARGS_K_: {'channels': 8, 'attn_heads': 2, 'concat_heads': False,
                     'activation': 'relu', 'sparse': [False, True]}
     },
     {
-        LAYER_K_: GraphConvSkip,
+        LAYER_K_: GCSConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
         KWARGS_K_: {'channels': 8, 'activation': 'relu', 'sparse': [False, True]}
     },
@@ -93,7 +93,7 @@ TESTS = [
                     'share_weights': True, 'sparse': [False, True]}
     },
     {
-        LAYER_K_: APPNP,
+        LAYER_K_: APPNPConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
         KWARGS_K_: {'channels': 8, 'activation': 'relu', 'mlp_hidden': [16],
                     'sparse': [False, True]}

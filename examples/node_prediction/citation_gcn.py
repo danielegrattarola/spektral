@@ -13,12 +13,12 @@ from tensorflow.keras.regularizers import l2
 
 from spektral.data.loaders import SingleLoader
 from spektral.datasets.citation import Citation
-from spektral.layers import GraphConv
+from spektral.layers import GCNConv
 from spektral.transforms import LayerPreprocess, AdjToSpTensor
 
 # Load data
 dataset = Citation('cora',
-                   transforms=[LayerPreprocess(GraphConv), AdjToSpTensor()])
+                   transforms=[LayerPreprocess(GCNConv), AdjToSpTensor()])
 mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
 
 # Parameters
@@ -39,14 +39,14 @@ x_in = Input(shape=(F,))
 a_in = Input((N,), sparse=True, dtype=a_dtype)
 
 do_1 = Dropout(dropout)(x_in)
-gc_1 = GraphConv(channels,
-                 activation='relu',
-                 kernel_regularizer=l2(l2_reg),
-                 use_bias=False)([do_1, a_in])
+gc_1 = GCNConv(channels,
+               activation='relu',
+               kernel_regularizer=l2(l2_reg),
+               use_bias=False)([do_1, a_in])
 do_2 = Dropout(dropout)(gc_1)
-gc_2 = GraphConv(n_out,
-                 activation='softmax',
-                 use_bias=False)([do_2, a_in])
+gc_2 = GCNConv(n_out,
+               activation='softmax',
+               use_bias=False)([do_2, a_in])
 
 # Build model
 model = Model(inputs=[x_in, a_in], outputs=gc_2)

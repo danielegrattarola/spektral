@@ -5,7 +5,7 @@ from tensorflow.keras.layers import Layer, Dense
 from spektral.layers import ops
 
 
-class GlobalPooling(Layer):
+class GlobalPool(Layer):
     def __init__(self, **kwargs):
 
         super().__init__(**kwargs)
@@ -50,7 +50,7 @@ class GlobalPooling(Layer):
         return super().get_config()
 
 
-class GlobalSumPool(GlobalPooling):
+class GlobalSumPool(GlobalPool):
     """
     A global sum pooling layer. Pools a graph by computing the sum of its node
     features.
@@ -79,7 +79,7 @@ class GlobalSumPool(GlobalPooling):
         self.batch_pooling_op = tf.reduce_sum
 
 
-class GlobalAvgPool(GlobalPooling):
+class GlobalAvgPool(GlobalPool):
     """
     An average pooling layer. Pools a graph by computing the average of its node
     features.
@@ -108,7 +108,7 @@ class GlobalAvgPool(GlobalPooling):
         self.batch_pooling_op = tf.reduce_mean
 
 
-class GlobalMaxPool(GlobalPooling):
+class GlobalMaxPool(GlobalPool):
     """
     A max pooling layer. Pools a graph by computing the maximum of its node
     features.
@@ -137,7 +137,7 @@ class GlobalMaxPool(GlobalPooling):
         self.batch_pooling_op = tf.reduce_max
 
 
-class GlobalAttentionPool(GlobalPooling):
+class GlobalAttentionPool(GlobalPool):
     r"""
     A gated attention global pooling layer as presented by
     [Li et al. (2017)](https://arxiv.org/abs/1511.05493).
@@ -249,7 +249,7 @@ class GlobalAttentionPool(GlobalPooling):
         return dict(list(base_config.items()) + list(config.items()))
 
 
-class GlobalAttnSumPool(GlobalPooling):
+class GlobalAttnSumPool(GlobalPool):
     r"""
     A node-attention global pooling layer. Pools a graph by learning attention
     coefficients to sum node features.

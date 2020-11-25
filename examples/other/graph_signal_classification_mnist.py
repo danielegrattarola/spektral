@@ -5,7 +5,7 @@ from tensorflow.keras.regularizers import l2
 
 from spektral.data import PackedBatchLoader
 from spektral.datasets.mnist import MNIST
-from spektral.layers import GraphConv
+from spektral.layers import GCNConv
 from spektral.layers.ops import sp_matrix_to_sp_tensor
 
 # Parameters
@@ -20,7 +20,7 @@ data = MNIST()
 # The adjacency matrix is stored as an attribute of the dataset.
 # Create filter for GCN and convert to sparse tensor.
 adj = data.a
-adj = GraphConv.preprocess(adj)
+adj = GCNConv.preprocess(adj)
 adj = sp_matrix_to_sp_tensor(adj)
 
 # Train/valid/test split
@@ -33,8 +33,8 @@ data_tr, data_va = data_tr[:-10000], data_tr[-10000:]
 class Net(Model):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.conv1 = GraphConv(32, activation='elu', kernel_regularizer=l2(l2_reg))
-        self.conv2 = GraphConv(32, activation='elu', kernel_regularizer=l2(l2_reg))
+        self.conv1 = GCNConv(32, activation='elu', kernel_regularizer=l2(l2_reg))
+        self.conv2 = GCNConv(32, activation='elu', kernel_regularizer=l2(l2_reg))
         self.flatten = Flatten()
         self.fc1 = Dense(512, activation='relu')
         self.fc2 = Dense(10, activation='softmax')  # MNIST has 10 classes

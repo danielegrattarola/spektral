@@ -6,7 +6,7 @@ from spektral.layers import ops
 from spektral.utils import gcn_filter
 
 
-class GraphConv(Layer):
+class GCNConv(Layer):
     r"""
     A graph convolutional layer (GCN) as presented by
     [Kipf & Welling (2016)](https://arxiv.org/abs/1609.02907).
