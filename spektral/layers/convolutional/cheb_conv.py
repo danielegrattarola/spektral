@@ -1,11 +1,11 @@
 from tensorflow.keras import backend as K
 
 from spektral.layers import ops
-from spektral.layers.convolutional.graph_conv import GraphConv
+from spektral.layers.convolutional.gcn_conv import GCNConv
 from spektral.utils import normalized_laplacian, rescale_laplacian
 
 
-class ChebConv(GraphConv):
+class ChebConv(GCNConv):
     r"""
     A Chebyshev convolutional layer as presented by
     [Defferrard et al. (2016)](https://arxiv.org/abs/1606.09375).

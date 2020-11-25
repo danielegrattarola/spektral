@@ -1,6 +1,6 @@
 import tensorflow as tf
 import tensorflow.keras.layers as layers
-from spektral.layers.convolutional.graph_conv import GraphConv
+from spektral.layers.convolutional.gcn_conv import GCNConv
 
 
 class DiffuseFeatures(layers.Layer):
@@ -81,7 +81,7 @@ class DiffuseFeatures(layers.Layer):
         return tf.expand_dims(H, -1)
 
 
-class DiffusionConv(GraphConv):
+class DiffusionConv(GCNConv):
     r"""Applies Graph Diffusion Convolution as descibed by
     [Li et al. (2016)](https://arxiv.org/pdf/1707.01926.pdf)
 

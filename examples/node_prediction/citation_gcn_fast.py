@@ -12,12 +12,12 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
 
 from spektral.datasets.citation import Cora
-from spektral.layers import GraphConv
+from spektral.layers import GCNConv
 from spektral.transforms import LayerPreprocess, AdjToSpTensor
 from spektral.utils import tic, toc
 
 # Load data
-dataset = Cora(transforms=[LayerPreprocess(GraphConv), AdjToSpTensor()])
+dataset = Cora(transforms=[LayerPreprocess(GCNConv), AdjToSpTensor()])
 graph = dataset[0]
 x, a, y = graph.x, graph.a, graph.y
 mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
@@ -25,9 +25,9 @@ mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
 # Define model
 x_in = Input(shape=(dataset.n_node_features,))
 a_in = Input((dataset.n_node_features,), sparse=True)
-x_1 = GraphConv(16, 'relu', True, kernel_regularizer=l2(5e-4))([x_in, a_in])
+x_1 = GCNConv(16, 'relu', True, kernel_regularizer=l2(5e-4))([x_in, a_in])
 x_1 = Dropout(0.5)(x_1)
-x_2 = GraphConv(y.shape[1], 'softmax', True)([x_1, a_in])
+x_2 = GCNConv(y.shape[1], 'softmax', True)([x_1, a_in])
 
 # Build model
 model = Model(inputs=[x_in, a_in], outputs=x_2)

@@ -14,7 +14,7 @@ from tensorflow.keras.optimizers import Adam
 
 from spektral.data import BatchLoader
 from spektral.datasets import OGB
-from spektral.layers import GraphConv, MinCutPool, GlobalSumPool
+from spektral.layers import GCNConv, MinCutPool, GlobalSumPool
 
 ################################################################################
 # PARAMETERS
@@ -49,9 +49,9 @@ dataset_te = dataset[idx_te]
 X_in = Input(shape=(None, F))
 A_in = Input(shape=(None, None))
 
-X_1 = GraphConv(32, activation='relu')([X_in, A_in])
+X_1 = GCNConv(32, activation='relu')([X_in, A_in])
 X_1, A_1 = MinCutPool(N // 2)([X_1, A_in])
-X_2 = GraphConv(32, activation='relu')([X_1, A_1])
+X_2 = GCNConv(32, activation='relu')([X_1, A_1])
 X_3 = GlobalSumPool()(X_2)
 output = Dense(n_out)(X_3)
 

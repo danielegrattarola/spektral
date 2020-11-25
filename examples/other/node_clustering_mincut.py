@@ -15,7 +15,7 @@ from tensorflow.keras.models import Model
 from tqdm import tqdm
 
 from spektral.datasets.citation import Cora
-from spektral.layers.convolutional import GraphConvSkip
+from spektral.layers.convolutional import GCSConv
 from spektral.layers.ops import sp_matrix_to_sp_tensor
 from spektral.layers.pooling import MinCutPool
 from spektral.utils.convolution import normalized_adjacency
@@ -52,7 +52,7 @@ n_clusters = y.max() + 1
 x_in = Input(shape=(F,), name='X_in')
 a_in = Input(shape=(None,), name='A_in', sparse=True)
 
-x_1 = GraphConvSkip(16, activation='elu')([x_in, a_in])
+x_1 = GCSConv(16, activation='elu')([x_in, a_in])
 x_1, a_1, s_1 = MinCutPool(n_clusters, return_mask=True)([x_1, a_in])
 
 model = Model([x_in, a_in], [x_1, s_1])

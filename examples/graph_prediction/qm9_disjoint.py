@@ -12,7 +12,7 @@ from tensorflow.keras.optimizers import Adam
 
 from spektral.data import DisjointLoader
 from spektral.datasets import QM9
-from spektral.layers import EdgeConditionedConv, GlobalSumPool
+from spektral.layers import ECCConv, GlobalSumPool
 
 ################################################################################
 # PARAMETERS
@@ -48,8 +48,8 @@ A_in = Input(shape=(None,), sparse=True, name='A_in')
 E_in = Input(shape=(S,), name='E_in')
 I_in = Input(shape=(), name='segment_ids_in', dtype=tf.int32)
 
-X_1 = EdgeConditionedConv(32, activation='relu')([X_in, A_in, E_in])
-X_2 = EdgeConditionedConv(32, activation='relu')([X_1, A_in, E_in])
+X_1 = ECCConv(32, activation='relu')([X_in, A_in, E_in])
+X_2 = ECCConv(32, activation='relu')([X_1, A_in, E_in])
 X_3 = GlobalSumPool()([X_2, I_in])
 output = Dense(n_out)(X_3)
 

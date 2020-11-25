@@ -123,7 +123,7 @@ Let's start by importing the necessary layers:
 ```python
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Dense, Dropout
-from spektral.layers import GraphConv, GlobalSumPool
+from spektral.layers import GCNConv, GlobalSumPool
 ```
 
 Now we can use model subclassing to define our model:

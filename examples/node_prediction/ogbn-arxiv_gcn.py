@@ -12,7 +12,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 
 from spektral.datasets.ogb import OGB
-from spektral.layers import GraphConv
+from spektral.layers import GCNConv
 from spektral.transforms import GCNFilter, AdjToSpTensor
 
 # Load data
@@ -46,13 +46,13 @@ masks = [mask_tr, mask_va, mask_te]
 # Model definition
 x_in = Input(shape=(F,))
 a_in = Input((N,), sparse=True)
-x_1 = GraphConv(channels, activation='relu')([x_in, a_in])
+x_1 = GCNConv(channels, activation='relu')([x_in, a_in])
 x_1 = BatchNormalization()(x_1)
 x_1 = Dropout(dropout)(x_1)
-x_2 = GraphConv(channels, activation='relu')([x_1, a_in])
+x_2 = GCNConv(channels, activation='relu')([x_1, a_in])
 x_2 = BatchNormalization()(x_2)
 x_2 = Dropout(dropout)(x_2)
-x_3 = GraphConv(n_out, activation='softmax')([x_2, a_in])
+x_3 = GCNConv(n_out, activation='softmax')([x_2, a_in])
 
 # Build model
 model = Model(inputs=[x_in, a_in], outputs=x_3)

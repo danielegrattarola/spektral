@@ -58,8 +58,8 @@ def test_gcn_filter():
 
 
 def test_layer_preprocess():
-    from spektral.layers import GraphConv
-    t = LayerPreprocess(GraphConv)
+    from spektral.layers import GCNConv
+    t = LayerPreprocess(GCNConv)
     assert callable(t)
     g = Graph(x=x, a=a, e=e, y=y_nl)
     t(g)

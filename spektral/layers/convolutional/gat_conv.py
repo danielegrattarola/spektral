@@ -4,11 +4,11 @@ from tensorflow.keras import initializers, regularizers, constraints
 from tensorflow.keras.layers import Dropout
 
 from spektral.layers import ops
-from spektral.layers.convolutional.graph_conv import GraphConv
+from spektral.layers.convolutional.gcn_conv import GCNConv
 from spektral.layers.ops import modes
 
 
-class GraphAttention(GraphConv):
+class GATConv(GCNConv):
     r"""
     A graph attention layer (GAT) as presented by
     [Velickovic et al. (2017)](https://arxiv.org/abs/1710.10903).

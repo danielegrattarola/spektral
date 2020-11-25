@@ -13,12 +13,12 @@ from tensorflow.keras.regularizers import l2
 
 from spektral.data.loaders import SingleLoader
 from spektral.datasets.citation import Citation
-from spektral.layers import GraphAttention
+from spektral.layers import GATConv
 from spektral.transforms import LayerPreprocess, AdjToSpTensor
 
 # Load data
 dataset = Citation('cora',
-                   transforms=[LayerPreprocess(GraphAttention), AdjToSpTensor()])
+                   transforms=[LayerPreprocess(GATConv), AdjToSpTensor()])
 mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
 
 # Parameters
@@ -40,23 +40,23 @@ x_in = Input(shape=(F,))
 a_in = Input((N,), sparse=True, dtype=a_dtype)
 
 do_1 = Dropout(dropout)(x_in)
-gc_1 = GraphAttention(channels,
-                      attn_heads=n_attn_heads,
-                      concat_heads=True,
-                      dropout_rate=dropout,
-                      activation='elu',
-                      kernel_regularizer=l2(l2_reg),
-                      attn_kernel_regularizer=l2(l2_reg)
-                      )([do_1, a_in])
+gc_1 = GATConv(channels,
+               attn_heads=n_attn_heads,
+               concat_heads=True,
+               dropout_rate=dropout,
+               activation='elu',
+               kernel_regularizer=l2(l2_reg),
+               attn_kernel_regularizer=l2(l2_reg)
+               )([do_1, a_in])
 do_2 = Dropout(dropout)(gc_1)
-gc_2 = GraphAttention(n_out,
-                      attn_heads=1,
-                      concat_heads=False,
-                      dropout_rate=dropout,
-                      activation='softmax',
-                      kernel_regularizer=l2(l2_reg),
-                      attn_kernel_regularizer=l2(l2_reg)
-                      )([do_2, a_in])
+gc_2 = GATConv(n_out,
+               attn_heads=1,
+               concat_heads=False,
+               dropout_rate=dropout,
+               activation='softmax',
+               kernel_regularizer=l2(l2_reg),
+               attn_kernel_regularizer=l2(l2_reg)
+               )([do_2, a_in])
 
 # Build model
 model = Model(inputs=[x_in, a_in], outputs=gc_2)
