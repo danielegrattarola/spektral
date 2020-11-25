@@ -102,19 +102,19 @@ class ChebConv(GCNConv):
         self.built = True
 
     def call(self, inputs):
-        features = inputs[0]
-        laplacian = inputs[1]
+        x = inputs[0]
+        a = inputs[1]
 
         # Convolution
-        T_0 = features
+        T_0 = x
         output = ops.dot(T_0, self.kernel[0])
 
         if self.K > 1:
-            T_1 = ops.filter_dot(laplacian, features)
+            T_1 = ops.filter_dot(a, x)
             output += ops.dot(T_1, self.kernel[1])
 
         for k in range(2, self.K):
-            T_2 = 2 * ops.filter_dot(laplacian, T_1) - T_0
+            T_2 = 2 * ops.filter_dot(a, T_1) - T_0
             output += ops.dot(T_2, self.kernel[k])
             T_0, T_1 = T_1, T_2
 
@@ -132,7 +132,7 @@ class ChebConv(GCNConv):
         return dict(list(base_config.items()) + list(config.items()))
 
     @staticmethod
-    def preprocess(A):
-        L = normalized_laplacian(A)
-        L = rescale_laplacian(L)
-        return L
+    def preprocess(a):
+        a = normalized_laplacian(a)
+        a = rescale_laplacian(a)
+        return a

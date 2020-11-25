@@ -120,15 +120,15 @@ class ARMAConv(GCNConv):
         self.built = True
 
     def call(self, inputs):
-        features = inputs[0]
-        fltr = inputs[1]
+        x = inputs[0]
+        a = inputs[1]
 
         # Convolution
         output = []  # Stores the parallel filters
         for k in range(self.order):
-            output_k = features
+            output_k = x
             for i in range(self.iterations):
-                output_k = self.gcs([output_k, features, fltr], k, i)
+                output_k = self.gcs([output_k, x, a], k, i)
             output.append(output_k)
 
         # Average stacks
@@ -217,7 +217,7 @@ class ARMAConv(GCNConv):
         return dict(list(base_config.items()) + list(config.items()))
 
     @staticmethod
-    def preprocess(A):
-        fltr = normalized_laplacian(A, symmetric=True)
-        fltr = rescale_laplacian(fltr, lmax=2)
-        return fltr
+    def preprocess(a):
+        a = normalized_laplacian(a, symmetric=True)
+        a = rescale_laplacian(a, lmax=2)
+        return a

@@ -12,5 +12,5 @@ from .gat_conv import GATConv
 from .gcn_conv import GCNConv
 from .gcs_conv import GCSConv
 from .graphsage_conv import GraphSageConv
-from .message_passing import MessagePassing
 from .tag_conv import TAGConv
+from .message_passing import MessagePassing

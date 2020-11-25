@@ -97,9 +97,9 @@ class TAGConv(MessagePassing):
 
         return self.linear(output)
 
-    def message(self, X, edge_weight=None):
-        X_j = self.get_j(X)
-        return edge_weight[:, None] * X_j
+    def message(self, x, edge_weight=None):
+        x_j = self.get_j(x)
+        return edge_weight[:, None] * x_j
 
     def get_config(self):
         config = {
@@ -110,5 +110,5 @@ class TAGConv(MessagePassing):
         return {**base_config, **config}
 
     @staticmethod
-    def preprocess(A):
-        return normalized_adjacency(A)
+    def preprocess(a):
+        return normalized_adjacency(a)

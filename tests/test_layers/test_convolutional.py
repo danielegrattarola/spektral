@@ -67,7 +67,7 @@ TESTS = [
     {
         LAYER_K_: GraphSageConv,
         MODES_K_: [SINGLE],
-        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'sparse': [False, True]}
+        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'sparse': [True]}
     },
     {
         LAYER_K_: ECCConv,

@@ -89,12 +89,9 @@ class GCNConv(Layer):
         self.built = True
 
     def call(self, inputs):
-        features = inputs[0]
-        fltr = inputs[1]
-
-        # Convolution
-        output = ops.dot(features, self.kernel)
-        output = ops.filter_dot(fltr, output)
+        x, a = inputs
+        output = ops.dot(x, self.kernel)
+        output = ops.filter_dot(a, output)
 
         if self.use_bias:
             output = K.bias_add(output, self.bias)
@@ -123,5 +120,5 @@ class GCNConv(Layer):
         return dict(list(base_config.items()) + list(config.items()))
 
     @staticmethod
-    def preprocess(A):
-        return gcn_filter(A)
+    def preprocess(a):
+        return gcn_filter(a)

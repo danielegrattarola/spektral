@@ -94,10 +94,10 @@ class EdgeConv(MessagePassing):
 
         self.built = True
 
-    def message(self, X, **kwargs):
-        X_i = self.get_i(X)
-        X_j = self.get_j(X)
-        return self.mlp(K.concatenate((X_i, X_j - X_i)))
+    def message(self, x, **kwargs):
+        x_i = self.get_i(x)
+        x_j = self.get_j(x)
+        return self.mlp(K.concatenate((x_i, x_j - x_i)))
 
     def get_config(self):
         config = {

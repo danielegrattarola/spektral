@@ -117,14 +117,14 @@ class APPNPConv(GCNConv):
         mlp_out = self.mlp(features)
 
         # Propagation
-        Z = mlp_out
+        z = mlp_out
         for k in range(self.propagations):
-            Z = (1 - self.alpha) * ops.filter_dot(fltr, Z) + self.alpha * mlp_out
+            z = (1 - self.alpha) * ops.filter_dot(fltr, z) + self.alpha * mlp_out
 
         if self.activation is not None:
-            output = self.activation(Z)
+            output = self.activation(z)
         else:
-            output = Z
+            output = z
         return output
 
     def get_config(self):

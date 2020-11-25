@@ -124,32 +124,30 @@ class ECCConv(GCNConv):
         self.built = True
 
     def call(self, inputs):
-        X = inputs[0]  # (batch_size, n_nodes, n_node_features)
-        A = inputs[1]  # (batch_size, n_nodes, n_nodes)
-        E = inputs[2]  # (n_edges, n_edge_features) or (batch_size, n_nodes, n_nodes, n_edge_features)
+        x, a, e = inputs
 
-        mode = ops.autodetect_mode(A, X)
+        mode = ops.autodetect_mode(a, x)
         if mode == modes.SINGLE:
             return self._call_single(inputs)
 
         # Parameters
-        N = K.shape(X)[-2]
-        F = K.int_shape(X)[-1]
+        N = K.shape(x)[-2]
+        F = K.int_shape(x)[-1]
         F_ = self.channels
 
         # Filter network
-        kernel_network = E
-        for l in self.kernel_network_layers:
-            kernel_network = l(kernel_network)
+        kernel_network = e
+        for layer in self.kernel_network_layers:
+            kernel_network = layer(kernel_network)
 
         # Convolution
         target_shape = (-1, N, N, F_, F) if mode == modes.BATCH else (N, N, F_, F)
         kernel = K.reshape(kernel_network, target_shape)
-        output = kernel * A[..., None, None]
-        output = tf.einsum('abicf,aif->abc', output, X)
+        output = kernel * a[..., None, None]
+        output = tf.einsum('abicf,aif->abc', output, x)
 
         if self.root:
-            output += ops.dot(X, self.root_kernel)
+            output += ops.dot(x, self.root_kernel)
         if self.use_bias:
             output = K.bias_add(output, self.bias)
         if self.activation is not None:
@@ -158,38 +156,38 @@ class ECCConv(GCNConv):
         return output
 
     def _call_single(self, inputs):
-        X = inputs[0]  # (n_nodes, F)
-        A = inputs[1]  # (n_nodes, n_nodes)
-        E = inputs[2]  # (n_edges, n_edge_features)
-        assert K.ndim(E) == 2, 'In single mode, E must have shape (n_edges, n_edge_features).'
+        x, a, e = inputs
+        if K.ndim(e) != 2:
+            raise ValueError('In single mode, E must have shape '
+                             '(n_edges, n_edge_features).')
 
         # Enforce sparse representation
-        if not K.is_sparse(A):
-            A = ops.dense_to_sparse(A)
+        if not K.is_sparse(a):
+            a = ops.dense_to_sparse(a)
 
         # Parameters
-        N = tf.shape(X)[-2]
-        F = K.int_shape(X)[-1]
+        N = tf.shape(x)[-2]
+        F = K.int_shape(x)[-1]
         F_ = self.channels
 
         # Filter network
-        kernel_network = E
-        for l in self.kernel_network_layers:
-            kernel_network = l(kernel_network)  # (n_edges, F * F_)
+        kernel_network = e
+        for layer in self.kernel_network_layers:
+            kernel_network = layer(kernel_network)  # (n_edges, F * F_)
         target_shape = (-1, F, F_)
         kernel = tf.reshape(kernel_network, target_shape)
 
         # Propagation
-        index_i = A.indices[:, -2]
-        index_j = A.indices[:, -1]
-        messages = tf.gather(X, index_j)
+        index_i = a.indices[:, -2]
+        index_j = a.indices[:, -1]
+        messages = tf.gather(x, index_j)
         messages = ops.dot(messages[:, None, :], kernel)[:, 0, :]
         aggregated = ops.scatter_sum(messages, index_i, N)
 
         # Update
         output = aggregated
         if self.root:
-            output += ops.dot(X, self.root_kernel)
+            output += ops.dot(x, self.root_kernel)
         if self.use_bias:
             output = K.bias_add(output, self.bias)
         if self.activation is not None:
@@ -206,5 +204,5 @@ class ECCConv(GCNConv):
         return dict(list(base_config.items()) + list(config.items()))
 
     @staticmethod
-    def preprocess(A):
-        return A
+    def preprocess(a):
+        return a
