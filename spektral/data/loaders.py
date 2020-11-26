@@ -34,12 +34,12 @@ class Loader:
 
     Since all data matrices (node attributes, adjacency matrices, etc.)
     are usually collated together, the two list comprehensions of the example
-    above can be computed all at once by using the private `_pack()` method
+    above can be computed all at once by using the private `pack()` method
     of the Loader class:
 
     ```python
     def collate(self, batch):
-        x, a = self._pack(batch)
+        x, a = self.pack(batch)
         return np.array(x), np.array(a)
     ```
 
@@ -105,8 +105,40 @@ class Loader:
         signature = self.dataset.signature
         return to_tf_signature(signature)
 
-    def _pack(self, batch):
-        return [list(elem) for elem in zip(*[g.numpy() for g in batch])]
+    def pack(self, batch, return_dict=False):
+        """
+        Given a batch of graphs, groups their attributes into separate lists.
+
+        For instance, if a batch has three graphs g1, g2 and g3 with node
+        features (x1, x2, x3) and adjacency matrices (a1, a2, a3), this method
+        will return:
+
+        ```
+        a_list = [a1, a2, a3]
+        x_list = [x1, x2, x3]
+        ```
+
+        If `return_dict=True`, the lists are wrapped in a dictionary:
+
+        ```
+        {'a_list': [a1, a2, a3],
+         'x_list': [x1, x2, x3]}
+        ```
+
+         this is useful for passing the packed batch to `data.utils.to_batch()`
+         and `data.utils.to_disjoint()` without knowing a-priori what are the
+         attributes of the graphs.
+
+        :param batch: a list of Graphs
+        :param return_dict: whether to return the lists as element of a dictionary.
+        :return: the batch packed into lists, by attribute type.
+        """
+        output = [list(elem) for elem in zip(*[g.numpy() for g in batch])]
+        if return_dict:
+            keys = [k + '_list' for k in self.dataset.signature.keys()]
+            return {k: v for k, v in zip(keys, output)}
+        else:
+            return output
 
     @property
     def steps_per_epoch(self):
@@ -233,21 +265,23 @@ class DisjointLoader(Loader):
                                              epochs=epochs, shuffle=shuffle)
 
     def collate(self, batch):
-        packed = self._pack(batch)
-        if self.node_level:
-            y = np.vstack(packed[-1])
-        else:
-            y = np.array(packed[-1])
-        output = to_disjoint(*packed[:-1])
+        packed = self.pack(batch, return_dict=True)
+        y = None
+        if 'y' in self.dataset.signature:
+            y = packed.pop('y_list')
+            y = np.vstack(y) if self.node_level else np.array(y)
 
-        # Sparse matrices to SparseTensors
+        output = to_disjoint(**packed)
         output = list(output)
         for i in range(len(output)):
             if sp.issparse(output[i]):
                 output[i] = sp_matrix_to_sp_tensor(output[i])
         output = tuple(output)
 
-        return output, y
+        if y is None:
+            return output
+        else:
+            return output, y
 
     def load(self):
         if not tf_loader_available:
@@ -322,13 +356,17 @@ class BatchLoader(Loader):
 
     """
     def collate(self, batch):
-        packed = self._pack(batch)
-        y = np.array(packed[-1])
-        output = to_batch(*packed[:-1])
+        packed = self.pack(batch, return_dict=True)
+        y = np.array(packed.pop('y_list')) if 'y' in self.dataset.signature else None
+
+        output = to_batch(**packed)
         if len(output) == 1:
             output = output[0]
 
-        return output, y
+        if y is None:
+            return output
+        else:
+            return output, y
 
     def tf_signature(self):
         signature = self.dataset.signature
@@ -365,9 +403,13 @@ class PackedBatchLoader(BatchLoader):
     """
     def __init__(self, dataset, batch_size=1, epochs=None, shuffle=True):
         super().__init__(dataset, batch_size=batch_size, epochs=epochs, shuffle=shuffle)
+
         # Drop the Dataset container and work on packed tensors directly
-        self.dataset = self._pack(self.dataset)
-        self.dataset = to_batch(*self.dataset[:-1]) + (np.array(self.dataset[-1]), )
+        packed = self.pack(self.dataset, return_dict=True)
+        y = np.array(packed.pop('y_list')) if 'y' in dataset.signature else None
+        self.dataset = to_batch(**packed)
+        if y is not None:
+            self.dataset += (y, )
 
         # Re-instantiate generator after packing dataset
         self._generator = self.generator()
