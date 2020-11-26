@@ -34,8 +34,7 @@ class Loader:
 
     Since all data matrices (node attributes, adjacency matrices, etc.)
     are usually collated together, the two list comprehensions of the example
-    above can be computed all at once by using the private `pack()` method
-    of the Loader class:
+    above can be computed all at once by using the `pack()` method:
 
     ```python
     def collate(self, batch):
@@ -43,31 +42,41 @@ class Loader:
         return np.array(x), np.array(a)
     ```
 
-    Additionally, a Loader should implement two main methods that simplify its
-    usage within the TensorFlow/Keras training pipeline:
+    The `load()` method of a Loader returns an object that can be given as
+    input to `Model.fit()`.
 
-    - `load()`: should return a `tf.data` dataset, a generator, or a
-    `keras.utils.Sequence`. Its usage pattern should be as follows:
+    You can use it as follows:
 
-    `model.fit(loader.load(), steps_per_epoch=loader.steps_per_epoch)`
+    ```python
+    model.fit(loader.load(), steps_per_epoch=loader.steps_per_epoch)
+    ```
 
-    The `steps_per_epoch` property returns the number of batches
-    (as specified by the `batch_size` argument) that are in an epoch and is
-    automatically computed from the data.
+    The `steps_per_epoch` property represents the number of batches that are in
+    an epoch, and is a required keyword when calling `model.fit()` with a Loader.
 
-    By default, `load()` will simply return a `tf.data.Dataset.from_generator`
-    dataset obtained from the Loader itself (since Loaders are also Python
-    generators).
 
-    - `tf_signature()`: this method should return the Tensorflow signature of
-    the batches computed by `collate(batch)`, using the `tf.TypeSpec` system.
-    All Datasets have a `signature` property that can be used to compute the
-    TensorFlow signature (which represents the shape, dtype and TypeSpec of a
-    each data matrix in a generic graph) with the
-    `spektral.data.utils.to_tf_signature(signature)` function.
+    If you want to write your own training function, you can use the
+    `tf_signature()` method to specify the signature of your batches using the
+    tf.TypeSpec system, in order to avoid unnecessary re-tracings.
 
-    By default, `tf_signature()` will simply return the Dataset's signature
-    converted to the TensorFlow format.
+    For example, a simple training function can be written as:
+
+    ```python
+    @tf.function(input_signature=loader.tf_signature(), experimental_relax_shapes=True)
+    def train_step(inputs, target):
+        with tf.GradientTape() as tape:
+            predictions = model(inputs, training=True)
+            loss = loss_fn(target, predictions) + sum(model.losses)
+        gradients = tape.gradient(loss, model.trainable_variables)
+        opt.apply_gradients(zip(gradients, model.trainable_variables))
+    ```
+
+    We can then train our model in a for loop as follows:
+
+    ```python
+    for batch in loader:
+        train_step(*batch)
+    ```
 
     **Arguments**
 
@@ -212,8 +221,8 @@ class DisjointLoader(Loader):
     """
     A Loader for disjoint mode.
 
-    This loader produces batches of graphs as their disjoint union, and supports
-    labels both for graph-level and node-level learning.
+    This loader represents a batch of graphs via their disjoint union, and
+    supports labels both for graph-level and node-level learning.
 
     Because in disjoint mode we need a way to keep track of which nodes belong
     to which graph, the loader will also automatically compute a batch index
@@ -230,7 +239,7 @@ class DisjointLoader(Loader):
     If `node_level=True`, then the labels are stacked vertically (i.e.,
     `(n_nodes, n_labels)`).
 
-    Note that TensorFlow 2.4 or above is required to use this Loader's `load()`
+    **Note:** TensorFlow 2.4 or above is required to use this Loader's `load()`
     method in a Keras training loop.
 
     **Arguments**
