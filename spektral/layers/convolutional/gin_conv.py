@@ -7,8 +7,10 @@ from spektral.layers.convolutional.message_passing import MessagePassing
 
 class GINConv(MessagePassing):
     r"""
-    A Graph Isomorphism Network (GIN) as presented by
-    [Xu et al. (2018)](https://arxiv.org/abs/1810.00826).
+    A Graph Isomorphism Network (GIN) from the paper
+
+    > [How Powerful are Graph Neural Networks?](https://arxiv.org/abs/1810.00826)<br>
+    > Keyulu Xu et al.
 
     **Mode**: single, disjoint.
 
@@ -16,7 +18,8 @@ class GINConv(MessagePassing):
 
     This layer computes for each node \(i\):
     $$
-        \Z_i = \textrm{MLP}\big( (1 + \epsilon) \cdot \X_i + \sum\limits_{j \in \mathcal{N}(i)} \X_j \big)
+        \x_i' = \textrm{MLP}\big( (1 + \epsilon) \cdot \x_i + \sum\limits_{j
+        \in \mathcal{N}(i)} \x_j \big)
     $$
     where \(\textrm{MLP}\) is a multi-layer perceptron.
 
@@ -33,8 +36,8 @@ class GINConv(MessagePassing):
     **Arguments**
 
     - `channels`: integer, number of output channels;
-    - `epsilon`: unnamed parameter, see
-    [Xu et al. (2018)](https://arxiv.org/abs/1810.00826), and the equation above.
+    - `epsilon`: unnamed parameter, see the original paper and the equation
+    above.
     By setting `epsilon=None`, the parameter will be learned (default behaviour).
     If given as a value, the parameter will stay fixed.
     - `mlp_hidden`: list of integers, number of hidden units for each hidden

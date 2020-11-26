@@ -9,8 +9,11 @@ from spektral.layers.convolutional.gcn_conv import GCNConv
 
 class ECCConv(GCNConv):
     r"""
-    An edge-conditioned convolutional layer (ECC) as presented by
-    [Simonovsky & Komodakis (2017)](https://arxiv.org/abs/1704.02901).
+    An edge-conditioned convolutional layer (ECC) from the paper
+
+    > [Dynamic Edge-Conditioned Filters in Convolutional Neural Networks on
+  Graphs](1704.02901)<br>
+    > Martin Simonovsky and Nikos Komodakis
 
     **Mode**: single, disjoint, batch.
 
@@ -19,9 +22,10 @@ class ECCConv(GCNConv):
         - In single mode, if the adjacency matrix is dense it will be converted
         to a SparseTensor automatically (which is an expensive operation).
 
-    For each node \( i \), this layer computes:
+    This layer computes:
     $$
-        \Z_i = \X_{i} \W_{\textrm{root}} + \sum\limits_{j \in \mathcal{N}(i)} \X_{j} \textrm{MLP}(\E_{ji}) + \b
+        \x_i' = \x_{i} \W_{\textrm{root}} + \sum\limits_{j \in \mathcal{N}(i)}
+        \x_{j} \textrm{MLP}(\e_{j \rightarrow i}) + \b
     $$
     where \(\textrm{MLP}\) is a multi-layer perceptron that outputs an
     edge-specific weight as a function of edge attributes.

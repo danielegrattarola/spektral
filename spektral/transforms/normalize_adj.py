@@ -4,8 +4,7 @@ from spektral.utils import normalized_adjacency
 class NormalizeAdj(object):
     r"""
     Normalizes the adjacency matrix as:
-
-    $$
+$$
     \A \leftarrow \D^{-1/2}\A\D^{-1/2}
     $$
 

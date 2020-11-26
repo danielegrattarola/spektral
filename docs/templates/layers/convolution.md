@@ -1,35 +1,21 @@
 # Convolutional layers
 
-The message-passing layers from these papers are available in Spektral:
-
-- [Semi-Supervised Classification with Graph Convolutional Networks](https://arxiv.org/abs/1609.02907)
-- [Convolutional Neural Networks on Graphs with Fast Localized Spectral Filtering](https://arxiv.org/abs/1606.09375)
-- [Inductive Representation Learning on Large Graphs](https://arxiv.org/abs/1706.02216)
-- [Graph Neural Networks with convolutional ARMA filters](https://arxiv.org/abs/1901.01343)
-- [Dynamic Edge-Conditioned Filters in Convolutional Neural Networks on Graphs](https://arxiv.org/abs/1704.02901)
-- [Graph Attention Networks](https://arxiv.org/abs/1710.10903)
-- [Predict then Propagate: Graph Neural Networks meet Personalized PageRank](https://arxiv.org/abs/1810.05997)
-- [How Powerful are Graph Neural Networks?](https://arxiv.org/abs/1810.00826)
-- [Diffusion Convolutional Recurrent Neural Network: Data-Driven Traffic Forecasting](https://arxiv.org/abs/1707.01926)
-- [Gated Graph Sequence Neural Networks](https://arxiv.org/abs/1511.05493)
-- [Attention-based Graph Neural Network for Semi-supervised Learning](https://arxiv.org/abs/1803.03735)
-- [Topology Adaptive Graph Convolutional Networks](https://arxiv.org/abs/1710.10370)
-- [Crystal Graph Convolutional Neural Networks for an Accurate and Interpretable Prediction of Material Properties](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.145301)
-- [Dynamic Graph CNN for Learning on Point Clouds](https://arxiv.org/abs/1801.07829)
+The following convolutional/message-passing layers are available in Spektral.
 
 Notation:
 
-- \( N \): number of nodes in the graph;
-- \( F \): dimension of the node attributes (i.e., each node has an attribute in \( \mathbb{R}^F \));
-- \( S \): dimension of the edge attributes (i.e., each edge has an attribute in \( \mathbb{R}^S \));
-- \( \A \in \{0, 1\}^{N \times N}\): binary adjacency matrix;
-- \( \X \in \mathbb{R}^{ N \times F } \): node attributes matrix;
-- \( \E \in \mathbb{R}^{ N \times N \times S } \): edge attributes matrix;
-- \( \D = \textrm{diag} ( \sum\limits_{j=0} \A_{ij} )\): degree matrix;
-- \( \W, \V \): trainable kernels;
+- \( N \): number of nodes;
+- \( F \): size of the node attributes;
+- \( S \): size of the edge attributes;
+- \( \x_i \): node attributes of the i-th node;
+- \( \e_{i \rightarrow j}\): edge attributes of the edge from node i to node j;
+- \( \A \): adjacency matrix;
+- \( \X \): node attributes matrix;
+- \( \E \): edge attributes matrix;
+- \( \D \): degree matrix;
+- \( \W, \V \): trainable weights matrices;
 - \( \b \): trainable bias vector;
-- \( \mathcal{N}(i) \): the one-hop neighbourhood of node \(i\); 
-- \( F' \): dimension of the node attributes after a message-passing layer;
+- \( \mathcal{N}(i) \): one-hop neighbourhood of node \(i\); 
 
 ---
 

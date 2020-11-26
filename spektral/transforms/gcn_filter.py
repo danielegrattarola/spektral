@@ -5,8 +5,7 @@ class GCNFilter(object):
     r"""
     Normalizes the adjacency matrix as described by
     [Kipf & Welling (2017)](https://arxiv.org/abs/1609.02907):
-
-    $$
+$$
     \A \leftarrow \hat\D^{-\frac{1}{2}} (\A + \I) \hat\D^{-\frac{1}{2}}
     $$
 

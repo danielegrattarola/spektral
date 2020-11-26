@@ -13,7 +13,7 @@ class GCSConv(GCNConv):
 
     This layer computes:
     $$
-        \Z = \D^{-1/2} \A \D^{-1/2} \X \W_1 + \X \W_2 + \b
+        \Z' = \D^{-1/2} \A \D^{-1/2} \X \W_1 + \X \W_2 + \b
     $$
     where \( \A \) does not have self-loops (unlike in GraphConv).
 

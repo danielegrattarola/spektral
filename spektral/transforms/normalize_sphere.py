@@ -5,8 +5,7 @@ class NormalizeSphere:
     r"""
     Normalizes the node attributes so that they are centered at the origin and
     contained within a sphere of radius 1:
-
-    $$
+$$
         \X_{i} \leftarrow \frac{\X_{i} - \bar\X}{\max_{i,j} \X_{ij}}
     $$
 

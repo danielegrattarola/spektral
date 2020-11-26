@@ -15,8 +15,10 @@ from spektral.data.dataset import DATASET_FOLDER
 
 class GraphSage(Dataset):
     """
-    The datasets used in the GraphSage paper 
-    [(Hamilton & Ying (2017))](https://arxiv.org/abs/1706.02216): PPI and Reddit.
+    The datasets used in the paper
+
+    > [Inductive Representation Learning on Large Graphs](https://arxiv.org/abs/1706.02216)<br>
+    > William L. Hamilton et al.
 
     The PPI dataset (originally
     [Stark et al. (2006)](https://www.ncbi.nlm.nih.gov/pubmed/16381927))
@@ -51,9 +53,9 @@ class GraphSage(Dataset):
     url = 'http://snap.stanford.edu/graphsage/{}.zip'
 
     def __init__(self, name, **kwargs):
-        if name.lower() not in self.available_datasets():
+        if name.lower() not in self.available_datasets:
             raise ValueError('Unknown dataset: {}. Possible: {}'
-                             .format(name, self.available_datasets()))
+                             .format(name, self.available_datasets))
         self.name = name.lower()
         self.mask_tr = self.mask_va = self.mask_te = None
         super().__init__(**kwargs)
@@ -107,8 +109,8 @@ class GraphSage(Dataset):
                  adj_col=adj.col, adj_shape=adj.shape, y=y,
                  mask_tr=mask_tr, mask_va=mask_va, mask_te=mask_te)
 
-    @staticmethod
-    def available_datasets():
+    @property
+    def available_datasets(self):
         return ['ppi', 'reddit']
 
 

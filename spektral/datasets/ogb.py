@@ -6,11 +6,11 @@ from spektral.data import Dataset, Graph
 
 class OGB(Dataset):
     """
-    Wrapper for OGB datasets.
+    Wrapper for datasets from the [Open Graph Benchmark (OGB)](https://ogb.stanford.edu/).
 
     **Arguments**
 
-    - `dataset`: an OGB library-agnostic Graph*Dataset object.
+    - `dataset`: an OGB library-agnostic dataset.
 
     """
     def __init__(self, dataset, **kwargs):

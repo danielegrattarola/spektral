@@ -7,14 +7,17 @@ from spektral.utils import normalized_laplacian, rescale_laplacian
 
 class ChebConv(GCNConv):
     r"""
-    A Chebyshev convolutional layer as presented by
-    [Defferrard et al. (2016)](https://arxiv.org/abs/1606.09375).
+    A Chebyshev convolutional layer from the paper
+
+    > [Convolutional Neural Networks on Graphs with Fast Localized Spectral
+  Filtering](https://arxiv.org/abs/1606.09375)<br>
+    > Michaël Defferrard et al.
 
     **Mode**: single, disjoint, mixed, batch.
 
     This layer computes:
     $$
-        \Z = \sum \limits_{k=0}^{K - 1} \T^{(k)} \W^{(k)}  + \b^{(k)},
+        \X' = \sum \limits_{k=0}^{K - 1} \T^{(k)} \W^{(k)}  + \b^{(k)},
     $$
     where \( \T^{(0)}, ..., \T^{(K - 1)} \) are Chebyshev polynomials of \(\tilde \L\)
     defined as
@@ -25,9 +28,8 @@ class ChebConv(GCNConv):
     $$
     where
     $$
-        \tilde \L =  \frac{2}{\lambda_{max}} \cdot (\I - \D^{-1/2} \A \D^{-1/2}) - \I
+        \tilde \L =  \frac{2}{\lambda_{max}} \cdot (\I - \D^{-1/2} \A \D^{-1/2}) - \I.
     $$
-    is the normalized Laplacian with a rescaled spectrum.
 
     **Input**
 

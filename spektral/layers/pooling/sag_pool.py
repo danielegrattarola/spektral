@@ -5,14 +5,15 @@ from spektral.layers.pooling.topk_pool import ops, TopKPool
 
 class SAGPool(TopKPool):
     r"""
-    A self-attention graph pooling layer as presented by
-    [Lee et al. (2019)](https://arxiv.org/abs/1904.08082).
+    A self-attention graph pooling layer (SAG) from the paper
+
+    > [Self-Attention Graph Pooling](https://arxiv.org/abs/1904.08082)<br>
+    > Junhyun Lee et al.
 
     **Mode**: single, disjoint.
 
     This layer computes the following operations:
-
-    $$
+$$
     \y = \textrm{GNN}(\A, \X); \;\;\;\;
     \i = \textrm{rank}(\y, K); \;\;\;\;
     \X' = (\X \odot \textrm{tanh}(\y))_\i; \;\;\;\;

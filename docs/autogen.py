@@ -141,6 +141,8 @@ PAGES = [
             datasets.GraphSage,
             datasets.PPI,
             datasets.Reddit,
+            datasets.MNIST,
+            datasets.ModelNet,
             datasets.OGB,
             datasets.QM9,
             datasets.TUDataset,
@@ -153,7 +155,9 @@ PAGES = [
         'methods': [],
         'classes': [
             transforms.AdjToSpTensor,
+            transforms.ClusteringCoeff,
             transforms.Constant,
+            transforms.Delaunay,
             transforms.Degree,
             transforms.GCNFilter,
             transforms.LayerPreprocess,

@@ -2,9 +2,7 @@ import numpy as np
 import scipy.sparse as sp
 
 from spektral.data import Graph
-from spektral.transforms import (AdjToSpTensor, Constant, Degree, GCNFilter,
-                                 LayerPreprocess, NormalizeAdj, NormalizeOne,
-                                 NormalizeSphere, OneHotLabels)
+from spektral import transforms as tr
 
 N = 10
 F = 3
@@ -24,14 +22,23 @@ g_sc = Graph(x=x, a=a, e=e, y=y_sc)
 
 
 def test_adj_to_sp_tensor():
-    t = AdjToSpTensor()
+    t = tr.AdjToSpTensor()
     g = Graph(x=x, a=a, e=e, y=y_gl)
     assert callable(t)
     t(g)
 
 
+def test_clustering_coeff():
+    t = tr.ClusteringCoeff()
+    assert callable(t)
+    g = Graph(x=x, a=a, e=e, y=y_gl)
+    t(g)
+    g = Graph(x=None, a=a, e=e, y=y_gl)
+    t(g)
+
+
 def test_constant():
-    t = Constant(10)
+    t = tr.Constant(10)
     assert callable(t)
     g = Graph(x=x, a=a, e=e, y=y_gl)
     t(g)
@@ -40,7 +47,7 @@ def test_constant():
 
 
 def test_degree():
-    t = Degree(10)
+    t = tr.Degree(10)
     assert callable(t)
     g = Graph(x=x, a=a, e=e, y=y_gl)
     t(g)
@@ -48,8 +55,18 @@ def test_degree():
     t(g)
 
 
+def test_delaunay():
+    t = tr.Delaunay()
+    assert callable(t)
+    x = np.random.rand(N, 2)
+    g = Graph(x=x, a=a, e=e, y=y_nl)
+    t(g)
+    g = Graph(x=x, a=a.A, e=e, y=y_nl)
+    t(g)
+
+
 def test_gcn_filter():
-    t = GCNFilter()
+    t = tr.GCNFilter()
     assert callable(t)
     g = Graph(x=x, a=a, e=e, y=y_nl)
     t(g)
@@ -59,14 +76,14 @@ def test_gcn_filter():
 
 def test_layer_preprocess():
     from spektral.layers import GCNConv
-    t = LayerPreprocess(GCNConv)
+    t = tr.LayerPreprocess(GCNConv)
     assert callable(t)
     g = Graph(x=x, a=a, e=e, y=y_nl)
     t(g)
 
 
 def test_normalize_adj():
-    t = NormalizeAdj
+    t = tr.NormalizeAdj()
     assert callable(t)
     g = Graph(x=x, a=a, e=e, y=y_nl)
     t(g)
@@ -75,21 +92,21 @@ def test_normalize_adj():
 
 
 def test_normalize_one():
-    t = NormalizeOne()
+    t = tr.NormalizeOne()
     assert callable(t)
     g = Graph(x=x, a=a, e=e, y=y_gl)
     t(g)
 
 
 def test_normalize_sphere():
-    t = NormalizeSphere()
+    t = tr.NormalizeSphere()
     assert callable(t)
     g = Graph(x=x, a=a, e=e, y=y_gl)
     t(g)
 
 
 def test_one_hot():
-    t = OneHotLabels(depth=2)
+    t = tr.OneHotLabels(depth=2)
     assert callable(t)
     g = Graph(x=x, a=a, e=e, y=y_gl)
     t(g)

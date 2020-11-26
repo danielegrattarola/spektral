@@ -139,8 +139,10 @@ class GlobalMaxPool(GlobalPool):
 
 class GlobalAttentionPool(GlobalPool):
     r"""
-    A gated attention global pooling layer as presented by
-    [Li et al. (2017)](https://arxiv.org/abs/1511.05493).
+    A gated attention global pooling layer from the paper
+
+    > [Gated Graph Sequence Neural Networks](https://arxiv.org/abs/1511.05493)<br>
+    > Yujia Li et al.
 
     This layer computes:
     $$

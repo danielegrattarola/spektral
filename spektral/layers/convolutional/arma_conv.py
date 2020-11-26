@@ -8,27 +8,28 @@ from spektral.utils import normalized_laplacian, rescale_laplacian
 
 class ARMAConv(GCNConv):
     r"""
-    A graph convolutional layer with ARMA\(_K\) filters, as presented by
-    [Bianchi et al. (2019)](https://arxiv.org/abs/1901.01343).
+    An Auto-Regressive Moving Average convolutional layer (ARMA) from the paper
+
+    > [Graph Neural Networks with convolutional ARMA filters](https://arxiv.org/abs/1901.01343)<br>
+    > Filippo Maria Bianchi et al.
 
     **Mode**: single, disjoint, mixed, batch.
 
     This layer computes:
     $$
-        \Z = \frac{1}{K} \sum\limits_{k=1}^K \bar\X_k^{(T)},
+        \X' = \frac{1}{K} \sum\limits_{k=1}^K \bar\X_k^{(T)},
     $$
     where \(K\) is the order of the ARMA\(_K\) filter, and where:
     $$
         \bar \X_k^{(t + 1)} =
-        \sigma \left(\tilde \L \bar \X^{(t)} \W^{(t)} + \X \V^{(t)} \right)
+        \sigma \left(\tilde \A \bar \X^{(t)} \W^{(t)} + \X \V^{(t)} \right)
     $$
     is a recursive approximation of an ARMA\(_1\) filter, where
     \( \bar \X^{(0)} = \X \)
     and
     $$
-        \tilde \L =  \frac{2}{\lambda_{max}} \cdot (\I - \D^{-1/2} \A \D^{-1/2}) - \I
+        \tilde \A =  \D^{-1/2} \A \D^{-1/2}.
     $$
-    is the normalized Laplacian with a rescaled spectrum.
 
     **Input**
 
