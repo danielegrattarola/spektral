@@ -109,7 +109,7 @@ def test_batch():
     assert y.shape == (graphs_in_batch, 2)
 
 
-def test_fast_batch():
+def test_packed_batch():
     data = TestDataset()
     loader = PackedBatchLoader(data, batch_size=batch_size, epochs=1, shuffle=False)
     batches = [b for b in loader]
