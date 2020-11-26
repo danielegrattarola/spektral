@@ -144,6 +144,7 @@ PAGES = [
             datasets.MNIST,
             datasets.ModelNet,
             datasets.OGB,
+            datasets.QM7,
             datasets.QM9,
             datasets.TUDataset,
         ]

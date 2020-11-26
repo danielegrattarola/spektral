@@ -4,6 +4,15 @@ import scipy.sparse as sp
 
 
 class Delaunay:
+    """
+    Computes the Delaunay triangulation of the node features.
+
+    The adjacency matrix is obtained from the edges of the triangulation and
+    replaces the previous adjacency matrix.
+    Duplicate edges are ignored and the adjacency matrix is binary.
+
+    Node features must be 2-dimensional.
+    """
     def __call__(self, graph):
         if 'x' not in graph:
             raise ValueError('The graph must have node features')
