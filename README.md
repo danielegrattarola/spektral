@@ -4,7 +4,7 @@
 Spektral is a Python library for graph deep learning, based on the Keras API and TensorFlow 2.
 The main goal of this project is to provide a simple but flexible framework for creating graph neural networks (GNNs).
 
-You can use Spektral for classifying the nodes of a network, predicting molecular properties, generating new graphs with GANs, clustering nodes, predicting links, and any other task where data is described by graphs. 
+You can use Spektral for classifying the userss of a social network, predicting molecular properties, generating new graphs with GANs, clustering nodes, predicting links, and any other task where data is described by graphs. 
 
 Spektral implements some of the most popular layers for graph deep learning, including: 
 

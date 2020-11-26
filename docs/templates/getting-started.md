@@ -80,7 +80,7 @@ First, we compute the maximum degree of the dataset, so that we know the size of
 12
 ```
 
-Try to go over the lambda function to see what it does. Also, notice that we passed another function to the `reduce` keyword. Can you guess why?
+Try to go over the lambda function to see what it does. Also, notice that we passed another function to the method with the `reduce` keyword. Can you guess why?
 
 Now we are ready to augment our node features with the one-hot-encoded degree. Spektral has a lot of pre-implemented `transforms` that we can use: 
 
@@ -90,16 +90,16 @@ Now we are ready to augment our node features with the one-hot-encoded degree. S
 >>> dataset.apply(Degree(max_degree))
 ```
 
-We can see that it worked because now we have and extra `max_degree + 1` node features, which are our one-hot vectors:
+We can see that it worked because now we have an extra `max_degree + 1` node features, which are our one-hot vectors:
 
 ```python
 >>> dataset[0]
 Graph(n_nodes=42, n_node_features=17, n_edge_features=None, y=[1. 0.])
 ```
 
-Since we will be using a `GraphConv` layer in our GNN, we also want to follow the [original paper](https://arxiv.org/abs/1609.02907) that introduced this layer, and do some extra pre-processing. 
+Since we will be using a `GCNConv` layer in our GNN, we also want to follow the [original paper](https://arxiv.org/abs/1609.02907) that introduced this layer, and do some extra pre-processing of the adjacency matrix. 
 
-Specifically, we need to normalize the adjacency matrix of each graph by the node degrees. Since this is a fairly common operation, Spektral has a transform to do it: 
+Since this is a fairly common operation, Spektral has a transform to do it: 
 
 ```python
 >>> from spektral.transforms import GCNFilter
@@ -133,7 +133,7 @@ class MyFirstGNN(Model):
 
     def __init__(self, n_hidden, n_labels):
         super().__init__()
-        self.graph_conv = GraphConv(n_hidden)
+        self.graph_conv = GCNConv(n_hidden)
         self.pool = GlobalSumPool()
         self.dropout = Dropout(0.5)
         self.dense = Dense(n_labels, 'softmax')
@@ -226,7 +226,7 @@ print('Test loss: {}'.format(loss))
 
 Besides learning to predict labels for the whole graph, like in this tutorial, GNNs are very effective at learning to predict labels for each individual node. This is called "node-level learning" and we usually do it for datasets with one big graph (think a social network).
 
-For example, reproducing the results of the [GCN paper for classifying nodes in a citation network](https://arxiv.org/abs/1609.02907) can be done with `GraphConv` layers, the `Citation` dataset, and a `SingleLoader`: check out [this example](https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_gcn.py).
+For example, reproducing the results of the [GCN paper for classifying nodes in a citation network](https://arxiv.org/abs/1609.02907) can be done with `GCNConv` layers, the `Citation` dataset, and a `SingleLoader`: check out [this example](https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_gcn.py).
 
 As a matter of fact, check out [all the examples](/examples).
 

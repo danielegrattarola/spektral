@@ -43,7 +43,7 @@ class TUDataset(Dataset):
 
     **Arguments**
 
-    - `name`: str, name of the dataset to load (see `TUD.available_datasets()`).
+    - `name`: str, name of the dataset to load (see `TUD.available_datasets`).
     - `clean`: if `True`, rload a version of the dataset with no isomorphic
                graphs.
     """
@@ -179,13 +179,14 @@ class TUDataset(Dataset):
         return [Graph(x=x, a=a, e=e, y=y)
                 for x, a, e, y in zip(x_list, a_list, e_list, labels)]
 
+    @property
     def available_datasets(self):
         try:
             names = pd.read_html(self.url)[0].Name[2:-1].values.tolist()
             return [d[:-4] for d in names]
         except URLError:
             # No internet, don't panic
-            print('No connection. See {}'.format(self.url))
+            print('Could not read URL {}'.format(self.url))
             return []
 
 

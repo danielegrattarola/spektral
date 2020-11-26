@@ -10,8 +10,10 @@ from spektral.layers.ops.scatter import deserialize_scatter
 
 class MessagePassing(Layer):
     r"""
-    A general class for message passing as presented by
-    [Gilmer et al. (2017)](https://arxiv.org/abs/1704.01212).
+    A general class for message passing networks from the paper
+
+    > [Neural Message Passing for Quantum Chemistry](https://arxiv.org/abs/1704.01212)<br>
+    > Justin Gilmer et al.
 
     **Mode**: single, disjoint.
 
@@ -19,8 +21,8 @@ class MessagePassing(Layer):
 
     This layer computes:
     $$
-        \Z_i = \gamma \left( \X_i, \square_{j \in \mathcal{N}(i)} \,
-        \phi \left(\X_i, \X_j, \E_{j,i} \right) \right),
+        \x_i' = \gamma \left( \x_i, \square_{j \in \mathcal{N}(i)} \,
+        \phi \left(\x_i, \x_j, \e_{j \rightarrow i} \right) \right),
     $$
     
     where \( \gamma \) is a differentiable update function, \( \phi \) is a

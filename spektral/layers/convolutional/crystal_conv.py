@@ -6,20 +6,21 @@ from spektral.layers.convolutional.message_passing import MessagePassing
 
 class CrystalConv(MessagePassing):
     r"""
-    A Crystal Graph Convolutional layer as presented by
-    [Xie & Grossman (2018)](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.145301).
+    A crystal graph convolutional layer from the paper
+
+    > [Crystal Graph Convolutional Neural Networks for an Accurate and
+    Interpretable Prediction of Material Properties](https://arxiv.org/abs/1710.10324)<br>
+    > Tian Xie and Jeffrey C. Grossman
 
     **Mode**: single, disjoint.
 
     **This layer expects a sparse adjacency matrix.**
 
-    This layer computes for each node \(i\):
+    This layer computes:
     $$
-        \H_i = \X_i +
-               \sum\limits_{j \in \mathcal{N}(i)}
-                    \sigma \left( \z_{ij} \W^{(f)} + \b^{(f)} \right)
-                    \odot
-                    \g \left( \z_{ij} \W^{(s)} + \b^{(s)} \right)
+        \x_i' = \x_i + \sum\limits_{j \in \mathcal{N}(i)} \sigma \left( \z_{ij}
+        \W^{(f)} + \b^{(f)} \right) \odot \g \left( \z_{ij} \W^{(s)} + \b^{(s)}
+        \right)
     $$
     where \(\z_{ij} = \X_i \| \X_j \| \E_{ij} \), \(\sigma\) is a sigmoid
     activation, and \(g\) is the activation function (defined by the `activation`

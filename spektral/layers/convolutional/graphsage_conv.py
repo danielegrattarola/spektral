@@ -6,8 +6,10 @@ from spektral.layers.convolutional.message_passing import MessagePassing
 
 class GraphSageConv(MessagePassing):
     r"""
-    A GraphSAGE layer as presented by
-    [Hamilton et al. (2017)](https://arxiv.org/abs/1706.02216).
+    A GraphSAGE layer from the paper
+
+    > [Inductive Representation Learning on Large Graphs](https://arxiv.org/abs/1706.02216)<br>
+    > William L. Hamilton et al.
 
     **Mode**: single, disjoint.
 
@@ -15,8 +17,8 @@ class GraphSageConv(MessagePassing):
 
     This layer computes:
     $$
-        \Z = \big[ \textrm{AGGREGATE}(\X) \| \X \big] \W + \b; \\
-        \Z = \frac{\Z}{\|\Z\|}
+        \X' = \big[ \textrm{AGGREGATE}(\X) \| \X \big] \W + \b; \\
+        \X' = \frac{\X'}{\|\X'\|}
     $$
     where \( \textrm{AGGREGATE} \) is a function to aggregate a node's
     neighbourhood. The supported aggregation methods are: sum, mean,

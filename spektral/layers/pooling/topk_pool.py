@@ -7,15 +7,20 @@ from spektral.layers import ops
 
 class TopKPool(Layer):
     r"""
-    A gPool/Top-K layer as presented by
-    [Gao & Ji (2019)](http://proceedings.mlr.press/v97/gao19a/gao19a.pdf) and
-    [Cangea et al. (2018)](https://arxiv.org/abs/1811.01287).
+    A gPool/Top-K layer from the papers
+
+    > [Graph U-Nets](https://arxiv.org/abs/1905.05178)<br>
+    > Hongyang Gao and Shuiwang Ji
+
+    and
+
+    > [Towards Sparse Hierarchical Graph Classifiers](https://arxiv.org/abs/1811.01287)<br>
+    > Cătălina Cangea et al.
 
     **Mode**: single, disjoint.
 
     This layer computes the following operations:
-
-    $$
+$$
     \y = \frac{\X\p}{\|\p\|}; \;\;\;\;
     \i = \textrm{rank}(\y, K); \;\;\;\;
     \X' = (\X \odot \textrm{tanh}(\y))_\i; \;\;\;\;

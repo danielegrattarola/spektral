@@ -9,15 +9,16 @@ from spektral.layers.ops import modes
 
 class DiffPool(Layer):
     r"""
-    A DiffPool layer as presented by
-    [Ying et al. (2018)](https://arxiv.org/abs/1806.08804).
+    A DiffPool layer from the paper
+
+    > [Hierarchical Graph Representation Learning with Differentiable Pooling](https://arxiv.org/abs/1806.08804)<br>
+    > Rex Ying et al.
 
     **Mode**: batch.
 
     This layer computes a soft clustering \(\S\) of the input graphs using a GNN,
     and reduces graphs as follows:
-
-    $$
+$$
         \S = \textrm{GNN}(\A, \X); \\
         \A' = \S^\top \A \S; \X' = \S^\top \X;
     $$

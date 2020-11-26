@@ -39,8 +39,8 @@ class Citation(Dataset):
 
     def __init__(self, name, random_split=False, normalize_x=False, **kwargs):
         self.name = name.lower()
-        if self.name not in self.available_datasets():
-            raise ValueError('Unknown dataset {}. See Citation.available_datasets() '
+        if self.name not in self.available_datasets:
+            raise ValueError('Unknown dataset {}. See Citation.available_datasets '
                              'for a list of available datasets.')
         self.random_split = random_split
         self.normalize_x = normalize_x
@@ -116,8 +116,8 @@ class Citation(Dataset):
             with open(os.path.join(self.path, f_name), 'wb') as out_file:
                 out_file.write(req.content)
 
-    @staticmethod
-    def available_datasets():
+    @property
+    def available_datasets(self):
         return ['cora', 'citeseer', 'pubmed']
 
 

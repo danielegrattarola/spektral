@@ -8,9 +8,6 @@ class Degree(object):
     Concatenates to each node attribute the one-hot degree of the corresponding
     node.
 
-    If the graph doesn't have node attributes, then they are created and set to
-    the degree.
-
     The adjacency matrix is expected to have integer entries and the degree is
     cast to integer before one-hot encoding.
 

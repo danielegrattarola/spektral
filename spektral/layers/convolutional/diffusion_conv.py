@@ -71,24 +71,22 @@ class DiffuseFeatures(layers.Layer):
 
 
 class DiffusionConv(GCNConv):
-    r"""Applies Graph Diffusion Convolution as descibed by
-    [Li et al. (2016)](https://arxiv.org/pdf/1707.01926.pdf)
+    r"""
+    A diffusion convolution operator from the paper
+
+    > [Diffusion Convolutional Recurrent Neural Network: Data-Driven Traffic
+  Forecasting](https://arxiv.org/abs/1707.01926)<br>
+    > Yaguang Li et al.
 
     **Mode**: single, disjoint, mixed, batch.
 
     **This layer expects a dense adjacency matrix.**
 
-    Given a number of diffusion steps \(K\) and a row normalized adjacency matrix \(\hat \A \),
-    this layer calculates the q'th channel as:
-
+    Given a number of diffusion steps \(K\) and a row-normalized adjacency
+    matrix \(\hat \A \), this layer calculates the \(q\)-th channel as:
     $$
-    \mathbf{H}_{~:,~q} = \sigma\left(
-        \sum_{f=1}^{n_node_features}
-            \left(
-                \sum_{k=0}^{K-1}\theta_k {\hat \A}^k
-            \right)
-        \X_{~:,~f}
-    \right)
+    \mathbf{X}_{~:,~q}' = \sigma\left( \sum_{f=1}^{F} \left( \sum_{k=0}^{K-1}
+    \theta_k {\hat \A}^k \right) \X_{~:,~f} \right)
     $$
 
     **Input**

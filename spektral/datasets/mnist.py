@@ -10,7 +10,7 @@ MNIST_SIZE = 28
 
 class MNIST(Dataset):
     """
-    The MNIST dataset used as node features for a grid graph, as described by
+    The MNIST images used as node features for a grid graph, as described by
     [Defferrard et al. (2016)](https://arxiv.org/abs/1606.09375).
 
     This dataset is a graph signal classification task, where graphs are

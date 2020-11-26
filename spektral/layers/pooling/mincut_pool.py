@@ -8,19 +8,19 @@ from spektral.layers import ops
 
 class MinCutPool(Layer):
     r"""
-    A minCUT pooling layer as presented by
-    [Bianchi et al. (2019)](https://arxiv.org/abs/1907.00481).
+    A MinCut pooling layer from the paper
+
+    > [Spectral Clustering with Graph Neural Networks for Graph Pooling](https://arxiv.org/abs/1907.00481)<br>
+    > Filippo Maria Bianchi et al.
 
     **Mode**: batch.
 
     This layer computes a soft clustering \(\S\) of the input graphs using a MLP,
     and reduces graphs as follows:
-
     $$
         \S = \textrm{MLP}(\X); \\
         \A' = \S^\top \A \S; \X' = \S^\top \X;
     $$
-
     where MLP is a multi-layer perceptron with softmax output.
     Two auxiliary loss terms are also added to the model: the _minCUT loss_
     $$

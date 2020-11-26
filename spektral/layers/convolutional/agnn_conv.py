@@ -7,8 +7,10 @@ from spektral.layers.convolutional.message_passing import MessagePassing
 
 class AGNNConv(MessagePassing):
     r"""
-    An Attention-based Graph Neural Network (AGNN) as presented by
-    [Thekumparampil et al. (2018)](https://arxiv.org/abs/1803.03735).
+    An Attention-based Graph Neural Network (AGNN) from the paper
+
+    > [Attention-based Graph Neural Network for Semi-supervised Learning](https://arxiv.org/abs/1803.03735)<br>
+    > Kiran K. Thekumparampil et al.
 
     **Mode**: single, disjoint.
 
@@ -16,15 +18,15 @@ class AGNNConv(MessagePassing):
 
     This layer computes:
     $$
-        \Z = \P\X
+        \X' = \P\X
     $$
     where
     $$
         \P_{ij} = \frac{
-            \exp \left( \beta \cos \left( \X_i, \X_j \right) \right)
+            \exp \left( \beta \cos \left( \x_i, \x_j \right) \right)
         }{
             \sum\limits_{k \in \mathcal{N}(i) \cup \{ i \}}
-            \exp \left( \beta \cos \left( \X_i, \X_k \right) \right)
+            \exp \left( \beta \cos \left( \x_i, \x_k \right) \right)
         }
     $$
     and \(\beta\) is a trainable parameter.

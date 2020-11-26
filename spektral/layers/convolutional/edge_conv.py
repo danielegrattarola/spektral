@@ -7,8 +7,10 @@ from spektral.layers.convolutional.message_passing import MessagePassing
 
 class EdgeConv(MessagePassing):
     r"""
-    An Edge Convolutional layer as presented by
-    [Wang et al. (2018)](https://arxiv.org/abs/1801.07829).
+    An edge convolutional layer from the paper
+
+    > [Dynamic Graph CNN for Learning on Point Clouds](https://arxiv.org/abs/1801.07829)<br>
+    > Yue Wang et al.
 
     **Mode**: single, disjoint.
 
@@ -16,7 +18,8 @@ class EdgeConv(MessagePassing):
 
     This layer computes for each node \(i\):
     $$
-        \Z_i = \sum\limits_{j \in \mathcal{N}(i)} \textrm{MLP}\big( \X_i \| \X_j - \X_i \big)
+        \x_i' = \sum\limits_{j \in \mathcal{N}(i)} \textrm{MLP}\big( \x_i \|
+        \x_j - \x_i \big)
     $$
     where \(\textrm{MLP}\) is a multi-layer perceptron.
 

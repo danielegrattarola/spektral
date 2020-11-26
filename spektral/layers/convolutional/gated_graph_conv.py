@@ -7,23 +7,24 @@ from spektral.layers.convolutional.message_passing import MessagePassing
 
 class GatedGraphConv(MessagePassing):
     r"""
-    A gated graph convolutional layer as presented by
-    [Li et al. (2018)](https://arxiv.org/abs/1511.05493).
+    A gated graph convolutional layer from the paper
+
+    > [Gated Graph Sequence Neural Networks](https://arxiv.org/abs/1511.05493)<br>
+    > Yujia Li et al.
 
     **Mode**: single, disjoint.
 
     **This layer expects a sparse adjacency matrix.**
 
-    This layer repeatedly applies a GRU cell \(L\) times to the node attributes
+    This layer computes \(\x_i' = \h^{(L)}_i\) where:
     $$
     \begin{align}
-        & \h^{(0)}_i = \X_i \| \mathbf{0} \\
+        & \h^{(0)}_i = \x_i \| \mathbf{0} \\
         & \m^{(l)}_i = \sum\limits_{j \in \mathcal{N}(i)} \h^{(l - 1)}_j \W \\
         & \h^{(l)}_i = \textrm{GRU} \left(\m^{(l)}_i, \h^{(l - 1)}_i \right) \\
-        & \Z_i = h^{(L)}_i
     \end{align}
     $$
-    where \(\textrm{GRU}\) is the GRU cell.
+    where \(\textrm{GRU}\) is a gated recurrent unit cell.
 
     **Input**
 

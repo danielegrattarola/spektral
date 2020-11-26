@@ -5,6 +5,7 @@ import joblib
 import networkx as nx
 import numpy as np
 import pandas as pd
+import scipy.sparse as sp
 
 
 def load_binary(filename):
@@ -144,6 +145,48 @@ def dump_txt(obj, filename, **kwargs):
     np.savetxt(filename, obj, **kwargs)
 
 
+def _parse_off(lines):
+    n_verts, n_faces, _ = map(int, lines[0].split(' '))
+
+    # Read vertices
+    verts = np.array([l.split(' ') for l in lines[1:n_verts + 1]]).astype(float)
+
+    # Read faces
+    faces = lines[n_verts + 1:n_verts + 1 + n_faces]
+    faces = [list(map(int, f.split(' '))) for f in faces]
+    triangles = np.array(list(filter(lambda f: len(f) == 4, faces))).astype(int)
+    rectangles = np.array(list(filter(lambda f: len(f) == 5, faces))).astype(int)
+    if len(rectangles) > 0:
+        tri_a = rectangles[:, [1, 2, 3]]
+        tri_b = rectangles[:, [1, 2, 4]]
+        triangles = np.vstack((triangles, tri_a, tri_b))
+    triangles = triangles[:, 1:]
+    triangles = triangles[triangles[:, 0].argsort()]
+
+    return verts, triangles
+
+
+def load_off(filename):
+    """
+    Reads an .off file into a Graph object. Node attributes are the 3d
+    coordinates of the points, all faces are converted to edges.
+    :param filename: path to the .off file.
+    :return: a Graph
+    """
+    from spektral.data.graph import Graph
+
+    lines = open(filename, 'r').read().lstrip('OF\n').splitlines()
+    x, faces = _parse_off(lines)
+    n = x.shape[0]
+    row, col = np.vstack((faces[:, :2], faces[:, 1:], faces[:, ::2])).T
+    adj = sp.csr_matrix((np.ones_like(row), (row, col)), shape=(n, n)).tolil()
+    adj[col, row] = adj[row, col]
+    adj = adj.T.tocsr()
+    adj.data = np.clip(adj.data, 0, 1)
+
+    return Graph(x=x, adj=adj)
+
+
 # Reference for implementation:
 # # http://www.nonlinear.com/progenesis/sdf-studio/v0.9/faq/sdf-file-format-guidance.aspx
 #
@@ -205,11 +248,6 @@ SYMBOL_TO_NUM = {v: k for k, v in NUM_TO_SYMBOL.items()}
 
 
 def _get_atomic_num(symbol):
-    """
-    Given an atomic symbol (e.g., 'C'), returns its atomic number (e.g., 6)
-    :param symbol: string, atomic symbol
-    :return: int <= 118
-    """
     return SYMBOL_TO_NUM[symbol.lower().capitalize()]
 
 

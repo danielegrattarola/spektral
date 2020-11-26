@@ -7,8 +7,10 @@ from spektral.utils import normalized_adjacency
 
 class TAGConv(MessagePassing):
     r"""
-    A Topology Adaptive Graph Convolutional layer (TAG) as presented by
-    [Du et al. (2017)](https://arxiv.org/abs/1710.10370).
+    A Topology Adaptive Graph Convolutional layer (TAG) from the paper
+
+    > [Topology Adaptive Graph Convolutional Networks](https://arxiv.org/abs/1710.10370)<br>
+    > Jian Du et al.
 
     **Mode**: single, disjoint.
 

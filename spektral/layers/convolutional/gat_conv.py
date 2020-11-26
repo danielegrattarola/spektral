@@ -10,8 +10,10 @@ from spektral.layers.ops import modes
 
 class GATConv(GCNConv):
     r"""
-    A graph attention layer (GAT) as presented by
-    [Velickovic et al. (2017)](https://arxiv.org/abs/1710.10903).
+    A Graph Attention layer (GAT) from the paper
+
+    > [Graph Attention Networks](https://arxiv.org/abs/1710.10903)<br>
+    > Petar Veličković et al.
 
     **Mode**: single, disjoint, mixed, batch.
 
@@ -21,25 +23,14 @@ class GATConv(GCNConv):
     uses the attention mechanism to weight the adjacency matrix instead of
     using the normalized Laplacian:
     $$
-        \Z = \mathbf{\alpha}\X\W + \b
+        \X' = \mathbf{\alpha}\X\W + \b
     $$
     where
     $$
-        \mathbf{\alpha}_{ij} =
-            \frac{
-                \exp\left(
-                    \mathrm{LeakyReLU}\left(
-                        \a^{\top} [(\X\W)_i \, \| \, (\X\W)_j]
-                    \right)
-                \right)
-            }
-            {\sum\limits_{k \in \mathcal{N}(i) \cup \{ i \}}
-                \exp\left(
-                    \mathrm{LeakyReLU}\left(
-                        \a^{\top} [(\X\W)_i \, \| \, (\X\W)_k]
-                    \right)
-                \right)
-            }
+        \mathbf{\alpha}_{ij} =\frac{ \exp\left(\mathrm{LeakyReLU}\left(
+        \a^{\top} [(\X\W)_i \, \| \, (\X\W)_j]\right)\right)}{\sum\limits_{k
+        \in \mathcal{N}(i) \cup \{ i \}} \exp\left(\mathrm{LeakyReLU}\left(
+        \a^{\top} [(\X\W)_i \, \| \, (\X\W)_k]\right)\right)}
     $$
     where \(\a \in \mathbb{R}^{2F'}\) is a trainable attention kernel.
     Dropout is also applied to \(\alpha\) before computing \(\Z\).

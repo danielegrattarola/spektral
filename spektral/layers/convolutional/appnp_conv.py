@@ -8,8 +8,10 @@ from spektral.layers.convolutional.gcn_conv import GCNConv
 
 class APPNPConv(GCNConv):
     r"""
-    A graph convolutional layer implementing the APPNP operator, as presented by
-    [Klicpera et al. (2019)](https://arxiv.org/abs/1810.05997).
+    The APPNP operator from the paper
+
+    > [Predict then Propagate: Graph Neural Networks meet Personalized PageRank](https://arxiv.org/abs/1810.05997)<br>
+    > Johannes Klicpera et al.
 
     This layer computes:
     $$
@@ -17,8 +19,8 @@ class APPNPConv(GCNConv):
         \Z^{(K)} = (1 - \alpha) \hat \D^{-1/2} \hat \A \hat \D^{-1/2} \Z^{(K - 1)} +
                    \alpha \Z^{(0)},
     $$
-    where \(\alpha\) is the _teleport_ probability and \(\textrm{MLP}\) is a
-    multi-layer perceptron.
+    where \(\alpha\) is the teleport probability, \(\textrm{MLP}\) is a
+    multi-layer perceptron, and \(K\) is defined by the `propagations` argument.
 
     **Mode**: single, disjoint, mixed, batch.
 

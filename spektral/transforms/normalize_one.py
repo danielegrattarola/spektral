@@ -5,7 +5,6 @@ class NormalizeOne:
     r"""
     Normalizes the node attributes by dividing each row by its sum, so that it
     sums to 1:
-
     $$
         \X_i \leftarrow \frac{\X_i}{\sum_{j=1}^{N} \X_{ij}}
     $$

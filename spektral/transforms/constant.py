@@ -5,9 +5,6 @@ class Constant(object):
     """
     Concatenates a constant value to the node attributes.
 
-    If the graph doesn't have node attributes, then they are created and set to
-    `value`.
-
     **Arguments**
 
     - `value`: the value to concatenate to the node attributes.

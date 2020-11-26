@@ -7,17 +7,18 @@ from tensorflow.keras import activations
 
 class GeneralConv(MessagePassing):
     r"""
-    A general convolutional layer as described by
-    [You et al.](https://arxiv.org/abs/2011.08843).
+    A general convolutional layer from the paper
+
+    > [Design Space for Graph Neural Networks](https://arxiv.org/abs/2011.08843)<br>
+    > Jiaxuan You et al.
 
     **Mode**: single, disjoint.
 
     **This layer expects a sparse adjacency matrix.**
 
     This layer computes:
-
     $$
-        \h_i = \mathrm{Agg} \left( \left\{ \mathrm{Act} \left( \mathrm{Dropout}
+        \x_i' = \mathrm{Agg} \left( \left\{ \mathrm{Act} \left( \mathrm{Dropout}
         \left( \mathrm{BN} \left( \x_j \W + \b \right) \right) \right),
         j \in \mathcal{N}(i) \right\} \right)
     $$
@@ -143,6 +144,8 @@ class GeneralConv(MessagePassing):
             'channels': self.channels,
         }
         base_config = super().get_config()
-        base_config.pop('aggregate')  # Remove it because it's defined by constructor
-        base_config['activation'] = 'prelu'
+        if isinstance(self.activation, PReLU):
+            base_config['activation'] = 'prelu'
+        else:
+            base_config['activation'] = activations.serialize(self.activation)
         return {**base_config, **config}

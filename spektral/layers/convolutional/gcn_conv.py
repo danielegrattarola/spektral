@@ -8,14 +8,16 @@ from spektral.utils import gcn_filter
 
 class GCNConv(Layer):
     r"""
-    A graph convolutional layer (GCN) as presented by
-    [Kipf & Welling (2016)](https://arxiv.org/abs/1609.02907).
+    A graph convolutional layer (GCN) from the paper
+
+    > [Semi-Supervised Classification with Graph Convolutional Networks](https://arxiv.org/abs/1609.02907)<br>
+    > Thomas N. Kipf and Max Welling
 
     **Mode**: single, disjoint, mixed, batch.
 
     This layer computes:
     $$
-        \Z = \hat \D^{-1/2} \hat \A \hat \D^{-1/2} \X \W + \b
+        \X' = \hat \D^{-1/2} \hat \A \hat \D^{-1/2} \X \W + \b
     $$
     where \( \hat \A = \A + \I \) is the adjacency matrix with added self-loops
     and \(\hat\D\) is its degree matrix.

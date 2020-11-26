@@ -17,11 +17,10 @@ def get_act(identifier):
 
 class GeneralGNN(Model):
     r"""
-    This model implements the GNN architecture described in
+    This model implements the GNN architecture from the paper
 
     > [Design Space for Graph Neural Networks](https://arxiv.org/abs/2011.08843)<br>
-    > Jiaxuan You, Rex Ying, Jure Leskovec<br>
-    > NeurIPS 2020
+    > Jiaxuan You, Rex Ying, Jure Leskovec
 
     The default parameters of the model are selected according to the best
     results obtained in the paper, and should provide a good performance on
@@ -47,15 +46,13 @@ class GeneralGNN(Model):
 
     The dense layers of the pre-processing and post-processing MLPs compute the
     following update of the node features:
-
-    $$
+$$
         \h_i = \mathrm{Act} \left( \mathrm{Dropout} \left( \mathrm{BN}
         \left( \x_i \W + \b \right) \right) \right)
     $$
 
     Message-passing layers compute:
-
-    $$
+$$
         \h_i = \mathrm{Agg} \left( \left\{ \mathrm{Act} \left( \mathrm{Dropout}
         \left( \mathrm{BN} \left( \x_j \W + \b \right) \right) \right),
         j \in \mathcal{N}(i) \right\} \right)
