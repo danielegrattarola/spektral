@@ -28,12 +28,10 @@ class QM9(Dataset):
     - The atomic charge;
     - The mass difference from the monoisotope;
 
-    See [this link](http://www.nonlinear.com/progenesis/sdf-studio/v0.9/faq/sdf-file-format-guidance.aspx)
-    for more information.
+    The edge features represent the type of chemical bond between two atoms,
+    one-hot encoded.
 
-    The edge features represent the type of chemical bond between two atoms.
-
-    Labels represent... TODO
+    Each graph has an 18-dimensional label for regression.
 
     **Arguments**
 
