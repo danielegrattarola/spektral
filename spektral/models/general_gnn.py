@@ -2,8 +2,6 @@ from tensorflow.keras import Model, Sequential
 from tensorflow.keras.layers import Dense, Concatenate, Add, BatchNormalization, Dropout, Activation
 from tensorflow.keras.layers import PReLU
 
-from spektral.data import DisjointLoader
-from spektral.datasets import TUDataset
 from spektral.layers import GeneralConv
 from spektral.layers.pooling import global_pool
 
@@ -46,13 +44,13 @@ class GeneralGNN(Model):
 
     The dense layers of the pre-processing and post-processing MLPs compute the
     following update of the node features:
-$$
+    $$
         \h_i = \mathrm{Act} \left( \mathrm{Dropout} \left( \mathrm{BN}
         \left( \x_i \W + \b \right) \right) \right)
     $$
 
     Message-passing layers compute:
-$$
+    $$
         \h_i = \mathrm{Agg} \left( \left\{ \mathrm{Act} \left( \mathrm{Dropout}
         \left( \mathrm{BN} \left( \x_j \W + \b \right) \right) \right),
         j \in \mathcal{N}(i) \right\} \right)
@@ -154,62 +152,3 @@ class MLP(Model):
 
     def call(self, inputs):
         return self.mlp(inputs)
-
-
-if __name__ == '__main__':
-    import tensorflow as tf
-    import numpy as np
-    from tensorflow.keras.optimizers import Adam
-    physical_devices = tf.config.list_physical_devices('GPU')
-    tf.config.experimental.set_memory_growth(physical_devices[0], True)
-
-    # Best config
-    batch_size = 32
-    learning_rate = 0.01
-    epochs = 400
-
-    # Read data
-    data = TUDataset('PROTEINS')
-
-    # Train/test split
-    np.random.shuffle(data)
-    split = int(0.8 * len(data))
-    data_tr, data_te = data[:split], data[split:]
-
-    # Data loader
-    loader_tr = DisjointLoader(data_tr, batch_size=batch_size, epochs=epochs)
-    loader_te = DisjointLoader(data_te, batch_size=batch_size)
-
-    # Create model
-    model = GeneralGNN(data.n_labels, activation='softmax')
-    optimizer = Adam(learning_rate)
-    model.compile('adam', 'categorical_crossentropy', metrics=['categorical_accuracy'])
-
-    # Evaluation function
-    def eval(loader):
-        step = 0
-        results = []
-        for batch in loader:
-            step += 1
-            l, a = model.test_on_batch(*batch)
-            results.append((l, a))
-            if step == loader.steps_per_epoch:
-                return np.mean(results, 0)
-
-    # Training loop
-    epoch = step = 0
-    results = []
-    for batch in loader_tr:
-        step += 1
-        l, a = model.train_on_batch(*batch)
-        results.append((l, a))
-        if step == loader_tr.steps_per_epoch:
-            step = 0
-            epoch += 1
-            results_te = eval(loader_te)
-            print('Epoch {} - Train loss: {:.3f} - Train acc: {:.3f} - '
-                  'Test loss: {:.3f} - Test acc: {:.3f}'
-                  .format(epoch, *np.mean(results, 0), *results_te))
-
-    results_te = eval(loader_te)
-    print('Final results - Loss: {:.3f} - Acc: {:.3f}'.format(*results_te))
