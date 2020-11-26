@@ -22,7 +22,8 @@ from spektral.datasets import TUDataset
 from tensorflow.keras.optimizers import Adam
 
 physical_devices = tf.config.list_physical_devices('GPU')
-tf.config.experimental.set_memory_growth(physical_devices[0], True)
+if len(physical_devices) > 0:
+    tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 # Best config
 batch_size = 32
