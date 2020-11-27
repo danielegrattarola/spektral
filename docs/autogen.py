@@ -64,7 +64,14 @@ PAGES = [
             layers.DiffPool,
             layers.MinCutPool,
             layers.SAGPool,
-            layers.TopKPool,
+            layers.TopKPool
+        ]
+    },
+    {
+        'page': 'layers/pooling.md',
+        'functions': [],
+        'methods': [],
+        'classes': [
             layers.GlobalAvgPool,
             layers.GlobalMaxPool,
             layers.GlobalSumPool,
