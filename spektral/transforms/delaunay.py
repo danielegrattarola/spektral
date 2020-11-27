@@ -1,6 +1,6 @@
-from scipy.spatial import Delaunay as DelaunaySP
 import numpy as np
 import scipy.sparse as sp
+from scipy.spatial import Delaunay as DelaunaySP
 
 
 class Delaunay:
