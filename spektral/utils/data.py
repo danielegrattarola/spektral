@@ -50,7 +50,7 @@ def numpy_to_batch(X_list, A_list, E_list=None):
     `X_list[i].shape[0] == A_list[i].shape[0] == E_list[i].shape[0]`.
 
     Note that if `A_list` contains sparse matrices, they will be converted to
-    dense np.arrays, which can be expensice.
+    dense np.arrays, which can be expensive.
 
     :param X_list: a list of np.arrays of shape `(N, F)`;
     :param A_list: a list of np.arrays or sparse matrices of shape `(N, N)`;
