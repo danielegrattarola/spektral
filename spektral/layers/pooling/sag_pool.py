@@ -13,11 +13,11 @@ class SAGPool(TopKPool):
     **Mode**: single, disjoint.
 
     This layer computes the following operations:
-$$
-    \y = \textrm{GNN}(\A, \X); \;\;\;\;
-    \i = \textrm{rank}(\y, K); \;\;\;\;
-    \X' = (\X \odot \textrm{tanh}(\y))_\i; \;\;\;\;
-    \A' = \A_{\i, \i}
+    $$
+        \y = \textrm{GNN}(\A, \X); \;\;\;\;
+        \i = \textrm{rank}(\y, K); \;\;\;\;
+        \X' = (\X \odot \textrm{tanh}(\y))_\i; \;\;\;\;
+        \A' = \A_{\i, \i}
     $$
 
     where \( \textrm{rank}(\y, K) \) returns the indices of the top K values of

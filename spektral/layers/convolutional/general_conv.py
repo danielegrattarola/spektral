@@ -1,8 +1,9 @@
-from spektral.layers.convolutional.message_passing import MessagePassing
-from tensorflow.keras.layers import Dropout, BatchNormalization, PReLU
-from spektral.layers.ops import dot
 import tensorflow as tf
 from tensorflow.keras import activations
+from tensorflow.keras.layers import Dropout, BatchNormalization, PReLU
+
+from spektral.layers.convolutional.message_passing import MessagePassing
+from spektral.layers.ops import dot
 
 
 class GeneralConv(MessagePassing):

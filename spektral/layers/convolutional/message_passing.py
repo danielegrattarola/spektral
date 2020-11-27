@@ -4,8 +4,8 @@ import tensorflow as tf
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Layer
 
-from spektral.utils.keras import is_layer_kwarg, is_keras_kwarg, deserialize_kwarg, serialize_kwarg
 from spektral.layers.ops.scatter import deserialize_scatter, serialize_scatter
+from spektral.utils.keras import is_layer_kwarg, is_keras_kwarg, deserialize_kwarg, serialize_kwarg
 
 
 class MessagePassing(Layer):

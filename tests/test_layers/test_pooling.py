@@ -4,6 +4,7 @@ import tensorflow as tf
 from tensorflow.keras import Input, Model
 
 from spektral.layers import TopKPool, MinCutPool, DiffPool, SAGPool
+from .test_convolutional import _test_get_config
 
 tf.keras.backend.set_floatx('float64')
 
@@ -146,14 +147,6 @@ def _test_disjoint_mode(layer, **kwargs):
 
     output_shape = [o.shape for o in output]
     _check_output_and_model_output_shapes(output_shape, model.output_shape)
-
-
-def _test_get_config(layer, **kwargs):
-    if kwargs.get('edges'):
-        kwargs.pop('edges')
-    layer_instance = layer(**kwargs)
-    config = layer_instance.get_config()
-    assert layer(**config)
 
 
 def test_layers():

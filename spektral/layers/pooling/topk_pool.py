@@ -1,11 +1,11 @@
 import tensorflow as tf
-from tensorflow.keras import backend as K, initializers, regularizers, constraints
-from tensorflow.keras.layers import Layer
+from tensorflow.keras import backend as K
 
 from spektral.layers import ops
+from spektral.layers.pooling.pool import Pool
 
 
-class TopKPool(Layer):
+class TopKPool(Pool):
     r"""
     A gPool/Top-K layer from the papers
 
@@ -20,11 +20,11 @@ class TopKPool(Layer):
     **Mode**: single, disjoint.
 
     This layer computes the following operations:
-$$
-    \y = \frac{\X\p}{\|\p\|}; \;\;\;\;
-    \i = \textrm{rank}(\y, K); \;\;\;\;
-    \X' = (\X \odot \textrm{tanh}(\y))_\i; \;\;\;\;
-    \A' = \A_{\i, \i}
+    $$
+        \y = \frac{\X\p}{\|\p\|}; \;\;\;\;
+        \i = \textrm{rank}(\y, K); \;\;\;\;
+        \X' = (\X \odot \textrm{tanh}(\y))_\i; \;\;\;\;
+        \A' = \A_{\i, \i}
     $$
 
     where \( \textrm{rank}(\y, K) \) returns the indices of the top K values of
@@ -72,14 +72,14 @@ $$
                  kernel_regularizer=None,
                  kernel_constraint=None,
                  **kwargs):
-        super().__init__(**kwargs)
+        super().__init__(kernel_initializer=kernel_initializer,
+                         kernel_regularizer=kernel_regularizer,
+                         kernel_constraint=kernel_constraint,
+                         **kwargs)
         self.ratio = ratio
         self.return_mask = return_mask
         self.sigmoid_gating = sigmoid_gating
         self.gating_op = K.sigmoid if self.sigmoid_gating else K.tanh
-        self.kernel_initializer = initializers.get(kernel_initializer)
-        self.kernel_regularizer = regularizers.get(kernel_regularizer)
-        self.kernel_constraint = constraints.get(kernel_constraint)
 
     def build(self, input_shape):
         self.F = input_shape[0][-1]
@@ -145,19 +145,10 @@ $$
     def compute_scores(self, X, A, I):
         return K.dot(X, K.l2_normalize(self.kernel))
 
-    def compute_output_shape(self, input_shape):
-        output_shape = input_shape
-        if self.return_mask:
-            output_shape += [(input_shape[0][:-1])]
-        return output_shape
-
-    def get_config(self):
-        config = {
+    @property
+    def config(self):
+        return {
             'ratio': self.ratio,
             'return_mask': self.return_mask,
-            'kernel_initializer': initializers.serialize(self.kernel_initializer),
-            'kernel_regularizer': regularizers.serialize(self.kernel_regularizer),
-            'kernel_constraint': constraints.serialize(self.kernel_constraint),
+            'sigmoid_gating': self.sigmoid_gating
         }
-        base_config = super().get_config()
-        return dict(list(base_config.items()) + list(config.items()))
