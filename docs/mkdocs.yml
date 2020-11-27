@@ -48,4 +48,5 @@ nav:
     - Convolution: utils/convolution.md
     - Miscellaneous: utils/misc.md
 - Other:
+    - External resources: external.md
     - About: about.md

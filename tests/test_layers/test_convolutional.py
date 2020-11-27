@@ -220,7 +220,17 @@ def _test_get_config(layer, **kwargs):
         kwargs.pop('edges')
     layer_instance = layer(**kwargs)
     config = layer_instance.get_config()
-    assert layer(**config)
+    layer_instance_new = layer(**config)
+    config_new = layer_instance_new.get_config()
+    config.pop('name')
+    config_new.pop('name')
+
+    # Remove 'name' if we have advanced activations (needed for GeneralConv)
+    if 'activation' in config and 'class_name' in config['activation']:
+        config['activation']['config'].pop('name')
+        config_new['activation']['config'].pop('name')
+
+    assert config_new == config
 
 
 def test_layers():

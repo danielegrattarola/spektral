@@ -1,12 +1,11 @@
-from tensorflow.keras import activations, initializers, regularizers, constraints
 from tensorflow.keras import backend as K
-from tensorflow.keras.layers import Layer
 
 from spektral.layers import ops
+from spektral.layers.convolutional.conv import Conv
 from spektral.utils import gcn_filter
 
 
-class GCNConv(Layer):
+class GCNConv(Conv):
     r"""
     A graph convolutional layer (GCN) from the paper
 
@@ -59,18 +58,17 @@ class GCNConv(Layer):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-
-        super().__init__(activity_regularizer=activity_regularizer, **kwargs)
+        super().__init__(activation=activation,
+                         use_bias=use_bias,
+                         kernel_initializer=kernel_initializer,
+                         bias_initializer=bias_initializer,
+                         kernel_regularizer=kernel_regularizer,
+                         bias_regularizer=bias_regularizer,
+                         activity_regularizer=activity_regularizer,
+                         kernel_constraint=kernel_constraint,
+                         bias_constraint=bias_constraint,
+                         **kwargs)
         self.channels = channels
-        self.activation = activations.get(activation)
-        self.use_bias = use_bias
-        self.kernel_initializer = initializers.get(kernel_initializer)
-        self.bias_initializer = initializers.get(bias_initializer)
-        self.kernel_regularizer = regularizers.get(kernel_regularizer)
-        self.bias_regularizer = regularizers.get(bias_regularizer)
-        self.kernel_constraint = constraints.get(kernel_constraint)
-        self.bias_constraint = constraints.get(bias_constraint)
-        self.supports_masking = False
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
@@ -92,34 +90,21 @@ class GCNConv(Layer):
 
     def call(self, inputs):
         x, a = inputs
+
         output = ops.dot(x, self.kernel)
         output = ops.filter_dot(a, output)
 
         if self.use_bias:
             output = K.bias_add(output, self.bias)
-        if self.activation is not None:
-            output = self.activation(output)
+        output = self.activation(output)
+
         return output
 
-    def compute_output_shape(self, input_shape):
-        features_shape = input_shape[0]
-        output_shape = features_shape[:-1] + (self.channels,)
-        return output_shape
-
-    def get_config(self):
-        config = {
-            'channels': self.channels,
-            'activation': activations.serialize(self.activation),
-            'use_bias': self.use_bias,
-            'kernel_initializer': initializers.serialize(self.kernel_initializer),
-            'bias_initializer': initializers.serialize(self.bias_initializer),
-            'kernel_regularizer': regularizers.serialize(self.kernel_regularizer),
-            'bias_regularizer': regularizers.serialize(self.bias_regularizer),
-            'kernel_constraint': constraints.serialize(self.kernel_constraint),
-            'bias_constraint': constraints.serialize(self.bias_constraint)
+    @property
+    def config(self):
+        return {
+            'channels': self.channels
         }
-        base_config = super().get_config()
-        return dict(list(base_config.items()) + list(config.items()))
 
     @staticmethod
     def preprocess(a):

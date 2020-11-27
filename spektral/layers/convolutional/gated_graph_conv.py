@@ -75,7 +75,7 @@ class GatedGraphConv(MessagePassing):
                          kernel_constraint=kernel_constraint,
                          bias_constraint=bias_constraint,
                          **kwargs)
-        self.channels = self.output_dim = channels
+        self.channels = channels
         self.n_layers = n_layers
 
     def build(self, input_shape):
@@ -115,10 +115,9 @@ class GatedGraphConv(MessagePassing):
         output = self.activation(output)
         return output
 
-    def get_config(self):
-        config = {
+    @property
+    def config(self):
+        return {
             'channels': self.channels,
             'n_layers': self.n_layers,
         }
-        base_config = super().get_config()
-        return {**base_config, **config}

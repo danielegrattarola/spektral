@@ -3,11 +3,11 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Dense
 
 from spektral.layers import ops
+from spektral.layers.convolutional.conv import Conv
 from spektral.layers.ops import modes
-from spektral.layers.convolutional.gcn_conv import GCNConv
 
 
-class ECCConv(GCNConv):
+class ECCConv(Conv):
     r"""
     An edge-conditioned convolutional layer (ECC) from the paper
 
@@ -75,8 +75,7 @@ class ECCConv(GCNConv):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        super().__init__(channels,
-                         activation=activation,
+        super().__init__(activation=activation,
                          use_bias=use_bias,
                          kernel_initializer=kernel_initializer,
                          bias_initializer=bias_initializer,
@@ -86,6 +85,7 @@ class ECCConv(GCNConv):
                          kernel_constraint=kernel_constraint,
                          bias_constraint=bias_constraint,
                          **kwargs)
+        self.channels = channels
         self.kernel_network = kernel_network
         self.root = root
 
@@ -199,14 +199,10 @@ class ECCConv(GCNConv):
 
         return output
 
-    def get_config(self):
-        config = {
+    @property
+    def config(self):
+        return {
+            'channels': self.channels,
             'kernel_network': self.kernel_network,
             'root': self.root,
         }
-        base_config = super().get_config()
-        return dict(list(base_config.items()) + list(config.items()))
-
-    @staticmethod
-    def preprocess(a):
-        return a

@@ -1,6 +1,8 @@
 import tensorflow as tf
 import tensorflow.keras.layers as layers
-from spektral.layers.convolutional.gcn_conv import GCNConv
+
+from spektral.layers.convolutional.conv import Conv
+from spektral.utils import gcn_filter
 
 
 class DiffuseFeatures(layers.Layer):
@@ -70,7 +72,7 @@ class DiffuseFeatures(layers.Layer):
         return tf.expand_dims(H, -1)
 
 
-class DiffusionConv(GCNConv):
+class DiffusionConv(Conv):
     r"""
     A diffusion convolution operator from the paper
 
@@ -103,7 +105,7 @@ class DiffusionConv(GCNConv):
     **Arguments**
 
     - `channels`: number of output channels;
-    - `num_diffusion_steps`: How many diffusion steps to consider. \(K\) in paper.
+    - `K`: number of diffusion steps.
     - `activation`: activation function \(\sigma\); (\(\tanh\) by default)
     - `kernel_initializer`: initializer for the weights;
     - `kernel_regularizer`: regularization applied to the weights;
@@ -112,25 +114,20 @@ class DiffusionConv(GCNConv):
 
     def __init__(self,
                  channels,
-                 num_diffusion_steps=6,
+                 K=6,
                  activation='tanh',
                  kernel_initializer='glorot_uniform',
                  kernel_regularizer=None,
                  kernel_constraint=None,
                  **kwargs):
-        super().__init__(channels,
-                         activation=activation,
+        super().__init__(activation=activation,
                          kernel_initializer=kernel_initializer,
                          kernel_regularizer=kernel_regularizer,
                          kernel_constraint=kernel_constraint,
                          **kwargs)
 
-        # number of features to generate (Q in paper)
-        assert channels > 0
-        self.Q = channels
-
-        # number of diffusion steps for each output feature
-        self.K = num_diffusion_steps + 1
+        self.channels = channels
+        self.K = K + 1
 
     def build(self, input_shape):
         self.filters = [
@@ -138,16 +135,16 @@ class DiffusionConv(GCNConv):
                             kernel_initializer=self.kernel_initializer,
                             kernel_regularizer=self.kernel_regularizer,
                             kernel_constraint=self.kernel_constraint)
-            for _ in range(self.Q)]
+            for _ in range(self.channels)]
 
     def apply_filters(self, x, a):
-        # This will be a list of Q diffused features.
+        # This will be a list of channels diffused features.
         # Each diffused feature is a (batch, n_nodes, 1) tensor.
         # Later we will concat all the features to get one
-        # (batch, n_nodes, Q) diffused graph signal
+        # (batch, n_nodes, channels) diffused graph signal
         diffused_features = []
 
-        # Iterating over all Q diffusion filters
+        # Iterating over all channels diffusion filters
         for diffusion in self.filters:
             diffused_feature = diffusion((x, a))
             diffused_features.append(diffused_feature)
@@ -160,3 +157,14 @@ class DiffusionConv(GCNConv):
         h = self.activation(h)
 
         return h
+
+    @property
+    def config(self):
+        return {
+            'channels': self.channels,
+            'K': self.K - 1
+        }
+
+    @staticmethod
+    def preprocess(a):
+        return gcn_filter(a)

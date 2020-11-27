@@ -1,5 +1,5 @@
 """
-This example implements an experiment from the paper
+This example implements the model from the paper
 
     > [Design Space for Graph Neural Networks](https://arxiv.org/abs/2011.08843)<br>
     > Jiaxuan You, Rex Ying, Jure Leskovec

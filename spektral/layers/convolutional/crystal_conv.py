@@ -53,6 +53,7 @@ class CrystalConv(MessagePassing):
 
     def __init__(self,
                  channels,
+                 aggregate='sum',
                  activation=None,
                  use_bias=True,
                  kernel_initializer='glorot_uniform',
@@ -63,7 +64,7 @@ class CrystalConv(MessagePassing):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        super().__init__(aggregate='sum',
+        super().__init__(aggregate=aggregate,
                          activation=activation,
                          use_bias=use_bias,
                          kernel_initializer=kernel_initializer,
@@ -74,7 +75,7 @@ class CrystalConv(MessagePassing):
                          kernel_constraint=kernel_constraint,
                          bias_constraint=bias_constraint,
                          **kwargs)
-        self.channels = self.output_dim = channels
+        self.channels = channels
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
@@ -102,10 +103,8 @@ class CrystalConv(MessagePassing):
     def update(self, embeddings, x=None):
         return x + embeddings
 
-    def get_config(self):
-        config = {
+    @property
+    def config(self):
+        return {
             'channels': self.channels
         }
-        base_config = super().get_config()
-        base_config.pop('aggregate')  # Remove it because it's defined by constructor
-        return {**base_config, **config}

@@ -98,10 +98,10 @@ class GeneralConv(MessagePassing):
                          kernel_constraint=kernel_constraint,
                          bias_constraint=bias_constraint,
                          **kwargs)
-        self.channels = self.output_dim = channels
+        self.channels = channels
         self.dropout_rate = dropout
         self.use_batch_norm = batch_norm
-        if activation == 'prelu':
+        if activation == 'prelu' or 'prelu' in kwargs:
             self.activation = PReLU()
         else:
             self.activation = activations.get(activation)
@@ -139,13 +139,12 @@ class GeneralConv(MessagePassing):
 
         return self.propagate(x, a)
 
-    def get_config(self):
+    @property
+    def config(self):
         config = {
             'channels': self.channels,
         }
-        base_config = super().get_config()
-        if isinstance(self.activation, PReLU):
-            base_config['activation'] = 'prelu'
-        else:
-            base_config['activation'] = activations.serialize(self.activation)
-        return {**base_config, **config}
+        if self.activation.__class__.__name__ == 'PReLU':
+            config['prelu'] = True
+
+        return config

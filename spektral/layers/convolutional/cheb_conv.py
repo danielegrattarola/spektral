@@ -1,11 +1,11 @@
 from tensorflow.keras import backend as K
 
 from spektral.layers import ops
-from spektral.layers.convolutional.gcn_conv import GCNConv
+from spektral.layers.convolutional.conv import Conv
 from spektral.utils import normalized_laplacian, rescale_laplacian
 
 
-class ChebConv(GCNConv):
+class ChebConv(Conv):
     r"""
     A Chebyshev convolutional layer from the paper
 
@@ -72,8 +72,7 @@ class ChebConv(GCNConv):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        super().__init__(channels,
-                         activation=activation,
+        super().__init__(activation=activation,
                          use_bias=use_bias,
                          kernel_initializer=kernel_initializer,
                          bias_initializer=bias_initializer,
@@ -83,6 +82,7 @@ class ChebConv(GCNConv):
                          kernel_constraint=kernel_constraint,
                          bias_constraint=bias_constraint,
                          **kwargs)
+        self.channels = channels
         self.K = K
 
     def build(self, input_shape):
@@ -104,10 +104,8 @@ class ChebConv(GCNConv):
         self.built = True
 
     def call(self, inputs):
-        x = inputs[0]
-        a = inputs[1]
+        x, a = inputs
 
-        # Convolution
         T_0 = x
         output = ops.dot(T_0, self.kernel[0])
 
@@ -122,16 +120,16 @@ class ChebConv(GCNConv):
 
         if self.use_bias:
             output = K.bias_add(output, self.bias)
-        if self.activation is not None:
-            output = self.activation(output)
+        output = self.activation(output)
+
         return output
 
-    def get_config(self):
-        config = {
+    @property
+    def config(self):
+        return {
+            'channels': self.channels,
             'K': self.K
         }
-        base_config = super(ChebConv, self).get_config()
-        return dict(list(base_config.items()) + list(config.items()))
 
     @staticmethod
     def preprocess(a):
