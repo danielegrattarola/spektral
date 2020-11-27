@@ -5,7 +5,7 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Layer
 
 from spektral.utils.keras import is_layer_kwarg, is_keras_kwarg, deserialize_kwarg, serialize_kwarg
-from spektral.layers.ops.scatter import deserialize_scatter
+from spektral.layers.ops.scatter import deserialize_scatter, serialize_scatter
 
 
 class MessagePassing(Layer):
@@ -33,27 +33,39 @@ class MessagePassing(Layer):
     By extending this class, it is possible to create any message-passing layer
     in single/disjoint mode.
 
-    **API:**
+    **API**
 
-    - `propagate(X, A, E=None, **kwargs)`: propagate the messages and compute
-    embeddings for each node in the graph. `kwargs` will be propagated as
-    keyword arguments to `message()`, `aggregate()` and `update()`.
-    - `message(X, **kwargs)`: computes messages, equivalent to \(\phi\) in the
-    definition.
-    Any extra keyword argument of this function will be  populated by
-    `propagate()` if a matching keyword is found.
+    ```python
+    propagate(x, a, e=None, **kwargs)
+    ```
+    Propagates the messages and computes embeddings for each node in the graph. <br>
+    Any `kwargs` will be forwarded as keyword arguments to `message()`,
+    `aggregate()` and `update()`.
+
+    ```python
+    message(x, **kwargs)
+    ```
+    Computes messages, equivalent to \(\phi\) in the definition. <br>
+    Any extra keyword argument of this function will be populated by
+    `propagate()` if a matching keyword is found. <br>
     Use `self.get_i()` and  `self.get_j()` to gather the elements using the
-    indices `i` or `j` of the adjacency matrix (e.g, `self.get_j(X)` will get
-    the features of the neighbours).
-    - `aggregate(messages, **kwargs)`: aggregates the messages, equivalent to
-    \(\square\) in the definition.
+    indices `i` or `j` of the adjacency matrix.
+
+    ```python
+    aggregate(messages, **kwargs)
+    ```
+    Aggregates the messages, equivalent to \(\square\) in the definition. <br>
     The behaviour of this function can also be controlled using the `aggregate`
     keyword in the constructor of the layer (supported aggregations: sum, mean,
-    max, min, prod).
+    max, min, prod). <br>
     Any extra keyword argument of this function will be  populated by
     `propagate()` if a matching keyword is found.
-    - `update(embeddings, **kwargs)`: updates the aggregated messages to obtain
-    the final node embeddings, equivalent to \(\gamma\) in the definition.
+
+    ```python
+    update(embeddings, **kwargs)
+    ```
+    Updates the aggregated messages to obtain the final node embeddings,
+    equivalent to \(\gamma\) in the definition. <br>
     Any extra keyword argument of this function will be  populated by
     `propagate()` if a matching keyword is found.
 
@@ -64,10 +76,11 @@ class MessagePassing(Layer):
     Supported aggregations: 'sum', 'mean', 'max', 'min', 'prod'.
     If callable, the function must have the signature `foo(updates, indices, n_nodes)`
     and return a rank 2 tensor with shape `(n_nodes, ...)`.
+    - `kwargs`: additional keyword arguments specific to Keras' Layers, like
+    regularizers, initializers, constraints, etc.
     """
     def __init__(self, aggregate='sum', **kwargs):
         super().__init__(**{k: v for k, v in kwargs.items() if is_keras_kwarg(k)})
-        self.output_dim = None
         self.kwargs_keys = []
         for key in kwargs:
             if is_layer_kwarg(key):
@@ -158,21 +171,20 @@ class MessagePassing(Layer):
 
         return x, a, e
 
-    def compute_output_shape(self, input_shape):
-        if self.output_dim:
-            output_shape = input_shape[0][:-1] + (self.output_dim, )
-        else:
-            output_shape = input_shape[0]
-        return output_shape
-
     def get_config(self):
-        config = {
-            'aggregate': self.agg,
+        mp_config = {
+            'aggregate': serialize_scatter(self.agg)
         }
+        keras_config = {}
         for key in self.kwargs_keys:
-            config[key] = serialize_kwarg(key, getattr(self, key))
+            keras_config[key] = serialize_kwarg(key, getattr(self, key))
         base_config = super().get_config()
-        return {**base_config, **config}
+
+        return {**base_config, **keras_config, **mp_config, **self.config}
+
+    @property
+    def config(self):
+        return {}
 
     @staticmethod
     def preprocess(a):

@@ -4,11 +4,11 @@ from tensorflow.keras import initializers, regularizers, constraints
 from tensorflow.keras.layers import Dropout
 
 from spektral.layers import ops
-from spektral.layers.convolutional.gcn_conv import GCNConv
+from spektral.layers.convolutional.conv import Conv
 from spektral.layers.ops import modes
 
 
-class GATConv(GCNConv):
+class GATConv(Conv):
     r"""
     A Graph Attention layer (GAT) from the paper
 
@@ -93,8 +93,7 @@ class GATConv(GCNConv):
                  bias_constraint=None,
                  attn_kernel_constraint=None,
                  **kwargs):
-        super().__init__(channels,
-                         activation=activation,
+        super().__init__(activation=activation,
                          use_bias=use_bias,
                          kernel_initializer=kernel_initializer,
                          bias_initializer=bias_initializer,
@@ -104,6 +103,7 @@ class GATConv(GCNConv):
                          kernel_constraint=kernel_constraint,
                          bias_constraint=bias_constraint,
                          **kwargs)
+        self.channels = channels
         self.attn_heads = attn_heads
         self.concat_heads = concat_heads
         self.dropout_rate = dropout_rate
@@ -113,10 +113,8 @@ class GATConv(GCNConv):
         self.attn_kernel_constraint = constraints.get(attn_kernel_constraint)
 
         if concat_heads:
-            # Output will have shape (..., attention_heads * channels)
             self.output_dim = self.channels * self.attn_heads
         else:
-            # Output will have shape (..., channels)
             self.output_dim = self.channels
 
     def build(self, input_shape):
@@ -237,12 +235,10 @@ class GATConv(GCNConv):
 
         return output, attn_coef
 
-    def compute_output_shape(self, input_shape):
-        output_shape = input_shape[0][:-1] + (self.output_dim,)
-        return output_shape
-
-    def get_config(self):
-        config = {
+    @property
+    def config(self):
+        return {
+            'channels': self.channels,
             'attn_heads': self.attn_heads,
             'concat_heads': self.concat_heads,
             'dropout_rate': self.dropout_rate,
@@ -251,9 +247,3 @@ class GATConv(GCNConv):
             'attn_kernel_regularizer': regularizers.serialize(self.attn_kernel_regularizer),
             'attn_kernel_constraint': constraints.serialize(self.attn_kernel_constraint),
         }
-        base_config = super().get_config()
-        return dict(list(base_config.items()) + list(config.items()))
-
-    @staticmethod
-    def preprocess(a):
-        return a

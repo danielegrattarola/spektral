@@ -90,6 +90,16 @@ OP_DICT = {
 }
 
 
+def serialize_scatter(identifier):
+    if identifier in OP_DICT:
+        return identifier
+    elif hasattr(identifier, '__name__'):
+        for k, v in OP_DICT.items():
+            if v.__name__ == identifier.__name__:
+                return k
+        return None
+
+
 def deserialize_scatter(scatter):
     if isinstance(scatter, str):
         if scatter in OP_DICT:

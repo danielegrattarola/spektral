@@ -47,8 +47,8 @@ class AGNNConv(MessagePassing):
     - `activation`: activation function to use;
     """
 
-    def __init__(self, trainable=True, activation=None, **kwargs):
-        super().__init__(aggregate='sum', activation=activation, **kwargs)
+    def __init__(self, trainable=True, aggregate='sum', activation=None, **kwargs):
+        super().__init__(aggregate=aggregate, activation=activation, **kwargs)
         self.trainable = trainable
 
     def build(self, input_shape):
@@ -77,11 +77,8 @@ class AGNNConv(MessagePassing):
 
         return alpha * x_j
 
-    def get_config(self):
-        config = {
+    @property
+    def config(self):
+        return {
             'trainable': self.trainable,
         }
-        base_config = super().get_config()
-        base_config.pop('aggregate')  # Remove it because it's defined by constructor
-
-        return {**base_config, **config}

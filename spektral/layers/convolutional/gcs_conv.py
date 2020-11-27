@@ -1,11 +1,11 @@
 from tensorflow.keras import backend as K
 
 from spektral.layers import ops
-from spektral.layers.convolutional.gcn_conv import GCNConv
+from spektral.layers.convolutional.conv import Conv
 from spektral.utils import normalized_adjacency
 
 
-class GCSConv(GCNConv):
+class GCSConv(Conv):
     r"""
     A simple convolutional layer with a skip connection.
 
@@ -55,8 +55,7 @@ class GCSConv(GCNConv):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        super().__init__(channels,
-                         activation=activation,
+        super().__init__(activation=activation,
                          use_bias=use_bias,
                          kernel_initializer=kernel_initializer,
                          bias_initializer=bias_initializer,
@@ -66,6 +65,7 @@ class GCSConv(GCNConv):
                          kernel_constraint=kernel_constraint,
                          bias_constraint=bias_constraint,
                          **kwargs)
+        self.channels = channels
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
@@ -104,6 +104,12 @@ class GCSConv(GCNConv):
         if self.activation is not None:
             output = self.activation(output)
         return output
+
+    @property
+    def config(self):
+        return {
+            'channels': self.channels
+        }
 
     @staticmethod
     def preprocess(a):

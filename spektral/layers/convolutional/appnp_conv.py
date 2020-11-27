@@ -3,10 +3,11 @@ from tensorflow.keras.layers import Dropout, Dense
 from tensorflow.keras.models import Sequential
 
 from spektral.layers import ops
-from spektral.layers.convolutional.gcn_conv import GCNConv
+from spektral.layers.convolutional.conv import Conv
+from spektral.utils import gcn_filter
 
 
-class APPNPConv(GCNConv):
+class APPNPConv(Conv):
     r"""
     The APPNP operator from the paper
 
@@ -72,8 +73,7 @@ class APPNPConv(GCNConv):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        super().__init__(channels,
-                         activation=activation,
+        super().__init__(activation=activation,
                          use_bias=use_bias,
                          kernel_initializer=kernel_initializer,
                          bias_initializer=bias_initializer,
@@ -83,6 +83,7 @@ class APPNPConv(GCNConv):
                          kernel_constraint=kernel_constraint,
                          bias_constraint=bias_constraint,
                          **kwargs)
+        self.channels = channels
         self.mlp_hidden = mlp_hidden if mlp_hidden else []
         self.alpha = alpha
         self.propagations = propagations
@@ -101,41 +102,34 @@ class APPNPConv(GCNConv):
         )
         mlp_layers = []
         for i, channels in enumerate(self.mlp_hidden):
-            mlp_layers.extend([
-                Dropout(self.dropout_rate),
-                Dense(channels, self.mlp_activation, **layer_kwargs)
-            ])
-        mlp_layers.append(
-            Dense(self.channels, 'linear', **layer_kwargs)
-        )
+            mlp_layers.extend([Dropout(self.dropout_rate),
+                               Dense(channels, self.mlp_activation, **layer_kwargs)])
+        mlp_layers.append(Dense(self.channels, 'linear', **layer_kwargs))
         self.mlp = Sequential(mlp_layers)
         self.built = True
 
     def call(self, inputs):
-        features = inputs[0]
-        fltr = inputs[1]
+        x, a = inputs
 
-        # Compute MLP hidden features
-        mlp_out = self.mlp(features)
-
-        # Propagation
+        mlp_out = self.mlp(x)
         z = mlp_out
         for k in range(self.propagations):
-            z = (1 - self.alpha) * ops.filter_dot(fltr, z) + self.alpha * mlp_out
+            z = (1 - self.alpha) * ops.filter_dot(a, z) + self.alpha * mlp_out
+        output = self.activation(z)
 
-        if self.activation is not None:
-            output = self.activation(z)
-        else:
-            output = z
         return output
 
-    def get_config(self):
-        config = {
+    @property
+    def config(self):
+        return {
+            'channels': self.channels,
             'alpha': self.alpha,
             'propagations': self.propagations,
             'mlp_hidden': self.mlp_hidden,
             'mlp_activation': activations.serialize(self.mlp_activation),
             'dropout_rate': self.dropout_rate,
         }
-        base_config = super().get_config()
-        return dict(list(base_config.items()) + list(config.items()))
+
+    @staticmethod
+    def preprocess(a):
+        return gcn_filter(a)

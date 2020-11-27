@@ -16,8 +16,8 @@ x = [[1, 0],
 the corresponding target will be [1, 0].
 """
 
-import networkx as nx
 import numpy as np
+import scipy.sparse as sp
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense
 from tensorflow.keras.losses import CategoricalCrossentropy
@@ -33,10 +33,10 @@ from spektral.transforms.normalize_adj import NormalizeAdj
 ################################################################################
 # PARAMETERS
 ################################################################################
-learning_rate = 1e-3       # Learning rate
-epochs = 500               # Number of training epochs
+learning_rate = 1e-2       # Learning rate
+epochs = 400               # Number of training epochs
 es_patience = 10           # Patience for early stopping
-batch_size = 16            # Batch size
+batch_size = 32            # Batch size
 
 
 ################################################################################
@@ -50,7 +50,7 @@ class MyDataset(Dataset):
     The graphs have `n_colors` colors, of at least `n_min` and at most `n_max`
     nodes connected with probability `p`.
     """
-    def __init__(self, n_samples, n_colors=3, n_min=10, n_max=100, p=0.5, **kwargs):
+    def __init__(self, n_samples, n_colors=3, n_min=10, n_max=100, p=0.1, **kwargs):
         self.n_samples = n_samples
         self.n_colors = n_colors
         self.n_min = n_min
@@ -68,7 +68,9 @@ class MyDataset(Dataset):
             x[np.arange(n), colors] = 1
 
             # Edges
-            a = nx.adj_matrix(nx.generators.gnp_random_graph(n, self.p))
+            a = np.random.rand(n, n) <= self.p
+            a = np.maximum(a, a.T).astype(int)
+            a = sp.csr_matrix(a)
 
             # Labels
             y = np.zeros((self.n_colors, ))
@@ -149,10 +151,7 @@ def evaluate(loader, ops_list):
 
 
 print('Fitting model')
-current_batch = 0
-epoch = 0
-model_loss = 0
-model_acc = 0
+current_batch = epoch = model_loss = model_acc = 0
 best_val_loss = np.inf
 best_weights = None
 patience = es_patience

@@ -50,6 +50,7 @@ class TAGConv(MessagePassing):
     def __init__(self,
                  channels,
                  K=3,
+                 aggregate='sum',
                  activation=None,
                  use_bias=True,
                  kernel_initializer='glorot_uniform',
@@ -60,7 +61,7 @@ class TAGConv(MessagePassing):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        super().__init__(aggregate='sum',
+        super().__init__(aggregate=aggregate,
                          activation=activation,
                          use_bias=use_bias,
                          kernel_initializer=kernel_initializer,
@@ -71,7 +72,7 @@ class TAGConv(MessagePassing):
                          kernel_constraint=kernel_constraint,
                          bias_constraint=bias_constraint,
                          **kwargs)
-        self.channels = self.output_dim = channels
+        self.channels = channels
         self.K = K
         self.linear = Dense(channels,
                             activation=activation,
@@ -103,13 +104,11 @@ class TAGConv(MessagePassing):
         x_j = self.get_j(x)
         return edge_weight[:, None] * x_j
 
-    def get_config(self):
-        config = {
+    @property
+    def config(self):
+        return{
             'channels': self.channels,
         }
-        base_config = super().get_config()
-        base_config.pop('aggregate')  # Remove it because it's defined by constructor
-        return {**base_config, **config}
 
     @staticmethod
     def preprocess(a):

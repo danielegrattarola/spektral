@@ -54,6 +54,7 @@ class EdgeConv(MessagePassing):
                  channels,
                  mlp_hidden=None,
                  mlp_activation='relu',
+                 aggregate='sum',
                  activation=None,
                  use_bias=True,
                  kernel_initializer='glorot_uniform',
@@ -64,7 +65,7 @@ class EdgeConv(MessagePassing):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        super().__init__(aggregate='sum',
+        super().__init__(aggregate=aggregate,
                          activation=activation,
                          use_bias=use_bias,
                          kernel_initializer=kernel_initializer,
@@ -75,7 +76,7 @@ class EdgeConv(MessagePassing):
                          kernel_constraint=kernel_constraint,
                          bias_constraint=bias_constraint,
                          **kwargs)
-        self.channels = self.output_dim = channels
+        self.channels = channels
         self.mlp_hidden = mlp_hidden if mlp_hidden else []
         self.mlp_activation = activations.get(mlp_activation)
 
@@ -102,12 +103,10 @@ class EdgeConv(MessagePassing):
         x_j = self.get_j(x)
         return self.mlp(K.concatenate((x_i, x_j - x_i)))
 
-    def get_config(self):
-        config = {
+    @property
+    def config(self):
+        return {
             'channels': self.channels,
             'mlp_hidden': self.mlp_hidden,
             'mlp_activation': self.mlp_activation
         }
-        base_config = super().get_config()
-        base_config.pop('aggregate')  # Remove it because it's defined by constructor
-        return {**base_config, **config}

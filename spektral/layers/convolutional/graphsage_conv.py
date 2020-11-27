@@ -75,7 +75,7 @@ class GraphSageConv(MessagePassing):
                          kernel_constraint=kernel_constraint,
                          bias_constraint=bias_constraint,
                          **kwargs)
-        self.channels = self.output_dim = channels
+        self.channels = channels
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
@@ -111,13 +111,8 @@ class GraphSageConv(MessagePassing):
 
         return output
 
-    def get_config(self):
-        config = {
+    @property
+    def config(self):
+        return{
             'channels': self.channels
         }
-        base_config = super().get_config()
-        return dict(list(base_config.items()) + list(config.items()))
-
-    @staticmethod
-    def preprocess(a):
-        return a
