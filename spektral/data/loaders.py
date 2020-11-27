@@ -201,15 +201,17 @@ class SingleLoader(Loader):
     def collate(self, batch):
         graph = batch[0]
         output = graph.numpy()
-        output = [output[:-1], output[-1]]
 
         # Sparse matrices to SparseTensors
+        output = list(output)
         for i in range(len(output)):
             if sp.issparse(output[i]):
                 output[i] = sp_matrix_to_sp_tensor(output[i])
+        output = tuple(output)
 
+        output = (output[:-1], output[-1])
         if self.sample_weights is not None:
-            output += [self.sample_weights]
+            output += (self.sample_weights, )
         return tuple(output)
 
     def load(self):

@@ -79,8 +79,8 @@ class Graph:
         return key in self.keys
 
     def __repr__(self):
-        return 'Graph(n_nodes={}, n_node_features={}, n_edge_features={}, y={})'\
-               .format(self.n_nodes, self.n_node_features, self.n_edge_features, self.y)
+        return 'Graph(n_nodes={}, n_node_features={}, n_edge_features={}, n_labels={})'\
+               .format(self.n_nodes, self.n_node_features, self.n_edge_features, self.n_labels)
 
     @property
     def n_nodes(self):
