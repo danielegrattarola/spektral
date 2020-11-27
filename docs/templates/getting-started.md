@@ -107,7 +107,8 @@ Since this is a fairly common operation, Spektral has a transform to do it:
 >>> dataset.apply(GCNFilter())
 ```
 
-Many layers will require you to do some form of preprocessing. If you don't want to go back to the literature every time, you can use the handy [`LayerPreprocess` transform](/transforms/#layerpreprocess).
+Many layers will require you to do some form of preprocessing. If you don't want to go back to the literature every time, every convolutional layer in Spektral has a `preprocess(a)` method that you can use to transform the adjacency matrix as needed. <br>
+Have a look at the handy [`LayerPreprocess` transform](/transforms/#layerpreprocess).
 
 
 ## Creating a GNN

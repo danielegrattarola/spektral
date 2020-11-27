@@ -17,11 +17,6 @@ class ECCConv(Conv):
 
     **Mode**: single, disjoint, batch.
 
-    **Notes**:
-
-        - In single mode, if the adjacency matrix is dense it will be converted
-        to a SparseTensor automatically (which is an expensive operation).
-
     This layer computes:
     $$
         \x_i' = \x_{i} \W_{\textrm{root}} + \sum\limits_{j \in \mathcal{N}(i)}
@@ -29,6 +24,9 @@ class ECCConv(Conv):
     $$
     where \(\textrm{MLP}\) is a multi-layer perceptron that outputs an
     edge-specific weight as a function of edge attributes.
+
+    **Note:** In single mode, if the adjacency matrix is dense it will be
+    converted to a SparseTensor automatically (which is an expensive operation).
 
     **Input**
 

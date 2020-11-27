@@ -14,6 +14,8 @@ class APPNPConv(Conv):
     > [Predict then Propagate: Graph Neural Networks meet Personalized PageRank](https://arxiv.org/abs/1810.05997)<br>
     > Johannes Klicpera et al.
 
+    **Mode**: single, disjoint, mixed, batch.
+
     This layer computes:
     $$
         \Z^{(0)} = \textrm{MLP}(\X); \\
@@ -22,8 +24,6 @@ class APPNPConv(Conv):
     $$
     where \(\alpha\) is the teleport probability, \(\textrm{MLP}\) is a
     multi-layer perceptron, and \(K\) is defined by the `propagations` argument.
-
-    **Mode**: single, disjoint, mixed, batch.
 
     **Input**
 

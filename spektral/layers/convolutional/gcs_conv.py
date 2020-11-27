@@ -7,7 +7,7 @@ from spektral.utils import normalized_adjacency
 
 class GCSConv(Conv):
     r"""
-    A simple convolutional layer with a skip connection.
+    A `GraphConv` layer with a trainable skip connection.
 
     **Mode**: single, disjoint, mixed, batch.
 
@@ -15,7 +15,7 @@ class GCSConv(Conv):
     $$
         \Z' = \D^{-1/2} \A \D^{-1/2} \X \W_1 + \X \W_2 + \b
     $$
-    where \( \A \) does not have self-loops (unlike in GraphConv).
+    where \( \A \) does not have self-loops.
 
     **Input**
 

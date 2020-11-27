@@ -2,7 +2,7 @@
 
 Creating mini-batches of data can be tricky when the samples have different shapes. 
 
-In traditional neural networks, we're used to stretching, cropping, or padding our data so that the inputs are standardized. 
+In traditional neural networks, we're used to stretching, cropping, or padding our data so that all inputs to our models are standardized. 
 For instance, images of different sizes can be modified so that they fit into a tensor of shape `[batch, width, height, channels]`.
 Sequences can be padded so that they have shape `[batch, time, channels]`. And so on...
 
