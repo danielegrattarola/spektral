@@ -12,7 +12,7 @@ class ECCConv(Conv):
     An edge-conditioned convolutional layer (ECC) from the paper
 
     > [Dynamic Edge-Conditioned Filters in Convolutional Neural Networks on
-  Graphs](1704.02901)<br>
+  Graphs](https://arxiv.org/abs/1704.02901)<br>
     > Martin Simonovsky and Nikos Komodakis
 
     **Mode**: single, disjoint, batch.
