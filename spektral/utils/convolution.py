@@ -166,8 +166,7 @@ def chebyshev_filter(A, k, symmetric=True):
     in [Defferrard et at. (2016)](https://arxiv.org/abs/1606.09375).
     :param A: rank 2 array or sparse matrix;
     :param k: integer, the order of the Chebyshev polynomial;
-    :param symmetric: boolean, whether to normalize the 
-    matrix as
+    :param symmetric: boolean, whether to normalize the matrix as
     \(\D^{-\frac{1}{2}}\A\D^{-\frac{1}{2}}\) or as \(\D^{-1}\A\);
     :return: a list of k + 1 arrays or sparse matrices with one element for each
     degree of the polynomial.
