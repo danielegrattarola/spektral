@@ -44,7 +44,7 @@ class AGNNConv(MessagePassing):
 
     - `trainable`: boolean, if True, then beta is a trainable parameter.
     Otherwise, beta is fixed to 1;
-    - `activation`: activation function to use;
+    - `activation`: activation function;
     """
 
     def __init__(self, trainable=True, aggregate='sum', activation=None, **kwargs):
@@ -72,7 +72,7 @@ class AGNNConv(MessagePassing):
         x_norm_i = self.get_i(x_norm)
         x_norm_j = self.get_j(x_norm)
         alpha = self.beta * tf.reduce_sum(x_norm_i * x_norm_j, axis=-1)
-        alpha = ops.unsorted_segment_softmax(alpha, self.index_i, self.N)
+        alpha = ops.unsorted_segment_softmax(alpha, self.index_i, self.n_nodes)
         alpha = alpha[:, None]
 
         return alpha * x_j

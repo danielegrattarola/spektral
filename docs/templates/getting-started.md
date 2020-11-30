@@ -60,7 +60,7 @@ Datasets also provide methods for applying **transforms** to each data:
 - `map(transform)` - returns a list obtained by applying the `transform` to each graph;
 - `filter(function)` - removes from the dataset any graph for which `function(graph)` is `False`. This is also an in-place operation.
 
-For exampe, let's modify our dataset so that we only have graphs with less than 500 nodes:
+For example, let's modify our dataset so that we only have graphs with less than 500 nodes:
 
 ```python
 >>> dataset.filter(lambda g: g.n_nodes < 500)
@@ -225,7 +225,7 @@ print('Test loss: {}'.format(loss))
 
 ## Node-level learning
 
-Besides learning to predict labels for the whole graph, like in this tutorial, GNNs are very effective at learning to predict labels for each individual node. This is called "node-level learning" and we usually do it for datasets with one big graph (think a social network).
+Besides learning to predict labels for the whole graph, like in this tutorial, GNNs are very effective at learning to predict labels for each node. This is called "node-level learning" and we usually do it for datasets with one big graph (think a social network).
 
 For example, reproducing the results of the [GCN paper for classifying nodes in a citation network](https://arxiv.org/abs/1609.02907) can be done with `GCNConv` layers, the `Citation` dataset, and a `SingleLoader`: check out [this example](https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_gcn.py).
 

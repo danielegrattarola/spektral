@@ -36,7 +36,7 @@ class TAGConv(MessagePassing):
     - `channels`: integer, number of output channels;
     - `K`: the order of the layer (i.e., the layer will consider a K-hop
     neighbourhood for each node);
-    - `activation`: activation function to use;
+    - `activation`: activation function;
     - `use_bias`: bool, add a bias vector to the output;
     - `kernel_initializer`: initializer for the weights;
     - `bias_initializer`: initializer for the bias vector;

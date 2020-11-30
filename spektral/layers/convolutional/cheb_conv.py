@@ -47,7 +47,7 @@ class ChebConv(Conv):
 
     - `channels`: number of output channels;
     - `K`: order of the Chebyshev polynomials;
-    - `activation`: activation function to use;
+    - `activation`: activation function;
     - `use_bias`: bool, add a bias vector to the output;
     - `kernel_initializer`: initializer for the weights;
     - `bias_initializer`: initializer for the bias vector;

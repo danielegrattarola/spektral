@@ -62,7 +62,7 @@ class GeneralConv(MessagePassing):
     - `dropout`: float, dropout rate;
     - `aggregate`: string or callable, an aggregation function. Supported
     aggregations: 'sum', 'mean', 'max', 'min', 'prod'.
-    - `activation`: activation function to use. This layer also supports the
+    - `activation`: activation function. This layer also supports the
     advanced activation PReLU by passing `activation='prelu'`.
     - `use_bias`: bool, add a bias vector to the output;
     - `kernel_initializer`: initializer for the weights;

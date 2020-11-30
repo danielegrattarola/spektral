@@ -4,7 +4,7 @@ This is a collection of additional material about Spektral.
 
 ## Paper
 
-We have presented the library at the ICML 2020 workshop "Graph Representation Learning and Beyond".
+We presented the library at the ICML 2020 workshop "Graph Representation Learning and Beyond".
 
 Paper: 
 

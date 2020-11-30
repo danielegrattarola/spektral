@@ -27,7 +27,7 @@ In all data modes, our goal is to represent one or more graphs by grouping their
 |:---------|:--|:--|:--|
 |`Single`  |`[nodes, nodes]`|`[nodes, n_feat]`|`[edges, e_feat]`|
 |`Disjoint`|`[nodes, nodes]`|`[nodes, n_feat]`|`[edges, e_feat]`|
-|`Batch`   |`[batch, n_max, n_max]`|`[batch, n_max, n_feat]`|`[batch, n_max, n_max, e_feat]`|
+|`Batch`   |`[batch, nodes, nodes]`|`[batch, nodes, nodes]`|`[batch, nodes, nodes, e_feat]`|
 |`Mixed`   |`[nodes, nodes]`|`[batch, nodes, n_feat]`| `n/a` |
 
 In the following sections we describe the four modes more into detail.
@@ -87,7 +87,7 @@ In disjoint mode we represent a set of graphs as a single graph, their "disjoint
 
 The shapes of the three matrices are the same as single mode, but `nodes` is the number of all the nodes in the set of graphs. 
 
-In order to keep track of the different graphs in the disjoint union, we use an additional array of zero-based indices `I` that identify which nodes belong to which graph. 
+To keep track of the different graphs in the disjoint union, we use an additional array of zero-based indices `I` that identify which nodes belong to which graph. 
 For instance: if node 8 belongs to the third graph, we will have `I[8] == 2`. <br>
 In the example above, color blue represents 0, green is 1, and orange is 2
 
@@ -136,7 +136,7 @@ Since Loaders are effectively generators, we can inspect the first batch that th
 (79, )
 ```
 
-Note that, since we don't have edge attributes in our datset, the loader did not create the `E` matrix.
+Note that, since we don't have edge attributes in our dataset, the loader did not create the `E` matrix.
 
 
 
@@ -186,7 +186,7 @@ In mixed mode we have a single graph that acts as the support for different node
 In this case we have that: 
 
 - `A` is a matrix of shape `[node, node]`;
-- `X` is a tensor in batch mode, of shape `[batch, node, n_feat)`;
+- `X` is a tensor in batch mode, of shape `[batch, node, n_feat]`;
 
 Currently, there are no layers in Spektral that support mixed mode and edge attributes. 
 
