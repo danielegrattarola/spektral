@@ -39,7 +39,7 @@ class GraphSageConv(MessagePassing):
     - `channels`: number of output channels;
     - `aggregate_op`: str, aggregation method to use (`'sum'`, `'mean'`,
     `'max'`, `'min'`, `'prod'`);
-    - `activation`: activation function to use;
+    - `activation`: activation function;
     - `use_bias`: bool, add a bias vector to the output;
     - `kernel_initializer`: initializer for the weights;
     - `bias_initializer`: initializer for the bias vector;

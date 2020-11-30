@@ -41,7 +41,7 @@ class GatedGraphConv(MessagePassing):
 
     - `channels`: integer, number of output channels;
     - `n_layers`: integer, number of iterations with the GRU cell;
-    - `activation`: activation function to use;
+    - `activation`: activation function;
     - `use_bias`: bool, add a bias vector to the output;
     - `kernel_initializer`: initializer for the weights;
     - `bias_initializer`: initializer for the bias vector;

@@ -50,10 +50,10 @@ class ARMAConv(Conv):
     stacks in the layer;
     - `iterations`: number of iterations to compute each ARMA\(_1\) approximation;
     - `share_weights`: share the weights in each ARMA\(_1\) stack.
-    - `gcn_activation`: activation function to use to compute each ARMA\(_1\)
+    - `gcn_activation`: activation function to compute each ARMA\(_1\)
     stack;
     - `dropout_rate`: dropout rate for skip connection;
-    - `activation`: activation function to use;
+    - `activation`: activation function;
     - `use_bias`: bool, add a bias vector to the output;
     - `kernel_initializer`: initializer for the weights;
     - `bias_initializer`: initializer for the bias vector;

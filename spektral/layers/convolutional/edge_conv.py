@@ -39,7 +39,7 @@ class EdgeConv(MessagePassing):
     - `mlp_hidden`: list of integers, number of hidden units for each hidden
     layer in the MLP (if None, the MLP has only the output layer);
     - `mlp_activation`: activation for the MLP layers;
-    - `activation`: activation function to use;
+    - `activation`: activation function;
     - `use_bias`: bool, add a bias vector to the output;
     - `kernel_initializer`: initializer for the weights;
     - `bias_initializer`: initializer for the bias vector;

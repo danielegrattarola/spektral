@@ -1,6 +1,6 @@
 # Examples
 
-This is a collection of examples that you can use as template to solve your own tasks. 
+This is a collection of examples that you can use as template for your projects. 
 
 ## Node-level prediction
 

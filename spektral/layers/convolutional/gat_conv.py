@@ -59,7 +59,7 @@ class GATConv(Conv):
     - `dropout_rate`: internal dropout rate for attention coefficients;
     - `return_attn_coef`: if True, return the attention coefficients for
     the given input (one n_nodes x n_nodes matrix for each head).
-    - `activation`: activation function to use;
+    - `activation`: activation function;
     - `use_bias`: bool, add a bias vector to the output;
     - `kernel_initializer`: initializer for the weights;
     - `attn_kernel_initializer`: initializer for the attention weights;

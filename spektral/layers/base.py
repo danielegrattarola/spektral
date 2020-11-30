@@ -100,7 +100,7 @@ class InnerProduct(Layer):
 
     :param trainable_kernel: add a trainable square matrix between the inner
     product (e.g., `X @ W @ X.T`);
-    :param activation: activation function to use;
+    :param activation: activation function;
     :param kernel_initializer: initializer for the weights;
     :param kernel_regularizer: regularization applied to the kernel;
     :param kernel_constraint: constraint applied to the kernel;
@@ -183,7 +183,7 @@ class MinkowskiProduct(Layer):
     :param input_dim_1: first dimension of the input Tensor; set this if you
     encounter issues with shapes in your model, in order to provide an explicit
     output shape for your layer.
-    :param activation: activation function to use;
+    :param activation: activation function;
     """
 
     def __init__(self,

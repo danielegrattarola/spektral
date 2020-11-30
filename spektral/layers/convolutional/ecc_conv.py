@@ -47,7 +47,7 @@ class ECCConv(Conv):
     the kernel-generating network;
     - 'root': if False, the layer will not consider the root node for computing
     the message passing (first term in equation above), but only the neighbours.
-    - `activation`: activation function to use;
+    - `activation`: activation function;
     - `use_bias`: bool, add a bias vector to the output;
     - `kernel_initializer`: initializer for the weights;
     - `bias_initializer`: initializer for the bias vector;

@@ -31,13 +31,13 @@ nav:
 - Tutorials:
     - Getting started: getting-started.md
     - Data modes: data-modes.md
-    - Creating a Dataset: creating-dataset.md
-    - Creating a Layer: creating-layer.md
+    - Creating a dataset: creating-dataset.md
+    - Creating a layer: creating-layer.md
     - Examples: examples.md
 - Layers:
-    - Convolutional Layers: layers/convolution.md
-    - Pooling Layers: layers/pooling.md
-    - Base Layers: layers/base.md
+    - Convolutional layers: layers/convolution.md
+    - Pooling layers: layers/pooling.md
+    - Base layers: layers/base.md
     - Models: models.md
 - Data:
     - Containers: data.md

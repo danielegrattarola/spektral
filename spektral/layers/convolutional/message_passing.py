@@ -49,7 +49,8 @@ class MessagePassing(Layer):
     Any extra keyword argument of this function will be populated by
     `propagate()` if a matching keyword is found. <br>
     Use `self.get_i()` and  `self.get_j()` to gather the elements using the
-    indices `i` or `j` of the adjacency matrix.
+    indices `i` or `j` of the adjacency matrix. Equivalently, you can access
+    the indices themselves via the `index_i` and `index_j` attributes.
 
     ```python
     aggregate(messages, **kwargs)
@@ -102,7 +103,7 @@ class MessagePassing(Layer):
         self.built = True
 
     def propagate(self, x, a, e=None, **kwargs):
-        self.N = tf.shape(x)[0]
+        self.n_nodes = tf.shape(x)[0]
         self.index_i = a.indices[:, 1]
         self.index_j = a.indices[:, 0]
 
@@ -124,7 +125,7 @@ class MessagePassing(Layer):
         return self.get_j(x)
 
     def aggregate(self, messages, **kwargs):
-        return self.agg(messages, self.index_i, self.N)
+        return self.agg(messages, self.index_i, self.n_nodes)
 
     def update(self, embeddings, **kwargs):
         return embeddings

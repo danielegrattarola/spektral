@@ -26,12 +26,12 @@ class Dataset:
     Datasets have the following properties that automatically computed from the
     graphs:
 
-        - `n_nodes`: the number of nodes in the dataset (returns `None` if the number
-        changes between graphs);
-        - `n_node_features`: the size of the node features (returns `None` if the size changes
-        between graphs or is not defined);
-        - `n_edge_features`: the size of the edge features (returns `None` if the size changes
-        between graphs or is not defined);
+        - `n_nodes`: the number of nodes in the dataset (returns `None` if the
+        number changes between graphs);
+        - `n_node_features`: the size of the node features (returns `None` if
+        the size changes between graphs or is not defined);
+        - `n_edge_features`: the size of the edge features (returns `None` if
+        the size changes between graphs or is not defined);
         - `n_labels`: the size of the labels (returns `None` if the size changes
         between graphs or is not defined); this is computed as the innermost
         dimension of the labels (i.e., `y.shape[-1]`).
@@ -51,12 +51,12 @@ class Dataset:
     - `map(transform, reduce=None)`: returns a list containing the output
     of `transform(graph)` for each graph. If `reduce` is a `callable`, then
     returns `reduce(output_list)` instead of just `output_list`.
-    For instance: `map(lambda: g.n_nodes, reduce=np.mean)` will return the average
-    number of nodes in the dataset.
+    For instance: `map(lambda: g.n_nodes, reduce=np.mean)` will return the
+    average number of nodes in the dataset.
     - `filter(function)`: removes from the dataset any graph for which
     `function(graph)` returns `False`.
-    For example: `filter(lambda: g.n_nodes < 100)` removes from the dataset all graphs
-    bigger than 100 nodes.
+    For example: `filter(lambda: g.n_nodes < 100)` removes from the dataset all
+    graphs bigger than 100 nodes.
 
     You can extend this class to create your own dataset.
     To create a `Dataset`, you must implement the `Dataset.read()` method, which
