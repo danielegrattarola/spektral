@@ -70,8 +70,7 @@ To install Spektral on [Google Colab](https://colab.research.google.com/):
 
 The 1.0 release of Spektral is an important milestone for the library and brings many new features and improvements. 
 
-If you have already used Spektral in your projects, the only major change that you need to be aware of is in the `datasets` API.
-Your models will continue to work in exactly the same way.
+If you have already used Spektral in your projects, the only major change that you need to be aware of is the new `datasets` API.
 
 This is a summary of the new features and changes: 
 
