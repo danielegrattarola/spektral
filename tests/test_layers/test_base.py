@@ -11,7 +11,7 @@ def test_Disjoint2Batch():
     A_row = [0, 1, 2, 3, 4]
     A_col = [1, 0, 1, 4, 3]
     A = ops.sp_matrix_to_sp_tensor(
-        sp.coo_matrix((A_data, (A_row, A_col)), shape=(5, 5))
+        sp.csr_matrix((A_data, (A_row, A_col)), shape=(5, 5))
     )
 
     expected_X = np.array([[[1., 0.],

@@ -2,9 +2,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras import Model, Input
 
-from spektral.layers import GraphConv, ChebConv, EdgeConditionedConv, GraphAttention, \
-    GraphConvSkip, ARMAConv, APPNP, GraphSageConv, GINConv, DiffusionConv, \
-    GatedGraphConv, AGNNConv, TAGConv, CrystalConv, MessagePassing, EdgeConv
+from spektral import layers
 from spektral.layers.ops import sp_matrix_to_sp_tensor
 
 tf.keras.backend.set_floatx('float64')
@@ -55,89 +53,94 @@ The loop will check:
 
 TESTS = [
     {
-        LAYER_K_: GraphConv,
+        LAYER_K_: layers.GCNConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
         KWARGS_K_: {'channels': 8, 'activation': 'relu', 'sparse': [False, True]},
     },
     {
-        LAYER_K_: ChebConv,
+        LAYER_K_: layers.ChebConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
         KWARGS_K_: {'K': 3, 'channels': 8, 'activation': 'relu', 'sparse': [False, True]}
     },
     {
-        LAYER_K_: GraphSageConv,
+        LAYER_K_: layers.GraphSageConv,
         MODES_K_: [SINGLE],
-        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'sparse': [False, True]}
+        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'sparse': [True]}
     },
     {
-        LAYER_K_: EdgeConditionedConv,
+        LAYER_K_: layers.ECCConv,
         MODES_K_: [SINGLE, BATCH],
         KWARGS_K_: {'kernel_network': [8], 'channels': 8, 'activation': 'relu',
                     'edges': True, 'sparse': [False, True]}
     },
     {
-        LAYER_K_: GraphAttention,
+        LAYER_K_: layers.GATConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
         KWARGS_K_: {'channels': 8, 'attn_heads': 2, 'concat_heads': False,
                     'activation': 'relu', 'sparse': [False, True]}
     },
     {
-        LAYER_K_: GraphConvSkip,
+        LAYER_K_: layers.GCSConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
         KWARGS_K_: {'channels': 8, 'activation': 'relu', 'sparse': [False, True]}
     },
     {
-        LAYER_K_: ARMAConv,
+        LAYER_K_: layers.ARMAConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
         KWARGS_K_: {'channels': 8, 'activation': 'relu', 'order': 2, 'iterations': 2,
                     'share_weights': True, 'sparse': [False, True]}
     },
     {
-        LAYER_K_: APPNP,
+        LAYER_K_: layers.APPNPConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
         KWARGS_K_: {'channels': 8, 'activation': 'relu', 'mlp_hidden': [16],
                     'sparse': [False, True]}
     },
     {
-        LAYER_K_: GINConv,
+        LAYER_K_: layers.GINConv,
         MODES_K_: [SINGLE],
         KWARGS_K_: {'channels': 8, 'activation': 'relu', 'mlp_hidden': [16],
                     'sparse': [True]}
     },
     {
-        LAYER_K_: DiffusionConv,
+        LAYER_K_: layers.DiffusionConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
         KWARGS_K_: {'channels': 8, 'activation': 'tanh', 'num_diffusion_steps': 5,
                     'sparse': [False]}
     },
     {
-        LAYER_K_: GatedGraphConv,
+        LAYER_K_: layers.GatedGraphConv,
         MODES_K_: [SINGLE],
         KWARGS_K_: {'channels': 10, 'n_layers': 3, 'sparse': [True]}
     },
     {
-        LAYER_K_: AGNNConv,
+        LAYER_K_: layers.AGNNConv,
         MODES_K_: [SINGLE],
         KWARGS_K_: {'channels': F, 'trainable': True, 'sparse': [True]}
     },
     {
-        LAYER_K_: TAGConv,
+        LAYER_K_: layers.TAGConv,
         MODES_K_: [SINGLE],
         KWARGS_K_: {'channels': F, 'K': 3, 'sparse': [True]}
     },
     {
-        LAYER_K_: CrystalConv,
+        LAYER_K_: layers.CrystalConv,
         MODES_K_: [SINGLE],
         KWARGS_K_: {'channels': F, 'edges': True, 'sparse': [True]}
     },
     {
-        LAYER_K_: EdgeConv,
+        LAYER_K_: layers.EdgeConv,
         MODES_K_: [SINGLE],
         KWARGS_K_: {'channels': 8, 'activation': 'relu', 'mlp_hidden': [16],
                     'sparse': [True]}
     },
     {
-        LAYER_K_: MessagePassing,
+        LAYER_K_: layers.GeneralConv,
+        MODES_K_: [SINGLE],
+        KWARGS_K_: {'channels': 256, 'sparse': [True]}
+    },
+    {
+        LAYER_K_: layers.MessagePassing,
         MODES_K_: [SINGLE],
         KWARGS_K_: {'channels': F, 'sparse': [True]}
     },
@@ -217,7 +220,17 @@ def _test_get_config(layer, **kwargs):
         kwargs.pop('edges')
     layer_instance = layer(**kwargs)
     config = layer_instance.get_config()
-    assert layer(**config)
+    layer_instance_new = layer(**config)
+    config_new = layer_instance_new.get_config()
+    config.pop('name')
+    config_new.pop('name')
+
+    # Remove 'name' if we have advanced activations (needed for GeneralConv)
+    if 'activation' in config and 'class_name' in config['activation']:
+        config['activation']['config'].pop('name')
+        config_new['activation']['config'].pop('name')
+
+    assert config_new == config
 
 
 def test_layers():

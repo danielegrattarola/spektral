@@ -5,18 +5,19 @@ from spektral.layers.pooling.topk_pool import ops, TopKPool
 
 class SAGPool(TopKPool):
     r"""
-    A self-attention graph pooling layer as presented by
-    [Lee et al. (2019)](https://arxiv.org/abs/1904.08082).
+    A self-attention graph pooling layer (SAG) from the paper
+
+    > [Self-Attention Graph Pooling](https://arxiv.org/abs/1904.08082)<br>
+    > Junhyun Lee et al.
 
     **Mode**: single, disjoint.
 
     This layer computes the following operations:
-
     $$
-    \y = \textrm{GNN}(\A, \X); \;\;\;\;
-    \i = \textrm{rank}(\y, K); \;\;\;\;
-    \X' = (\X \odot \textrm{tanh}(\y))_\i; \;\;\;\;
-    \A' = \A_{\i, \i}
+        \y = \textrm{GNN}(\A, \X); \;\;\;\;
+        \i = \textrm{rank}(\y, K); \;\;\;\;
+        \X' = (\X \odot \textrm{tanh}(\y))_\i; \;\;\;\;
+        \A' = \A_{\i, \i}
     $$
 
     where \( \textrm{rank}(\y, K) \) returns the indices of the top K values of
@@ -33,16 +34,16 @@ class SAGPool(TopKPool):
 
     **Input**
 
-    - Node features of shape `(N, F)`;
-    - Binary adjacency matrix of shape `(N, N)`;
-    - Graph IDs of shape `(N, )` (only in disjoint mode);
+    - Node features of shape `(n_nodes, n_node_features)`;
+    - Binary adjacency matrix of shape `(n_nodes, n_nodes)`;
+    - Graph IDs of shape `(n_nodes, )` (only in disjoint mode);
 
     **Output**
 
-    - Reduced node features of shape `(ratio * N, F)`;
-    - Reduced adjacency matrix of shape `(ratio * N, ratio * N)`;
-    - Reduced graph IDs of shape `(ratio * N, )` (only in disjoint mode);
-    - If `return_mask=True`, the binary pooling mask of shape `(ratio * N, )`.
+    - Reduced node features of shape `(ratio * n_nodes, n_node_features)`;
+    - Reduced adjacency matrix of shape `(ratio * n_nodes, ratio * n_nodes)`;
+    - Reduced graph IDs of shape `(ratio * n_nodes, )` (only in disjoint mode);
+    - If `return_mask=True`, the binary pooling mask of shape `(ratio * n_nodes, )`.
 
     **Arguments**
 

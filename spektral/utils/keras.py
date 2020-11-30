@@ -6,10 +6,9 @@ KERAS_KWARGS = {'activity_regularizer', 'autocast', 'batch_input_shape',
 
 
 def is_layer_kwarg(key):
-    return (key.endswith('_initializer')
-            or key.endswith('_regularizer')
-            or key.endswith('_constraint')
-            or key in LAYER_KWARGS) and not key in KERAS_KWARGS
+    return (key not in KERAS_KWARGS and (key.endswith('_initializer')
+            or key.endswith('_regularizer') or key.endswith('_constraint')
+            or key in LAYER_KWARGS))
 
 
 def is_keras_kwarg(key):

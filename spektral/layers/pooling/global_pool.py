@@ -5,7 +5,7 @@ from tensorflow.keras.layers import Layer, Dense
 from spektral.layers import ops
 
 
-class GlobalPooling(Layer):
+class GlobalPool(Layer):
     def __init__(self, **kwargs):
 
         super().__init__(**kwargs)
@@ -50,7 +50,7 @@ class GlobalPooling(Layer):
         return super().get_config()
 
 
-class GlobalSumPool(GlobalPooling):
+class GlobalSumPool(GlobalPool):
     """
     A global sum pooling layer. Pools a graph by computing the sum of its node
     features.
@@ -59,13 +59,13 @@ class GlobalSumPool(GlobalPooling):
 
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
-    - Graph IDs of shape `(N, )` (only in disjoint mode);
+    - Node features of shape `([batch], n_nodes, n_node_features)`;
+    - Graph IDs of shape `(n_nodes, )` (only in disjoint mode);
 
     **Output**
 
-    - Pooled node features of shape `(batch, F)` (if single mode, shape will
-    be `(1, F)`).
+    - Pooled node features of shape `(batch, n_node_features)` (if single mode, shape will
+    be `(1, n_node_features)`).
 
     **Arguments**
 
@@ -79,7 +79,7 @@ class GlobalSumPool(GlobalPooling):
         self.batch_pooling_op = tf.reduce_sum
 
 
-class GlobalAvgPool(GlobalPooling):
+class GlobalAvgPool(GlobalPool):
     """
     An average pooling layer. Pools a graph by computing the average of its node
     features.
@@ -88,13 +88,13 @@ class GlobalAvgPool(GlobalPooling):
 
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
-    - Graph IDs of shape `(N, )` (only in disjoint mode);
+    - Node features of shape `([batch], n_nodes, n_node_features)`;
+    - Graph IDs of shape `(n_nodes, )` (only in disjoint mode);
 
     **Output**
 
-    - Pooled node features of shape `(batch, F)` (if single mode, shape will
-    be `(1, F)`).
+    - Pooled node features of shape `(batch, n_node_features)` (if single mode, shape will
+    be `(1, n_node_features)`).
 
     **Arguments**
 
@@ -108,7 +108,7 @@ class GlobalAvgPool(GlobalPooling):
         self.batch_pooling_op = tf.reduce_mean
 
 
-class GlobalMaxPool(GlobalPooling):
+class GlobalMaxPool(GlobalPool):
     """
     A max pooling layer. Pools a graph by computing the maximum of its node
     features.
@@ -117,13 +117,13 @@ class GlobalMaxPool(GlobalPooling):
 
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
-    - Graph IDs of shape `(N, )` (only in disjoint mode);
+    - Node features of shape `([batch], n_nodes, n_node_features)`;
+    - Graph IDs of shape `(n_nodes, )` (only in disjoint mode);
 
     **Output**
 
-    - Pooled node features of shape `(batch, F)` (if single mode, shape will
-    be `(1, F)`).
+    - Pooled node features of shape `(batch, n_node_features)` (if single mode, shape will
+    be `(1, n_node_features)`).
 
     **Arguments**
 
@@ -137,10 +137,12 @@ class GlobalMaxPool(GlobalPooling):
         self.batch_pooling_op = tf.reduce_max
 
 
-class GlobalAttentionPool(GlobalPooling):
+class GlobalAttentionPool(GlobalPool):
     r"""
-    A gated attention global pooling layer as presented by
-    [Li et al. (2017)](https://arxiv.org/abs/1511.05493).
+    A gated attention global pooling layer from the paper
+
+    > [Gated Graph Sequence Neural Networks](https://arxiv.org/abs/1511.05493)<br>
+    > Yujia Li et al.
 
     This layer computes:
     $$
@@ -152,8 +154,8 @@ class GlobalAttentionPool(GlobalPooling):
 
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
-    - Graph IDs of shape `(N, )` (only in disjoint mode);
+    - Node features of shape `([batch], n_nodes, n_node_features)`;
+    - Graph IDs of shape `(n_nodes, )` (only in disjoint mode);
 
     **Output**
 
@@ -249,7 +251,7 @@ class GlobalAttentionPool(GlobalPooling):
         return dict(list(base_config.items()) + list(config.items()))
 
 
-class GlobalAttnSumPool(GlobalPooling):
+class GlobalAttnSumPool(GlobalPool):
     r"""
     A node-attention global pooling layer. Pools a graph by learning attention
     coefficients to sum node features.
@@ -266,13 +268,13 @@ class GlobalAttnSumPool(GlobalPooling):
 
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
-    - Graph IDs of shape `(N, )` (only in disjoint mode);
+    - Node features of shape `([batch], n_nodes, n_node_features)`;
+    - Graph IDs of shape `(n_nodes, )` (only in disjoint mode);
 
     **Output**
 
-    - Pooled node features of shape `(batch, F)` (if single mode, shape will
-    be `(1, F)`).
+    - Pooled node features of shape `(batch, n_node_features)` (if single mode, shape will
+    be `(1, n_node_features)`).
 
     **Arguments**
 
@@ -356,13 +358,13 @@ class SortPool(Layer):
     
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
-    - Graph IDs of shape `(N, )` (only in disjoint mode);
+    - Node features of shape `([batch], n_nodes, n_node_features)`;
+    - Graph IDs of shape `(n_nodes, )` (only in disjoint mode);
 
     **Output**
 
-    - Pooled node features of shape `(batch, k, F)` (if single mode, shape will
-    be `(1, k, F)`).
+    - Pooled node features of shape `(batch, k, n_node_features)` (if single mode, shape will
+    be `(1, k, n_node_features)`).
 
     **Arguments**
 
@@ -431,3 +433,21 @@ class SortPool(Layer):
             return self.k, self.F
         elif self.data_mode == 'batch' or self.data_mode == 'disjoint':
             return input_shape[0], self.k, self.F
+
+
+layers = {
+    'sum': GlobalSumPool,
+    'avg': GlobalAvgPool,
+    'max': GlobalMaxPool,
+    'attn': GlobalAttentionPool,
+    'attn_sum': GlobalAttnSumPool,
+    'sort': SortPool
+}
+
+
+def get(identifier):
+    if identifier not in layers:
+        raise ValueError('Unknown identifier {}. Available: {}'
+                         .format(identifier, list(layers.keys())))
+    else:
+        return layers[identifier]

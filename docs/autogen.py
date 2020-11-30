@@ -8,9 +8,11 @@ import re
 import shutil
 import sys
 
-from spektral import chem
+from spektral import data
 from spektral import datasets
 from spektral import layers
+from spektral import models
+from spektral import transforms
 from spektral import utils
 
 try:
@@ -35,22 +37,23 @@ PAGES = [
     {
         'page': 'layers/convolution.md',
         'classes': [
-            layers.GraphConv,
-            layers.ChebConv,
-            layers.GraphSageConv,
-            layers.ARMAConv,
-            layers.EdgeConditionedConv,
-            layers.GraphAttention,
-            layers.GraphConvSkip,
-            layers.APPNP,
-            layers.GINConv,
-            layers.DiffusionConv,
-            layers.GatedGraphConv,
-            layers.AGNNConv,
-            layers.TAGConv,
-            layers.CrystalConv,
-            layers.EdgeConv,
             layers.MessagePassing,
+            layers.AGNNConv,
+            layers.APPNPConv,
+            layers.ARMAConv,
+            layers.ChebConv,
+            layers.CrystalConv,
+            layers.DiffusionConv,
+            layers.ECCConv,
+            layers.EdgeConv,
+            layers.GATConv,
+            layers.GatedGraphConv,
+            layers.GCNConv,
+            layers.GeneralConv,
+            layers.GCSConv,
+            layers.GINConv,
+            layers.GraphSageConv,
+            layers.TAGConv,
         ]
     },
     {
@@ -60,11 +63,18 @@ PAGES = [
         'classes': [
             layers.DiffPool,
             layers.MinCutPool,
-            layers.TopKPool,
             layers.SAGPool,
-            layers.GlobalSumPool,
+            layers.TopKPool
+        ]
+    },
+    {
+        'page': 'layers/pooling.md',
+        'functions': [],
+        'methods': [],
+        'classes': [
             layers.GlobalAvgPool,
             layers.GlobalMaxPool,
+            layers.GlobalSumPool,
             layers.GlobalAttentionPool,
             layers.GlobalAttnSumPool,
             layers.SortPool
@@ -76,77 +86,96 @@ PAGES = [
         'methods': [],
         'classes': [
             layers.InnerProduct,
-            layers.MinkowskiProduct,
             layers.Disjoint2Batch,
+            layers.MinkowskiProduct,
+        ]
+    },
+    {
+        'page': 'models.md',
+        'functions': [],
+        'methods': [],
+        'classes': [
+            models.GeneralGNN
+        ]
+    },
+    # Data #####################################################################
+    {
+        'page': 'data.md',
+        'functions': [],
+        'methods': [],
+        'classes': [
+            data.Graph
+        ]
+    },
+    {
+        'page': 'data.md',
+        'functions': [],
+        'methods': [],
+        'classes': [
+            data.Dataset
+        ]
+    },
+    {
+        'page': 'data.md',
+        'functions': [
+            data.utils.to_disjoint,
+            data.utils.to_batch,
+            data.utils.to_tf_signature
+        ],
+        'methods': [],
+        'classes': []
+    },
+    # Loaders ##################################################################
+    {
+        'page': 'loaders.md',
+        'functions': [],
+        'methods': [],
+        'classes': [
+            data.Loader,
+            data.SingleLoader,
+            data.DisjointLoader,
+            data.BatchLoader,
+            data.PackedBatchLoader
         ]
     },
     # Datasets #################################################################
     {
         'page': 'datasets.md',
-        'functions': [
-            datasets.citation.load_data
-        ],
+        'functions': [],
         'methods': [],
-        'classes': []
-    },
-    {
-        'page': 'datasets.md',
-        'functions': [
-            datasets.graphsage.load_data
-        ],
-        'methods': [],
-        'classes': []
-    },
-    {
-        'page': 'datasets.md',
-        'functions': [
-            datasets.tud.load_data
-        ],
-        'methods': [],
-        'classes': []
-    },
-    {
-        'page': 'datasets.md',
-        'functions': [
-            datasets.ogb.graph_to_numpy,
-            datasets.ogb.dataset_to_numpy
-        ],
-        'methods': [],
-        'classes': []
-    },
-    {
-        'page': 'datasets.md',
-        'functions': [
-            datasets.qm9.load_data
-        ],
-        'methods': [],
-        'classes': []
-    },
-    {
-        'page': 'datasets.md',
-        'functions': [
-            datasets.mnist.load_data
-        ],
-        'methods': [],
-        'classes': []
-    },
-    {
-        'page': 'datasets.md',
-        'functions': [
-            datasets.delaunay.generate_data
-        ],
-        'methods': [],
-        'classes': []
-    },
-    # Utils ####################################################################
-    {
-        'page': 'utils/data.md',
-        'functions': [
-            utils.data.numpy_to_disjoint,
-            utils.data.numpy_to_batch,
-            utils.data.batch_iterator
+        'classes': [
+            datasets.Citation,
+            datasets.GraphSage,
+            datasets.PPI,
+            datasets.Reddit,
+            datasets.MNIST,
+            datasets.ModelNet,
+            datasets.OGB,
+            datasets.QM7,
+            datasets.QM9,
+            datasets.TUDataset,
         ]
     },
+    # Transforms ###############################################################
+    {
+        'page': 'transforms.md',
+        'functions': [],
+        'methods': [],
+        'classes': [
+            transforms.AdjToSpTensor,
+            transforms.ClusteringCoeff,
+            transforms.Constant,
+            transforms.Delaunay,
+            transforms.Degree,
+            transforms.GCNFilter,
+            transforms.LayerPreprocess,
+            transforms.NormalizeAdj,
+            transforms.NormalizeOne,
+            transforms.NormalizeSphere,
+            transforms.OneHotLabels
+        ]
+    },
+    # Utils ####################################################################
     {
         'page': 'utils/convolution.md',
         'functions': [
@@ -156,7 +185,8 @@ PAGES = [
             utils.convolution.laplacian,
             utils.convolution.normalized_laplacian,
             utils.convolution.rescale_laplacian,
-            utils.convolution.localpooling_filter,
+            utils.convolution.add_self_loops,
+            utils.convolution.gcn_filter,
             utils.convolution.chebyshev_polynomial,
             utils.convolution.chebyshev_filter
         ],
@@ -167,46 +197,9 @@ PAGES = [
         'page': 'utils/misc.md',
         'functions': [
             utils.misc.pad_jagged_array,
-            utils.misc.add_eye,
-            utils.misc.sub_eye,
-            utils.misc.add_eye_batch,
-            utils.misc.sub_eye_batch,
-            utils.misc.add_eye_jagged,
-            utils.misc.sub_eye_jagged,
-        ],
-        'methods': [],
-        'classes': []
-    },
-    {
-        'page': 'utils/conversion.md',
-        'functions': [
-            utils.conversion.nx_to_adj,
-            utils.conversion.nx_to_node_features,
-            utils.conversion.nx_to_edge_features,
-            utils.conversion.nx_to_numpy,
-            utils.conversion.numpy_to_nx
-        ],
-        'methods': [],
-        'classes': []
-    },
-    # Chem #####################################################################
-    {
-        'page': 'chem.md',
-        'functions': [
-            chem.numpy_to_rdkit,
-            chem.numpy_to_smiles,
-            chem.rdkit_to_smiles,
-            chem.sdf_to_nx,
-            chem.nx_to_sdf,
-            chem.validate_rdkit,
-            chem.get_atomic_symbol,
-            chem.get_atomic_num,
-            chem.valid_score,
-            chem.novel_score,
-            chem.unique_score,
-            chem.enable_rdkit_log,
-            chem.plot_rdkit,
-            chem.plot_rdkit_svg_grid
+            utils.misc.one_hot,
+            utils.misc.label_to_one_hot,
+            utils.misc.flatten_list
         ],
         'methods': [],
         'classes': []

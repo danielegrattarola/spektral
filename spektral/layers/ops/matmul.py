@@ -36,15 +36,17 @@ def dot(a, b, transpose_a=False, transpose_b=False):
                 tf.sparse.sparse_dense_matmul(ops.transpose(b), ops.transpose(a))
             )
 
-    # Fallthrough to tfsp implementation
-    # Defaults to tf.matmul if neither is sparse
+    # Fallthrough to sp-sp and d-d implementations
     if a_is_sparse_tensor:
         a = tfsp.CSRSparseMatrix(a)
     if b_is_sparse_tensor:
         b = tfsp.CSRSparseMatrix(b)
-    out = tfsp.matmul(a, b, transpose_a=transpose_a, transpose_b=transpose_b)
-    if hasattr(out, 'to_sparse_tensor'):
-        return out.to_sparse_tensor()
+    if a_is_sparse_tensor or b_is_sparse_tensor:
+        out = tfsp.matmul(a, b, transpose_a=transpose_a, transpose_b=transpose_b)
+        if hasattr(out, 'to_sparse_tensor'):
+            return out.to_sparse_tensor()
+    else:
+        out = tf.matmul(a, b, transpose_a=transpose_a, transpose_b=transpose_b)
 
     return out
 

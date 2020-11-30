@@ -6,20 +6,21 @@ from spektral.layers.convolutional.message_passing import MessagePassing
 
 class CrystalConv(MessagePassing):
     r"""
-    A Crystal Graph Convolutional layer as presented by
-    [Xie & Grossman (2018)](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.145301).
+    A crystal graph convolutional layer from the paper
+
+    > [Crystal Graph Convolutional Neural Networks for an Accurate and
+    Interpretable Prediction of Material Properties](https://arxiv.org/abs/1710.10324)<br>
+    > Tian Xie and Jeffrey C. Grossman
 
     **Mode**: single, disjoint.
 
     **This layer expects a sparse adjacency matrix.**
 
-    This layer computes for each node \(i\):
+    This layer computes:
     $$
-        \H_i = \X_i +
-               \sum\limits_{j \in \mathcal{N}(i)}
-                    \sigma \left( \z_{ij} \W^{(f)} + \b^{(f)} \right)
-                    \odot
-                    \g \left( \z_{ij} \W^{(s)} + \b^{(s)} \right)
+        \x_i' = \x_i + \sum\limits_{j \in \mathcal{N}(i)} \sigma \left( \z_{ij}
+        \W^{(f)} + \b^{(f)} \right) \odot \g \left( \z_{ij} \W^{(s)} + \b^{(s)}
+        \right)
     $$
     where \(\z_{ij} = \X_i \| \X_j \| \E_{ij} \), \(\sigma\) is a sigmoid
     activation, and \(g\) is the activation function (defined by the `activation`
@@ -27,9 +28,9 @@ class CrystalConv(MessagePassing):
 
     **Input**
 
-    - Node features of shape `(N, F)`;
-    - Binary adjacency matrix of shape `(N, N)`.
-    - Edge features of shape `(num_edges, S)`.
+    - Node features of shape `(n_nodes, n_node_features)`;
+    - Binary adjacency matrix of shape `(n_nodes, n_nodes)`.
+    - Edge features of shape `(num_edges, n_edge_features)`.
 
     **Output**
 
@@ -39,7 +40,7 @@ class CrystalConv(MessagePassing):
     **Arguments**
 
     - `channels`: integer, number of output channels;
-    - `activation`: activation function to use;
+    - `activation`: activation function;
     - `use_bias`: bool, add a bias vector to the output;
     - `kernel_initializer`: initializer for the weights;
     - `bias_initializer`: initializer for the bias vector;
@@ -52,6 +53,7 @@ class CrystalConv(MessagePassing):
 
     def __init__(self,
                  channels,
+                 aggregate='sum',
                  activation=None,
                  use_bias=True,
                  kernel_initializer='glorot_uniform',
@@ -62,7 +64,7 @@ class CrystalConv(MessagePassing):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        super().__init__(aggregate='sum',
+        super().__init__(aggregate=aggregate,
                          activation=activation,
                          use_bias=use_bias,
                          kernel_initializer=kernel_initializer,
@@ -73,7 +75,7 @@ class CrystalConv(MessagePassing):
                          kernel_constraint=kernel_constraint,
                          bias_constraint=bias_constraint,
                          **kwargs)
-        self.channels = self.output_dim = channels
+        self.channels = channels
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
@@ -90,21 +92,19 @@ class CrystalConv(MessagePassing):
 
         self.built = True
 
-    def message(self, X, E=None):
-        X_i = self.get_i(X)
-        X_j = self.get_j(X)
-        Z = K.concatenate((X_i, X_j, E), axis=-1)
-        output = self.dense_s(Z) * self.dense_f(Z)
+    def message(self, x, e=None):
+        x_i = self.get_i(x)
+        x_j = self.get_j(x)
+        z = K.concatenate((x_i, x_j, e), axis=-1)
+        output = self.dense_s(z) * self.dense_f(z)
 
         return output
 
-    def update(self, embeddings, X=None):
-        return X + embeddings
+    def update(self, embeddings, x=None):
+        return x + embeddings
 
-    def get_config(self):
-        config = {
+    @property
+    def config(self):
+        return {
             'channels': self.channels
         }
-        base_config = super().get_config()
-        base_config.pop('aggregate')  # Remove it because it's defined by constructor
-        return {**base_config, **config}

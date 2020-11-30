@@ -1,22 +1,23 @@
 import tensorflow as tf
-from tensorflow.keras import activations, initializers, regularizers, constraints
+from tensorflow.keras import activations
 from tensorflow.keras import backend as K
-from tensorflow.keras.layers import Layer
 
 from spektral.layers import ops
 from spektral.layers.ops import modes
+from spektral.layers.pooling.pool import Pool
 
 
-class DiffPool(Layer):
+class DiffPool(Pool):
     r"""
-    A DiffPool layer as presented by
-    [Ying et al. (2018)](https://arxiv.org/abs/1806.08804).
+    A DiffPool layer from the paper
+
+    > [Hierarchical Graph Representation Learning with Differentiable Pooling](https://arxiv.org/abs/1806.08804)<br>
+    > Rex Ying et al.
 
     **Mode**: batch.
 
     This layer computes a soft clustering \(\S\) of the input graphs using a GNN,
     and reduces graphs as follows:
-
     $$
         \S = \textrm{GNN}(\A, \X); \\
         \A' = \S^\top \A \S; \X' = \S^\top \X;
@@ -41,14 +42,14 @@ class DiffPool(Layer):
 
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
-    - Binary adjacency matrix of shape `([batch], N, N)`;
+    - Node features of shape `([batch], n_nodes, n_node_features)`;
+    - Binary adjacency matrix of shape `([batch], n_nodes, n_nodes)`;
 
     **Output**
 
     - Reduced node features of shape `([batch], K, channels)`;
     - Reduced adjacency matrix of shape `([batch], K, K)`;
-    - If `return_mask=True`, the soft clustering matrix of shape `([batch], N, K)`.
+    - If `return_mask=True`, the soft clustering matrix of shape `([batch], n_nodes, K)`.
 
     **Arguments**
 
@@ -71,14 +72,14 @@ class DiffPool(Layer):
                  kernel_constraint=None,
                  **kwargs):
 
-        super().__init__(**kwargs)
+        super().__init__(activation=activation,
+                         kernel_initializer=kernel_initializer,
+                         kernel_regularizer=kernel_regularizer,
+                         kernel_constraint=kernel_constraint,
+                         **kwargs)
         self.k = k
         self.channels = channels
         self.return_mask = return_mask
-        self.activation = activations.get(activation)
-        self.kernel_initializer = initializers.get(kernel_initializer)
-        self.kernel_regularizer = regularizers.get(kernel_regularizer)
-        self.kernel_constraint = constraints.get(kernel_constraint)
 
     def build(self, input_shape):
         assert isinstance(input_shape, list)
@@ -171,35 +172,10 @@ class DiffPool(Layer):
 
         return output
 
-    def compute_output_shape(self, input_shape):
-        X_shape = input_shape[0]
-        A_shape = input_shape[1]
-        X_shape_out = X_shape[:-2] + (self.k, self.channels)
-        if self.reduce_loss:
-            A_shape_out = X_shape[:-2] + (self.k, self.k)
-        else:
-            A_shape_out = A_shape[:-2] + (self.k, self.k)
-
-        output_shape = [X_shape_out, A_shape_out]
-
-        if len(input_shape) == 3:
-            I_shape_out = A_shape[:-2] + (self.k,)
-            output_shape.append(I_shape_out)
-
-        if self.return_mask:
-            S_shape_out = A_shape[:-1] + (self.k,)
-            output_shape.append(S_shape_out)
-
-        return output_shape
-
-    def get_config(self):
-        config = {
+    @property
+    def config(self):
+        return {
             'k': self.k,
             'channels': self.channels,
             'return_mask': self.return_mask,
-            'kernel_initializer': initializers.serialize(self.kernel_initializer),
-            'kernel_regularizer': regularizers.serialize(self.kernel_regularizer),
-            'kernel_constraint': constraints.serialize(self.kernel_constraint),
         }
-        base_config = super().get_config()
-        return dict(list(base_config.items()) + list(config.items()))

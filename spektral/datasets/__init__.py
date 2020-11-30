@@ -1,7 +1,8 @@
-from . import citation
-from . import delaunay
-from . import graphsage
-from . import mnist
-from . import ogb
-from . import qm9
-from . import tud
+from .citation import Citation, Cora, Citeseer, Pubmed
+from .graphsage import GraphSage, PPI, Reddit
+from .mnist import MNIST
+from .modelnet import ModelNet
+from .ogb import OGB
+from .qm7 import QM7
+from .qm9 import QM9
+from .tudataset import TUDataset

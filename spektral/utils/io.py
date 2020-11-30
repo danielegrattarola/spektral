@@ -5,8 +5,7 @@ import joblib
 import networkx as nx
 import numpy as np
 import pandas as pd
-
-from spektral.chem import get_atomic_num
+import scipy.sparse as sp
 
 
 def load_binary(filename):
@@ -146,6 +145,48 @@ def dump_txt(obj, filename, **kwargs):
     np.savetxt(filename, obj, **kwargs)
 
 
+def _parse_off(lines):
+    n_verts, n_faces, _ = map(int, lines[0].split(' '))
+
+    # Read vertices
+    verts = np.array([l.split(' ') for l in lines[1:n_verts + 1]]).astype(float)
+
+    # Read faces
+    faces = lines[n_verts + 1:n_verts + 1 + n_faces]
+    faces = [list(map(int, f.split(' '))) for f in faces]
+    triangles = np.array(list(filter(lambda f: len(f) == 4, faces))).astype(int)
+    rectangles = np.array(list(filter(lambda f: len(f) == 5, faces))).astype(int)
+    if len(rectangles) > 0:
+        tri_a = rectangles[:, [1, 2, 3]]
+        tri_b = rectangles[:, [1, 2, 4]]
+        triangles = np.vstack((triangles, tri_a, tri_b))
+    triangles = triangles[:, 1:]
+    triangles = triangles[triangles[:, 0].argsort()]
+
+    return verts, triangles
+
+
+def load_off(filename):
+    """
+    Reads an .off file into a Graph object. Node attributes are the 3d
+    coordinates of the points, all faces are converted to edges.
+    :param filename: path to the .off file.
+    :return: a Graph
+    """
+    from spektral.data.graph import Graph
+
+    lines = open(filename, 'r').read().lstrip('OF\n').splitlines()
+    x, faces = _parse_off(lines)
+    n = x.shape[0]
+    row, col = np.vstack((faces[:, :2], faces[:, 1:], faces[:, ::2])).T
+    adj = sp.csr_matrix((np.ones_like(row), (row, col)), shape=(n, n)).tolil()
+    adj[col, row] = adj[row, col]
+    adj = adj.T.tocsr()
+    adj.data = np.clip(adj.data, 0, 1)
+
+    return Graph(x=x, adj=adj)
+
+
 # Reference for implementation:
 # # http://www.nonlinear.com/progenesis/sdf-studio/v0.9/faq/sdf-file-format-guidance.aspx
 #
@@ -183,6 +224,31 @@ def dump_txt(obj, filename, **kwargs):
 #  'name': 'gdb_54964',
 #  'properties': []}
 HEADER_SIZE = 3
+NUM_TO_SYMBOL = {1: 'H', 2: 'He', 3: 'Li', 4: 'Be', 5: 'B', 6: 'C', 7: 'N',
+                 8: 'O', 9: 'F', 10: 'Ne', 11: 'Na', 12: 'Mg', 13: 'Al',
+                 14: 'Si', 15: 'P', 16: 'S', 17: 'Cl', 18: 'Ar', 19: 'K',
+                 20: 'Ca', 21: 'Sc', 22: 'Ti', 23: 'V', 24: 'Cr', 25: 'Mn',
+                 26: 'Fe', 27: 'Co', 28: 'Ni', 29: 'Cu', 30: 'Zn', 31: 'Ga',
+                 32: 'Ge', 33: 'As', 34: 'Se', 35: 'Br', 36: 'Kr', 37: 'Rb',
+                 38: 'Sr', 39: 'Y', 40: 'Zr', 41: 'Nb', 42: 'Mo', 43: 'Tc',
+                 44: 'Ru', 45: 'Rh', 46: 'Pd', 47: 'Ag', 48: 'Cd', 49: 'In',
+                 50: 'Sn', 51: 'Sb', 52: 'Te', 53: 'I', 54: 'Xe', 55: 'Cs',
+                 56: 'Ba', 57: 'La', 58: 'Ce', 59: 'Pr', 60: 'Nd', 61: 'Pm',
+                 62: 'Sm', 63: 'Eu', 64: 'Gd', 65: 'Tb', 66: 'Dy', 67: 'Ho',
+                 68: 'Er', 69: 'Tm', 70: 'Yb', 71: 'Lu', 72: 'Hf', 73: 'Ta',
+                 74: 'W', 75: 'Re', 76: 'Os', 77: 'Ir', 78: 'Pt', 79: 'Au',
+                 80: 'Hg', 81: 'Tl', 82: 'Pb', 83: 'Bi', 84: 'Po', 85: 'At',
+                 86: 'Rn', 87: 'Fr', 88: 'Ra', 89: 'Ac', 90: 'Th', 91: 'Pa',
+                 92: 'U', 93: 'Np', 94: 'Pu', 95: 'Am', 96: 'Cm', 97: 'Bk',
+                 98: 'Cf', 99: 'Es', 100: 'Fm', 101: 'Md', 102: 'No', 103: 'Lr',
+                 104: 'Rf', 105: 'Db', 106: 'Sg', 107: 'Bh', 108: 'Hs',
+                 109: 'Mt', 110: 'Ds', 111: 'Rg', 112: 'Cn', 113: 'Nh',
+                 114: 'Fl', 115: 'Mc', 116: 'Lv', 117: 'Ts', 118: 'Og'}
+SYMBOL_TO_NUM = {v: k for k, v in NUM_TO_SYMBOL.items()}
+
+
+def _get_atomic_num(symbol):
+    return SYMBOL_TO_NUM[symbol.lower().capitalize()]
 
 
 def _parse_header(sdf):
@@ -222,7 +288,7 @@ def _parse_atoms_block(sdf, n_atoms):
     atoms = []
     for i, v in enumerate(values):
         coords = np.array([float(v[pos:pos+10]) for pos in range(0, 30, 10)])
-        atomic_num = get_atomic_num(v[31:34].strip())
+        atomic_num = _get_atomic_num(v[31:34].strip())
         iso = int(v[34:36])
         charge = int(v[36:39])
         info = np.array([int(v[pos:pos+3]) for pos in range(39, len(v), 3)])

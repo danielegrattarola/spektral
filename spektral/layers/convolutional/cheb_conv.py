@@ -1,20 +1,23 @@
 from tensorflow.keras import backend as K
 
 from spektral.layers import ops
-from spektral.layers.convolutional.graph_conv import GraphConv
+from spektral.layers.convolutional.conv import Conv
 from spektral.utils import normalized_laplacian, rescale_laplacian
 
 
-class ChebConv(GraphConv):
+class ChebConv(Conv):
     r"""
-    A Chebyshev convolutional layer as presented by
-    [Defferrard et al. (2016)](https://arxiv.org/abs/1606.09375).
+    A Chebyshev convolutional layer from the paper
+
+    > [Convolutional Neural Networks on Graphs with Fast Localized Spectral
+  Filtering](https://arxiv.org/abs/1606.09375)<br>
+    > Michaël Defferrard et al.
 
     **Mode**: single, disjoint, mixed, batch.
 
     This layer computes:
     $$
-        \Z = \sum \limits_{k=0}^{K - 1} \T^{(k)} \W^{(k)}  + \b^{(k)},
+        \X' = \sum \limits_{k=0}^{K - 1} \T^{(k)} \W^{(k)}  + \b^{(k)},
     $$
     where \( \T^{(0)}, ..., \T^{(K - 1)} \) are Chebyshev polynomials of \(\tilde \L\)
     defined as
@@ -25,15 +28,14 @@ class ChebConv(GraphConv):
     $$
     where
     $$
-        \tilde \L =  \frac{2}{\lambda_{max}} \cdot (\I - \D^{-1/2} \A \D^{-1/2}) - \I
+        \tilde \L =  \frac{2}{\lambda_{max}} \cdot (\I - \D^{-1/2} \A \D^{-1/2}) - \I.
     $$
-    is the normalized Laplacian with a rescaled spectrum.
 
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
+    - Node features of shape `([batch], n_nodes, n_node_features)`;
     - A list of K Chebyshev polynomials of shape
-    `[([batch], N, N), ..., ([batch], N, N)]`; can be computed with
+    `[([batch], n_nodes, n_nodes), ..., ([batch], n_nodes, n_nodes)]`; can be computed with
     `spektral.utils.convolution.chebyshev_filter`.
 
     **Output**
@@ -45,7 +47,7 @@ class ChebConv(GraphConv):
 
     - `channels`: number of output channels;
     - `K`: order of the Chebyshev polynomials;
-    - `activation`: activation function to use;
+    - `activation`: activation function;
     - `use_bias`: bool, add a bias vector to the output;
     - `kernel_initializer`: initializer for the weights;
     - `bias_initializer`: initializer for the bias vector;
@@ -70,8 +72,7 @@ class ChebConv(GraphConv):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        super().__init__(channels,
-                         activation=activation,
+        super().__init__(activation=activation,
                          use_bias=use_bias,
                          kernel_initializer=kernel_initializer,
                          bias_initializer=bias_initializer,
@@ -81,6 +82,7 @@ class ChebConv(GraphConv):
                          kernel_constraint=kernel_constraint,
                          bias_constraint=bias_constraint,
                          **kwargs)
+        self.channels = channels
         self.K = K
 
     def build(self, input_shape):
@@ -102,37 +104,35 @@ class ChebConv(GraphConv):
         self.built = True
 
     def call(self, inputs):
-        features = inputs[0]
-        laplacian = inputs[1]
+        x, a = inputs
 
-        # Convolution
-        T_0 = features
+        T_0 = x
         output = ops.dot(T_0, self.kernel[0])
 
         if self.K > 1:
-            T_1 = ops.filter_dot(laplacian, features)
+            T_1 = ops.filter_dot(a, x)
             output += ops.dot(T_1, self.kernel[1])
 
         for k in range(2, self.K):
-            T_2 = 2 * ops.filter_dot(laplacian, T_1) - T_0
+            T_2 = 2 * ops.filter_dot(a, T_1) - T_0
             output += ops.dot(T_2, self.kernel[k])
             T_0, T_1 = T_1, T_2
 
         if self.use_bias:
             output = K.bias_add(output, self.bias)
-        if self.activation is not None:
-            output = self.activation(output)
+        output = self.activation(output)
+
         return output
 
-    def get_config(self):
-        config = {
+    @property
+    def config(self):
+        return {
+            'channels': self.channels,
             'K': self.K
         }
-        base_config = super(ChebConv, self).get_config()
-        return dict(list(base_config.items()) + list(config.items()))
 
     @staticmethod
-    def preprocess(A):
-        L = normalized_laplacian(A)
-        L = rescale_laplacian(L)
-        return L
+    def preprocess(a):
+        a = normalized_laplacian(a)
+        a = rescale_laplacian(a)
+        return a

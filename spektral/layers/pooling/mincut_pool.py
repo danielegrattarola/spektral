@@ -1,26 +1,27 @@
 import tensorflow as tf
 from tensorflow.keras import Sequential
-from tensorflow.keras import activations, initializers, regularizers, constraints, backend as K
-from tensorflow.keras.layers import Layer, Dense
+from tensorflow.keras import backend as K
+from tensorflow.keras.layers import Dense
 
 from spektral.layers import ops
+from spektral.layers.pooling.pool import Pool
 
 
-class MinCutPool(Layer):
+class MinCutPool(Pool):
     r"""
-    A minCUT pooling layer as presented by
-    [Bianchi et al. (2019)](https://arxiv.org/abs/1907.00481).
+    A MinCut pooling layer from the paper
+
+    > [Spectral Clustering with Graph Neural Networks for Graph Pooling](https://arxiv.org/abs/1907.00481)<br>
+    > Filippo Maria Bianchi et al.
 
     **Mode**: batch.
 
     This layer computes a soft clustering \(\S\) of the input graphs using a MLP,
     and reduces graphs as follows:
-
     $$
         \S = \textrm{MLP}(\X); \\
         \A' = \S^\top \A \S; \X' = \S^\top \X;
     $$
-
     where MLP is a multi-layer perceptron with softmax output.
     Two auxiliary loss terms are also added to the model: the _minCUT loss_
     $$
@@ -39,14 +40,14 @@ class MinCutPool(Layer):
 
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
-    - Binary adjacency matrix of shape `([batch], N, N)`;
+    - Node features of shape `([batch], n_nodes, n_node_features)`;
+    - Binary adjacency matrix of shape `([batch], n_nodes, n_nodes)`;
 
     **Output**
 
-    - Reduced node features of shape `([batch], K, F)`;
+    - Reduced node features of shape `([batch], K, n_node_features)`;
     - Reduced adjacency matrix of shape `([batch], K, K)`;
-    - If `return_mask=True`, the soft clustering matrix of shape `([batch], N, K)`.
+    - If `return_mask=True`, the soft clustering matrix of shape `([batch], n_nodes, K)`.
 
     **Arguments**
 
@@ -56,9 +57,13 @@ class MinCutPool(Layer):
     only the output layer);
     - `mlp_activation`: activation for the MLP layers;
     - `return_mask`: boolean, whether to return the cluster assignment matrix;
-    - `kernel_initializer`: initializer for the weights;
-    - `kernel_regularizer`: regularization applied to the weights;
-    - `kernel_constraint`: constraint applied to the weights;
+    - `use_bias`: use bias in the MLP;
+    - `kernel_initializer`: initializer for the weights of the MLP;
+    - `bias_initializer`: initializer for the bias of the MLP;
+    - `kernel_regularizer`: regularization applied to the weights of the MLP;
+    - `bias_regularizer`: regularization applied to the bias of the MLP;
+    - `kernel_constraint`: constraint applied to the weights of the MLP;
+    - `bias_constraint`: constraint applied to the bias of the MLP;
     """
 
     def __init__(self,
@@ -76,19 +81,19 @@ class MinCutPool(Layer):
                  bias_constraint=None,
                  **kwargs):
 
-        super().__init__(**kwargs)
+        super().__init__(activation=activation,
+                         use_bias=use_bias,
+                         kernel_initializer=kernel_initializer,
+                         bias_initializer=bias_initializer,
+                         kernel_regularizer=kernel_regularizer,
+                         bias_regularizer=bias_regularizer,
+                         kernel_constraint=kernel_constraint,
+                         bias_constraint=bias_constraint,
+                         **kwargs)
         self.k = k
         self.mlp_hidden = mlp_hidden if mlp_hidden else []
         self.mlp_activation = mlp_activation
         self.return_mask = return_mask
-        self.activation = activations.get(activation)
-        self.use_bias = use_bias
-        self.kernel_initializer = initializers.get(kernel_initializer)
-        self.bias_initializer = initializers.get(bias_initializer)
-        self.kernel_regularizer = regularizers.get(kernel_regularizer)
-        self.bias_regularizer = regularizers.get(bias_regularizer)
-        self.kernel_constraint = constraints.get(kernel_constraint)
-        self.bias_constraint = constraints.get(bias_constraint)
 
     def build(self, input_shape):
         assert isinstance(input_shape, list)
@@ -167,36 +172,11 @@ class MinCutPool(Layer):
 
         return output
 
-    def compute_output_shape(self, input_shape):
-        X_shape = input_shape[0]
-        A_shape = input_shape[1]
-        X_shape_out = X_shape[:-2] + (self.k,) + X_shape[-1:]
-        A_shape_out = A_shape[:-2] + (self.k, self.k)
-
-        output_shape = [X_shape_out, A_shape_out]
-
-        if len(input_shape) == 3:
-            I_shape_out = A_shape[:-2] + (self.k, )
-            output_shape.append(I_shape_out)
-
-        if self.return_mask:
-            S_shape_out = A_shape[:-1] + (self.k, )
-            output_shape.append(S_shape_out)
-
-        return output_shape
-
-    def get_config(self):
-        config = {
+    @property
+    def config(self):
+        return {
             'k': self.k,
             'mlp_hidden': self.mlp_hidden,
             'mlp_activation': self.mlp_activation,
-            'return_mask': self.return_mask,
-            'kernel_initializer': initializers.serialize(self.kernel_initializer),
-            'bias_initializer': initializers.serialize(self.bias_initializer),
-            'kernel_regularizer': regularizers.serialize(self.kernel_regularizer),
-            'bias_regularizer': regularizers.serialize(self.bias_regularizer),
-            'kernel_constraint': constraints.serialize(self.kernel_constraint),
-            'bias_constraint': constraints.serialize(self.bias_constraint)
+            'return_mask': self.return_mask
         }
-        base_config = super().get_config()
-        return dict(list(base_config.items()) + list(config.items()))

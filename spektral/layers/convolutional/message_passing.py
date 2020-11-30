@@ -4,14 +4,16 @@ import tensorflow as tf
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Layer
 
+from spektral.layers.ops.scatter import deserialize_scatter, serialize_scatter
 from spektral.utils.keras import is_layer_kwarg, is_keras_kwarg, deserialize_kwarg, serialize_kwarg
-from spektral.layers.ops.scatter import deserialize_scatter
 
 
 class MessagePassing(Layer):
     r"""
-    A general class for message passing as presented by
-    [Gilmer et al. (2017)](https://arxiv.org/abs/1704.01212).
+    A general class for message passing networks from the paper
+
+    > [Neural Message Passing for Quantum Chemistry](https://arxiv.org/abs/1704.01212)<br>
+    > Justin Gilmer et al.
 
     **Mode**: single, disjoint.
 
@@ -19,8 +21,8 @@ class MessagePassing(Layer):
 
     This layer computes:
     $$
-        \Z_i = \gamma \left( \X_i, \square_{j \in \mathcal{N}(i)} \,
-        \phi \left(\X_i, \X_j, \E_{j,i} \right) \right),
+        \x_i' = \gamma \left( \x_i, \square_{j \in \mathcal{N}(i)} \,
+        \phi \left(\x_i, \x_j, \e_{j \rightarrow i} \right) \right),
     $$
     
     where \( \gamma \) is a differentiable update function, \( \phi \) is a
@@ -31,41 +33,55 @@ class MessagePassing(Layer):
     By extending this class, it is possible to create any message-passing layer
     in single/disjoint mode.
 
-    **API:**
+    **API**
 
-    - `propagate(X, A, E=None, **kwargs)`: propagate the messages and computes
-    embeddings for each node in the graph. `kwargs` will be propagated as
-    keyword arguments to `message()`, `aggregate()` and `update()`.
-    - `message(X, **kwargs)`: computes messages, equivalent to \(\phi\) in the
-    definition.
-    Any extra keyword argument of this function will be  populated by
-    `propagate()` if a matching keyword is found.
+    ```python
+    propagate(x, a, e=None, **kwargs)
+    ```
+    Propagates the messages and computes embeddings for each node in the graph. <br>
+    Any `kwargs` will be forwarded as keyword arguments to `message()`,
+    `aggregate()` and `update()`.
+
+    ```python
+    message(x, **kwargs)
+    ```
+    Computes messages, equivalent to \(\phi\) in the definition. <br>
+    Any extra keyword argument of this function will be populated by
+    `propagate()` if a matching keyword is found. <br>
     Use `self.get_i()` and  `self.get_j()` to gather the elements using the
-    indices `i` or `j` of the adjacency matrix (e.g, `self.get_j(X)` will get
-    the features of the neighbours).
-    - `aggregate(messages, **kwargs)`: aggregates the messages, equivalent to
-    \(\square\) in the definition.
+    indices `i` or `j` of the adjacency matrix. Equivalently, you can access
+    the indices themselves via the `index_i` and `index_j` attributes.
+
+    ```python
+    aggregate(messages, **kwargs)
+    ```
+    Aggregates the messages, equivalent to \(\square\) in the definition. <br>
     The behaviour of this function can also be controlled using the `aggregate`
     keyword in the constructor of the layer (supported aggregations: sum, mean,
-    max, min, prod).
+    max, min, prod). <br>
     Any extra keyword argument of this function will be  populated by
     `propagate()` if a matching keyword is found.
-    - `update(embeddings, **kwargs)`: updates the aggregated messages to obtain
-    the final node embeddings, equivalent to \(\gamma\) in the definition.
+
+    ```python
+    update(embeddings, **kwargs)
+    ```
+    Updates the aggregated messages to obtain the final node embeddings,
+    equivalent to \(\gamma\) in the definition. <br>
     Any extra keyword argument of this function will be  populated by
     `propagate()` if a matching keyword is found.
 
     **Arguments**:
 
-    - `aggregate`: string or callable, an aggregate function. This flag can be
+    - `aggregate`: string or callable, an aggregation function. This flag can be
     used to control the behaviour of `aggregate()` wihtout re-implementing it.
     Supported aggregations: 'sum', 'mean', 'max', 'min', 'prod'.
-    If callable, the function must have the signature `foo(updates, indices, N)`
-    and return a rank 2 tensor with shape `(N, ...)`.
+    If callable, the function must have the signature `foo(updates, indices, n_nodes)`
+    and return a rank 2 tensor with shape `(n_nodes, ...)`.
+    - `kwargs`: additional keyword arguments specific to Keras' Layers, like
+    regularizers, initializers, constraints, etc.
     """
     def __init__(self, aggregate='sum', **kwargs):
         super().__init__(**{k: v for k, v in kwargs.items() if is_keras_kwarg(k)})
-        self.output_dim = None
         self.kwargs_keys = []
         for key in kwargs:
             if is_layer_kwarg(key):
@@ -80,36 +96,36 @@ class MessagePassing(Layer):
         self.agg = deserialize_scatter(aggregate)
 
     def call(self, inputs, **kwargs):
-        X, A, E = self.get_inputs(inputs)
-        return self.propagate(X, A, E)
+        x, a, e = self.get_inputs(inputs)
+        return self.propagate(x, a, e)
 
     def build(self, input_shape):
         self.built = True
 
-    def propagate(self, X, A, E=None, **kwargs):
-        self.N = tf.shape(X)[0]
-        self.index_i = A.indices[:, 0]
-        self.index_j = A.indices[:, 1]
+    def propagate(self, x, a, e=None, **kwargs):
+        self.n_nodes = tf.shape(x)[0]
+        self.index_i = a.indices[:, 1]
+        self.index_j = a.indices[:, 0]
 
         # Message
-        msg_kwargs = self.get_kwargs(X, A, E, self.msg_signature, kwargs)
-        messages = self.message(X, **msg_kwargs)
+        msg_kwargs = self.get_kwargs(x, a, e, self.msg_signature, kwargs)
+        messages = self.message(x, **msg_kwargs)
 
         # Aggregate
-        agg_kwargs = self.get_kwargs(X, A, E, self.agg_signature, kwargs)
+        agg_kwargs = self.get_kwargs(x, a, e, self.agg_signature, kwargs)
         embeddings = self.aggregate(messages, **agg_kwargs)
 
         # Update
-        upd_kwargs = self.get_kwargs(X, A, E, self.upd_signature, kwargs)
+        upd_kwargs = self.get_kwargs(x, a, e, self.upd_signature, kwargs)
         output = self.update(embeddings, **upd_kwargs)
 
         return output
 
-    def message(self, X, **kwargs):
-        return self.get_j(X)
+    def message(self, x, **kwargs):
+        return self.get_j(x)
 
     def aggregate(self, messages, **kwargs):
-        return self.agg(messages, self.index_i, self.N)
+        return self.agg(messages, self.index_i, self.n_nodes)
 
     def update(self, embeddings, **kwargs):
         return embeddings
@@ -120,17 +136,17 @@ class MessagePassing(Layer):
     def get_j(self, x):
         return tf.gather(x, self.index_j)
 
-    def get_kwargs(self, X, A, E, signature, kwargs):
+    def get_kwargs(self, x, a, e, signature, kwargs):
         output = {}
         for k in signature.keys():
             if signature[k].default is inspect.Parameter.empty or k == 'kwargs':
                 pass
-            elif k == 'X':
-                output[k] = X
-            elif k == 'A':
-                output[k] = A
-            elif k == 'E':
-                output[k] = E
+            elif k == 'x':
+                output[k] = x
+            elif k == 'a':
+                output[k] = a
+            elif k == 'e':
+                output[k] = e
             elif k in kwargs:
                 output[k] = kwargs[k]
             else:
@@ -142,36 +158,35 @@ class MessagePassing(Layer):
     @staticmethod
     def get_inputs(inputs):
         if len(inputs) == 3:
-            X, A, E = inputs
-            assert K.ndim(E) == 2, 'E must have rank 2'
+            x, a, e = inputs
+            assert K.ndim(e) == 2, 'E must have rank 2'
         elif len(inputs) == 2:
-            X, A = inputs
-            E = None
+            x, a = inputs
+            e = None
         else:
             raise ValueError('Expected 2 or 3 inputs tensors (X, A, E), got {}.'
                              .format(len(inputs)))
-        assert K.ndim(X) == 2, 'X must have rank 2'
-        assert K.is_sparse(A), 'A must be a SparseTensor'
-        assert K.ndim(A) == 2, 'A must have rank 2'
+        assert K.ndim(x) == 2, 'X must have rank 2'
+        assert K.is_sparse(a), 'A must be a SparseTensor'
+        assert K.ndim(a) == 2, 'A must have rank 2'
 
-        return X, A, E
-
-    def compute_output_shape(self, input_shape):
-        if self.output_dim:
-            output_shape = input_shape[0][:-1] + (self.output_dim, )
-        else:
-            output_shape = input_shape[0]
-        return output_shape
+        return x, a, e
 
     def get_config(self):
-        config = {
-            'aggregate': self.agg,
+        mp_config = {
+            'aggregate': serialize_scatter(self.agg)
         }
+        keras_config = {}
         for key in self.kwargs_keys:
-            config[key] = serialize_kwarg(key, getattr(self, key))
+            keras_config[key] = serialize_kwarg(key, getattr(self, key))
         base_config = super().get_config()
-        return {**base_config, **config}
+
+        return {**base_config, **keras_config, **mp_config, **self.config}
+
+    @property
+    def config(self):
+        return {}
 
     @staticmethod
-    def preprocess(A):
-        return A
+    def preprocess(a):
+        return a

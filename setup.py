@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='spektral',
-    version='0.6.2',
+    version='1.0.0',
     packages=find_packages(),
     install_requires=['tensorflow>=2.1.0',
                       'networkx',

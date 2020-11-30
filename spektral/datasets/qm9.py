@@ -1,109 +1,96 @@
 import os
+import os.path as osp
 
+import numpy as np
+import scipy.sparse as sp
 from tensorflow.keras.utils import get_file
 
-from spektral.chem import sdf_to_nx
-from spektral.utils import nx_to_numpy
+from spektral.data import Dataset, Graph
+from spektral.utils import label_to_one_hot
 from spektral.utils.io import load_csv, load_sdf
 
-DATA_PATH = os.path.expanduser('~/.spektral/datasets/qm9/')
-DATASET_URL = 'https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/gdb9.tar.gz'
-RETURN_TYPES = {'numpy', 'networkx', 'sdf'}
-NODE_FEATURES = ['atomic_num', 'charge', 'coords', 'iso']
-EDGE_FEATURES = ['type', 'stereo']
-MAX_K = 9
+ATOM_TYPES = [1, 6, 7, 8, 9]
+BOND_TYPES = [1, 2, 3, 4]
 
 
-def load_data(nf_keys=None, ef_keys=None, auto_pad=True, self_loops=False,
-              amount=None, return_type='numpy'):
+class QM9(Dataset):
     """
-    Loads the QM9 chemical data set of small molecules.
+    The QM9 chemical data set of small molecules.
 
-    Nodes represent heavy atoms (hydrogens are discarded), edges represent
-    chemical bonds.
+    In this dataset, nodes represent atoms and edges represent chemical bonds.
+    There are 5 possible atom types (H, C, N, O, F) and 4 bond types (single,
+    double, triple, aromatic).
 
-    The node features represent the chemical properties of each atom, and are
-    loaded according to the `nf_keys` argument.
-    See `spektral.datasets.qm9.NODE_FEATURES` for possible node features, and
-    see [this link](http://www.nonlinear.com/progenesis/sdf-studio/v0.9/faq/sdf-file-format-guidance.aspx)
-    for the meaning of each property. Usually, it is sufficient to load the
-    atomic number.
+    Node features represent the chemical properties of each atom and include:
 
-    The edge features represent the type and stereoscopy of each chemical bond
-    between two atoms.
-    See `spektral.datasets.qm9.EDGE_FEATURES` for possible edge features, and
-    see [this link](http://www.nonlinear.com/progenesis/sdf-studio/v0.9/faq/sdf-file-format-guidance.aspx)
-    for the meaning of each property. Usually, it is sufficient to load the
-    type of bond.
+    - The atomic number, one-hot encoded;
+    - The atom's position in the X, Y, and Z dimensions;
+    - The atomic charge;
+    - The mass difference from the monoisotope;
 
-    :param nf_keys: list or str, node features to return (see `qm9.NODE_FEATURES`
-    for available features);
-    :param ef_keys: list or str, edge features to return (see `qm9.EDGE_FEATURES`
-    for available features);
-    :param auto_pad: if `return_type='numpy'`, zero pad graph matrices to have 
-    the same number of nodes;
-    :param self_loops: if `return_type='numpy'`, add self loops to adjacency 
-    matrices;
-    :param amount: the amount of molecules to return (in ascending order by
-    number of atoms).
-    :param return_type: `'numpy'`, `'networkx'`, or `'sdf'`, data format to return;
-    :return:
-    - if `return_type='numpy'`, the adjacency matrix, node features,
-    edge features, and a Pandas dataframe containing labels;
-    - if `return_type='networkx'`, a list of graphs in Networkx format,
-    and a dataframe containing labels;   
-    - if `return_type='sdf'`, a list of molecules in the internal SDF format and
-    a dataframe containing labels.
+    The edge features represent the type of chemical bond between two atoms,
+    one-hot encoded.
+
+    Each graph has an 18-dimensional label for regression.
+
+    **Arguments**
+
+    - `amount`: int, load this many molecules instead of the full dataset
+    (useful for debugging).
     """
-    if return_type not in RETURN_TYPES:
-        raise ValueError('Possible return_type: {}'.format(RETURN_TYPES))
+    url = 'https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/gdb9.tar.gz'
 
-    if not os.path.exists(DATA_PATH):
-        _download_data()  # Try to download dataset
+    def __init__(self, amount=None, **kwargs):
+        self.amount = amount
+        super().__init__(**kwargs)
 
-    print('Loading QM9 dataset.')
-    sdf_file = os.path.join(DATA_PATH, 'qm9.sdf')
-    data = load_sdf(sdf_file, amount=amount)  # Internal SDF format
+    def download(self):
+        get_file('qm9.tar.gz', self.url, extract=True, cache_dir=self.path,
+                 cache_subdir=self.path)
+        os.remove(osp.join(self.path, 'qm9.tar.gz'))
 
-    # Load labels
-    labels_file = os.path.join(DATA_PATH, 'qm9.sdf.csv')
-    labels = load_csv(labels_file)
-    if amount is not None:
-        labels = labels[:amount]
-    if return_type == 'sdf':
-        return data, labels
-    else:
-        # Convert to Networkx
-        data = [sdf_to_nx(_) for _ in data]
+    def read(self):
+        print('Loading QM9 dataset.')
+        sdf_file = osp.join(self.path, 'gdb9.sdf')
+        data = load_sdf(sdf_file, amount=self.amount)  # Internal SDF format
 
-    if return_type == 'numpy':
-        if nf_keys is not None:
-            if isinstance(nf_keys, str):
-                nf_keys = [nf_keys]
-        else:
-            nf_keys = NODE_FEATURES
-        if ef_keys is not None:
-            if isinstance(ef_keys, str):
-                ef_keys = [ef_keys]
-        else:
-            ef_keys = EDGE_FEATURES
+        x_list, a_list, e_list = [], [], []
+        for mol in data:
+            x = np.array([atom_to_feature(atom) for atom in mol['atoms']])
+            a, e = mol_to_adj(mol)
+            x_list += [x]
+            a_list += [a]
+            e_list += [e]
 
-        adj, nf, ef = nx_to_numpy(data,
-                                  auto_pad=auto_pad, self_loops=self_loops,
-                                  nf_keys=nf_keys, ef_keys=ef_keys)
-        return adj, nf, ef, labels
-    elif return_type == 'networkx':
-        return data, labels
-    else:
-        # Should not get here
-        raise RuntimeError()
+        # Load labels
+        labels_file = osp.join(self.path, 'gdb9.sdf.csv')
+        labels = load_csv(labels_file)
+        labels = labels.set_index('mol_id').values[:, 1:]
+        if self.amount is not None:
+            labels = labels[:self.amount]
+
+        return [Graph(x=x, a=a, e=e, y=y)
+                for x, a, e, y in zip(x_list, a_list, e_list, labels)]
 
 
-def _download_data():
-    _ = get_file(
-        'qm9.tar.gz', DATASET_URL,
-        extract=True, cache_dir=DATA_PATH, cache_subdir=DATA_PATH
-    )
-    os.rename(DATA_PATH + 'gdb9.sdf', DATA_PATH + 'qm9.sdf')
-    os.rename(DATA_PATH + 'gdb9.sdf.csv', DATA_PATH + 'qm9.sdf.csv')
-    os.remove(DATA_PATH + 'qm9.tar.gz')
+def atom_to_feature(atom):
+    atomic_num = label_to_one_hot(atom['atomic_num'], ATOM_TYPES)
+    coords = atom['coords']
+    charge = atom['charge']
+    iso = atom['iso']
+
+    return np.concatenate((atomic_num, coords, [charge, iso]), -1)
+
+
+def mol_to_adj(mol):
+    row, col, edge_attr = [], [], []
+    for bond in mol['bonds']:
+        start, end = bond['start_atom'], bond['end_atom']
+        row += [start, end]
+        col += [end, start]
+        edge_attr += [bond['type']] * 2
+
+    a = sp.csr_matrix((np.ones_like(row), (row, col)))
+    edge_attr = np.array([label_to_one_hot(e, BOND_TYPES)
+                          for e in edge_attr])
+    return a, edge_attr
