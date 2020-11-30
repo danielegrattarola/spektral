@@ -1,6 +1,6 @@
 # Getting started
 
-Spektral is designed according to the guiding principles of the Keras API to make things extremely simple for beginners while maintaining flexibility for experts.  
+Spektral is designed according to the guiding principles of Keras to make things extremely simple for beginners while maintaining flexibility for experts.  
 
 In this page we will go over the main features of Spektral while creating a graph neural network for graph classification. 
 
@@ -17,7 +17,7 @@ In Spektral, graphs are represented with instances of `spektral.data.Graph` whic
 - `e`: the **edge features** - usually represented in a sparse edge list format, with a `np.array` of shape `(n_edges, n_edge_features)`.
 - `y`: the **labels** - can represent anything, from graph labels to node labels, or even something else. 
 
-A graph can have all of these attributes or none of them. You can even add extra attributes if you want: after all, a `Graph` is just a plain Python object. For instance, see `graph.n_nodes`, `graph.n_node_features`, etc.
+A graph can have all of these attributes or none of them. Since Graphs are just plain Python objects, you can also add extra attributes if you want. For instance, see `graph.n_nodes`, `graph.n_node_features`, etc.
 
 ## Datasets
 
@@ -90,14 +90,14 @@ Now we are ready to augment our node features with the one-hot-encoded degree. S
 >>> dataset.apply(Degree(max_degree))
 ```
 
-We can see that it worked because now we have an extra `max_degree + 1` node features, which are our one-hot vectors:
+We can see that it worked because now we have an extra `max_degree + 1` node features:
 
 ```python
 >>> dataset[0]
 Graph(n_nodes=42, n_node_features=17, n_edge_features=None, y=[1. 0.])
 ```
 
-Since we will be using a `GCNConv` layer in our GNN, we also want to follow the [original paper](https://arxiv.org/abs/1609.02907) that introduced this layer, and do some extra pre-processing of the adjacency matrix. 
+Since we will be using a `GCNConv` layer in our GNN, we also want to follow the [original paper](https://arxiv.org/abs/1609.02907) that introduced this layer and do some extra pre-processing of the adjacency matrix. 
 
 Since this is a fairly common operation, Spektral has a transform to do it: 
 
@@ -196,9 +196,7 @@ and we can finally train our GNN!
 Since loaders are essentially generators, we need to provide the `steps_per_epoch` keyword to `model.fit()` and we don't need to specify a batch size:
 
 ```python
-model.fit(loader.load(),
-          steps_per_epoch=loader.steps_per_epoch,
-          epochs=10)
+model.fit(loader.load(), steps_per_epoch=loader.steps_per_epoch, epochs=10)
 ``` 
 
 Done!
@@ -218,8 +216,8 @@ loader = BatchLoader(dataset_test, batch_size=32)
 and feed it to the model by calling `load()`:
 
 ```python
-loss = model.evaluate(loader.load(), 
-                      steps=loader.steps_per_epoch)
+loss = model.evaluate(loader.load(), steps=loader.steps_per_epoch)
+
 print('Test loss: {}'.format(loss))
 ```
 
@@ -243,7 +241,6 @@ Make sure to read the documentation, and get in touch [on Github](https://github
 
 If you want to cite Spektral in your work, refer to our paper: 
 
-> Graph Neural Networks in TensorFlow and Keras with Spektral  
-> D. Grattarola and C. Alippi  
-> ICML 2020 - GRL+ Workshop  
-> [https://arxiv.org/abs/2006.12138](https://arxiv.org/abs/2006.12138)  
+> [Graph Neural Networks in TensorFlow and Keras with Spektral](https://arxiv.org/abs/2006.12138) <br>
+> Daniele Grattarola and Cesare Alippi  
+
