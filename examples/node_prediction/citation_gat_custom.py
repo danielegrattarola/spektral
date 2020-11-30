@@ -1,5 +1,5 @@
 """
-This script is an extension of the citation_gcn_fast.py script.
+This script is an extension of the citation_gcn_custom.py script.
 It shows how to train GAT (with the same experimental setting of the original
 paper), using faster training and test functions.
 """
@@ -98,6 +98,6 @@ for epoch in range(1, epochs + 1):
     else:
         current_patience -= 1
         if current_patience == 0:
-            print('Best test acc: {}'.format(best_test_acc))
+            print('Test accuracy: {}'.format(best_test_acc))
             break
 toc('GAT ({} epochs)'.format(epoch))

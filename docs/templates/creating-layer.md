@@ -40,7 +40,7 @@ class GCN(MessagePassing):
 
 Note that the Keras keyword `activation` was passed to the constructor of the superclass. This can be done with any Keras keyword (like regularizers, constraints, etc) and the layer will process them automatically. 
 
-By default, the `call` method of MessagePassing layers will only call `propagate`. We modify it so that it also updates the node features before starting the propagation:
+By default, the `call` method of MessagePassing layers will only call `propagate`. We modify it so that it also transforms the node features before starting the propagation:
 
 ```py
 def call(self, inputs):
@@ -52,10 +52,10 @@ def call(self, inputs):
     return self.propagate(x=x, a=a)
 ```
 
-Then, we implement the `message` function, which only needs to get the neighbours for each node.<br>
+Then, we implement the `message` function.
 The `get_i` and `get_j` built-in methods can be used to automatically access either side of the edges \(i \leftarrow j\). For instance, we can use `get_j` to access the node features `x[j]` of all neighbors `j`.
 
-If you need direct access to the edge indices, you can use the `index_i` and `index_j` attributes directly.
+If you need direct access to the edge indices, you can use the `index_i` and `index_j` attributes.
 
 In this case, we only need to get the neighbors' features and return them: 
 
@@ -95,7 +95,7 @@ This is enough to get started with building your own layers in Spektral.
 
 ## Notes
 
-An important feature of the MessagePassing class is that any extra keyword argument given to `propagate`, will be matched to the signature of `message`, `aggregate` and `update` and forwarded to those functions if a match is found. 
+An important feature of the MessagePassing class is that any extra keyword argument given to `propagate`, will be compared to the signatures of `message`, `aggregate` and `update` and forwarded to those functions if a match is found. 
 
 For example, we can call:
 
