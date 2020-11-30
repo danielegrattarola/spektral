@@ -1,21 +1,24 @@
-import tensorflow as tf
 from tensorflow.keras import backend as K
 
 from spektral.layers import ops
-from spektral.layers.convolutional.graph_conv import GraphConv
+from spektral.layers.convolutional.message_passing import MessagePassing
 
 
-class GraphSageConv(GraphConv):
+class GraphSageConv(MessagePassing):
     r"""
-    A GraphSAGE layer as presented by
-    [Hamilton et al. (2017)](https://arxiv.org/abs/1706.02216).
+    A GraphSAGE layer from the paper
+
+    > [Inductive Representation Learning on Large Graphs](https://arxiv.org/abs/1706.02216)<br>
+    > William L. Hamilton et al.
 
     **Mode**: single, disjoint.
 
+    **This layer expects a sparse adjacency matrix.**
+
     This layer computes:
     $$
-        \Z = \big[ \textrm{AGGREGATE}(\X) \| \X \big] \W + \b; \\
-        \Z = \frac{\Z}{\|\Z\|}
+        \X' = \big[ \textrm{AGGREGATE}(\X) \| \X \big] \W + \b; \\
+        \X' = \frac{\X'}{\|\X'\|}
     $$
     where \( \textrm{AGGREGATE} \) is a function to aggregate a node's
     neighbourhood. The supported aggregation methods are: sum, mean,
@@ -23,8 +26,8 @@ class GraphSageConv(GraphConv):
 
     **Input**
 
-    - Node features of shape `(N, F)`;
-    - Binary adjacency matrix of shape `(N, N)`.
+    - Node features of shape `(n_nodes, n_node_features)`;
+    - Binary adjacency matrix of shape `(n_nodes, n_nodes)`.
 
     **Output**
 
@@ -36,7 +39,7 @@ class GraphSageConv(GraphConv):
     - `channels`: number of output channels;
     - `aggregate_op`: str, aggregation method to use (`'sum'`, `'mean'`,
     `'max'`, `'min'`, `'prod'`);
-    - `activation`: activation function to use;
+    - `activation`: activation function;
     - `use_bias`: bool, add a bias vector to the output;
     - `kernel_initializer`: initializer for the weights;
     - `bias_initializer`: initializer for the bias vector;
@@ -50,7 +53,7 @@ class GraphSageConv(GraphConv):
 
     def __init__(self,
                  channels,
-                 aggregate_op='mean',
+                 aggregate='mean',
                  activation=None,
                  use_bias=True,
                  kernel_initializer='glorot_uniform',
@@ -61,7 +64,7 @@ class GraphSageConv(GraphConv):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        super().__init__(channels,
+        super().__init__(aggregate=aggregate,
                          activation=activation,
                          use_bias=use_bias,
                          kernel_initializer=kernel_initializer,
@@ -72,21 +75,7 @@ class GraphSageConv(GraphConv):
                          kernel_constraint=kernel_constraint,
                          bias_constraint=bias_constraint,
                          **kwargs)
-        if aggregate_op == 'sum':
-            self.aggregate_op = ops.scatter_sum
-        elif aggregate_op == 'mean':
-            self.aggregate_op = ops.scatter_mean
-        elif aggregate_op == 'max':
-            self.aggregate_op = ops.scatter_max
-        elif aggregate_op == 'min':
-            self.aggregate_op = ops.scatter_sum
-        elif aggregate_op == 'prod':
-            self.aggregate_op = ops.scatter_prod
-        elif callable(aggregate_op):
-            self.aggregate_op = aggregate_op
-        else:
-            raise ValueError('Possbile aggragation methods: sum, mean, max, min, '
-                             'prod')
+        self.channels = channels
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
@@ -107,21 +96,11 @@ class GraphSageConv(GraphConv):
         self.built = True
 
     def call(self, inputs):
-        features = inputs[0]
-        fltr = inputs[1]
+        x, a, _ = self.get_inputs(inputs)
+        a = ops.add_self_loops(a)
 
-        # Enforce sparse representation
-        if not K.is_sparse(fltr):
-            fltr = ops.dense_to_sparse(fltr)
-
-        # Propagation
-        indices = fltr.indices
-        N = tf.shape(features, out_type=indices.dtype)[0]
-        indices = ops.sparse_add_self_loops(indices, N)
-        targets, sources = indices[:, -2], indices[:, -1]
-        messages = tf.gather(features, sources)
-        aggregated = self.aggregate_op(messages, targets, N)
-        output = K.concatenate([features, aggregated])
+        aggregated = self.propagate(x, a)
+        output = K.concatenate([x, aggregated])
         output = ops.dot(output, self.kernel)
 
         if self.use_bias:
@@ -129,15 +108,11 @@ class GraphSageConv(GraphConv):
         output = K.l2_normalize(output, axis=-1)
         if self.activation is not None:
             output = self.activation(output)
+
         return output
 
-    def get_config(self):
-        config = {
-            'aggregate_op': self.aggregate_op
+    @property
+    def config(self):
+        return{
+            'channels': self.channels
         }
-        base_config = super().get_config()
-        return dict(list(base_config.items()) + list(config.items()))
-
-    @staticmethod
-    def preprocess(A):
-        return A

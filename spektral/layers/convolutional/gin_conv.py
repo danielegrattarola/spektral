@@ -7,8 +7,10 @@ from spektral.layers.convolutional.message_passing import MessagePassing
 
 class GINConv(MessagePassing):
     r"""
-    A Graph Isomorphism Network (GIN) as presented by
-    [Xu et al. (2018)](https://arxiv.org/abs/1810.00826).
+    A Graph Isomorphism Network (GIN) from the paper
+
+    > [How Powerful are Graph Neural Networks?](https://arxiv.org/abs/1810.00826)<br>
+    > Keyulu Xu et al.
 
     **Mode**: single, disjoint.
 
@@ -16,14 +18,15 @@ class GINConv(MessagePassing):
 
     This layer computes for each node \(i\):
     $$
-        \Z_i = \textrm{MLP}\big( (1 + \epsilon) \cdot \X_i + \sum\limits_{j \in \mathcal{N}(i)} \X_j \big)
+        \x_i' = \textrm{MLP}\big( (1 + \epsilon) \cdot \x_i + \sum\limits_{j
+        \in \mathcal{N}(i)} \x_j \big)
     $$
     where \(\textrm{MLP}\) is a multi-layer perceptron.
 
     **Input**
 
-    - Node features of shape `(N, F)`;
-    - Binary adjacency matrix of shape `(N, N)`.
+    - Node features of shape `(n_nodes, n_node_features)`;
+    - Binary adjacency matrix of shape `(n_nodes, n_nodes)`.
 
     **Output**
 
@@ -33,14 +36,14 @@ class GINConv(MessagePassing):
     **Arguments**
 
     - `channels`: integer, number of output channels;
-    - `epsilon`: unnamed parameter, see
-    [Xu et al. (2018)](https://arxiv.org/abs/1810.00826), and the equation above.
+    - `epsilon`: unnamed parameter, see the original paper and the equation
+    above.
     By setting `epsilon=None`, the parameter will be learned (default behaviour).
     If given as a value, the parameter will stay fixed.
     - `mlp_hidden`: list of integers, number of hidden units for each hidden
     layer in the MLP (if None, the MLP has only the output layer);
     - `mlp_activation`: activation for the MLP layers;
-    - `activation`: activation function to use;
+    - `activation`: activation function;
     - `use_bias`: bool, add a bias vector to the output;
     - `kernel_initializer`: initializer for the weights;
     - `bias_initializer`: initializer for the bias vector;
@@ -56,6 +59,7 @@ class GINConv(MessagePassing):
                  epsilon=None,
                  mlp_hidden=None,
                  mlp_activation='relu',
+                 aggregate='sum',
                  activation=None,
                  use_bias=True,
                  kernel_initializer='glorot_uniform',
@@ -66,7 +70,7 @@ class GINConv(MessagePassing):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        super().__init__(aggregate='sum',
+        super().__init__(aggregate=aggregate,
                          activation=activation,
                          use_bias=use_bias,
                          kernel_initializer=kernel_initializer,
@@ -77,7 +81,7 @@ class GINConv(MessagePassing):
                          kernel_constraint=kernel_constraint,
                          bias_constraint=bias_constraint,
                          **kwargs)
-        self.channels = self.output_dim = channels
+        self.channels = channels
         self.epsilon = epsilon
         self.mlp_hidden = mlp_hidden if mlp_hidden else []
         self.mlp_activation = activations.get(mlp_activation)
@@ -108,19 +112,17 @@ class GINConv(MessagePassing):
 
         self.built = True
 
-    def call(self, inputs):
-        X, A, E = self.get_inputs(inputs)
-        output = self.mlp((1.0 + self.eps) * X + self.propagate(X, A, E))
+    def call(self, inputs, **kwargs):
+        x, a, _ = self.get_inputs(inputs)
+        output = self.mlp((1.0 + self.eps) * x + self.propagate(x, a))
 
         return output
 
-    def get_config(self):
-        config = {
+    @property
+    def config(self):
+        return{
             'channels': self.channels,
             'epsilon': self.epsilon,
             'mlp_hidden': self.mlp_hidden,
             'mlp_activation': self.mlp_activation
         }
-        base_config = super().get_config()
-        base_config.pop('aggregate')  # Remove it because it's defined by constructor
-        return {**base_config, **config}

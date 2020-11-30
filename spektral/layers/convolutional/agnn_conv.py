@@ -7,8 +7,10 @@ from spektral.layers.convolutional.message_passing import MessagePassing
 
 class AGNNConv(MessagePassing):
     r"""
-    An Attention-based Graph Neural Network (AGNN) as presented by
-    [Thekumparampil et al. (2018)](https://arxiv.org/abs/1803.03735).
+    An Attention-based Graph Neural Network (AGNN) from the paper
+
+    > [Attention-based Graph Neural Network for Semi-supervised Learning](https://arxiv.org/abs/1803.03735)<br>
+    > Kiran K. Thekumparampil et al.
 
     **Mode**: single, disjoint.
 
@@ -16,23 +18,23 @@ class AGNNConv(MessagePassing):
 
     This layer computes:
     $$
-        \Z = \P\X
+        \X' = \P\X
     $$
     where
     $$
         \P_{ij} = \frac{
-            \exp \left( \beta \cos \left( \X_i, \X_j \right) \right)
+            \exp \left( \beta \cos \left( \x_i, \x_j \right) \right)
         }{
             \sum\limits_{k \in \mathcal{N}(i) \cup \{ i \}}
-            \exp \left( \beta \cos \left( \X_i, \X_k \right) \right)
+            \exp \left( \beta \cos \left( \x_i, \x_k \right) \right)
         }
     $$
     and \(\beta\) is a trainable parameter.
 
     **Input**
 
-    - Node features of shape `(N, F)`;
-    - Binary adjacency matrix of shape `(N, N)`.
+    - Node features of shape `(n_nodes, n_node_features)`;
+    - Binary adjacency matrix of shape `(n_nodes, n_nodes)`.
 
     **Output**
 
@@ -42,11 +44,11 @@ class AGNNConv(MessagePassing):
 
     - `trainable`: boolean, if True, then beta is a trainable parameter.
     Otherwise, beta is fixed to 1;
-    - `activation`: activation function to use;
+    - `activation`: activation function;
     """
 
-    def __init__(self, trainable=True, activation=None, **kwargs):
-        super().__init__(aggregate='sum', activation=activation, **kwargs)
+    def __init__(self, trainable=True, aggregate='sum', activation=None, **kwargs):
+        super().__init__(aggregate=aggregate, activation=activation, **kwargs)
         self.trainable = trainable
 
     def build(self, input_shape):
@@ -58,28 +60,25 @@ class AGNNConv(MessagePassing):
         self.built = True
 
     def call(self, inputs, **kwargs):
-        X, A, E = self.get_inputs(inputs)
-        X_norm = K.l2_normalize(X, axis=-1)
-        output = self.propagate(X, A, E, X_norm=X_norm)
+        x, a, _ = self.get_inputs(inputs)
+        x_norm = K.l2_normalize(x, axis=-1)
+        output = self.propagate(x, a, x_norm=x_norm)
         output = self.activation(output)
 
         return output
 
-    def message(self, X, X_norm=None):
-        X_j = self.get_j(X)
-        X_norm_i = self.get_i(X_norm)
-        X_norm_j = self.get_j(X_norm)
-        alpha = self.beta * tf.reduce_sum(X_norm_i * X_norm_j, axis=-1)
-        alpha = ops.unsorted_segment_softmax(alpha, self.index_i, self.N)
+    def message(self, x, x_norm=None):
+        x_j = self.get_j(x)
+        x_norm_i = self.get_i(x_norm)
+        x_norm_j = self.get_j(x_norm)
+        alpha = self.beta * tf.reduce_sum(x_norm_i * x_norm_j, axis=-1)
+        alpha = ops.unsorted_segment_softmax(alpha, self.index_i, self.n_nodes)
         alpha = alpha[:, None]
 
-        return alpha * X_j
+        return alpha * x_j
 
-    def get_config(self):
-        config = {
+    @property
+    def config(self):
+        return {
             'trainable': self.trainable,
         }
-        base_config = super().get_config()
-        base_config.pop('aggregate')  # Remove it because it's defined by constructor
-
-        return {**base_config, **config}

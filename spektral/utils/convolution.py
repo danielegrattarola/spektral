@@ -1,3 +1,6 @@
+import copy
+import warnings
+
 import numpy as np
 from scipy import sparse as sp
 from scipy.sparse.linalg import ArpackNoConvergence
@@ -27,7 +30,9 @@ def degree_power(A, k):
     :return: if A is a dense array, a dense array; if A is sparse, a sparse
     matrix in DIA format.
     """
-    degrees = np.power(np.array(A.sum(1)), k).flatten()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        degrees = np.power(np.array(A.sum(1)), k).ravel()
     degrees[np.isinf(degrees)] = 0.
     if sp.issparse(A):
         D = sp.diags(degrees)
@@ -46,11 +51,10 @@ def normalized_adjacency(A, symmetric=True):
     """
     if symmetric:
         normalized_D = degree_power(A, -0.5)
-        output = normalized_D.dot(A).dot(normalized_D)
+        return normalized_D.dot(A).dot(normalized_D)
     else:
         normalized_D = degree_power(A, -1.)
-        output = normalized_D.dot(A)
-    return output
+        return normalized_D.dot(A)
 
 
 def laplacian(A):
@@ -100,7 +104,7 @@ def rescale_laplacian(L, lmax=None):
     return L_scaled
 
 
-def localpooling_filter(A, symmetric=True):
+def gcn_filter(A, symmetric=True):
     r"""
     Computes the graph filter described in
     [Kipf & Welling (2017)](https://arxiv.org/abs/1609.02907).
@@ -109,22 +113,23 @@ def localpooling_filter(A, symmetric=True):
     \(\D^{-\frac{1}{2}}\A\D^{-\frac{1}{2}}\) or as \(\D^{-1}\A\);
     :return: array or sparse matrix with rank 2 or 3, same as A;
     """
-    fltr = A.copy()
-    if sp.issparse(A):
-        I = sp.eye(A.shape[-1], dtype=A.dtype)
+    out = copy.deepcopy(A)
+    if isinstance(A, list) or (isinstance(A, np.ndarray) and A.ndim == 3):
+        for i in range(len(A)):
+            out[i] = A[i]
+            out[i][np.diag_indices_from(out[i])] += 1
+            out[i] = normalized_adjacency(out[i], symmetric=symmetric)
     else:
-        I = np.eye(A.shape[-1], dtype=A.dtype)
-    if A.ndim == 3:
-        for i in range(A.shape[0]):
-            A_tilde = A[i] + I
-            fltr[i] = normalized_adjacency(A_tilde, symmetric=symmetric)
-    else:
-        A_tilde = A + I
-        fltr = normalized_adjacency(A_tilde, symmetric=symmetric)
+        if hasattr(out, 'tocsr'):
+            out = out.tocsr()
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            out[np.diag_indices_from(out)] += 1
+        out = normalized_adjacency(out, symmetric=symmetric)
 
-    if sp.issparse(fltr):
-        fltr.sort_indices()
-    return fltr
+    if sp.issparse(out):
+        out.sort_indices()
+    return out
 
 
 def chebyshev_polynomial(X, k):
@@ -188,3 +193,26 @@ def chebyshev_filter(A, k, symmetric=True):
     return T_k
 
 
+def add_self_loops(a, value=1):
+    """
+    Sets the inner diagonals of `a` to `value`.
+    :param a: a np.array or scipy.sparse matrix, the innermost two dimensions
+    must be equal.
+    :param value: value to set the diagonals to.
+    :return: a np.array or scipy.sparse matrix with the same shape as `a`.
+    """
+    a = a.copy()
+    if len(a.shape) < 2:
+        raise ValueError('a must have at least rank 2')
+    n = a.shape[-1]
+    if n != a.shape[-2]:
+        raise ValueError('Innermost two dimensions must be equal. Got {}'
+                         .format(a.shape))
+    if sp.issparse(a):
+        a = a.tolil()
+        a.setdiag(value)
+        return a.tocsr()
+    else:
+        idx = np.arange(n)
+        a[..., idx, idx] = value
+        return a

@@ -8,14 +8,12 @@ If you found a bug in the latest version of Spektral, you can [open an issue](ht
 
 Before opening the issue, make sure to follow these steps: 
 
-1. Update to the current master branch and see if the problem is already solved. Sometimes a change does not get released immediately on PyPi, so it might be a good idea to install from source. 
+1. Update to the current `develop` branch and see if the problem is already solved. Sometimes a change does not get released immediately on PyPi, so it might be a good idea to install from source. 
 2. Check old issues to see if the problem was already solved. 
-3. Make sure that your configuration checks all requirements, including: 
+3. Make sure that your configuration matches all requirements, including: 
     - Operating system
     - Python version
-    - Version of Spektral
-    - Version of Tensorflow and Keras (note that since version 0.3 Spektral only supports `tf.keras`)
-    - Version of CUDA and cuDNN
+    - Tensorflow version (note that since version 0.3 Spektral only supports `tf.keras` and TensorFlow 2.1 and above)
 4. Provide a minimal script to reproduce the issue. The script should be runnable as-is, with no modification or external data. 
 5. Include any stack trace/errors that you get.
 
@@ -27,7 +25,7 @@ Bug fixes should be added to the `master` branch.
 
 ## Feature requests
 
-If you want to request a feature, [open an issue](https://github.com/danielegrattarola/spektral/issues) on GitHub and clearly mark it as a feature request.
+If you want to request a feature, [open an issue](https://github.com/danielegrattarola/spektral/issues) on GitHub and mark it as a feature request.
 
 1. Give a detailed description of the feature, including why it is important and why it fits in the scope of the project. 
 Spektral is primarily a library for creating graph neural networks, so new features should gravitate around this subject.
@@ -47,7 +45,7 @@ There are no hard rules for contributing to Spektral, but you should try to foll
 **General guidelines:**
 
 - Format your code according to PEP8;
-- Make sure that the code you contribute is clearly identifiable in a PR (e.g., watch out for your IDE automatically reformatting the whole project);
+- Make sure that the code you contribute is clearly identifiable in a PR (e.g., watch out for your IDE automatically reformatting files);
 - New features should support:
     - Python >= 3.5
     - TensorFlow >= 2.1.0
@@ -64,23 +62,15 @@ There are no hard rules for contributing to Spektral, but you should try to foll
 - Message-passing/convolutional layers go in their own file in `layers/convolutional/`;
 - Pooling layers go in their own file in `layers/pooling/`;
 - Global pooling layers go in `layers/pooling/globalpool.py`;
-- Layers should extend `tensorflow.keras.layers.Layer` and implement the following methods: 
-    - `build()`
-    - `call()`
-    - `compute_output_shape()`
-    - `get_config()`
-- Convolutional layers should also implement a `preprocess(A)` staticmethod to manipulate/normalize the adjacency matrix before giving it as input to the GNN (e.g., the `preoprocess()` method of GCN adds self-loops and then re-scales each row by the degree);
-- Make sure that you understand [data modes](https://spektral.graphneural.network/data/) and that you know the modes supported by your layer. Layers should support at least single or batch mode;
-- Many layers in Spektral inherit their base functionality from `GraphConv`, check if this is the case for yours as well;
-- There is also a `MessagePassing` layer that offers a quick API to implement convolutional layers in single/disjoint mode;
+- Layers should extend `MessagePassing`, `Conv` or `Pool`.
+- Make sure that you understand [data modes](https://graphneural.network/data-modes/) and that you know the modes supported by your layer. Layers should support at least one of disjoint or batch mode;
 
 **Guidelines for testing:**
 
 - Tests are found in `tests/`;
-- It's especially important to add tests for any new layer. See `tests/test_layers/` and the files contained there;
-- See the comments in each test `.py` for more information;
+- See the docstrings in each file for more information;
 
 **Guidelines for the documentation:**
 
 - See the documentation in the other layers for how to format docstrings (it's important that the format is the same so that the docs can be built automatically);
-- Docs are automatically generated using `docs/autogen.py`. Make sure to include any new Layer as an entry in the `PAGES` dictionary. It is not necessary to add utils and other minor functions to `autogen.py` (although you should still write the docstrings). 
+- Docs are automatically generated using `docs/autogen.py`. Make sure to include any new layer as an entry in the `PAGES` dictionary. It is not necessary to add utils and other minor functions to `autogen.py` (although you should still write the docstrings). 

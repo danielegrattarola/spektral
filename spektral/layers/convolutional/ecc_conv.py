@@ -3,35 +3,37 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Dense
 
 from spektral.layers import ops
+from spektral.layers.convolutional.conv import Conv
 from spektral.layers.ops import modes
-from spektral.layers.convolutional.graph_conv import GraphConv
 
 
-class EdgeConditionedConv(GraphConv):
+class ECCConv(Conv):
     r"""
-    An edge-conditioned convolutional layer (ECC) as presented by
-    [Simonovsky & Komodakis (2017)](https://arxiv.org/abs/1704.02901).
+    An edge-conditioned convolutional layer (ECC) from the paper
+
+    > [Dynamic Edge-Conditioned Filters in Convolutional Neural Networks on
+  Graphs](1704.02901)<br>
+    > Martin Simonovsky and Nikos Komodakis
 
     **Mode**: single, disjoint, batch.
 
-    **Notes**:
-
-        - In single mode, if the adjacency matrix is dense it will be converted
-        to a SparseTensor automatically (which is an expensive operation).
-
-    For each node \( i \), this layer computes:
+    This layer computes:
     $$
-        \Z_i = \X_{i} \W_{\textrm{root}} + \sum\limits_{j \in \mathcal{N}(i)} \X_{j} \textrm{MLP}(\E_{ji}) + \b
+        \x_i' = \x_{i} \W_{\textrm{root}} + \sum\limits_{j \in \mathcal{N}(i)}
+        \x_{j} \textrm{MLP}(\e_{j \rightarrow i}) + \b
     $$
     where \(\textrm{MLP}\) is a multi-layer perceptron that outputs an
     edge-specific weight as a function of edge attributes.
 
+    **Note:** In single mode, if the adjacency matrix is dense it will be
+    converted to a SparseTensor automatically (which is an expensive operation).
+
     **Input**
 
-    - Node features of shape `([batch], N, F)`;
-    - Binary adjacency matrices of shape `([batch], N, N)`;
-    - Edge features. In single mode, shape `(num_edges, S)`; in batch mode, shape
-    `(batch, N, N, S)`.
+    - Node features of shape `([batch], n_nodes, n_node_features)`;
+    - Binary adjacency matrices of shape `([batch], n_nodes, n_nodes)`;
+    - Edge features. In single mode, shape `(num_edges, n_edge_features)`; in batch mode, shape
+    `(batch, n_nodes, n_nodes, n_edge_features)`.
 
     **Output**
 
@@ -45,7 +47,7 @@ class EdgeConditionedConv(GraphConv):
     the kernel-generating network;
     - 'root': if False, the layer will not consider the root node for computing
     the message passing (first term in equation above), but only the neighbours.
-    - `activation`: activation function to use;
+    - `activation`: activation function;
     - `use_bias`: bool, add a bias vector to the output;
     - `kernel_initializer`: initializer for the weights;
     - `bias_initializer`: initializer for the bias vector;
@@ -71,8 +73,7 @@ class EdgeConditionedConv(GraphConv):
                  kernel_constraint=None,
                  bias_constraint=None,
                  **kwargs):
-        super().__init__(channels,
-                         activation=activation,
+        super().__init__(activation=activation,
                          use_bias=use_bias,
                          kernel_initializer=kernel_initializer,
                          bias_initializer=bias_initializer,
@@ -82,6 +83,7 @@ class EdgeConditionedConv(GraphConv):
                          kernel_constraint=kernel_constraint,
                          bias_constraint=bias_constraint,
                          **kwargs)
+        self.channels = channels
         self.kernel_network = kernel_network
         self.root = root
 
@@ -124,32 +126,30 @@ class EdgeConditionedConv(GraphConv):
         self.built = True
 
     def call(self, inputs):
-        X = inputs[0]  # (batch_size, N, F)
-        A = inputs[1]  # (batch_size, N, N)
-        E = inputs[2]  # (n_edges, S) or (batch_size, N, N, S)
+        x, a, e = inputs
 
-        mode = ops.autodetect_mode(A, X)
+        mode = ops.autodetect_mode(a, x)
         if mode == modes.SINGLE:
             return self._call_single(inputs)
 
         # Parameters
-        N = K.shape(X)[-2]
-        F = K.int_shape(X)[-1]
+        N = K.shape(x)[-2]
+        F = K.int_shape(x)[-1]
         F_ = self.channels
 
         # Filter network
-        kernel_network = E
-        for l in self.kernel_network_layers:
-            kernel_network = l(kernel_network)
+        kernel_network = e
+        for layer in self.kernel_network_layers:
+            kernel_network = layer(kernel_network)
 
         # Convolution
         target_shape = (-1, N, N, F_, F) if mode == modes.BATCH else (N, N, F_, F)
         kernel = K.reshape(kernel_network, target_shape)
-        output = kernel * A[..., None, None]
-        output = tf.einsum('abicf,aif->abc', output, X)
+        output = kernel * a[..., None, None]
+        output = tf.einsum('abicf,aif->abc', output, x)
 
         if self.root:
-            output += ops.dot(X, self.root_kernel)
+            output += ops.dot(x, self.root_kernel)
         if self.use_bias:
             output = K.bias_add(output, self.bias)
         if self.activation is not None:
@@ -158,38 +158,38 @@ class EdgeConditionedConv(GraphConv):
         return output
 
     def _call_single(self, inputs):
-        X = inputs[0]  # (N, F)
-        A = inputs[1]  # (N, N)
-        E = inputs[2]  # (n_edges, S)
-        assert K.ndim(E) == 2, 'In single mode, E must have shape (n_edges, S).'
+        x, a, e = inputs
+        if K.ndim(e) != 2:
+            raise ValueError('In single mode, E must have shape '
+                             '(n_edges, n_edge_features).')
 
         # Enforce sparse representation
-        if not K.is_sparse(A):
-            A = ops.dense_to_sparse(A)
+        if not K.is_sparse(a):
+            a = ops.dense_to_sparse(a)
 
         # Parameters
-        N = tf.shape(X)[-2]
-        F = K.int_shape(X)[-1]
+        N = tf.shape(x)[-2]
+        F = K.int_shape(x)[-1]
         F_ = self.channels
 
         # Filter network
-        kernel_network = E
-        for l in self.kernel_network_layers:
-            kernel_network = l(kernel_network)  # (n_edges, F * F_)
+        kernel_network = e
+        for layer in self.kernel_network_layers:
+            kernel_network = layer(kernel_network)  # (n_edges, F * F_)
         target_shape = (-1, F, F_)
         kernel = tf.reshape(kernel_network, target_shape)
 
         # Propagation
-        index_i = A.indices[:, -2]
-        index_j = A.indices[:, -1]
-        messages = tf.gather(X, index_j)
+        index_i = a.indices[:, -2]
+        index_j = a.indices[:, -1]
+        messages = tf.gather(x, index_j)
         messages = ops.dot(messages[:, None, :], kernel)[:, 0, :]
         aggregated = ops.scatter_sum(messages, index_i, N)
 
         # Update
         output = aggregated
         if self.root:
-            output += ops.dot(X, self.root_kernel)
+            output += ops.dot(x, self.root_kernel)
         if self.use_bias:
             output = K.bias_add(output, self.bias)
         if self.activation is not None:
@@ -197,14 +197,10 @@ class EdgeConditionedConv(GraphConv):
 
         return output
 
-    def get_config(self):
-        config = {
+    @property
+    def config(self):
+        return {
+            'channels': self.channels,
             'kernel_network': self.kernel_network,
             'root': self.root,
         }
-        base_config = super().get_config()
-        return dict(list(base_config.items()) + list(config.items()))
-
-    @staticmethod
-    def preprocess(A):
-        return A
