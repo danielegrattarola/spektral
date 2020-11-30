@@ -7,9 +7,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <meta name="author" content="Daniele Grattarola">
-  <link rel="canonical" href="https://graphneural.network/examples/">
+  <link rel="canonical" href="https://graphneural.network/external/">
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Examples - Spektral</title>
+  <title>External resources - Spektral</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
   <link rel="stylesheet" href="../css/theme.css" />
@@ -19,9 +19,9 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Examples";
-    var mkdocs_page_input_path = "examples.md";
-    var mkdocs_page_url = "/examples/";
+    var mkdocs_page_name = "External resources";
+    var mkdocs_page_input_path = "external.md";
+    var mkdocs_page_url = "/external/";
   </script>
   
   <script src="../js/jquery-2.1.1.min.js" defer></script>
@@ -63,7 +63,7 @@
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Tutorials</span></p>
-                <ul class="current">
+                <ul>
                     <li class="toctree-l1"><a class="reference internal" href="../getting-started/">Getting started</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../data-modes/">Data modes</a>
@@ -72,15 +72,7 @@
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../creating-layer/">Creating a layer</a>
                     </li>
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Examples</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#node-level-prediction">Node-level prediction</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#graph-level-prediction">Graph-level prediction</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#other-applications">Other applications</a>
-    </li>
-    </ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a>
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Layers</span></p>
@@ -113,8 +105,14 @@
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Other</span></p>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../external/">External resources</a>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">External resources</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#paper">Paper</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#notebooks">Notebooks</a>
+    </li>
+    </ul>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../about/">About</a>
                     </li>
@@ -140,11 +138,11 @@
     
       
         
-          <li>Tutorials &raquo;</li>
+          <li>Other &raquo;</li>
         
       
     
-    <li>Examples</li>
+    <li>External resources</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -155,33 +153,20 @@
           <div role="main">
             <div class="section">
               
-                <h2 id="examples">Examples</h2>
-<p>This is a collection of examples that you can use as template for your projects. </p>
-<h3 id="node-level-prediction">Node-level prediction</h3>
+                <h2 id="external-resources">External resources</h2>
+<p>This is a collection of additional material about Spektral.</p>
+<h3 id="paper">Paper</h3>
+<p>We presented the library at the ICML 2020 workshop "Graph Representation Learning and Beyond".</p>
+<p>Paper: </p>
+<blockquote>
+<p><a href="https://grlplus.github.io/papers/9.pdf">Graph Neural Networks in TensorFlow and Keras with Spektral</a><br>
+Daniele Grattarola and Cesare Alippi</p>
+</blockquote>
+<h3 id="notebooks">Notebooks</h3>
+<p>The following notebooks are available on Kaggle with more visualizations (maintained by <a href="https://github.com/kmader">@kmader</a>):</p>
 <ul>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_gcn.py">Citation networks with GCN</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_gcn_custom.py">Citation networks with GCN (custom training loop)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_cheby.py">Citation networks with ChebConv</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_gat.py">Citation networks with GAT</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_gat_custom.py">Citation networks with GAT (custom training loop)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_arma.py">Citation networks with ARMA</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_simple_gc.py">Citation networks with SimpleGCN (custom transform)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/ogbn-arxiv_gcn.py">Open Graph Benchmark dataset</a></li>
-</ul>
-<h3 id="graph-level-prediction">Graph-level prediction</h3>
-<ul>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/general_gnn.py">General GNN</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/custom_dataset.py">Custom dataset</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/ogbg-mol-esol_batch.py">OGB mol-esol regression with MinCut pooling</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/ogbg-mol-esol_batch.py">OGB mol-hiv classification (edge attributes)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/qm9_ecc.py">QM9 regression with ECC (custom training loop)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/qm9_ecc_batch.py">QM9 regression with ECC (batch mode)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/tud_gin.py">TUDataset classification with GIN</a></li>
-</ul>
-<h3 id="other-applications">Other applications</h3>
-<ul>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/other/graph_signal_classification_mnist.py">Graph signal classification on MNIST (mixed mode)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/other/node_clustering_mincut.py">Node clustering on citation networks with MinCut pooling (unsupervised)</a></li>
+<li><a href="https://www.kaggle.com/kmader/mnist-graph-deep-learning">MNIST Graph Deep Learning</a>;</li>
+<li><a href="https://www.kaggle.com/kmader/mnist-graph-nn-with-pooling">MNIST Graph Pooling</a>;</li>
 </ul>
               
             </div>
@@ -190,10 +175,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../layers/convolution/" class="btn btn-neutral float-right" title="Convolutional layers">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../about/" class="btn btn-neutral float-right" title="About">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../creating-layer/" class="btn btn-neutral" title="Creating a layer"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../utils/misc/" class="btn btn-neutral" title="Miscellaneous"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -221,10 +206,10 @@
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../creating-layer/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../utils/misc/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../layers/convolution/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../about/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

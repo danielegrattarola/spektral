@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="Daniele Grattarola">
+  <link rel="canonical" href="https://graphneural.network/data-modes/">
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Data modes - Spektral</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link href="../stylesheets/extra.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Data modes";
+    var mkdocs_page_input_path = "data-modes.md";
+    var mkdocs_page_url = "/data-modes/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+  <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-125823175-1', 'auto');
+      ga('send', 'pageview');
+  </script>
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Spektral</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Tutorials</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../getting-started/">Getting started</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Data modes</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#single-mode">Single mode</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#disjoint-mode">Disjoint mode</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#batch-mode">Batch mode</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#mixed-mode">Mixed mode</a>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../creating-dataset/">Creating a dataset</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../creating-layer/">Creating a layer</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Layers</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../layers/convolution/">Convolutional layers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../layers/pooling/">Pooling layers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../layers/base/">Base layers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../models/">Models</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Data</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../data/">Containers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../datasets/">Datasets</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../loaders/">Loaders</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../transforms/">Transforms</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Utils</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../utils/convolution/">Convolution</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../utils/misc/">Miscellaneous</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Other</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../external/">External resources</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../about/">About</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Spektral</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Tutorials &raquo;</li>
+        
+      
+    
+    <li>Data modes</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="data-modes">Data modes</h2>
+<p>Creating mini-batches of data can be tricky when the samples have different shapes. </p>
+<p>In traditional neural networks, we're used to stretching, cropping, or padding our data so that all inputs to our models are standardized. 
+For instance, images of different sizes can be modified so that they fit into a tensor of shape <code>[batch, width, height, channels]</code>.
+Sequences can be padded so that they have shape <code>[batch, time, channels]</code>. And so on...</p>
+<p>With graphs, it's a bit different. </p>
+<p>For instance, it is not that easy to define the meaning of "cropping" or "stretching" a graph, since these are all transformations that assume a "spatial closeness" of the pixels (which we don't have for graphs in general).</p>
+<p>Also, it's not always the case that we have many graphs in our datasets. Sometimes, we're just interested in classifying the nodes of one big graph. Sometimes, we may have one big graph but many instances of its node features (the classification of images is one such case: one grid, many instances of pixels values). </p>
+<p>To make Spektral work in all of these cases, and to account for the difficulties in dealing with graphs of different sizes, we introduce the concept of <strong>data modes</strong>.</p>
+<p>In Spektral, there are four of them:</p>
+<ul>
+<li>In <strong>single mode</strong>, we have only one graph. Node classification tasks are usually in this mode. </li>
+<li>In <strong>disjoint mode</strong>, we represent a batch of graphs with their disjoint union. This gives us one big graph, similar to single mode, although with some differences (see below).</li>
+<li>In <strong>batch mode</strong>, we zero-pad the graphs so that we can fit them into <strong>dense</strong> tensors of shape <code>[batch, nodes, ...]</code>. This can be more expensive, but makes it easier to interface with traditional NNs. </li>
+<li>In <strong>mixed mode</strong>, we have one adjacency matrix shared by many graphs. We keep the adjacency matrix in single mode (for performance, no need to duplicate it for each graph), and the node attributes in batch mode. </li>
+</ul>
+<p>In all data modes, our goal is to represent one or more graphs by grouping their respective <code>x</code>, <code>a</code> and <code>e</code> matrices into single tensors <code>X</code>, <code>A</code>, and <code>E</code>. The shapes of these tensors in the different data modes are summarized in the table below. </p>
+<table>
+<thead>
+<tr>
+<th align="left">Mode</th>
+<th align="left"><code>A.shape</code></th>
+<th align="left"><code>X.shape</code></th>
+<th align="left"><code>E.shape</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>Single</code></td>
+<td align="left"><code>[nodes, nodes]</code></td>
+<td align="left"><code>[nodes, n_feat]</code></td>
+<td align="left"><code>[edges, e_feat]</code></td>
+</tr>
+<tr>
+<td align="left"><code>Disjoint</code></td>
+<td align="left"><code>[nodes, nodes]</code></td>
+<td align="left"><code>[nodes, n_feat]</code></td>
+<td align="left"><code>[edges, e_feat]</code></td>
+</tr>
+<tr>
+<td align="left"><code>Batch</code></td>
+<td align="left"><code>[batch, nodes, nodes]</code></td>
+<td align="left"><code>[batch, nodes, nodes]</code></td>
+<td align="left"><code>[batch, nodes, nodes, e_feat]</code></td>
+</tr>
+<tr>
+<td align="left"><code>Mixed</code></td>
+<td align="left"><code>[nodes, nodes]</code></td>
+<td align="left"><code>[batch, nodes, n_feat]</code></td>
+<td align="left"><code>n/a</code></td>
+</tr>
+</tbody>
+</table>
+<p>In the following sections we describe the four modes more into detail.
+In particular, we go over which <a href="/loaders/">data <code>Loader</code></a> to use in each case.</p>
+<h3 id="single-mode">Single mode</h3>
+<p><img src="https://danielegrattarola.github.io/spektral/img/single_mode.svg" style="max-width: 400px; width: 100%;"/></p>
+<p>In single mode we have only one graph in which: </p>
+<ul>
+<li><code>A</code> is a matrix of shape <code>[nodes, nodes]</code>;</li>
+<li><code>X</code> is a matrix of shape <code>[nodes, n_feat]</code>;</li>
+<li><code>E</code> has shape <code>[edges, e_feat]</code> so that <code>E[i]</code> corresponds to the edge in <code>A[i // nodes, i % nodes]</code>.</li>
+</ul>
+<p>A very common benchmark dataset in single mode is the Cora citation network. 
+We can load it with:</p>
+<pre><code class="py">&gt;&gt;&gt; from spektral.datasets import Cora
+&gt;&gt;&gt; dataset = Cora()
+&gt;&gt;&gt; dataset
+Cora(n_graphs=1)
+</code></pre>
+
+<p>As expected, we have only one graph: </p>
+<pre><code class="py">&gt;&gt;&gt; dataset[0]
+Graph(n_nodes=2708, n_node_features=1433, n_edge_features=None, n_labels=7)
+
+&gt;&gt;&gt; dataset[0].a.shape
+(2708, 2708)
+
+&gt;&gt;&gt; dataset[0].x.shape
+(2708, 1433)
+</code></pre>
+
+<p>When training a GNN in single mode, we can use a <code>SingleLoader</code> that will extract the characteristic matrices from the graph and return a <code>tf.data.Dataset</code> to feed to our model:</p>
+<pre><code class="py">&gt;&gt;&gt; from spektral.data import SingleLoader
+&gt;&gt;&gt; loader = SingleLoader(dataset)
+&gt;&gt;&gt; loader.load()
+&lt;RepeatDataset shapes: (((2708, 1433), (2708, 2708)), (2708, 7)), types: ((tf.float32, tf.int64), tf.int32)&gt;
+</code></pre>
+
+<h3 id="disjoint-mode">Disjoint mode</h3>
+<p><img src="https://danielegrattarola.github.io/spektral/img/disjoint_mode.svg" style="max-width: 400px; width: 100%;"/></p>
+<p>In disjoint mode we represent a set of graphs as a single graph, their "disjoint union", where:</p>
+<ul>
+<li><code>A</code> is a sparse block diagonal matrix where each block is the adjacency matrix <code>a_i</code> of the i-th graph.</li>
+<li><code>X</code> is obtained by stacking the node attributes <code>x_i</code>;</li>
+<li><code>E</code> is also obtained by stacking the edges <code>e_i</code>.</li>
+</ul>
+<p>The shapes of the three matrices are the same as single mode, but <code>nodes</code> is the number of all the nodes in the set of graphs. </p>
+<p>To keep track of the different graphs in the disjoint union, we use an additional array of zero-based indices <code>I</code> that identify which nodes belong to which graph. 
+For instance: if node 8 belongs to the third graph, we will have <code>I[8] == 2</code>. <br>
+In the example above, color blue represents 0, green is 1, and orange is 2</p>
+<p>In convolutional layers, disjoint mode is indistinguishable from single mode because it is not possible to exchange messages between the disjoint components of the graph, so <code>I</code> is not needed to compute the output.<br />
+Pooling layers, on the other hand, require <code>I</code> to know which nodes can be pooled together.</p>
+<p>Let's load a dataset with many small graphs and have a look at the first three:</p>
+<pre><code class="py">&gt;&gt;&gt; from spektral.datasets import TUDataset
+&gt;&gt;&gt; dataset = TUDataset('PROTEINS')
+Successfully loaded PROTEINS.
+
+&gt;&gt;&gt; dataset = dataset[:3]
+&gt;&gt;&gt; dataset[0]
+Graph(n_nodes=42, n_node_features=4, n_edge_features=None, n_labels=2)
+
+&gt;&gt;&gt; dataset[1]
+Graph(n_nodes=27, n_node_features=4, n_edge_features=None, n_labels=2)
+
+&gt;&gt;&gt; dataset[2]
+Graph(n_nodes=10, n_node_features=4, n_edge_features=None, n_labels=2)
+</code></pre>
+
+<p>To create batches in disjoint mode, we can use a <code>DisjointLoader</code>:</p>
+<pre><code class="py">&gt;&gt;&gt; from spektral.data import DisjointLoader
+&gt;&gt;&gt; loader = DisjointLoader(dataset, batch_size=3)
+</code></pre>
+
+<p>Since Loaders are effectively generators, we can inspect the first batch that the loader will compute for us by calling <code>__next__()</code>:</p>
+<pre><code class="py">&gt;&gt;&gt; batch = loader.__next__()
+&gt;&gt;&gt; inputs, target = batch
+&gt;&gt;&gt; x, a, i = inputs
+&gt;&gt;&gt; x.shape
+(79, 4)  # 79 == 42 + 27 + 10
+
+&gt;&gt;&gt; a.shape
+(79, 79)
+
+&gt;&gt;&gt; i.shape
+(79, )
+</code></pre>
+
+<p>Note that, since we don't have edge attributes in our dataset, the loader did not create the <code>E</code> matrix.</p>
+<h3 id="batch-mode">Batch mode</h3>
+<p><img src="https://danielegrattarola.github.io/spektral/img/batch_mode.svg" style="max-width: 400px; width: 100%;"/></p>
+<p>In batch mode, graphs are zero-padded so that they fit into tensors of shape <code>[batch, N, ...]</code>. 
+Due to the general lack of support for sparse higher-order tensors both in Scipy and TensorFlow, <code>X</code>, <code>A</code>, and <code>E</code> will be dense tensors:</p>
+<ul>
+<li><code>A</code> has shape <code>[batch, nodes, nodes]</code>;</li>
+<li><code>X</code> has shape <code>[batch, nodes, n_feat]</code>;</li>
+<li><code>E</code> has shape <code>[batch, nodes, nodes, e_feat]</code> (the attributes of non-existing edges are all zeros).</li>
+</ul>
+<p>If the graphs have a variable number of nodes, <code>nodes</code> will be the size of the biggest graph in the batch.</p>
+<p>If you don't want to zero-pad the graphs or work with dense inputs, it is better to use <a href="#disjoint-mode">disjoint mode</a> instead.</p>
+<p>However, note that some pooling layers like <code>DiffPool</code> and <code>MinCutPool</code> will only work in batch mode. </p>
+<p>Let's re-use the dataset from the example above. We can use a <code>BatchLoader</code> as follows: </p>
+<pre><code class="py">&gt;&gt;&gt; from spektral.data import BatchLoader
+&gt;&gt;&gt; loader = BatchLoader(dataset, batch_size=3)
+&gt;&gt;&gt; inputs, target = loader.__next__()
+
+&gt;&gt;&gt; inputs[0].shape
+(3, 42, 4)
+
+&gt;&gt;&gt; inputs[1].shape
+(3, 42, 42)
+</code></pre>
+
+<p>In this case, the loader only created two inputs because we don't need the indices <code>I</code>. 
+Also note that the batch was padded so that all graphs have 42 nodes, which is the size of the biggest graph out of the three.</p>
+<p>The <code>BatchLoader</code> zero-pads each batch independently of the others, so that we don't waste memory. If you want to remove the overhead of padding each batch, you can use a <code>PackedBatchLoader</code> which will pre-pad all graphs before yielding the batches. Of course, this means that all graphs will have the same number of nodes as the biggest graph in the dataset (and not just in the batch).</p>
+<h3 id="mixed-mode">Mixed mode</h3>
+<p><img src="https://danielegrattarola.github.io/spektral/img/mixed_mode.svg" style="max-width: 400px; width: 100%;"/></p>
+<p>In mixed mode we have a single graph that acts as the support for different node attributes (also sometimes called "graph signals").</p>
+<p>In this case we have that: </p>
+<ul>
+<li><code>A</code> is a matrix of shape <code>[node, node]</code>;</li>
+<li><code>X</code> is a tensor in batch mode, of shape <code>[batch, node, n_feat]</code>;</li>
+</ul>
+<p>Currently, there are no layers in Spektral that support mixed mode and edge attributes. </p>
+<p>An example of a mixed mode dataset is the MNIST random grid (<a href="https://arxiv.org/abs/1606.09375">Defferrard et al., 2016</a>):</p>
+<pre><code class="py">&gt;&gt;&gt; from spektral.datasets import MNIST
+&gt;&gt;&gt; dataset = MNIST()
+&gt;&gt;&gt; dataset
+MNIST(n_graphs=70000)
+</code></pre>
+
+<p>Mixed-mode datasets have a special <code>a</code> attribute that stores the adjacency matrix, while the proper graphs that make up the dataset only have node features:</p>
+<pre><code class="py">&gt;&gt;&gt;dataset.a
+&lt;784x784 sparse matrix of type '&lt;class 'numpy.float64'&gt;'
+    with 6396 stored elements in Compressed Sparse Row format&gt;
+
+&gt;&gt;&gt; dataset[0]
+Graph(n_nodes=784, n_node_features=1, n_edge_features=None, n_labels=1)
+
+&gt;&gt;&gt;dataset[0].a
+# None
+</code></pre>
+
+<p>For this reason, a <code>PackedBatchLoader</code> will work perfectly for our mixed mode datasets (a <code>BatchLoader</code> will work perfectly, as well, but it will have slightly more Python overhead).</p>
+<p>Mixed mode requires a bit more work than the other three modes. In particular, it is not possible to use <code>loader.load()</code> to train a model in this mode. </p>
+<p>Have a look at <a href="https://github.com/danielegrattarola/spektral/blob/master/examples/other/graph_signal_classification_mnist.py">this example</a> to see how to train a GNN in mixed mode.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../creating-dataset/" class="btn btn-neutral float-right" title="Creating a dataset">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../getting-started/" class="btn btn-neutral" title="Getting started"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../getting-started/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../creating-dataset/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+      <script src="../js/macros.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

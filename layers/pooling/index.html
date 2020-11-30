@@ -9,7 +9,7 @@
   <meta name="author" content="Daniele Grattarola">
   <link rel="canonical" href="https://graphneural.network/layers/pooling/">
   <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>Pooling Layers - Spektral</title>
+  <title>Pooling layers - Spektral</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
   <link rel="stylesheet" href="../../css/theme.css" />
@@ -19,7 +19,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Pooling Layers";
+    var mkdocs_page_name = "Pooling layers";
     var mkdocs_page_input_path = "layers/pooling.md";
     var mkdocs_page_url = "/layers/pooling/";
   </script>
@@ -66,47 +66,61 @@
                 <ul>
                     <li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting started</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../data/">Data representation</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../../data-modes/">Data modes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../creating-dataset/">Creating a dataset</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../creating-layer/">Creating a layer</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../../examples/">Examples</a>
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Layers</span></p>
                 <ul class="current">
-                    <li class="toctree-l1"><a class="reference internal" href="../convolution/">Convolutional Layers</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../convolution/">Convolutional layers</a>
                     </li>
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Pooling Layers</a>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Pooling layers</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#diffpool">DiffPool</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#mincutpool">MinCutPool</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#topkpool">TopKPool</a>
-    </li>
     <li class="toctree-l2"><a class="reference internal" href="#sagpool">SAGPool</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#globalsumpool">GlobalSumPool</a>
+    <li class="toctree-l2"><a class="reference internal" href="#topkpool">TopKPool</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#globalavgpool">GlobalAvgPool</a>
+    <li class="toctree-l2"><a class="reference internal" href="#global-pooling-layers">Global pooling layers</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#globalavgpool">GlobalAvgPool</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#globalmaxpool">GlobalMaxPool</a>
+    <li class="toctree-l3"><a class="reference internal" href="#globalmaxpool">GlobalMaxPool</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#globalattentionpool">GlobalAttentionPool</a>
+    <li class="toctree-l3"><a class="reference internal" href="#globalsumpool">GlobalSumPool</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#globalattnsumpool">GlobalAttnSumPool</a>
+    <li class="toctree-l3"><a class="reference internal" href="#globalattentionpool">GlobalAttentionPool</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#sortpool">SortPool</a>
+    <li class="toctree-l3"><a class="reference internal" href="#globalattnsumpool">GlobalAttnSumPool</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#sortpool">SortPool</a>
+    </li>
+        </ul>
     </li>
     </ul>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../base/">Base Layers</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../base/">Base layers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../models/">Models</a>
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Data</span></p>
                 <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../data/">Containers</a>
+                    </li>
                     <li class="toctree-l1"><a class="reference internal" href="../../datasets/">Datasets</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../utils/data/">Data utils</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../../loaders/">Loaders</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../transforms/">Transforms</a>
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Utils</span></p>
@@ -115,15 +129,11 @@
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../../utils/misc/">Miscellaneous</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../utils/conversion/">Conversion</a>
-                    </li>
-                </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../../chem/">Chemistry</a>
-                    </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Other</span></p>
                 <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../external/">External resources</a>
+                    </li>
                     <li class="toctree-l1"><a class="reference internal" href="../../about/">About</a>
                     </li>
                 </ul>
@@ -152,7 +162,7 @@
         
       
     
-    <li>Pooling Layers</li>
+    <li>Pooling layers</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -164,17 +174,7 @@
             <div class="section">
               
                 <h2 id="pooling-layers">Pooling layers</h2>
-<p>The pooling layers from these papers are available in Spektral:</p>
-<ul>
-<li><a href="https://arxiv.org/abs/1806.08804">Hierarchical Graph Representation Learning with Differentiable Pooling</a></li>
-<li><a href="https://arxiv.org/abs/1907.00481">Mincut pooling in Graph Neural Networks</a></li>
-<li><a href="http://proceedings.mlr.press/v97/gao19a/gao19a.pdf">Graph U-Nets</a></li>
-<li><a href="https://arxiv.org/abs/1904.08082">Self-Attention Graph Pooling</a></li>
-<li><a href="https://arxiv.org/abs/1511.05493">Gated Graph Sequence Neural Networks</a></li>
-</ul>
-<p>Additionally, sum, average, and max global pooling are implemented, as well as 
-a simple global weighted sum pooling where weights are calculated with an 
-attention mechanism. </p>
+<p>The following pooling layers are available in Spektral.</p>
 <p>See <a href="/layers/convolution">the convolutional layers page</a> for the notation. </p>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/diff_pool.py#L10">[source]</a></span></p>
@@ -182,12 +182,14 @@ attention mechanism. </p>
 <pre><code class="python">spektral.layers.DiffPool(k, channels=None, return_mask=False, activation=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
 </code></pre>
 
-<p>A DiffPool layer as presented by
-<a href="https://arxiv.org/abs/1806.08804">Ying et al. (2018)</a>.</p>
+<p>A DiffPool layer from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1806.08804">Hierarchical Graph Representation Learning with Differentiable Pooling</a><br>
+Rex Ying et al.</p>
+</blockquote>
 <p><strong>Mode</strong>: batch.</p>
 <p>This layer computes a soft clustering <script type="math/tex">\S</script> of the input graphs using a GNN,
-and reduces graphs as follows:</p>
-<p>
+and reduces graphs as follows:
 <script type="math/tex; mode=display">
 \S = \textrm{GNN}(\A, \X); \\
 \A' = \S^\top \A \S; \X' = \S^\top \X;
@@ -211,14 +213,14 @@ The layer can be used without a supervised loss, to compute node clustering
 simply by minimizing the two auxiliary losses.</p>
 <p><strong>Input</strong></p>
 <ul>
-<li>Node features of shape <code>([batch], N, F)</code>;</li>
-<li>Binary adjacency matrix of shape <code>([batch], N, N)</code>;</li>
+<li>Node features of shape <code>([batch], n_nodes, n_node_features)</code>;</li>
+<li>Binary adjacency matrix of shape <code>([batch], n_nodes, n_nodes)</code>;</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
 <li>Reduced node features of shape <code>([batch], K, channels)</code>;</li>
 <li>Reduced adjacency matrix of shape <code>([batch], K, K)</code>;</li>
-<li>If <code>return_mask=True</code>, the soft clustering matrix of shape <code>([batch], N, K)</code>.</li>
+<li>If <code>return_mask=True</code>, the soft clustering matrix of shape <code>([batch], n_nodes, K)</code>.</li>
 </ul>
 <p><strong>Arguments</strong></p>
 <ul>
@@ -231,23 +233,24 @@ channels is assumed to be the same as the input);</li>
 <li><code>kernel_constraint</code>: constraint applied to the weights;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/mincut_pool.py#L9">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/mincut_pool.py#L10">[source]</a></span></p>
 <h4 id="mincutpool">MinCutPool</h4>
 <pre><code class="python">spektral.layers.MinCutPool(k, mlp_hidden=None, mlp_activation='relu', return_mask=False, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
-<p>A minCUT pooling layer as presented by
-<a href="https://arxiv.org/abs/1907.00481">Bianchi et al. (2019)</a>.</p>
+<p>A MinCut pooling layer from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1907.00481">Spectral Clustering with Graph Neural Networks for Graph Pooling</a><br>
+Filippo Maria Bianchi et al.</p>
+</blockquote>
 <p><strong>Mode</strong>: batch.</p>
 <p>This layer computes a soft clustering <script type="math/tex">\S</script> of the input graphs using a MLP,
-and reduces graphs as follows:</p>
-<p>
+and reduces graphs as follows:
 <script type="math/tex; mode=display">
 \S = \textrm{MLP}(\X); \\
 \A' = \S^\top \A \S; \X' = \S^\top \X;
 </script>
-</p>
-<p>where MLP is a multi-layer perceptron with softmax output.
+where MLP is a multi-layer perceptron with softmax output.
 Two auxiliary loss terms are also added to the model: the <em>minCUT loss</em>
 <script type="math/tex; mode=display">
 - \frac{ \mathrm{Tr}(\S^\top \A \S) }{ \mathrm{Tr}(\S^\top \D \S) }
@@ -264,14 +267,14 @@ and the <em>orthogonality loss</em>
 simply by minimizing the two auxiliary losses.</p>
 <p><strong>Input</strong></p>
 <ul>
-<li>Node features of shape <code>([batch], N, F)</code>;</li>
-<li>Binary adjacency matrix of shape <code>([batch], N, N)</code>;</li>
+<li>Node features of shape <code>([batch], n_nodes, n_node_features)</code>;</li>
+<li>Binary adjacency matrix of shape <code>([batch], n_nodes, n_nodes)</code>;</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li>Reduced node features of shape <code>([batch], K, F)</code>;</li>
+<li>Reduced node features of shape <code>([batch], K, n_node_features)</code>;</li>
 <li>Reduced adjacency matrix of shape <code>([batch], K, K)</code>;</li>
-<li>If <code>return_mask=True</code>, the soft clustering matrix of shape <code>([batch], N, K)</code>.</li>
+<li>If <code>return_mask=True</code>, the soft clustering matrix of shape <code>([batch], n_nodes, K)</code>.</li>
 </ul>
 <p><strong>Arguments</strong></p>
 <ul>
@@ -281,6 +284,63 @@ layer in the MLP used to compute cluster assignments (if None, the MLP has
 only the output layer);</li>
 <li><code>mlp_activation</code>: activation for the MLP layers;</li>
 <li><code>return_mask</code>: boolean, whether to return the cluster assignment matrix;</li>
+<li><code>use_bias</code>: use bias in the MLP;</li>
+<li><code>kernel_initializer</code>: initializer for the weights of the MLP;</li>
+<li><code>bias_initializer</code>: initializer for the bias of the MLP;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights of the MLP;</li>
+<li><code>bias_regularizer</code>: regularization applied to the bias of the MLP;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights of the MLP;</li>
+<li><code>bias_constraint</code>: constraint applied to the bias of the MLP;</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/sag_pool.py#L6">[source]</a></span></p>
+<h4 id="sagpool">SAGPool</h4>
+<pre><code class="python">spektral.layers.SAGPool(ratio, return_mask=False, sigmoid_gating=False, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
+</code></pre>
+
+<p>A self-attention graph pooling layer (SAG) from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1904.08082">Self-Attention Graph Pooling</a><br>
+Junhyun Lee et al.</p>
+</blockquote>
+<p><strong>Mode</strong>: single, disjoint.</p>
+<p>This layer computes the following operations:
+<script type="math/tex; mode=display">
+\y = \textrm{GNN}(\A, \X); \;\;\;\;
+\i = \textrm{rank}(\y, K); \;\;\;\;
+\X' = (\X \odot \textrm{tanh}(\y))_\i; \;\;\;\;
+\A' = \A_{\i, \i}
+</script>
+</p>
+<p>where <script type="math/tex"> \textrm{rank}(\y, K) </script> returns the indices of the top K values of
+<script type="math/tex">\y</script>, and <script type="math/tex">\textrm{GNN}</script> consists of one GraphConv layer with no
+activation. <script type="math/tex">K</script> is defined for each graph as a fraction of the number of
+nodes.</p>
+<p>This layer temporarily makes the adjacency matrix dense in order to compute
+<script type="math/tex">\A'</script>.
+If memory is not an issue, considerable speedups can be achieved by using
+dense graphs directly.
+Converting a graph from sparse to dense and back to sparse is an expensive
+operation.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>(n_nodes, n_node_features)</code>;</li>
+<li>Binary adjacency matrix of shape <code>(n_nodes, n_nodes)</code>;</li>
+<li>Graph IDs of shape <code>(n_nodes, )</code> (only in disjoint mode);</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Reduced node features of shape <code>(ratio * n_nodes, n_node_features)</code>;</li>
+<li>Reduced adjacency matrix of shape <code>(ratio * n_nodes, ratio * n_nodes)</code>;</li>
+<li>Reduced graph IDs of shape <code>(ratio * n_nodes, )</code> (only in disjoint mode);</li>
+<li>If <code>return_mask=True</code>, the binary pooling mask of shape <code>(ratio * n_nodes, )</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>ratio</code>: float between 0 and 1, ratio of nodes to keep in each graph;</li>
+<li><code>return_mask</code>: boolean, whether to return the binary mask used for pooling;</li>
+<li><code>sigmoid_gating</code>: boolean, use a sigmoid gating activation instead of a
+tanh;</li>
 <li><code>kernel_initializer</code>: initializer for the weights;</li>
 <li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
 <li><code>kernel_constraint</code>: constraint applied to the weights;</li>
@@ -291,12 +351,18 @@ only the output layer);</li>
 <pre><code class="python">spektral.layers.TopKPool(ratio, return_mask=False, sigmoid_gating=False, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
 </code></pre>
 
-<p>A gPool/Top-K layer as presented by
-<a href="http://proceedings.mlr.press/v97/gao19a/gao19a.pdf">Gao &amp; Ji (2019)</a> and
-<a href="https://arxiv.org/abs/1811.01287">Cangea et al. (2018)</a>.</p>
+<p>A gPool/Top-K layer from the papers</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1905.05178">Graph U-Nets</a><br>
+Hongyang Gao and Shuiwang Ji</p>
+</blockquote>
+<p>and</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1811.01287">Towards Sparse Hierarchical Graph Classifiers</a><br>
+Cătălina Cangea et al.</p>
+</blockquote>
 <p><strong>Mode</strong>: single, disjoint.</p>
-<p>This layer computes the following operations:</p>
-<p>
+<p>This layer computes the following operations:
 <script type="math/tex; mode=display">
 \y = \frac{\X\p}{\|\p\|}; \;\;\;\;
 \i = \textrm{rank}(\y, K); \;\;\;\;
@@ -317,16 +383,16 @@ Converting a graph from sparse to dense and back to sparse is an expensive
 operation.</p>
 <p><strong>Input</strong></p>
 <ul>
-<li>Node features of shape <code>(N, F)</code>;</li>
-<li>Binary adjacency matrix of shape <code>(N, N)</code>;</li>
-<li>Graph IDs of shape <code>(N, )</code> (only in disjoint mode);</li>
+<li>Node features of shape <code>(n_nodes, n_node_features)</code>;</li>
+<li>Binary adjacency matrix of shape <code>(n_nodes, n_nodes)</code>;</li>
+<li>Graph IDs of shape <code>(n_nodes, )</code> (only in disjoint mode);</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li>Reduced node features of shape <code>(ratio * N, F)</code>;</li>
-<li>Reduced adjacency matrix of shape <code>(ratio * N, ratio * N)</code>;</li>
-<li>Reduced graph IDs of shape <code>(ratio * N, )</code> (only in disjoint mode);</li>
-<li>If <code>return_mask=True</code>, the binary pooling mask of shape <code>(ratio * N, )</code>.</li>
+<li>Reduced node features of shape <code>(ratio * n_nodes, n_node_features)</code>;</li>
+<li>Reduced adjacency matrix of shape <code>(ratio * n_nodes, ratio * n_nodes)</code>;</li>
+<li>Reduced graph IDs of shape <code>(ratio * n_nodes, )</code> (only in disjoint mode);</li>
+<li>If <code>return_mask=True</code>, the binary pooling mask of shape <code>(ratio * n_nodes, )</code>.</li>
 </ul>
 <p><strong>Arguments</strong></p>
 <ul>
@@ -339,78 +405,7 @@ tanh;</li>
 <li><code>kernel_constraint</code>: constraint applied to the weights;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/sag_pool.py#L6">[source]</a></span></p>
-<h4 id="sagpool">SAGPool</h4>
-<pre><code class="python">spektral.layers.SAGPool(ratio, return_mask=False, sigmoid_gating=False, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
-</code></pre>
-
-<p>A self-attention graph pooling layer as presented by
-<a href="https://arxiv.org/abs/1904.08082">Lee et al. (2019)</a>.</p>
-<p><strong>Mode</strong>: single, disjoint.</p>
-<p>This layer computes the following operations:</p>
-<p>
-<script type="math/tex; mode=display">
-\y = \textrm{GNN}(\A, \X); \;\;\;\;
-\i = \textrm{rank}(\y, K); \;\;\;\;
-\X' = (\X \odot \textrm{tanh}(\y))_\i; \;\;\;\;
-\A' = \A_{\i, \i}
-</script>
-</p>
-<p>where <script type="math/tex"> \textrm{rank}(\y, K) </script> returns the indices of the top K values of
-<script type="math/tex">\y</script>, and <script type="math/tex">\textrm{GNN}</script> consists of one GraphConv layer with no
-activation. <script type="math/tex">K</script> is defined for each graph as a fraction of the number of
-nodes.</p>
-<p>This layer temporarily makes the adjacency matrix dense in order to compute
-<script type="math/tex">\A'</script>.
-If memory is not an issue, considerable speedups can be achieved by using
-dense graphs directly.
-Converting a graph from sparse to dense and back to sparse is an expensive
-operation.</p>
-<p><strong>Input</strong></p>
-<ul>
-<li>Node features of shape <code>(N, F)</code>;</li>
-<li>Binary adjacency matrix of shape <code>(N, N)</code>;</li>
-<li>Graph IDs of shape <code>(N, )</code> (only in disjoint mode);</li>
-</ul>
-<p><strong>Output</strong></p>
-<ul>
-<li>Reduced node features of shape <code>(ratio * N, F)</code>;</li>
-<li>Reduced adjacency matrix of shape <code>(ratio * N, ratio * N)</code>;</li>
-<li>Reduced graph IDs of shape <code>(ratio * N, )</code> (only in disjoint mode);</li>
-<li>If <code>return_mask=True</code>, the binary pooling mask of shape <code>(ratio * N, )</code>.</li>
-</ul>
-<p><strong>Arguments</strong></p>
-<ul>
-<li><code>ratio</code>: float between 0 and 1, ratio of nodes to keep in each graph;</li>
-<li><code>return_mask</code>: boolean, whether to return the binary mask used for pooling;</li>
-<li><code>sigmoid_gating</code>: boolean, use a sigmoid gating activation instead of a
-tanh;</li>
-<li><code>kernel_initializer</code>: initializer for the weights;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
-<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
-</ul>
-<hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L53">[source]</a></span></p>
-<h4 id="globalsumpool">GlobalSumPool</h4>
-<pre><code class="python">spektral.layers.GlobalSumPool()
-</code></pre>
-
-<p>A global sum pooling layer. Pools a graph by computing the sum of its node
-features.</p>
-<p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
-<p><strong>Input</strong></p>
-<ul>
-<li>Node features of shape <code>([batch], N, F)</code>;</li>
-<li>Graph IDs of shape <code>(N, )</code> (only in disjoint mode);</li>
-</ul>
-<p><strong>Output</strong></p>
-<ul>
-<li>Pooled node features of shape <code>(batch, F)</code> (if single mode, shape will
-be <code>(1, F)</code>).</li>
-</ul>
-<p><strong>Arguments</strong></p>
-<p>None.</p>
-<hr />
+<h3 id="global-pooling-layers">Global pooling layers</h3>
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L82">[source]</a></span></p>
 <h4 id="globalavgpool">GlobalAvgPool</h4>
 <pre><code class="python">spektral.layers.GlobalAvgPool()
@@ -421,13 +416,13 @@ features.</p>
 <p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
 <p><strong>Input</strong></p>
 <ul>
-<li>Node features of shape <code>([batch], N, F)</code>;</li>
-<li>Graph IDs of shape <code>(N, )</code> (only in disjoint mode);</li>
+<li>Node features of shape <code>([batch], n_nodes, n_node_features)</code>;</li>
+<li>Graph IDs of shape <code>(n_nodes, )</code> (only in disjoint mode);</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li>Pooled node features of shape <code>(batch, F)</code> (if single mode, shape will
-be <code>(1, F)</code>).</li>
+<li>Pooled node features of shape <code>(batch, n_node_features)</code> (if single mode, shape will
+be <code>(1, n_node_features)</code>).</li>
 </ul>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
@@ -442,13 +437,34 @@ features.</p>
 <p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
 <p><strong>Input</strong></p>
 <ul>
-<li>Node features of shape <code>([batch], N, F)</code>;</li>
-<li>Graph IDs of shape <code>(N, )</code> (only in disjoint mode);</li>
+<li>Node features of shape <code>([batch], n_nodes, n_node_features)</code>;</li>
+<li>Graph IDs of shape <code>(n_nodes, )</code> (only in disjoint mode);</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li>Pooled node features of shape <code>(batch, F)</code> (if single mode, shape will
-be <code>(1, F)</code>).</li>
+<li>Pooled node features of shape <code>(batch, n_node_features)</code> (if single mode, shape will
+be <code>(1, n_node_features)</code>).</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<p>None.</p>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L53">[source]</a></span></p>
+<h4 id="globalsumpool">GlobalSumPool</h4>
+<pre><code class="python">spektral.layers.GlobalSumPool()
+</code></pre>
+
+<p>A global sum pooling layer. Pools a graph by computing the sum of its node
+features.</p>
+<p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>([batch], n_nodes, n_node_features)</code>;</li>
+<li>Graph IDs of shape <code>(n_nodes, )</code> (only in disjoint mode);</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Pooled node features of shape <code>(batch, n_node_features)</code> (if single mode, shape will
+be <code>(1, n_node_features)</code>).</li>
 </ul>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
@@ -458,8 +474,11 @@ be <code>(1, F)</code>).</li>
 <pre><code class="python">spektral.layers.GlobalAttentionPool(channels, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
-<p>A gated attention global pooling layer as presented by
-<a href="https://arxiv.org/abs/1511.05493">Li et al. (2017)</a>.</p>
+<p>A gated attention global pooling layer from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1511.05493">Gated Graph Sequence Neural Networks</a><br>
+Yujia Li et al.</p>
+</blockquote>
 <p>This layer computes:
 <script type="math/tex; mode=display">
 \X' = \sum\limits_{i=1}^{N} (\sigma(\X \W_1 + \b_1) \odot (\X \W_2 + \b_2))_i
@@ -468,8 +487,8 @@ where <script type="math/tex">\sigma</script> is the sigmoid activation function
 <p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
 <p><strong>Input</strong></p>
 <ul>
-<li>Node features of shape <code>([batch], N, F)</code>;</li>
-<li>Graph IDs of shape <code>(N, )</code> (only in disjoint mode);</li>
+<li>Node features of shape <code>([batch], n_nodes, n_node_features)</code>;</li>
+<li>Graph IDs of shape <code>(n_nodes, )</code> (only in disjoint mode);</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
@@ -486,7 +505,7 @@ shape will be <code>(1, channels)</code>).</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vectors.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L252">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L254">[source]</a></span></p>
 <h4 id="globalattnsumpool">GlobalAttnSumPool</h4>
 <pre><code class="python">spektral.layers.GlobalAttnSumPool(attn_kernel_initializer='glorot_uniform', attn_kernel_regularizer=None, attn_kernel_constraint=None)
 </code></pre>
@@ -503,13 +522,13 @@ is applied across nodes, and not across features.</p>
 <p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
 <p><strong>Input</strong></p>
 <ul>
-<li>Node features of shape <code>([batch], N, F)</code>;</li>
-<li>Graph IDs of shape <code>(N, )</code> (only in disjoint mode);</li>
+<li>Node features of shape <code>([batch], n_nodes, n_node_features)</code>;</li>
+<li>Graph IDs of shape <code>(n_nodes, )</code> (only in disjoint mode);</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li>Pooled node features of shape <code>(batch, F)</code> (if single mode, shape will
-be <code>(1, F)</code>).</li>
+<li>Pooled node features of shape <code>(batch, n_node_features)</code> (if single mode, shape will
+be <code>(1, n_node_features)</code>).</li>
 </ul>
 <p><strong>Arguments</strong></p>
 <ul>
@@ -520,7 +539,7 @@ matrix;</li>
 matrix;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L347">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L349">[source]</a></span></p>
 <h4 id="sortpool">SortPool</h4>
 <pre><code class="python">spektral.layers.SortPool(k)
 </code></pre>
@@ -533,13 +552,13 @@ If <script type="math/tex">\mathbf{X}</script> has less than k rows, the result 
 <p><strong>Mode</strong>: single, disjoint, batch.</p>
 <p><strong>Input</strong></p>
 <ul>
-<li>Node features of shape <code>([batch], N, F)</code>;</li>
-<li>Graph IDs of shape <code>(N, )</code> (only in disjoint mode);</li>
+<li>Node features of shape <code>([batch], n_nodes, n_node_features)</code>;</li>
+<li>Graph IDs of shape <code>(n_nodes, )</code> (only in disjoint mode);</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li>Pooled node features of shape <code>(batch, k, F)</code> (if single mode, shape will
-be <code>(1, k, F)</code>).</li>
+<li>Pooled node features of shape <code>(batch, k, n_node_features)</code> (if single mode, shape will
+be <code>(1, k, n_node_features)</code>).</li>
 </ul>
 <p><strong>Arguments</strong></p>
 <ul>
@@ -552,10 +571,10 @@ be <code>(1, k, F)</code>).</li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../base/" class="btn btn-neutral float-right" title="Base Layers">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../base/" class="btn btn-neutral float-right" title="Base layers">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../convolution/" class="btn btn-neutral" title="Convolutional Layers"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../convolution/" class="btn btn-neutral" title="Convolutional layers"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   

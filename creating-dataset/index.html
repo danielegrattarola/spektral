@@ -7,9 +7,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <meta name="author" content="Daniele Grattarola">
-  <link rel="canonical" href="https://graphneural.network/examples/">
+  <link rel="canonical" href="https://graphneural.network/creating-dataset/">
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Examples - Spektral</title>
+  <title>Creating a dataset - Spektral</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
   <link rel="stylesheet" href="../css/theme.css" />
@@ -19,9 +19,9 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Examples";
-    var mkdocs_page_input_path = "examples.md";
-    var mkdocs_page_url = "/examples/";
+    var mkdocs_page_name = "Creating a dataset";
+    var mkdocs_page_input_path = "creating-dataset.md";
+    var mkdocs_page_url = "/creating-dataset/";
   </script>
   
   <script src="../js/jquery-2.1.1.min.js" defer></script>
@@ -68,19 +68,17 @@
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../data-modes/">Data modes</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../creating-dataset/">Creating a dataset</a>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Creating a dataset</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#essential-information">Essential information</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#example">Example</a>
+    </li>
+    </ul>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../creating-layer/">Creating a layer</a>
                     </li>
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Examples</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#node-level-prediction">Node-level prediction</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#graph-level-prediction">Graph-level prediction</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#other-applications">Other applications</a>
-    </li>
-    </ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a>
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Layers</span></p>
@@ -144,7 +142,7 @@
         
       
     
-    <li>Examples</li>
+    <li>Creating a dataset</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -155,34 +153,81 @@
           <div role="main">
             <div class="section">
               
-                <h2 id="examples">Examples</h2>
-<p>This is a collection of examples that you can use as template for your projects. </p>
-<h3 id="node-level-prediction">Node-level prediction</h3>
-<ul>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_gcn.py">Citation networks with GCN</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_gcn_custom.py">Citation networks with GCN (custom training loop)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_cheby.py">Citation networks with ChebConv</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_gat.py">Citation networks with GAT</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_gat_custom.py">Citation networks with GAT (custom training loop)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_arma.py">Citation networks with ARMA</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_simple_gc.py">Citation networks with SimpleGCN (custom transform)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/ogbn-arxiv_gcn.py">Open Graph Benchmark dataset</a></li>
-</ul>
-<h3 id="graph-level-prediction">Graph-level prediction</h3>
-<ul>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/general_gnn.py">General GNN</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/custom_dataset.py">Custom dataset</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/ogbg-mol-esol_batch.py">OGB mol-esol regression with MinCut pooling</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/ogbg-mol-esol_batch.py">OGB mol-hiv classification (edge attributes)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/qm9_ecc.py">QM9 regression with ECC (custom training loop)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/qm9_ecc_batch.py">QM9 regression with ECC (batch mode)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/tud_gin.py">TUDataset classification with GIN</a></li>
-</ul>
-<h3 id="other-applications">Other applications</h3>
-<ul>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/other/graph_signal_classification_mnist.py">Graph signal classification on MNIST (mixed mode)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/other/node_clustering_mincut.py">Node clustering on citation networks with MinCut pooling (unsupervised)</a></li>
-</ul>
+                <h2 id="creating-a-custom-dataset">Creating a Custom Dataset</h2>
+<p>The <code>Dataset</code> class is a new feature of Spektral 1.0 that standardizes how graph datasets are represented in Spektral. </p>
+<p>In this tutorial, we'll go over a simple example to create a custom dataset with your data. </p>
+<p>This is also useful if you want to share you datasets publicly or include them as part of Spektral. </p>
+<h3 id="essential-information">Essential information</h3>
+<p>You create a dataset by subclassing the <code>spektral.data.Dataset</code> class. </p>
+<p>The core of datasets is the <code>read()</code> method. This is called at every instantiation of the dataset and must return a list of <code>spektral.data.Graph</code>.
+It doesn't matter if you read the data from a file or create it on the fly, this is where the dataset is loaded in memory. </p>
+<p>All datasets have a <code>path</code> property that represents the directory in which the data is stored. This defaults to <code>~/.spektral/datasets/[ClassName]</code>.
+You can ignore it if you want.<br>
+However, each time you instantiate a Dataset it will check whether <code>path</code> exists. If it doesn't, the <code>download()</code> method will be called.</p>
+<p>You can use <code>download()</code> to define any additional operations that are needed to save your raw data to disk. The method will be called <strong>before</strong> <code>read()</code>.</p>
+<p>Both <code>read()</code> and <code>download()</code> are called by the dataset's <code>__init__()</code> method. If you need to override the initialization of your dataset, make sure to call <code>super().__init__()</code> somewhere in your implementation (usually as the last line).</p>
+<h3 id="example">Example</h3>
+<p>This is a simple example that shows how to create a custom dataset with five random graphs. We pretend that the data comes from an online source so that we can show how to use <code>download()</code>. </p>
+<p>We start by overriding the <code>__init__()</code> method to store some custom parameters of the dataset: </p>
+<pre><code class="py">class MyDataset(Dataset):
+    &quot;&quot;&quot;
+    A dataset of five random graphs.
+    &quot;&quot;&quot;
+    def __init__(self, nodes, feats, **kwargs):
+        self.nodes = nodes
+        self.feats = feats
+
+        super().__init__(**kwargs)
+</code></pre>
+
+<p>Remember to call <code>super().__init__(**kwargs)</code> as the last line.</p>
+<p>Then, we simulate downloading the data from the web. Since this method gets called if <code>path</code> does not exist on the system, it makes sense to create the corresponding directory now:</p>
+<pre><code class="py">def download(self):
+    data = ...  # Download from somewhere
+
+    # Create the directory
+    os.mkdir(self.path)
+
+    # Write the data to file
+    for i in range(5):
+        x = rand(self.nodes, self.feats)
+        a = randint(0, 2, (self.nodes, self.nodes))
+        y = randint(0, 2)
+
+        filename = os.path.join(self.path, f'graph_{i}')
+        np.savez(filename, x=x, a=a, y=y)
+</code></pre>
+
+<p>Finally, we implement the <code>read()</code> method to return a list of <code>Graph</code> objects:</p>
+<pre><code class="py">def read(self):
+    # We must return a list of Graph objects
+    output = []
+
+    for i in range(5):
+        data = np.load(os.path.join(self.path, f'graph_{i}.npz'))
+        output.append(
+            Graph(x=data['x'], a=data['a'], y=data['y'])
+        )
+
+    return output
+</code></pre>
+
+<p>We can now instantiate our dataset, which will "download" our data and read it into memory: </p>
+<pre><code>&gt;&gt;&gt; dataset = MyDataset(3, 2)
+&gt;&gt;&gt; dataset
+MyDataset(n_graphs=5)
+</code></pre>
+
+<p>We can see that our graphs were saved to file: </p>
+<pre><code class="sh">$ ls ~/.spektral/datasets/MyDataset/
+graph_0.npz  graph_1.npz  graph_2.npz  graph_3.npz  graph_4.npz
+</code></pre>
+
+<p>so the next time we create <code>MyDataset</code> it will read from the files we have saved. </p>
+<hr />
+<p>You can now use your custom dataset however you like. <a href="/loaders">Loaders</a> will work, as well as <a href="/transforms">transforms</a> and all other features described in the <a href="/data/#dataset">documentation</a>.</p>
+<p>Remember that, if you want, you're free to store your data as you prefer. Datasets in Spektral are just there to simplify your workflow, but the library is still designed according to Keras' principle of not getting in your way. If you want to manipulate your data differently, your GNNs will still work. </p>
+<p>You can also see <a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/custom_dataset.py">this script</a> for another example on how to create and use a custom dataset.</p>
               
             </div>
           </div>
@@ -190,10 +235,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../layers/convolution/" class="btn btn-neutral float-right" title="Convolutional layers">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../creating-layer/" class="btn btn-neutral float-right" title="Creating a layer">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../creating-layer/" class="btn btn-neutral" title="Creating a layer"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../data-modes/" class="btn btn-neutral" title="Data modes"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -221,10 +266,10 @@
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../creating-layer/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../data-modes/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../layers/convolution/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../creating-layer/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

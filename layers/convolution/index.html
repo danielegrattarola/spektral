@@ -9,7 +9,7 @@
   <meta name="author" content="Daniele Grattarola">
   <link rel="canonical" href="https://graphneural.network/layers/convolution/">
   <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>Convolutional Layers - Spektral</title>
+  <title>Convolutional layers - Spektral</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
   <link rel="stylesheet" href="../../css/theme.css" />
@@ -19,7 +19,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Convolutional Layers";
+    var mkdocs_page_name = "Convolutional layers";
     var mkdocs_page_input_path = "layers/convolution.md";
     var mkdocs_page_url = "/layers/convolution/";
   </script>
@@ -66,59 +66,71 @@
                 <ul>
                     <li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting started</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../data/">Data representation</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../../data-modes/">Data modes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../creating-dataset/">Creating a dataset</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../creating-layer/">Creating a layer</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../../examples/">Examples</a>
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Layers</span></p>
                 <ul class="current">
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Convolutional Layers</a>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Convolutional layers</a>
     <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#graphconv">GraphConv</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#chebconv">ChebConv</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#graphsageconv">GraphSageConv</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#armaconv">ARMAConv</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#edgeconditionedconv">EdgeConditionedConv</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#graphattention">GraphAttention</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#graphconvskip">GraphConvSkip</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#appnp">APPNP</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#ginconv">GINConv</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#diffusionconv">DiffusionConv</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#gatedgraphconv">GatedGraphConv</a>
+    <li class="toctree-l2"><a class="reference internal" href="#messagepassing">MessagePassing</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#agnnconv">AGNNConv</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#tagconv">TAGConv</a>
+    <li class="toctree-l2"><a class="reference internal" href="#appnpconv">APPNPConv</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#armaconv">ARMAConv</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#chebconv">ChebConv</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#crystalconv">CrystalConv</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#diffusionconv">DiffusionConv</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#eccconv">ECCConv</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#edgeconv">EdgeConv</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#messagepassing">MessagePassing</a>
+    <li class="toctree-l2"><a class="reference internal" href="#gatconv">GATConv</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#gatedgraphconv">GatedGraphConv</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#gcnconv">GCNConv</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#generalconv">GeneralConv</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#gcsconv">GCSConv</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#ginconv">GINConv</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#graphsageconv">GraphSageConv</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#tagconv">TAGConv</a>
     </li>
     </ul>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../pooling/">Pooling Layers</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../pooling/">Pooling layers</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../base/">Base Layers</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../base/">Base layers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../models/">Models</a>
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Data</span></p>
                 <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../data/">Containers</a>
+                    </li>
                     <li class="toctree-l1"><a class="reference internal" href="../../datasets/">Datasets</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../utils/data/">Data utils</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../../loaders/">Loaders</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../transforms/">Transforms</a>
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Utils</span></p>
@@ -127,15 +139,11 @@
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../../utils/misc/">Miscellaneous</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../utils/conversion/">Conversion</a>
-                    </li>
-                </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../../chem/">Chemistry</a>
-                    </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Other</span></p>
                 <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../external/">External resources</a>
+                    </li>
                     <li class="toctree-l1"><a class="reference internal" href="../../about/">About</a>
                     </li>
                 </ul>
@@ -164,7 +172,7 @@
         
       
     
-    <li>Convolutional Layers</li>
+    <li>Convolutional layers</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -176,418 +184,168 @@
             <div class="section">
               
                 <h2 id="convolutional-layers">Convolutional layers</h2>
-<p>The message-passing layers from these papers are available in Spektral:</p>
-<ul>
-<li><a href="https://arxiv.org/abs/1609.02907">Semi-Supervised Classification with Graph Convolutional Networks</a></li>
-<li><a href="https://arxiv.org/abs/1606.09375">Convolutional Neural Networks on Graphs with Fast Localized Spectral Filtering</a></li>
-<li><a href="https://arxiv.org/abs/1706.02216">Inductive Representation Learning on Large Graphs</a></li>
-<li><a href="https://arxiv.org/abs/1901.01343">Graph Neural Networks with convolutional ARMA filters</a></li>
-<li><a href="https://arxiv.org/abs/1704.02901">Dynamic Edge-Conditioned Filters in Convolutional Neural Networks on Graphs</a></li>
-<li><a href="https://arxiv.org/abs/1710.10903">Graph Attention Networks</a></li>
-<li><a href="https://arxiv.org/abs/1810.05997">Predict then Propagate: Graph Neural Networks meet Personalized PageRank</a></li>
-<li><a href="https://arxiv.org/abs/1810.00826">How Powerful are Graph Neural Networks?</a></li>
-<li><a href="https://arxiv.org/abs/1707.01926">Diffusion Convolutional Recurrent Neural Network: Data-Driven Traffic Forecasting</a></li>
-<li><a href="https://arxiv.org/abs/1511.05493">Gated Graph Sequence Neural Networks</a></li>
-<li><a href="https://arxiv.org/abs/1803.03735">Attention-based Graph Neural Network for Semi-supervised Learning</a></li>
-<li><a href="https://arxiv.org/abs/1710.10370">Topology Adaptive Graph Convolutional Networks</a></li>
-<li><a href="https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.145301">Crystal Graph Convolutional Neural Networks for an Accurate and Interpretable Prediction of Material Properties</a></li>
-<li><a href="https://arxiv.org/abs/1801.07829">Dynamic Graph CNN for Learning on Point Clouds</a></li>
-</ul>
+<p>The following convolutional/message-passing layers are available in Spektral.</p>
 <p>Notation:</p>
 <ul>
 <li>
-<script type="math/tex"> N </script>: number of nodes in the graph;</li>
+<script type="math/tex"> N </script>: number of nodes;</li>
 <li>
-<script type="math/tex"> F </script>: dimension of the node attributes (i.e., each node has an attribute in <script type="math/tex"> \mathbb{R}^F </script>);</li>
+<script type="math/tex"> F </script>: size of the node attributes;</li>
 <li>
-<script type="math/tex"> S </script>: dimension of the edge attributes (i.e., each edge has an attribute in <script type="math/tex"> \mathbb{R}^S </script>);</li>
+<script type="math/tex"> S </script>: size of the edge attributes;</li>
 <li>
-<script type="math/tex"> \A \in \{0, 1\}^{N \times N}</script>: binary adjacency matrix;</li>
+<script type="math/tex"> \x_i </script>: node attributes of the i-th node;</li>
 <li>
-<script type="math/tex"> \X \in \mathbb{R}^{ N \times F } </script>: node attributes matrix;</li>
+<script type="math/tex"> \e_{i \rightarrow j}</script>: edge attributes of the edge from node i to node j;</li>
 <li>
-<script type="math/tex"> \E \in \mathbb{R}^{ N \times N \times S } </script>: edge attributes matrix;</li>
+<script type="math/tex"> \A </script>: adjacency matrix;</li>
 <li>
-<script type="math/tex"> \D = \textrm{diag} ( \sum\limits_{j=0} \A_{ij} )</script>: degree matrix;</li>
+<script type="math/tex"> \X </script>: node attributes matrix;</li>
 <li>
-<script type="math/tex"> \W, \V </script>: trainable kernels;</li>
+<script type="math/tex"> \E </script>: edge attributes matrix;</li>
+<li>
+<script type="math/tex"> \D </script>: degree matrix;</li>
+<li>
+<script type="math/tex"> \W, \V </script>: trainable weights matrices;</li>
 <li>
 <script type="math/tex"> \b </script>: trainable bias vector;</li>
 <li>
-<script type="math/tex"> \mathcal{N}(i) </script>: the one-hop neighbourhood of node <script type="math/tex">i</script>; </li>
-<li>
-<script type="math/tex"> F' </script>: dimension of the node attributes after a message-passing layer;</li>
+<script type="math/tex"> \mathcal{N}(i) </script>: one-hop neighbourhood of node <script type="math/tex">i</script>; </li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/graph_conv.py#L9">[source]</a></span></p>
-<h4 id="graphconv">GraphConv</h4>
-<pre><code class="python">spektral.layers.GraphConv(channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/message_passing.py#L11">[source]</a></span></p>
+<h4 id="messagepassing">MessagePassing</h4>
+<pre><code class="python">spektral.layers.MessagePassing(aggregate='sum')
 </code></pre>
 
-<p>A graph convolutional layer (GCN) as presented by
-<a href="https://arxiv.org/abs/1609.02907">Kipf &amp; Welling (2016)</a>.</p>
-<p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
-<p>This layer computes:
-<script type="math/tex; mode=display">
-\Z = \hat \D^{-1/2} \hat \A \hat \D^{-1/2} \X \W + \b
-</script>
-where <script type="math/tex"> \hat \A = \A + \I </script> is the adjacency matrix with added self-loops
-and <script type="math/tex">\hat\D</script> is its degree matrix.</p>
-<p><strong>Input</strong></p>
-<ul>
-<li>Node features of shape <code>([batch], N, F)</code>;</li>
-<li>Modified Laplacian of shape <code>([batch], N, N)</code>; can be computed with
-<code>spektral.utils.convolution.localpooling_filter</code>.</li>
-</ul>
-<p><strong>Output</strong></p>
-<ul>
-<li>Node features with the same shape as the input, but with the last
-dimension changed to <code>channels</code>.</li>
-</ul>
-<p><strong>Arguments</strong></p>
-<ul>
-<li><code>channels</code>: number of output channels;</li>
-<li><code>activation</code>: activation function to use;</li>
-<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
-<li><code>kernel_initializer</code>: initializer for the weights;</li>
-<li><code>bias_initializer</code>: initializer for the bias vector;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
-<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
-<li><code>activity_regularizer</code>: regularization applied to the output;</li>
-<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
-<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
-</ul>
-<hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/cheb_conv.py#L8">[source]</a></span></p>
-<h4 id="chebconv">ChebConv</h4>
-<pre><code class="python">spektral.layers.ChebConv(channels, K=1, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
-</code></pre>
-
-<p>A Chebyshev convolutional layer as presented by
-<a href="https://arxiv.org/abs/1606.09375">Defferrard et al. (2016)</a>.</p>
-<p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
-<p>This layer computes:
-<script type="math/tex; mode=display">
-\Z = \sum \limits_{k=0}^{K - 1} \T^{(k)} \W^{(k)}  + \b^{(k)},
-</script>
-where <script type="math/tex"> \T^{(0)}, ..., \T^{(K - 1)} </script> are Chebyshev polynomials of <script type="math/tex">\tilde \L</script>
-defined as
-<script type="math/tex; mode=display">
-\T^{(0)} = \X \\
-\T^{(1)} = \tilde \L \X \\
-\T^{(k \ge 2)} = 2 \cdot \tilde \L \T^{(k - 1)} - \T^{(k - 2)},
-</script>
-where
-<script type="math/tex; mode=display">
-\tilde \L =  \frac{2}{\lambda_{max}} \cdot (\I - \D^{-1/2} \A \D^{-1/2}) - \I
-</script>
-is the normalized Laplacian with a rescaled spectrum.</p>
-<p><strong>Input</strong></p>
-<ul>
-<li>Node features of shape <code>([batch], N, F)</code>;</li>
-<li>A list of K Chebyshev polynomials of shape
-<code>[([batch], N, N), ..., ([batch], N, N)]</code>; can be computed with
-<code>spektral.utils.convolution.chebyshev_filter</code>.</li>
-</ul>
-<p><strong>Output</strong></p>
-<ul>
-<li>Node features with the same shape of the input, but with the last
-dimension changed to <code>channels</code>.</li>
-</ul>
-<p><strong>Arguments</strong></p>
-<ul>
-<li><code>channels</code>: number of output channels;</li>
-<li><code>K</code>: order of the Chebyshev polynomials;</li>
-<li><code>activation</code>: activation function to use;</li>
-<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
-<li><code>kernel_initializer</code>: initializer for the weights;</li>
-<li><code>bias_initializer</code>: initializer for the bias vector;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
-<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
-<li><code>activity_regularizer</code>: regularization applied to the output;</li>
-<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
-<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
-</ul>
-<hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/graphsage_conv.py#L8">[source]</a></span></p>
-<h4 id="graphsageconv">GraphSageConv</h4>
-<pre><code class="python">spektral.layers.GraphSageConv(channels, aggregate_op='mean', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
-</code></pre>
-
-<p>A GraphSAGE layer as presented by
-<a href="https://arxiv.org/abs/1706.02216">Hamilton et al. (2017)</a>.</p>
+<p>A general class for message passing networks from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1704.01212">Neural Message Passing for Quantum Chemistry</a><br>
+Justin Gilmer et al.</p>
+</blockquote>
 <p><strong>Mode</strong>: single, disjoint.</p>
+<p><strong>This layer and all of its extensions expect a sparse adjacency matrix.</strong></p>
 <p>This layer computes:
 <script type="math/tex; mode=display">
-\Z = \big[ \textrm{AGGREGATE}(\X) \| \X \big] \W + \b; \\
-\Z = \frac{\Z}{\|\Z\|}
+\x_i' = \gamma \left( \x_i, \square_{j \in \mathcal{N}(i)} \,
+\phi \left(\x_i, \x_j, \e_{j \rightarrow i} \right) \right),
 </script>
-where <script type="math/tex"> \textrm{AGGREGATE} </script> is a function to aggregate a node's
-neighbourhood. The supported aggregation methods are: sum, mean,
-max, min, and product.</p>
-<p><strong>Input</strong></p>
-<ul>
-<li>Node features of shape <code>(N, F)</code>;</li>
-<li>Binary adjacency matrix of shape <code>(N, N)</code>.</li>
-</ul>
-<p><strong>Output</strong></p>
-<ul>
-<li>Node features with the same shape as the input, but with the last
-dimension changed to <code>channels</code>.</li>
-</ul>
-<p><strong>Arguments</strong></p>
-<ul>
-<li><code>channels</code>: number of output channels;</li>
-<li><code>aggregate_op</code>: str, aggregation method to use (<code>'sum'</code>, <code>'mean'</code>,
-<code>'max'</code>, <code>'min'</code>, <code>'prod'</code>);</li>
-<li><code>activation</code>: activation function to use;</li>
-<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
-<li><code>kernel_initializer</code>: initializer for the weights;</li>
-<li><code>bias_initializer</code>: initializer for the bias vector;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
-<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
-<li><code>activity_regularizer</code>: regularization applied to the output;</li>
-<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
-<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
-</ul>
-<hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/arma_conv.py#L9">[source]</a></span></p>
-<h4 id="armaconv">ARMAConv</h4>
-<pre><code class="python">spektral.layers.ARMAConv(channels, order=1, iterations=1, share_weights=False, gcn_activation='relu', dropout_rate=0.0, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+</p>
+<p>where <script type="math/tex"> \gamma </script> is a differentiable update function, <script type="math/tex"> \phi </script> is a
+differentiable message function, <script type="math/tex"> \square </script> is a permutation-invariant
+function to aggregate the messages (like the sum or the average), and
+<script type="math/tex">\E_{ij}</script> is the edge attribute of edge i-j.</p>
+<p>By extending this class, it is possible to create any message-passing layer
+in single/disjoint mode.</p>
+<p><strong>API</strong></p>
+<pre><code class="python">propagate(x, a, e=None, **kwargs)
 </code></pre>
 
-<p>A graph convolutional layer with ARMA<script type="math/tex">_K</script> filters, as presented by
-<a href="https://arxiv.org/abs/1901.01343">Bianchi et al. (2019)</a>.</p>
-<p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
+<p>Propagates the messages and computes embeddings for each node in the graph. <br>
+Any <code>kwargs</code> will be forwarded as keyword arguments to <code>message()</code>,
+<code>aggregate()</code> and <code>update()</code>.</p>
+<pre><code class="python">message(x, **kwargs)
+</code></pre>
+
+<p>Computes messages, equivalent to <script type="math/tex">\phi</script> in the definition. <br>
+Any extra keyword argument of this function will be populated by
+<code>propagate()</code> if a matching keyword is found. <br>
+Use <code>self.get_i()</code> and  <code>self.get_j()</code> to gather the elements using the
+indices <code>i</code> or <code>j</code> of the adjacency matrix. Equivalently, you can access
+the indices themselves via the <code>index_i</code> and <code>index_j</code> attributes.</p>
+<pre><code class="python">aggregate(messages, **kwargs)
+</code></pre>
+
+<p>Aggregates the messages, equivalent to <script type="math/tex">\square</script> in the definition. <br>
+The behaviour of this function can also be controlled using the <code>aggregate</code>
+keyword in the constructor of the layer (supported aggregations: sum, mean,
+max, min, prod). <br>
+Any extra keyword argument of this function will be  populated by
+<code>propagate()</code> if a matching keyword is found.</p>
+<pre><code class="python">update(embeddings, **kwargs)
+</code></pre>
+
+<p>Updates the aggregated messages to obtain the final node embeddings,
+equivalent to <script type="math/tex">\gamma</script> in the definition. <br>
+Any extra keyword argument of this function will be  populated by
+<code>propagate()</code> if a matching keyword is found.</p>
+<p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>aggregate</code>: string or callable, an aggregation function. This flag can be
+used to control the behaviour of <code>aggregate()</code> wihtout re-implementing it.
+Supported aggregations: 'sum', 'mean', 'max', 'min', 'prod'.
+If callable, the function must have the signature <code>foo(updates, indices, n_nodes)</code>
+and return a rank 2 tensor with shape <code>(n_nodes, ...)</code>.</li>
+<li><code>kwargs</code>: additional keyword arguments specific to Keras' Layers, like
+regularizers, initializers, constraints, etc.</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/agnn_conv.py#L8">[source]</a></span></p>
+<h4 id="agnnconv">AGNNConv</h4>
+<pre><code class="python">spektral.layers.AGNNConv(trainable=True, aggregate='sum', activation=None)
+</code></pre>
+
+<p>An Attention-based Graph Neural Network (AGNN) from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1803.03735">Attention-based Graph Neural Network for Semi-supervised Learning</a><br>
+Kiran K. Thekumparampil et al.</p>
+</blockquote>
+<p><strong>Mode</strong>: single, disjoint.</p>
+<p><strong>This layer expects a sparse adjacency matrix.</strong></p>
 <p>This layer computes:
 <script type="math/tex; mode=display">
-\Z = \frac{1}{K} \sum\limits_{k=1}^K \bar\X_k^{(T)},
-</script>
-where <script type="math/tex">K</script> is the order of the ARMA<script type="math/tex">_K</script> filter, and where:
-<script type="math/tex; mode=display">
-\bar \X_k^{(t + 1)} =
-\sigma \left(\tilde \L \bar \X^{(t)} \W^{(t)} + \X \V^{(t)} \right)
-</script>
-is a recursive approximation of an ARMA<script type="math/tex">_1</script> filter, where
-<script type="math/tex"> \bar \X^{(0)} = \X </script>
-and
-<script type="math/tex; mode=display">
-\tilde \L =  \frac{2}{\lambda_{max}} \cdot (\I - \D^{-1/2} \A \D^{-1/2}) - \I
-</script>
-is the normalized Laplacian with a rescaled spectrum.</p>
-<p><strong>Input</strong></p>
-<ul>
-<li>Node features of shape <code>([batch], N, F)</code>;</li>
-<li>Normalized and rescaled Laplacian of shape <code>([batch], N, N)</code>; can be
-computed with <code>spektral.utils.convolution.normalized_laplacian</code> and
-<code>spektral.utils.convolution.rescale_laplacian</code>.</li>
-</ul>
-<p><strong>Output</strong></p>
-<ul>
-<li>Node features with the same shape as the input, but with the last
-dimension changed to <code>channels</code>.</li>
-</ul>
-<p><strong>Arguments</strong></p>
-<ul>
-<li><code>channels</code>: number of output channels;</li>
-<li><code>order</code>: order of the full ARMA<script type="math/tex">_K</script> filter, i.e., the number of parallel
-stacks in the layer;</li>
-<li><code>iterations</code>: number of iterations to compute each ARMA<script type="math/tex">_1</script> approximation;</li>
-<li><code>share_weights</code>: share the weights in each ARMA<script type="math/tex">_1</script> stack.</li>
-<li><code>gcn_activation</code>: activation function to use to compute each ARMA<script type="math/tex">_1</script>
-stack;</li>
-<li><code>dropout_rate</code>: dropout rate for skip connection;</li>
-<li><code>activation</code>: activation function to use;</li>
-<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
-<li><code>kernel_initializer</code>: initializer for the weights;</li>
-<li><code>bias_initializer</code>: initializer for the bias vector;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
-<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
-<li><code>activity_regularizer</code>: regularization applied to the output;</li>
-<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
-<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
-</ul>
-<hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/ecc_conv.py#L10">[source]</a></span></p>
-<h4 id="edgeconditionedconv">EdgeConditionedConv</h4>
-<pre><code class="python">spektral.layers.EdgeConditionedConv(channels, kernel_network=None, root=True, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
-</code></pre>
-
-<p>An edge-conditioned convolutional layer (ECC) as presented by
-<a href="https://arxiv.org/abs/1704.02901">Simonovsky &amp; Komodakis (2017)</a>.</p>
-<p><strong>Mode</strong>: single, disjoint, batch.</p>
-<p><strong>Notes</strong>:</p>
-<ul>
-<li>In single mode, if the adjacency matrix is dense it will be converted
-to a SparseTensor automatically (which is an expensive operation).</li>
-</ul>
-<p>For each node <script type="math/tex"> i </script>, this layer computes:
-<script type="math/tex; mode=display">
-\Z_i = \X_{i} \W_{\textrm{root}} + \sum\limits_{j \in \mathcal{N}(i)} \X_{j} \textrm{MLP}(\E_{ji}) + \b
-</script>
-where <script type="math/tex">\textrm{MLP}</script> is a multi-layer perceptron that outputs an
-edge-specific weight as a function of edge attributes.</p>
-<p><strong>Input</strong></p>
-<ul>
-<li>Node features of shape <code>([batch], N, F)</code>;</li>
-<li>Binary adjacency matrices of shape <code>([batch], N, N)</code>;</li>
-<li>Edge features. In single mode, shape <code>(num_edges, S)</code>; in batch mode, shape
-<code>(batch, N, N, S)</code>.</li>
-</ul>
-<p><strong>Output</strong></p>
-<ul>
-<li>node features with the same shape of the input, but the last dimension
-changed to <code>channels</code>.</li>
-</ul>
-<p><strong>Arguments</strong></p>
-<ul>
-<li><code>channels</code>: integer, number of output channels;</li>
-<li><code>kernel_network</code>: a list of integers representing the hidden neurons of
-the kernel-generating network;</li>
-<li>'root': if False, the layer will not consider the root node for computing
-the message passing (first term in equation above), but only the neighbours.</li>
-<li><code>activation</code>: activation function to use;</li>
-<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
-<li><code>kernel_initializer</code>: initializer for the weights;</li>
-<li><code>bias_initializer</code>: initializer for the bias vector;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
-<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
-<li><code>activity_regularizer</code>: regularization applied to the output;</li>
-<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
-<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
-</ul>
-<hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/graph_attention.py#L11">[source]</a></span></p>
-<h4 id="graphattention">GraphAttention</h4>
-<pre><code class="python">spektral.layers.GraphAttention(channels, attn_heads=1, concat_heads=True, dropout_rate=0.5, return_attn_coef=False, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', attn_kernel_initializer='glorot_uniform', kernel_regularizer=None, bias_regularizer=None, attn_kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None, attn_kernel_constraint=None)
-</code></pre>
-
-<p>A graph attention layer (GAT) as presented by
-<a href="https://arxiv.org/abs/1710.10903">Velickovic et al. (2017)</a>.</p>
-<p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
-<p><strong>This layer expects dense inputs when working in batch mode.</strong></p>
-<p>This layer computes a convolution similar to <code>layers.GraphConv</code>, but
-uses the attention mechanism to weight the adjacency matrix instead of
-using the normalized Laplacian:
-<script type="math/tex; mode=display">
-\Z = \mathbf{\alpha}\X\W + \b
+\X' = \P\X
 </script>
 where
 <script type="math/tex; mode=display">
-\mathbf{\alpha}_{ij} =
-\frac{
-\exp\left(
-\mathrm{LeakyReLU}\left(
-\a^{\top} [(\X\W)_i \, \| \, (\X\W)_j]
-\right)
-\right)
-}
-{\sum\limits_{k \in \mathcal{N}(i) \cup \{ i \}}
-\exp\left(
-\mathrm{LeakyReLU}\left(
-\a^{\top} [(\X\W)_i \, \| \, (\X\W)_k]
-\right)
-\right)
+\P_{ij} = \frac{
+\exp \left( \beta \cos \left( \x_i, \x_j \right) \right)
+}{
+\sum\limits_{k \in \mathcal{N}(i) \cup \{ i \}}
+\exp \left( \beta \cos \left( \x_i, \x_k \right) \right)
 }
 </script>
-where <script type="math/tex">\a \in \mathbb{R}^{2F'}</script> is a trainable attention kernel.
-Dropout is also applied to <script type="math/tex">\alpha</script> before computing <script type="math/tex">\Z</script>.
-Parallel attention heads are computed in parallel and their results are
-aggregated by concatenation or average.</p>
+and <script type="math/tex">\beta</script> is a trainable parameter.</p>
 <p><strong>Input</strong></p>
 <ul>
-<li>Node features of shape <code>([batch], N, F)</code>;</li>
-<li>Binary adjacency matrix of shape <code>([batch], N, N)</code>;</li>
+<li>Node features of shape <code>(n_nodes, n_node_features)</code>;</li>
+<li>Binary adjacency matrix of shape <code>(n_nodes, n_nodes)</code>.</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li>Node features with the same shape as the input, but with the last
-dimension changed to <code>channels</code>;</li>
-<li>if <code>return_attn_coef=True</code>, a list with the attention coefficients for
-each attention head. Each attention coefficient matrix has shape
-<code>([batch], N, N)</code>.</li>
+<li>Node features with the same shape of the input.</li>
 </ul>
 <p><strong>Arguments</strong></p>
 <ul>
-<li><code>channels</code>: number of output channels;</li>
-<li><code>attn_heads</code>: number of attention heads to use;</li>
-<li><code>concat_heads</code>: bool, whether to concatenate the output of the attention
-heads instead of averaging;</li>
-<li><code>dropout_rate</code>: internal dropout rate for attention coefficients;</li>
-<li><code>return_attn_coef</code>: if True, return the attention coefficients for
-the given input (one N x N matrix for each head).</li>
-<li><code>activation</code>: activation function to use;</li>
-<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
-<li><code>kernel_initializer</code>: initializer for the weights;</li>
-<li><code>attn_kernel_initializer</code>: initializer for the attention weights;</li>
-<li><code>bias_initializer</code>: initializer for the bias vector;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
-<li><code>attn_kernel_regularizer</code>: regularization applied to the attention kernels;</li>
-<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
-<li><code>activity_regularizer</code>: regularization applied to the output;</li>
-<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
-<li><code>attn_kernel_constraint</code>: constraint applied to the attention kernels;</li>
-<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
+<li><code>trainable</code>: boolean, if True, then beta is a trainable parameter.
+Otherwise, beta is fixed to 1;</li>
+<li><code>activation</code>: activation function;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/graph_conv_skip.py#L8">[source]</a></span></p>
-<h4 id="graphconvskip">GraphConvSkip</h4>
-<pre><code class="python">spektral.layers.GraphConvSkip(channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/appnp_conv.py#L10">[source]</a></span></p>
+<h4 id="appnpconv">APPNPConv</h4>
+<pre><code class="python">spektral.layers.APPNPConv(channels, alpha=0.2, propagations=1, mlp_hidden=None, mlp_activation='relu', dropout_rate=0.0, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
-<p>A simple convolutional layer with a skip connection.</p>
+<p>The APPNP operator from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1810.05997">Predict then Propagate: Graph Neural Networks meet Personalized PageRank</a><br>
+Johannes Klicpera et al.</p>
+</blockquote>
 <p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
-<p>This layer computes:
-<script type="math/tex; mode=display">
-\Z = \D^{-1/2} \A \D^{-1/2} \X \W_1 + \X \W_2 + \b
-</script>
-where <script type="math/tex"> \A </script> does not have self-loops (unlike in GraphConv).</p>
-<p><strong>Input</strong></p>
-<ul>
-<li>Node features of shape <code>([batch], N, F)</code>;</li>
-<li>Normalized adjacency matrix of shape <code>([batch], N, N)</code>; can be computed
-with <code>spektral.utils.convolution.normalized_adjacency</code>.</li>
-</ul>
-<p><strong>Output</strong></p>
-<ul>
-<li>Node features with the same shape as the input, but with the last
-dimension changed to <code>channels</code>.</li>
-</ul>
-<p><strong>Arguments</strong></p>
-<ul>
-<li><code>channels</code>: number of output channels;</li>
-<li><code>activation</code>: activation function to use;</li>
-<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
-<li><code>kernel_initializer</code>: initializer for the weights;</li>
-<li><code>bias_initializer</code>: initializer for the bias vector;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
-<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
-<li><code>activity_regularizer</code>: regularization applied to the output;</li>
-<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
-<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
-</ul>
-<hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/appnp.py#L9">[source]</a></span></p>
-<h4 id="appnp">APPNP</h4>
-<pre><code class="python">spektral.layers.APPNP(channels, alpha=0.2, propagations=1, mlp_hidden=None, mlp_activation='relu', dropout_rate=0.0, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
-</code></pre>
-
-<p>A graph convolutional layer implementing the APPNP operator, as presented by
-<a href="https://arxiv.org/abs/1810.05997">Klicpera et al. (2019)</a>.</p>
 <p>This layer computes:
 <script type="math/tex; mode=display">
 \Z^{(0)} = \textrm{MLP}(\X); \\
 \Z^{(K)} = (1 - \alpha) \hat \D^{-1/2} \hat \A \hat \D^{-1/2} \Z^{(K - 1)} +
 \alpha \Z^{(0)},
 </script>
-where <script type="math/tex">\alpha</script> is the <em>teleport</em> probability and <script type="math/tex">\textrm{MLP}</script> is a
-multi-layer perceptron.</p>
-<p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
+where <script type="math/tex">\alpha</script> is the teleport probability, <script type="math/tex">\textrm{MLP}</script> is a
+multi-layer perceptron, and <script type="math/tex">K</script> is defined by the <code>propagations</code> argument.</p>
 <p><strong>Input</strong></p>
 <ul>
-<li>Node features of shape <code>([batch], N, F)</code>;</li>
-<li>Modified Laplacian of shape <code>([batch], N, N)</code>; can be computed with
-<code>spektral.utils.convolution.localpooling_filter</code>.</li>
+<li>Node features of shape <code>([batch], n_nodes, n_node_features)</code>;</li>
+<li>Modified Laplacian of shape <code>([batch], n_nodes, n_nodes)</code>; can be computed with
+<code>spektral.utils.convolution.gcn_filter</code>.</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
@@ -603,7 +361,7 @@ dimension changed to <code>channels</code>.</li>
 layer in the MLP (if None, the MLP has only the output layer);</li>
 <li><code>mlp_activation</code>: activation for the MLP layers;</li>
 <li><code>dropout_rate</code>: dropout rate for Laplacian and MLP layers;</li>
-<li><code>activation</code>: activation function to use;</li>
+<li><code>activation</code>: activation function;</li>
 <li><code>use_bias</code>: bool, add a bias vector to the output;</li>
 <li><code>kernel_initializer</code>: initializer for the weights;</li>
 <li><code>bias_initializer</code>: initializer for the bias vector;</li>
@@ -614,77 +372,39 @@ layer in the MLP (if None, the MLP has only the output layer);</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gin_conv.py#L8">[source]</a></span></p>
-<h4 id="ginconv">GINConv</h4>
-<pre><code class="python">spektral.layers.GINConv(channels, epsilon=None, mlp_hidden=None, mlp_activation='relu', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/arma_conv.py#L9">[source]</a></span></p>
+<h4 id="armaconv">ARMAConv</h4>
+<pre><code class="python">spektral.layers.ARMAConv(channels, order=1, iterations=1, share_weights=False, gcn_activation='relu', dropout_rate=0.0, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
-<p>A Graph Isomorphism Network (GIN) as presented by
-<a href="https://arxiv.org/abs/1810.00826">Xu et al. (2018)</a>.</p>
-<p><strong>Mode</strong>: single, disjoint.</p>
-<p><strong>This layer expects a sparse adjacency matrix.</strong></p>
-<p>This layer computes for each node <script type="math/tex">i</script>:
-<script type="math/tex; mode=display">
-\Z_i = \textrm{MLP}\big( (1 + \epsilon) \cdot \X_i + \sum\limits_{j \in \mathcal{N}(i)} \X_j \big)
-</script>
-where <script type="math/tex">\textrm{MLP}</script> is a multi-layer perceptron.</p>
-<p><strong>Input</strong></p>
-<ul>
-<li>Node features of shape <code>(N, F)</code>;</li>
-<li>Binary adjacency matrix of shape <code>(N, N)</code>.</li>
-</ul>
-<p><strong>Output</strong></p>
-<ul>
-<li>Node features with the same shape of the input, but the last dimension
-changed to <code>channels</code>.</li>
-</ul>
-<p><strong>Arguments</strong></p>
-<ul>
-<li><code>channels</code>: integer, number of output channels;</li>
-<li><code>epsilon</code>: unnamed parameter, see
-<a href="https://arxiv.org/abs/1810.00826">Xu et al. (2018)</a>, and the equation above.
-By setting <code>epsilon=None</code>, the parameter will be learned (default behaviour).
-If given as a value, the parameter will stay fixed.</li>
-<li><code>mlp_hidden</code>: list of integers, number of hidden units for each hidden
-layer in the MLP (if None, the MLP has only the output layer);</li>
-<li><code>mlp_activation</code>: activation for the MLP layers;</li>
-<li><code>activation</code>: activation function to use;</li>
-<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
-<li><code>kernel_initializer</code>: initializer for the weights;</li>
-<li><code>bias_initializer</code>: initializer for the bias vector;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
-<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
-<li><code>activity_regularizer</code>: regularization applied to the output;</li>
-<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
-<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
-</ul>
-<hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/diffusion_conv.py#L84">[source]</a></span></p>
-<h4 id="diffusionconv">DiffusionConv</h4>
-<pre><code class="python">spektral.layers.DiffusionConv(channels, num_diffusion_steps=6, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None, activation='tanh')
-</code></pre>
-
-<p>Applies Graph Diffusion Convolution as descibed by
-<a href="https://arxiv.org/pdf/1707.01926.pdf">Li et al. (2016)</a></p>
+<p>An Auto-Regressive Moving Average convolutional layer (ARMA) from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1901.01343">Graph Neural Networks with convolutional ARMA filters</a><br>
+Filippo Maria Bianchi et al.</p>
+</blockquote>
 <p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
-<p><strong>This layer expects a dense adjacency matrix.</strong></p>
-<p>Given a number of diffusion steps <script type="math/tex">K</script> and a row normalized adjacency matrix <script type="math/tex">\hat \A </script>,
-this layer calculates the q'th channel as:
+<p>This layer computes:
 <script type="math/tex; mode=display">
-\mathbf{H}_{~:,~q} = \sigma\left(
-\sum_{f=1}^{F}
-\left(
-\sum_{k=0}^{K-1}\theta_k {\hat \A}^k
-\right)
-\X_{~:,~f}
-\right)
+\X' = \frac{1}{K} \sum\limits_{k=1}^K \bar\X_k^{(T)},
+</script>
+where <script type="math/tex">K</script> is the order of the ARMA<script type="math/tex">_K</script> filter, and where:
+<script type="math/tex; mode=display">
+\bar \X_k^{(t + 1)} =
+\sigma \left(\tilde \A \bar \X^{(t)} \W^{(t)} + \X \V^{(t)} \right)
+</script>
+is a recursive approximation of an ARMA<script type="math/tex">_1</script> filter, where
+<script type="math/tex"> \bar \X^{(0)} = \X </script>
+and
+<script type="math/tex; mode=display">
+\tilde \A =  \D^{-1/2} \A \D^{-1/2}.
 </script>
 </p>
 <p><strong>Input</strong></p>
 <ul>
-<li>Node features of shape <code>([batch], N, F)</code>;</li>
-<li>Normalized adjacency or attention coef. matrix <script type="math/tex">\hat \A </script> of shape
-<code>([batch], N, N)</code>; Use <code>DiffusionConvolution.preprocess</code> to normalize.</li>
+<li>Node features of shape <code>([batch], n_nodes, n_node_features)</code>;</li>
+<li>Normalized and rescaled Laplacian of shape <code>([batch], n_nodes, n_nodes)</code>; can be
+computed with <code>spektral.utils.convolution.normalized_laplacian</code> and
+<code>spektral.utils.convolution.rescale_laplacian</code>.</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
@@ -694,48 +414,14 @@ dimension changed to <code>channels</code>.</li>
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>channels</code>: number of output channels;</li>
-<li><code>num_diffusion_steps</code>: How many diffusion steps to consider. <script type="math/tex">K</script> in paper.</li>
-<li><code>activation</code>: activation function <script type="math/tex">\sigma</script>; (<script type="math/tex">\tanh</script> by default)</li>
-<li><code>kernel_initializer</code>: initializer for the weights;</li>
-<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
-<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
-</ul>
-<hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gated_graph_conv.py#L8">[source]</a></span></p>
-<h4 id="gatedgraphconv">GatedGraphConv</h4>
-<pre><code class="python">spektral.layers.GatedGraphConv(channels, n_layers, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
-</code></pre>
-
-<p>A gated graph convolutional layer as presented by
-<a href="https://arxiv.org/abs/1511.05493">Li et al. (2018)</a>.</p>
-<p><strong>Mode</strong>: single, disjoint.</p>
-<p><strong>This layer expects a sparse adjacency matrix.</strong></p>
-<p>This layer repeatedly applies a GRU cell <script type="math/tex">L</script> times to the node attributes
-<script type="math/tex; mode=display">
-\begin{align}
-& \h^{(0)}_i = \X_i \| \mathbf{0} \\
-& \m^{(l)}_i = \sum\limits_{j \in \mathcal{N}(i)} \h^{(l - 1)}_j \W \\
-& \h^{(l)}_i = \textrm{GRU} \left(\m^{(l)}_i, \h^{(l - 1)}_i \right) \\
-& \Z_i = h^{(L)}_i
-\end{align}
-</script>
-where <script type="math/tex">\textrm{GRU}</script> is the GRU cell.</p>
-<p><strong>Input</strong></p>
-<ul>
-<li>Node features of shape <code>(N, F)</code>; note that <code>F</code> must be smaller or equal
-than <code>channels</code>.</li>
-<li>Binary adjacency matrix of shape <code>(N, N)</code>.</li>
-</ul>
-<p><strong>Output</strong></p>
-<ul>
-<li>Node features with the same shape of the input, but the last dimension
-changed to <code>channels</code>.</li>
-</ul>
-<p><strong>Arguments</strong></p>
-<ul>
-<li><code>channels</code>: integer, number of output channels;</li>
-<li><code>n_layers</code>: integer, number of iterations with the GRU cell;</li>
-<li><code>activation</code>: activation function to use;</li>
+<li><code>order</code>: order of the full ARMA<script type="math/tex">_K</script> filter, i.e., the number of parallel
+stacks in the layer;</li>
+<li><code>iterations</code>: number of iterations to compute each ARMA<script type="math/tex">_1</script> approximation;</li>
+<li><code>share_weights</code>: share the weights in each ARMA<script type="math/tex">_1</script> stack.</li>
+<li><code>gcn_activation</code>: activation function to compute each ARMA<script type="math/tex">_1</script>
+stack;</li>
+<li><code>dropout_rate</code>: dropout rate for skip connection;</li>
+<li><code>activation</code>: activation function;</li>
 <li><code>use_bias</code>: bool, add a bias vector to the output;</li>
 <li><code>kernel_initializer</code>: initializer for the weights;</li>
 <li><code>bias_initializer</code>: initializer for the bias vector;</li>
@@ -746,75 +432,51 @@ changed to <code>channels</code>.</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/agnn_conv.py#L8">[source]</a></span></p>
-<h4 id="agnnconv">AGNNConv</h4>
-<pre><code class="python">spektral.layers.AGNNConv(trainable=True, activation=None)
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/cheb_conv.py#L8">[source]</a></span></p>
+<h4 id="chebconv">ChebConv</h4>
+<pre><code class="python">spektral.layers.ChebConv(channels, K=1, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
-<p>An Attention-based Graph Neural Network (AGNN) as presented by
-<a href="https://arxiv.org/abs/1803.03735">Thekumparampil et al. (2018)</a>.</p>
-<p><strong>Mode</strong>: single, disjoint.</p>
-<p><strong>This layer expects a sparse adjacency matrix.</strong></p>
+<p>A Chebyshev convolutional layer from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1606.09375">Convolutional Neural Networks on Graphs with Fast Localized Spectral
+Filtering</a><br>
+Michaël Defferrard et al.</p>
+</blockquote>
+<p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
 <p>This layer computes:
 <script type="math/tex; mode=display">
-\Z = \P\X
+\X' = \sum \limits_{k=0}^{K - 1} \T^{(k)} \W^{(k)}  + \b^{(k)},
+</script>
+where <script type="math/tex"> \T^{(0)}, ..., \T^{(K - 1)} </script> are Chebyshev polynomials of <script type="math/tex">\tilde \L</script>
+defined as
+<script type="math/tex; mode=display">
+\T^{(0)} = \X \\
+\T^{(1)} = \tilde \L \X \\
+\T^{(k \ge 2)} = 2 \cdot \tilde \L \T^{(k - 1)} - \T^{(k - 2)},
 </script>
 where
 <script type="math/tex; mode=display">
-\P_{ij} = \frac{
-\exp \left( \beta \cos \left( \X_i, \X_j \right) \right)
-}{
-\sum\limits_{k \in \mathcal{N}(i) \cup \{ i \}}
-\exp \left( \beta \cos \left( \X_i, \X_k \right) \right)
-}
-</script>
-and <script type="math/tex">\beta</script> is a trainable parameter.</p>
-<p><strong>Input</strong></p>
-<ul>
-<li>Node features of shape <code>(N, F)</code>;</li>
-<li>Binary adjacency matrix of shape <code>(N, N)</code>.</li>
-</ul>
-<p><strong>Output</strong></p>
-<ul>
-<li>Node features with the same shape of the input.</li>
-</ul>
-<p><strong>Arguments</strong></p>
-<ul>
-<li><code>trainable</code>: boolean, if True, then beta is a trainable parameter.
-Otherwise, beta is fixed to 1;</li>
-<li><code>activation</code>: activation function to use;</li>
-</ul>
-<hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/tag_conv.py#L8">[source]</a></span></p>
-<h4 id="tagconv">TAGConv</h4>
-<pre><code class="python">spektral.layers.TAGConv(channels, K=3, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
-</code></pre>
-
-<p>A Topology Adaptive Graph Convolutional layer (TAG) as presented by
-<a href="https://arxiv.org/abs/1710.10370">Du et al. (2017)</a>.</p>
-<p><strong>Mode</strong>: single, disjoint.</p>
-<p><strong>This layer expects a sparse adjacency matrix.</strong></p>
-<p>This layer computes:
-<script type="math/tex; mode=display">
-\Z = \sum\limits_{k=0}^{K} \D^{-1/2}\A^k\D^{-1/2}\X\W^{(k)}
+\tilde \L =  \frac{2}{\lambda_{max}} \cdot (\I - \D^{-1/2} \A \D^{-1/2}) - \I.
 </script>
 </p>
 <p><strong>Input</strong></p>
 <ul>
-<li>Node features of shape <code>(N, F)</code>;</li>
-<li>Binary adjacency matrix of shape <code>(N, N)</code>.</li>
+<li>Node features of shape <code>([batch], n_nodes, n_node_features)</code>;</li>
+<li>A list of K Chebyshev polynomials of shape
+<code>[([batch], n_nodes, n_nodes), ..., ([batch], n_nodes, n_nodes)]</code>; can be computed with
+<code>spektral.utils.convolution.chebyshev_filter</code>.</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li>Node features with the same shape of the input, but the last dimension
-changed to <code>channels</code>.</li>
+<li>Node features with the same shape of the input, but with the last
+dimension changed to <code>channels</code>.</li>
 </ul>
 <p><strong>Arguments</strong></p>
 <ul>
-<li><code>channels</code>: integer, number of output channels;</li>
-<li><code>K</code>: the order of the layer (i.e., the layer will consider a K-hop
-neighbourhood for each node);</li>
-<li><code>activation</code>: activation function to use;</li>
+<li><code>channels</code>: number of output channels;</li>
+<li><code>K</code>: order of the Chebyshev polynomials;</li>
+<li><code>activation</code>: activation function;</li>
 <li><code>use_bias</code>: bool, add a bias vector to the output;</li>
 <li><code>kernel_initializer</code>: initializer for the weights;</li>
 <li><code>bias_initializer</code>: initializer for the bias vector;</li>
@@ -827,29 +489,31 @@ neighbourhood for each node);</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/crystal_conv.py#L7">[source]</a></span></p>
 <h4 id="crystalconv">CrystalConv</h4>
-<pre><code class="python">spektral.layers.CrystalConv(channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<pre><code class="python">spektral.layers.CrystalConv(channels, aggregate='sum', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
-<p>A Crystal Graph Convolutional layer as presented by
-<a href="https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.145301">Xie &amp; Grossman (2018)</a>.</p>
+<p>A crystal graph convolutional layer from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1710.10324">Crystal Graph Convolutional Neural Networks for an Accurate and
+Interpretable Prediction of Material Properties</a><br>
+Tian Xie and Jeffrey C. Grossman</p>
+</blockquote>
 <p><strong>Mode</strong>: single, disjoint.</p>
 <p><strong>This layer expects a sparse adjacency matrix.</strong></p>
-<p>This layer computes for each node <script type="math/tex">i</script>:
+<p>This layer computes:
 <script type="math/tex; mode=display">
-\H_i = \X_i +
-\sum\limits_{j \in \mathcal{N}(i)}
-\sigma \left( \z_{ij} \W^{(f)} + \b^{(f)} \right)
-\odot
-\g \left( \z_{ij} \W^{(s)} + \b^{(s)} \right)
+\x_i' = \x_i + \sum\limits_{j \in \mathcal{N}(i)} \sigma \left( \z_{ij}
+\W^{(f)} + \b^{(f)} \right) \odot \g \left( \z_{ij} \W^{(s)} + \b^{(s)}
+\right)
 </script>
 where <script type="math/tex">\z_{ij} = \X_i \| \X_j \| \E_{ij} </script>, <script type="math/tex">\sigma</script> is a sigmoid
 activation, and <script type="math/tex">g</script> is the activation function (defined by the <code>activation</code>
 argument).</p>
 <p><strong>Input</strong></p>
 <ul>
-<li>Node features of shape <code>(N, F)</code>;</li>
-<li>Binary adjacency matrix of shape <code>(N, N)</code>.</li>
-<li>Edge features of shape <code>(num_edges, S)</code>.</li>
+<li>Node features of shape <code>(n_nodes, n_node_features)</code>;</li>
+<li>Binary adjacency matrix of shape <code>(n_nodes, n_nodes)</code>.</li>
+<li>Edge features of shape <code>(num_edges, n_edge_features)</code>.</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
@@ -859,7 +523,99 @@ changed to <code>channels</code>.</li>
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>channels</code>: integer, number of output channels;</li>
-<li><code>activation</code>: activation function to use;</li>
+<li><code>activation</code>: activation function;</li>
+<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
+<li><code>bias_initializer</code>: initializer for the bias vector;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
+<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
+<li><code>activity_regularizer</code>: regularization applied to the output;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
+<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/diffusion_conv.py#L75">[source]</a></span></p>
+<h4 id="diffusionconv">DiffusionConv</h4>
+<pre><code class="python">spektral.layers.DiffusionConv(channels, K=6, activation='tanh', kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
+</code></pre>
+
+<p>A diffusion convolution operator from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1707.01926">Diffusion Convolutional Recurrent Neural Network: Data-Driven Traffic
+Forecasting</a><br>
+Yaguang Li et al.</p>
+</blockquote>
+<p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
+<p><strong>This layer expects a dense adjacency matrix.</strong></p>
+<p>Given a number of diffusion steps <script type="math/tex">K</script> and a row-normalized adjacency
+matrix <script type="math/tex">\hat \A </script>, this layer calculates the <script type="math/tex">q</script>-th channel as:
+<script type="math/tex; mode=display">
+\mathbf{X}_{~:,~q}' = \sigma\left( \sum_{f=1}^{F} \left( \sum_{k=0}^{K-1}
+\theta_k {\hat \A}^k \right) \X_{~:,~f} \right)
+</script>
+</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>([batch], n_nodes, n_node_features)</code>;</li>
+<li>Normalized adjacency or attention coef. matrix <script type="math/tex">\hat \A </script> of shape
+<code>([batch], n_nodes, n_nodes)</code>; Use <code>DiffusionConvolution.preprocess</code> to normalize.</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Node features with the same shape as the input, but with the last
+dimension changed to <code>channels</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>channels</code>: number of output channels;</li>
+<li><code>K</code>: number of diffusion steps.</li>
+<li><code>activation</code>: activation function <script type="math/tex">\sigma</script>; (<script type="math/tex">\tanh</script> by default)</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/ecc_conv.py#L10">[source]</a></span></p>
+<h4 id="eccconv">ECCConv</h4>
+<pre><code class="python">spektral.layers.ECCConv(channels, kernel_network=None, root=True, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+</code></pre>
+
+<p>An edge-conditioned convolutional layer (ECC) from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1704.02901">Dynamic Edge-Conditioned Filters in Convolutional Neural Networks on
+Graphs</a><br>
+Martin Simonovsky and Nikos Komodakis</p>
+</blockquote>
+<p><strong>Mode</strong>: single, disjoint, batch.</p>
+<p>This layer computes:
+<script type="math/tex; mode=display">
+\x_i' = \x_{i} \W_{\textrm{root}} + \sum\limits_{j \in \mathcal{N}(i)}
+\x_{j} \textrm{MLP}(\e_{j \rightarrow i}) + \b
+</script>
+where <script type="math/tex">\textrm{MLP}</script> is a multi-layer perceptron that outputs an
+edge-specific weight as a function of edge attributes.</p>
+<p><strong>Note:</strong> In single mode, if the adjacency matrix is dense it will be
+converted to a SparseTensor automatically (which is an expensive operation).</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>([batch], n_nodes, n_node_features)</code>;</li>
+<li>Binary adjacency matrices of shape <code>([batch], n_nodes, n_nodes)</code>;</li>
+<li>Edge features. In single mode, shape <code>(num_edges, n_edge_features)</code>; in batch mode, shape
+<code>(batch, n_nodes, n_nodes, n_edge_features)</code>.</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>node features with the same shape of the input, but the last dimension
+changed to <code>channels</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>channels</code>: integer, number of output channels;</li>
+<li><code>kernel_network</code>: a list of integers representing the hidden neurons of
+the kernel-generating network;</li>
+<li>'root': if False, the layer will not consider the root node for computing
+the message passing (first term in equation above), but only the neighbours.</li>
+<li><code>activation</code>: activation function;</li>
 <li><code>use_bias</code>: bool, add a bias vector to the output;</li>
 <li><code>kernel_initializer</code>: initializer for the weights;</li>
 <li><code>bias_initializer</code>: initializer for the bias vector;</li>
@@ -872,22 +628,26 @@ changed to <code>channels</code>.</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/edge_conv.py#L8">[source]</a></span></p>
 <h4 id="edgeconv">EdgeConv</h4>
-<pre><code class="python">spektral.layers.EdgeConv(channels, mlp_hidden=None, mlp_activation='relu', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<pre><code class="python">spektral.layers.EdgeConv(channels, mlp_hidden=None, mlp_activation='relu', aggregate='sum', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
-<p>An Edge Convolutional layer as presented by
-<a href="https://arxiv.org/abs/1801.07829">Wang et al. (2018)</a>.</p>
+<p>An edge convolutional layer from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1801.07829">Dynamic Graph CNN for Learning on Point Clouds</a><br>
+Yue Wang et al.</p>
+</blockquote>
 <p><strong>Mode</strong>: single, disjoint.</p>
 <p><strong>This layer expects a sparse adjacency matrix.</strong></p>
 <p>This layer computes for each node <script type="math/tex">i</script>:
 <script type="math/tex; mode=display">
-\Z_i = \sum\limits_{j \in \mathcal{N}(i)} \textrm{MLP}\big( \X_i \| \X_j - \X_i \big)
+\x_i' = \sum\limits_{j \in \mathcal{N}(i)} \textrm{MLP}\big( \x_i \|
+\x_j - \x_i \big)
 </script>
 where <script type="math/tex">\textrm{MLP}</script> is a multi-layer perceptron.</p>
 <p><strong>Input</strong></p>
 <ul>
-<li>Node features of shape <code>(N, F)</code>;</li>
-<li>Binary adjacency matrix of shape <code>(N, N)</code>.</li>
+<li>Node features of shape <code>(n_nodes, n_node_features)</code>;</li>
+<li>Binary adjacency matrix of shape <code>(n_nodes, n_nodes)</code>.</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
@@ -900,7 +660,7 @@ changed to <code>channels</code>.</li>
 <li><code>mlp_hidden</code>: list of integers, number of hidden units for each hidden
 layer in the MLP (if None, the MLP has only the output layer);</li>
 <li><code>mlp_activation</code>: activation for the MLP layers;</li>
-<li><code>activation</code>: activation function to use;</li>
+<li><code>activation</code>: activation function;</li>
 <li><code>use_bias</code>: bool, add a bias vector to the output;</li>
 <li><code>kernel_initializer</code>: initializer for the weights;</li>
 <li><code>bias_initializer</code>: initializer for the bias vector;</li>
@@ -911,58 +671,399 @@ layer in the MLP (if None, the MLP has only the output layer);</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/message_passing.py#L11">[source]</a></span></p>
-<h4 id="messagepassing">MessagePassing</h4>
-<pre><code class="python">spektral.layers.MessagePassing(aggregate='sum')
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gat_conv.py#L11">[source]</a></span></p>
+<h4 id="gatconv">GATConv</h4>
+<pre><code class="python">spektral.layers.GATConv(channels, attn_heads=1, concat_heads=True, dropout_rate=0.5, return_attn_coef=False, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', attn_kernel_initializer='glorot_uniform', kernel_regularizer=None, bias_regularizer=None, attn_kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None, attn_kernel_constraint=None)
 </code></pre>
 
-<p>A general class for message passing as presented by
-<a href="https://arxiv.org/abs/1704.01212">Gilmer et al. (2017)</a>.</p>
+<p>A Graph Attention layer (GAT) from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1710.10903">Graph Attention Networks</a><br>
+Petar Veličković et al.</p>
+</blockquote>
+<p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
+<p><strong>This layer expects dense inputs when working in batch mode.</strong></p>
+<p>This layer computes a convolution similar to <code>layers.GraphConv</code>, but
+uses the attention mechanism to weight the adjacency matrix instead of
+using the normalized Laplacian:
+<script type="math/tex; mode=display">
+\X' = \mathbf{\alpha}\X\W + \b
+</script>
+where
+<script type="math/tex; mode=display">
+\mathbf{\alpha}_{ij} =\frac{ \exp\left(\mathrm{LeakyReLU}\left(
+\a^{\top} [(\X\W)_i \, \| \, (\X\W)_j]\right)\right)}{\sum\limits_{k
+\in \mathcal{N}(i) \cup \{ i \}} \exp\left(\mathrm{LeakyReLU}\left(
+\a^{\top} [(\X\W)_i \, \| \, (\X\W)_k]\right)\right)}
+</script>
+where <script type="math/tex">\a \in \mathbb{R}^{2F'}</script> is a trainable attention kernel.
+Dropout is also applied to <script type="math/tex">\alpha</script> before computing <script type="math/tex">\Z</script>.
+Parallel attention heads are computed in parallel and their results are
+aggregated by concatenation or average.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>([batch], n_nodes, n_node_features)</code>;</li>
+<li>Binary adjacency matrix of shape <code>([batch], n_nodes, n_nodes)</code>;</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Node features with the same shape as the input, but with the last
+dimension changed to <code>channels</code>;</li>
+<li>if <code>return_attn_coef=True</code>, a list with the attention coefficients for
+each attention head. Each attention coefficient matrix has shape
+<code>([batch], n_nodes, n_nodes)</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>channels</code>: number of output channels;</li>
+<li><code>attn_heads</code>: number of attention heads to use;</li>
+<li><code>concat_heads</code>: bool, whether to concatenate the output of the attention
+heads instead of averaging;</li>
+<li><code>dropout_rate</code>: internal dropout rate for attention coefficients;</li>
+<li><code>return_attn_coef</code>: if True, return the attention coefficients for
+the given input (one n_nodes x n_nodes matrix for each head).</li>
+<li><code>activation</code>: activation function;</li>
+<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
+<li><code>attn_kernel_initializer</code>: initializer for the attention weights;</li>
+<li><code>bias_initializer</code>: initializer for the bias vector;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
+<li><code>attn_kernel_regularizer</code>: regularization applied to the attention kernels;</li>
+<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
+<li><code>activity_regularizer</code>: regularization applied to the output;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
+<li><code>attn_kernel_constraint</code>: constraint applied to the attention kernels;</li>
+<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gated_graph_conv.py#L8">[source]</a></span></p>
+<h4 id="gatedgraphconv">GatedGraphConv</h4>
+<pre><code class="python">spektral.layers.GatedGraphConv(channels, n_layers, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+</code></pre>
+
+<p>A gated graph convolutional layer from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1511.05493">Gated Graph Sequence Neural Networks</a><br>
+Yujia Li et al.</p>
+</blockquote>
 <p><strong>Mode</strong>: single, disjoint.</p>
-<p><strong>This layer and all of its extensions expect a sparse adjacency matrix.</strong></p>
+<p><strong>This layer expects a sparse adjacency matrix.</strong></p>
+<p>This layer computes <script type="math/tex">\x_i' = \h^{(L)}_i</script> where:
+<script type="math/tex; mode=display">
+\begin{align}
+& \h^{(0)}_i = \x_i \| \mathbf{0} \\
+& \m^{(l)}_i = \sum\limits_{j \in \mathcal{N}(i)} \h^{(l - 1)}_j \W \\
+& \h^{(l)}_i = \textrm{GRU} \left(\m^{(l)}_i, \h^{(l - 1)}_i \right) \\
+\end{align}
+</script>
+where <script type="math/tex">\textrm{GRU}</script> is a gated recurrent unit cell.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>(n_nodes, n_node_features)</code>; note that <code>n_node_features</code> must be smaller or equal
+than <code>channels</code>.</li>
+<li>Binary adjacency matrix of shape <code>(n_nodes, n_nodes)</code>.</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Node features with the same shape of the input, but the last dimension
+changed to <code>channels</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>channels</code>: integer, number of output channels;</li>
+<li><code>n_layers</code>: integer, number of iterations with the GRU cell;</li>
+<li><code>activation</code>: activation function;</li>
+<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
+<li><code>bias_initializer</code>: initializer for the bias vector;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
+<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
+<li><code>activity_regularizer</code>: regularization applied to the output;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
+<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gcn_conv.py#L8">[source]</a></span></p>
+<h4 id="gcnconv">GCNConv</h4>
+<pre><code class="python">spektral.layers.GCNConv(channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+</code></pre>
+
+<p>A graph convolutional layer (GCN) from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1609.02907">Semi-Supervised Classification with Graph Convolutional Networks</a><br>
+Thomas N. Kipf and Max Welling</p>
+</blockquote>
+<p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
 <p>This layer computes:
 <script type="math/tex; mode=display">
-\Z_i = \gamma \left( \X_i, \square_{j \in \mathcal{N}(i)} \,
-\phi \left(\X_i, \X_j, \E_{j,i} \right) \right),
+\X' = \hat \D^{-1/2} \hat \A \hat \D^{-1/2} \X \W + \b
+</script>
+where <script type="math/tex"> \hat \A = \A + \I </script> is the adjacency matrix with added self-loops
+and <script type="math/tex">\hat\D</script> is its degree matrix.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>([batch], n_nodes, n_node_features)</code>;</li>
+<li>Modified Laplacian of shape <code>([batch], n_nodes, n_nodes)</code>; can be computed with
+<code>spektral.utils.convolution.gcn_filter</code>.</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Node features with the same shape as the input, but with the last
+dimension changed to <code>channels</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>channels</code>: number of output channels;</li>
+<li><code>activation</code>: activation function;</li>
+<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
+<li><code>bias_initializer</code>: initializer for the bias vector;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
+<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
+<li><code>activity_regularizer</code>: regularization applied to the output;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
+<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/general_conv.py#L9">[source]</a></span></p>
+<h4 id="generalconv">GeneralConv</h4>
+<pre><code class="python">spektral.layers.GeneralConv(channels=256, batch_norm=True, dropout=0.0, aggregate='sum', activation='prelu', use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+</code></pre>
+
+<p>A general convolutional layer from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/2011.08843">Design Space for Graph Neural Networks</a><br>
+Jiaxuan You et al.</p>
+</blockquote>
+<p><strong>Mode</strong>: single, disjoint.</p>
+<p><strong>This layer expects a sparse adjacency matrix.</strong></p>
+<p>This layer computes:
+<script type="math/tex; mode=display">
+\x_i' = \mathrm{Agg} \left( \left\{ \mathrm{Act} \left( \mathrm{Dropout}
+\left( \mathrm{BN} \left( \x_j \W + \b \right) \right) \right),
+j \in \mathcal{N}(i) \right\} \right)
 </script>
 </p>
-<p>where <script type="math/tex"> \gamma </script> is a differentiable update function, <script type="math/tex"> \phi </script> is a
-differentiable message function, <script type="math/tex"> \square </script> is a permutation-invariant
-function to aggregate the messages (like the sum or the average), and
-<script type="math/tex">\E_{ij}</script> is the edge attribute of edge i-j.</p>
-<p>By extending this class, it is possible to create any message-passing layer
-in single/disjoint mode.</p>
-<p><strong>API:</strong></p>
+<p>where <script type="math/tex"> \mathrm{Agg} </script> is an aggregation function for the messages,
+<script type="math/tex"> \mathrm{Act} </script> is an activation function, <script type="math/tex"> \mathrm{Dropout} </script>
+applies dropout to the node features, and <script type="math/tex"> \mathrm{BN} </script> applies batch
+normalization to the node features.</p>
+<p>This layer supports the PReLU activation via the 'prelu' keyword.</p>
+<p>The default parameters of this layer are selected according to the best
+results obtained in the paper, and should provide a good performance on
+many node-level and graph-level tasks, without modifications.
+The defaults are as follows:</p>
 <ul>
-<li><code>propagate(X, A, E=None, **kwargs)</code>: propagate the messages and computes
-embeddings for each node in the graph. <code>kwargs</code> will be propagated as
-keyword arguments to <code>message()</code>, <code>aggregate()</code> and <code>update()</code>.</li>
-<li><code>message(X, **kwargs)</code>: computes messages, equivalent to <script type="math/tex">\phi</script> in the
-definition.
-Any extra keyword argument of this function will be  populated by
-<code>propagate()</code> if a matching keyword is found.
-Use <code>self.get_i()</code> and  <code>self.get_j()</code> to gather the elements using the
-indices <code>i</code> or <code>j</code> of the adjacency matrix (e.g, <code>self.get_j(X)</code> will get
-the features of the neighbours).</li>
-<li><code>aggregate(messages, **kwargs)</code>: aggregates the messages, equivalent to
-<script type="math/tex">\square</script> in the definition.
-The behaviour of this function can also be controlled using the <code>aggregate</code>
-keyword in the constructor of the layer (supported aggregations: sum, mean,
-max, min, prod).
-Any extra keyword argument of this function will be  populated by
-<code>propagate()</code> if a matching keyword is found.</li>
-<li><code>update(embeddings, **kwargs)</code>: updates the aggregated messages to obtain
-the final node embeddings, equivalent to <script type="math/tex">\gamma</script> in the definition.
-Any extra keyword argument of this function will be  populated by
-<code>propagate()</code> if a matching keyword is found.</li>
+<li>256 channels</li>
+<li>Batch normalization</li>
+<li>No dropout</li>
+<li>PReLU activation</li>
+<li>Sum aggregation</li>
 </ul>
-<p><strong>Arguments</strong>:</p>
+<p>If you are uncertain about which layers to use for your GNN, this is a
+safe choice. Check out the original paper for more specific configurations.</p>
+<p><strong>Input</strong></p>
 <ul>
-<li><code>aggregate</code>: string or callable, an aggregate function. This flag can be
-used to control the behaviour of <code>aggregate()</code> wihtout re-implementing it.
-Supported aggregations: 'sum', 'mean', 'max', 'min', 'prod'.
-If callable, the function must have the signature <code>foo(updates, indices, N)</code>
-and return a rank 2 tensor with shape <code>(N, ...)</code>.</li>
+<li>Node features of shape <code>(n_nodes, n_node_features)</code>;</li>
+<li>Binary adjacency matrix of shape <code>(n_nodes, n_nodes)</code>.</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Node features with the same shape of the input, but the last dimension
+changed to <code>channels</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>channels</code>: integer, number of output channels;</li>
+<li><code>batch_norm</code>: bool, whether to use batch normalization;</li>
+<li><code>dropout</code>: float, dropout rate;</li>
+<li><code>aggregate</code>: string or callable, an aggregation function. Supported
+aggregations: 'sum', 'mean', 'max', 'min', 'prod'.</li>
+<li><code>activation</code>: activation function. This layer also supports the
+advanced activation PReLU by passing <code>activation='prelu'</code>.</li>
+<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
+<li><code>bias_initializer</code>: initializer for the bias vector;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
+<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
+<li><code>activity_regularizer</code>: regularization applied to the output;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
+<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gcs_conv.py#L8">[source]</a></span></p>
+<h4 id="gcsconv">GCSConv</h4>
+<pre><code class="python">spektral.layers.GCSConv(channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+</code></pre>
+
+<p>A <code>GraphConv</code> layer with a trainable skip connection.</p>
+<p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
+<p>This layer computes:
+<script type="math/tex; mode=display">
+\Z' = \D^{-1/2} \A \D^{-1/2} \X \W_1 + \X \W_2 + \b
+</script>
+where <script type="math/tex"> \A </script> does not have self-loops.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>([batch], n_nodes, n_node_features)</code>;</li>
+<li>Normalized adjacency matrix of shape <code>([batch], n_nodes, n_nodes)</code>; can be computed
+with <code>spektral.utils.convolution.normalized_adjacency</code>.</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Node features with the same shape as the input, but with the last
+dimension changed to <code>channels</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>channels</code>: number of output channels;</li>
+<li><code>activation</code>: activation function;</li>
+<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
+<li><code>bias_initializer</code>: initializer for the bias vector;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
+<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
+<li><code>activity_regularizer</code>: regularization applied to the output;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
+<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gin_conv.py#L8">[source]</a></span></p>
+<h4 id="ginconv">GINConv</h4>
+<pre><code class="python">spektral.layers.GINConv(channels, epsilon=None, mlp_hidden=None, mlp_activation='relu', aggregate='sum', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+</code></pre>
+
+<p>A Graph Isomorphism Network (GIN) from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1810.00826">How Powerful are Graph Neural Networks?</a><br>
+Keyulu Xu et al.</p>
+</blockquote>
+<p><strong>Mode</strong>: single, disjoint.</p>
+<p><strong>This layer expects a sparse adjacency matrix.</strong></p>
+<p>This layer computes for each node <script type="math/tex">i</script>:
+<script type="math/tex; mode=display">
+\x_i' = \textrm{MLP}\big( (1 + \epsilon) \cdot \x_i + \sum\limits_{j
+\in \mathcal{N}(i)} \x_j \big)
+</script>
+where <script type="math/tex">\textrm{MLP}</script> is a multi-layer perceptron.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>(n_nodes, n_node_features)</code>;</li>
+<li>Binary adjacency matrix of shape <code>(n_nodes, n_nodes)</code>.</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Node features with the same shape of the input, but the last dimension
+changed to <code>channels</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>channels</code>: integer, number of output channels;</li>
+<li><code>epsilon</code>: unnamed parameter, see the original paper and the equation
+above.
+By setting <code>epsilon=None</code>, the parameter will be learned (default behaviour).
+If given as a value, the parameter will stay fixed.</li>
+<li><code>mlp_hidden</code>: list of integers, number of hidden units for each hidden
+layer in the MLP (if None, the MLP has only the output layer);</li>
+<li><code>mlp_activation</code>: activation for the MLP layers;</li>
+<li><code>activation</code>: activation function;</li>
+<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
+<li><code>bias_initializer</code>: initializer for the bias vector;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
+<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
+<li><code>activity_regularizer</code>: regularization applied to the output;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
+<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/graphsage_conv.py#L7">[source]</a></span></p>
+<h4 id="graphsageconv">GraphSageConv</h4>
+<pre><code class="python">spektral.layers.GraphSageConv(channels, aggregate='mean', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+</code></pre>
+
+<p>A GraphSAGE layer from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1706.02216">Inductive Representation Learning on Large Graphs</a><br>
+William L. Hamilton et al.</p>
+</blockquote>
+<p><strong>Mode</strong>: single, disjoint.</p>
+<p><strong>This layer expects a sparse adjacency matrix.</strong></p>
+<p>This layer computes:
+<script type="math/tex; mode=display">
+\X' = \big[ \textrm{AGGREGATE}(\X) \| \X \big] \W + \b; \\
+\X' = \frac{\X'}{\|\X'\|}
+</script>
+where <script type="math/tex"> \textrm{AGGREGATE} </script> is a function to aggregate a node's
+neighbourhood. The supported aggregation methods are: sum, mean,
+max, min, and product.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>(n_nodes, n_node_features)</code>;</li>
+<li>Binary adjacency matrix of shape <code>(n_nodes, n_nodes)</code>.</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Node features with the same shape as the input, but with the last
+dimension changed to <code>channels</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>channels</code>: number of output channels;</li>
+<li><code>aggregate_op</code>: str, aggregation method to use (<code>'sum'</code>, <code>'mean'</code>,
+<code>'max'</code>, <code>'min'</code>, <code>'prod'</code>);</li>
+<li><code>activation</code>: activation function;</li>
+<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
+<li><code>bias_initializer</code>: initializer for the bias vector;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
+<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
+<li><code>activity_regularizer</code>: regularization applied to the output;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
+<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/tag_conv.py#L8">[source]</a></span></p>
+<h4 id="tagconv">TAGConv</h4>
+<pre><code class="python">spektral.layers.TAGConv(channels, K=3, aggregate='sum', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+</code></pre>
+
+<p>A Topology Adaptive Graph Convolutional layer (TAG) from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1710.10370">Topology Adaptive Graph Convolutional Networks</a><br>
+Jian Du et al.</p>
+</blockquote>
+<p><strong>Mode</strong>: single, disjoint.</p>
+<p><strong>This layer expects a sparse adjacency matrix.</strong></p>
+<p>This layer computes:
+<script type="math/tex; mode=display">
+\Z = \sum\limits_{k=0}^{K} \D^{-1/2}\A^k\D^{-1/2}\X\W^{(k)}
+</script>
+</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>(n_nodes, n_node_features)</code>;</li>
+<li>Binary adjacency matrix of shape <code>(n_nodes, n_nodes)</code>.</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Node features with the same shape of the input, but the last dimension
+changed to <code>channels</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>channels</code>: integer, number of output channels;</li>
+<li><code>K</code>: the order of the layer (i.e., the layer will consider a K-hop
+neighbourhood for each node);</li>
+<li><code>activation</code>: activation function;</li>
+<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
+<li><code>bias_initializer</code>: initializer for the bias vector;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
+<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
+<li><code>activity_regularizer</code>: regularization applied to the output;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
+<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
               
             </div>
@@ -971,7 +1072,7 @@ and return a rank 2 tensor with shape <code>(N, ...)</code>.</li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../pooling/" class="btn btn-neutral float-right" title="Pooling Layers">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../pooling/" class="btn btn-neutral float-right" title="Pooling layers">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../../examples/" class="btn btn-neutral" title="Examples"><span class="icon icon-circle-arrow-left"></span> Previous</a>

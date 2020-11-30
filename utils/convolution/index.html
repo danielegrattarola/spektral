@@ -66,25 +66,35 @@
                 <ul>
                     <li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting started</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../data/">Data representation</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../../data-modes/">Data modes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../creating-dataset/">Creating a dataset</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../creating-layer/">Creating a layer</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../../examples/">Examples</a>
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Layers</span></p>
                 <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../../layers/convolution/">Convolutional Layers</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../../layers/convolution/">Convolutional layers</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../layers/pooling/">Pooling Layers</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../../layers/pooling/">Pooling layers</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../layers/base/">Base Layers</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../../layers/base/">Base layers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../models/">Models</a>
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Data</span></p>
                 <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../data/">Containers</a>
+                    </li>
                     <li class="toctree-l1"><a class="reference internal" href="../../datasets/">Datasets</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../data/">Data utils</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../../loaders/">Loaders</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../transforms/">Transforms</a>
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Utils</span></p>
@@ -103,7 +113,9 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#rescale_laplacian">rescale_laplacian</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#localpooling_filter">localpooling_filter</a>
+    <li class="toctree-l2"><a class="reference internal" href="#add_self_loops">add_self_loops</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#gcn_filter">gcn_filter</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#chebyshev_polynomial">chebyshev_polynomial</a>
     </li>
@@ -113,15 +125,11 @@
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../misc/">Miscellaneous</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../conversion/">Conversion</a>
-                    </li>
-                </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../../chem/">Chemistry</a>
-                    </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Other</span></p>
                 <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../external/">External resources</a>
+                    </li>
                     <li class="toctree-l1"><a class="reference internal" href="../../about/">About</a>
                     </li>
                 </ul>
@@ -255,13 +263,31 @@ matrix in DIA format.</p>
 <li>
 <p><code>lmax</code>: if None, compute largest eigenvalue with scipy.linalg.eisgh.
 If the eigendecomposition fails, lmax is set to 2 automatically.
-If scalar, use this value as largest eignevalue when rescaling.</p>
+If scalar, use this value as largest eigenvalue when rescaling.</p>
 </li>
 </ul>
 <p><strong>Return</strong>  </p>
 <hr />
-<h4 id="localpooling_filter">localpooling_filter</h4>
-<pre><code class="python">spektral.utils.localpooling_filter(A, symmetric=True)
+<h4 id="add_self_loops">add_self_loops</h4>
+<pre><code class="python">spektral.utils.add_self_loops(a, value=1)
+</code></pre>
+
+<p>Sets the inner diagonals of <code>a</code> to <code>value</code>.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>a</code>: a np.array or scipy.sparse matrix, the innermost two dimensions
+must be equal.</p>
+</li>
+<li>
+<p><code>value</code>: value to set the diagonals to.</p>
+</li>
+</ul>
+<p><strong>Return</strong><br />
+ A np.array or scipy.sparse matrix with the same shape as <code>a</code>.</p>
+<hr />
+<h4 id="gcn_filter">gcn_filter</h4>
+<pre><code class="python">spektral.utils.gcn_filter(A, symmetric=True)
 </code></pre>
 
 <p>Computes the graph filter described in
@@ -312,7 +338,7 @@ in <a href="https://arxiv.org/abs/1606.09375">Defferrard et at. (2016)</a>.</p>
 <p><code>k</code>: integer, the order of the Chebyshev polynomial;</p>
 </li>
 <li>
-<p><code>symmetric</code>: boolean, whether to normalize the adjacency matrix as
+<p><code>symmetric</code>: boolean, whether to normalize the matrix as
 <script type="math/tex">\D^{-\frac{1}{2}}\A\D^{-\frac{1}{2}}</script> or as <script type="math/tex">\D^{-1}\A</script>;</p>
 </li>
 </ul>
@@ -329,7 +355,7 @@ degree of the polynomial.</p>
         <a href="../misc/" class="btn btn-neutral float-right" title="Miscellaneous">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../data/" class="btn btn-neutral" title="Data utils"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../transforms/" class="btn btn-neutral" title="Transforms"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -357,7 +383,7 @@ degree of the polynomial.</p>
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../data/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../../transforms/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
         <span style="margin-left: 15px"><a href="../misc/" style="color: #fcfcfc">Next &raquo;</a></span>

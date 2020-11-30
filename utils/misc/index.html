@@ -66,25 +66,35 @@
                 <ul>
                     <li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting started</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../data/">Data representation</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../../data-modes/">Data modes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../creating-dataset/">Creating a dataset</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../creating-layer/">Creating a layer</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../../examples/">Examples</a>
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Layers</span></p>
                 <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../../layers/convolution/">Convolutional Layers</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../../layers/convolution/">Convolutional layers</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../layers/pooling/">Pooling Layers</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../../layers/pooling/">Pooling layers</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../layers/base/">Base Layers</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../../layers/base/">Base layers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../models/">Models</a>
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Data</span></p>
                 <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../data/">Containers</a>
+                    </li>
                     <li class="toctree-l1"><a class="reference internal" href="../../datasets/">Datasets</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../data/">Data utils</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../../loaders/">Loaders</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../transforms/">Transforms</a>
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Utils</span></p>
@@ -95,29 +105,19 @@
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#pad_jagged_array">pad_jagged_array</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#add_eye">add_eye</a>
+    <li class="toctree-l2"><a class="reference internal" href="#one_hot">one_hot</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#sub_eye">sub_eye</a>
+    <li class="toctree-l2"><a class="reference internal" href="#label_to_one_hot">label_to_one_hot</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#add_eye_batch">add_eye_batch</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#sub_eye_batch">sub_eye_batch</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#add_eye_jagged">add_eye_jagged</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#sub_eye_jagged">sub_eye_jagged</a>
+    <li class="toctree-l2"><a class="reference internal" href="#flatten_list">flatten_list</a>
     </li>
     </ul>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../conversion/">Conversion</a>
-                    </li>
-                </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../../chem/">Chemistry</a>
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Other</span></p>
                 <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../external/">External resources</a>
+                    </li>
                     <li class="toctree-l1"><a class="reference internal" href="../../about/">About</a>
                     </li>
                 </ul>
@@ -159,7 +159,7 @@
               
                 <h2 id="miscellaneous">Miscellaneous</h2>
 <h4 id="pad_jagged_array">pad_jagged_array</h4>
-<pre><code class="python">spektral.utils.pad_jagged_array(x, target_shape, dtype=&lt;class 'float'&gt;)
+<pre><code class="python">spektral.utils.pad_jagged_array(x, target_shape)
 </code></pre>
 
 <p>Given a jagged array of arbitrary dimensions, zero-pads all elements in the
@@ -167,97 +167,66 @@ array to match the provided <code>target_shape</code>.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
 <li>
-<p><code>x</code>: a list or np.array of dtype object, containing np.arrays of
-varying dimensions</p>
+<p><code>x</code>: a list or np.array of dtype object, containing np.arrays with
+variable dimensions;</p>
 </li>
 <li>
 <p><code>target_shape</code>: a tuple or list s.t. target_shape[i] &gt;= x.shape[i]
-for each x in X.
-If <code>target_shape[i] = -1</code>, it will be automatically converted to X.shape[i], 
-so that passing a target shape of e.g. (-1, n, m) will leave the first 
-dimension of each element untouched (note that the creation of the output
-array may fail if the result is again a jagged array). </p>
+for each x in X. If <code>target_shape[i] = -1</code>, it will be automatically
+converted to X.shape[i], so that passing a target shape of e.g. (-1, n, m)
+will leave the first  dimension of each element untouched.</p>
+</li>
+</ul>
+<p><strong>Return</strong><br />
+ A np.array of shape <code>(len(x), ) + target_shape</code>.</p>
+<hr />
+<h4 id="one_hot">one_hot</h4>
+<pre><code class="python">spektral.utils.one_hot(x, depth)
+</code></pre>
+
+<p>One-hot encodes the integer array <code>x</code> in an array of length <code>depth</code>.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>x</code>: a np.array of integers.</p>
 </li>
 <li>
-<p><code>dtype</code>: the dtype of the returned np.array</p>
+<p><code>depth</code>: size of the one-hot vectors.</p>
 </li>
 </ul>
 <p><strong>Return</strong><br />
- A zero-padded np.array of shape <code>(X.shape[0], ) + target_shape</code></p>
+ An array of shape <code>x.shape + (depth, )</code></p>
 <hr />
-<h4 id="add_eye">add_eye</h4>
-<pre><code class="python">spektral.utils.add_eye(x)
+<h4 id="label_to_one_hot">label_to_one_hot</h4>
+<pre><code class="python">spektral.utils.label_to_one_hot(x, labels)
 </code></pre>
 
-<p>Adds the identity matrix to the given matrix.</p>
+<p>One-hot encodes the integer array <code>x</code> according to the given <code>labels</code>.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
-<li><code>x</code>: a rank 2 np.array or scipy.sparse matrix</li>
+<li>
+<p><code>x</code>: a np.array of integers. Each value must be contained in <code>labels</code>.</p>
+</li>
+<li>
+<p><code>labels</code>: list/tuple/np.array of labels.</p>
+</li>
 </ul>
 <p><strong>Return</strong><br />
- A rank 2 np.array or scipy.sparse matrix</p>
+ An array of shape <code>x.shape + (len(labels), )</code></p>
 <hr />
-<h4 id="sub_eye">sub_eye</h4>
-<pre><code class="python">spektral.utils.sub_eye(x)
+<h4 id="flatten_list">flatten_list</h4>
+<pre><code class="python">spektral.utils.flatten_list(alist)
 </code></pre>
 
-<p>Subtracts the identity matrix from the given matrix.</p>
+<p>Flattens an arbitrarily nested list to 1D.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
-<li><code>x</code>: a rank 2 np.array or scipy.sparse matrix</li>
+<li><code>alist</code>: a list or np.array (with at least one dimension), 
+arbitrarily nested.</li>
 </ul>
 <p><strong>Return</strong><br />
- A rank 2 np.array or scipy.sparse matrix</p>
-<hr />
-<h4 id="add_eye_batch">add_eye_batch</h4>
-<pre><code class="python">spektral.utils.add_eye_batch(x)
-</code></pre>
-
-<p>Adds the identity matrix to each submatrix of the given rank 3 array.</p>
-<p><strong>Arguments</strong>  </p>
-<ul>
-<li><code>x</code>: a rank 3 np.array</li>
-</ul>
-<p><strong>Return</strong><br />
- A rank 3 np.array</p>
-<hr />
-<h4 id="sub_eye_batch">sub_eye_batch</h4>
-<pre><code class="python">spektral.utils.sub_eye_batch(x)
-</code></pre>
-
-<p>Subtracts the identity matrix from each submatrix of the given rank 3
-array.</p>
-<p><strong>Arguments</strong>  </p>
-<ul>
-<li><code>x</code>: a rank 3 np.array</li>
-</ul>
-<p><strong>Return</strong><br />
- A rank 3 np.array</p>
-<hr />
-<h4 id="add_eye_jagged">add_eye_jagged</h4>
-<pre><code class="python">spektral.utils.add_eye_jagged(x)
-</code></pre>
-
-<p>Adds the identity matrix to each submatrix of the given rank 3 jagged array.</p>
-<p><strong>Arguments</strong>  </p>
-<ul>
-<li><code>x</code>: a rank 3 jagged np.array</li>
-</ul>
-<p><strong>Return</strong><br />
- A rank 3 jagged np.array</p>
-<hr />
-<h4 id="sub_eye_jagged">sub_eye_jagged</h4>
-<pre><code class="python">spektral.utils.sub_eye_jagged(x)
-</code></pre>
-
-<p>Subtracts the identity matrix from each submatrix of the given rank 3
-jagged array.</p>
-<p><strong>Arguments</strong>  </p>
-<ul>
-<li><code>x</code>: a rank 3 jagged np.array</li>
-</ul>
-<p><strong>Return</strong><br />
- A rank 3 jagged np.array</p>
+ A 1D Python list with the flattened elements as returned by a 
+depth-first search.</p>
               
             </div>
           </div>
@@ -265,7 +234,7 @@ jagged array.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../conversion/" class="btn btn-neutral float-right" title="Conversion">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../../external/" class="btn btn-neutral float-right" title="External resources">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../convolution/" class="btn btn-neutral" title="Convolution"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -299,7 +268,7 @@ jagged array.</p>
         <span><a href="../convolution/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../conversion/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../../external/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

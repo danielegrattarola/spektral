@@ -7,9 +7,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <meta name="author" content="Daniele Grattarola">
-  <link rel="canonical" href="https://graphneural.network/examples/">
+  <link rel="canonical" href="https://graphneural.network/models/">
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Examples - Spektral</title>
+  <title>Models - Spektral</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
   <link rel="stylesheet" href="../css/theme.css" />
@@ -19,9 +19,9 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Examples";
-    var mkdocs_page_input_path = "examples.md";
-    var mkdocs_page_url = "/examples/";
+    var mkdocs_page_name = "Models";
+    var mkdocs_page_input_path = "models.md";
+    var mkdocs_page_url = "/models/";
   </script>
   
   <script src="../js/jquery-2.1.1.min.js" defer></script>
@@ -63,7 +63,7 @@
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Tutorials</span></p>
-                <ul class="current">
+                <ul>
                     <li class="toctree-l1"><a class="reference internal" href="../getting-started/">Getting started</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../data-modes/">Data modes</a>
@@ -72,26 +72,22 @@
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../creating-layer/">Creating a layer</a>
                     </li>
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Examples</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#node-level-prediction">Node-level prediction</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#graph-level-prediction">Graph-level prediction</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#other-applications">Other applications</a>
-    </li>
-    </ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a>
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Layers</span></p>
-                <ul>
+                <ul class="current">
                     <li class="toctree-l1"><a class="reference internal" href="../layers/convolution/">Convolutional layers</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../layers/pooling/">Pooling layers</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../layers/base/">Base layers</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../models/">Models</a>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Models</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#generalgnn">GeneralGNN</a>
+    </li>
+    </ul>
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Data</span></p>
@@ -140,11 +136,11 @@
     
       
         
-          <li>Tutorials &raquo;</li>
+          <li>Layers &raquo;</li>
         
       
     
-    <li>Examples</li>
+    <li>Models</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -155,33 +151,73 @@
           <div role="main">
             <div class="section">
               
-                <h2 id="examples">Examples</h2>
-<p>This is a collection of examples that you can use as template for your projects. </p>
-<h3 id="node-level-prediction">Node-level prediction</h3>
+                <h2 id="models">Models</h2>
+<p>This module implements ready-to-use models from recent literature.</p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/models/general_gnn.py#L16">[source]</a></span></p>
+<h4 id="generalgnn">GeneralGNN</h4>
+<pre><code class="python">spektral.models.general_gnn.GeneralGNN(output, activation=None, hidden=256, message_passing=4, pre_process=2, post_process=2, connectivity='cat', batch_norm=True, dropout=0.0, aggregate='sum', hidden_activation='prelu', pool='sum')
+</code></pre>
+
+<p>This model implements the GNN architecture from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/2011.08843">Design Space for Graph Neural Networks</a><br>
+Jiaxuan You, Rex Ying, Jure Leskovec</p>
+</blockquote>
+<p>The default parameters of the model are selected according to the best
+results obtained in the paper, and should provide a good performance on
+many node-level and graph-level tasks, without modifications.
+The defaults are as follows:</p>
 <ul>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_gcn.py">Citation networks with GCN</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_gcn_custom.py">Citation networks with GCN (custom training loop)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_cheby.py">Citation networks with ChebConv</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_gat.py">Citation networks with GAT</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_gat_custom.py">Citation networks with GAT (custom training loop)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_arma.py">Citation networks with ARMA</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_simple_gc.py">Citation networks with SimpleGCN (custom transform)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/ogbn-arxiv_gcn.py">Open Graph Benchmark dataset</a></li>
+<li>256 hidden channels</li>
+<li>4 message passing layers</li>
+<li>2 pre-processing layers</li>
+<li>2 post-processing layers</li>
+<li>Skip connections with concatenation</li>
+<li>Batch normalization</li>
+<li>No dropout</li>
+<li>PReLU activations</li>
+<li>Sum aggregation in the message-passing layers</li>
+<li>Global sum pooling (not from the paper)</li>
 </ul>
-<h3 id="graph-level-prediction">Graph-level prediction</h3>
+<p>The GNN uses the <a href="/layers/convolution/#generalconv"><code>GeneralConv</code> layer</a>
+for message passing, and has a pre- and a post-processing MLP for the node
+features.
+Message-passing layers also have optional skip connections, which can be
+implemented as sum or concatenation.</p>
+<p>The dense layers of the pre-processing and post-processing MLPs compute the
+following update of the node features:
+<script type="math/tex; mode=display">
+\h_i = \mathrm{Act} \left( \mathrm{Dropout} \left( \mathrm{BN}
+\left( \x_i \W + \b \right) \right) \right)
+</script>
+</p>
+<p>Message-passing layers compute:
+<script type="math/tex; mode=display">
+\h_i = \mathrm{Agg} \left( \left\{ \mathrm{Act} \left( \mathrm{Dropout}
+\left( \mathrm{BN} \left( \x_j \W + \b \right) \right) \right),
+j \in \mathcal{N}(i) \right\} \right)
+</script>
+</p>
+<p><strong>Arguments</strong></p>
 <ul>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/general_gnn.py">General GNN</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/custom_dataset.py">Custom dataset</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/ogbg-mol-esol_batch.py">OGB mol-esol regression with MinCut pooling</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/ogbg-mol-esol_batch.py">OGB mol-hiv classification (edge attributes)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/qm9_ecc.py">QM9 regression with ECC (custom training loop)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/qm9_ecc_batch.py">QM9 regression with ECC (batch mode)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/tud_gin.py">TUDataset classification with GIN</a></li>
-</ul>
-<h3 id="other-applications">Other applications</h3>
-<ul>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/other/graph_signal_classification_mnist.py">Graph signal classification on MNIST (mixed mode)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/other/node_clustering_mincut.py">Node clustering on citation networks with MinCut pooling (unsupervised)</a></li>
+<li><code>output</code>: int, the number of output units;</li>
+<li><code>activation</code>: the activation function of the output layer.</li>
+<li><code>hidden</code>: int, the number of hidden units for all layers except the output
+one;</li>
+<li><code>message_passing</code>: int, the nummber of message-passing layers;</li>
+<li><code>pre_process</code>: int, the number of layers in the pre-processing MLP;</li>
+<li><code>post_process</code>: int, the number of layers in the post-processing MLP;</li>
+<li><code>connectivity</code>: the type of skip connection. Can be: None, 'sum' or 'cat';</li>
+<li><code>batch_norm</code>: bool, whether to use batch normalization;</li>
+<li><code>dropout</code>: float, dropout rate;</li>
+<li><code>aggregate</code>: string or callable, an aggregation function. Supported
+aggregations: 'sum', 'mean', 'max', 'min', 'prod'.</li>
+<li><code>hidden_activation</code>: activation function in the hidden layers. The PReLU
+activation can be used by passing <code>hidden_activation='prelu'</code>.</li>
+<li><code>pool</code>: string or None, the global pooling function. If None, no global
+pooling is applied (e.g., for node-level learning). Supported pooling methods:
+'sum', 'avg', 'max', 'attn', 'attn_sum', 'sort'
+(see <code>spektral.layers.pooling.global_pool</code>).</li>
 </ul>
               
             </div>
@@ -190,10 +226,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../layers/convolution/" class="btn btn-neutral float-right" title="Convolutional layers">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../data/" class="btn btn-neutral float-right" title="Containers">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../creating-layer/" class="btn btn-neutral" title="Creating a layer"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../layers/base/" class="btn btn-neutral" title="Base layers"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -221,10 +257,10 @@
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../creating-layer/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../layers/base/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../layers/convolution/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../data/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

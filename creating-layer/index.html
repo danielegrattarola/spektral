@@ -7,9 +7,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <meta name="author" content="Daniele Grattarola">
-  <link rel="canonical" href="https://graphneural.network/examples/">
+  <link rel="canonical" href="https://graphneural.network/creating-layer/">
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Examples - Spektral</title>
+  <title>Creating a layer - Spektral</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
   <link rel="stylesheet" href="../css/theme.css" />
@@ -19,9 +19,9 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Examples";
-    var mkdocs_page_input_path = "examples.md";
-    var mkdocs_page_url = "/examples/";
+    var mkdocs_page_name = "Creating a layer";
+    var mkdocs_page_input_path = "creating-layer.md";
+    var mkdocs_page_url = "/creating-layer/";
   </script>
   
   <script src="../js/jquery-2.1.1.min.js" defer></script>
@@ -70,17 +70,17 @@
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../creating-dataset/">Creating a dataset</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../creating-layer/">Creating a layer</a>
-                    </li>
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Examples</a>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Creating a layer</a>
     <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#node-level-prediction">Node-level prediction</a>
+    <li class="toctree-l2"><a class="reference internal" href="#essential-information">Essential information</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#graph-level-prediction">Graph-level prediction</a>
+    <li class="toctree-l2"><a class="reference internal" href="#example">Example</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#other-applications">Other applications</a>
+    <li class="toctree-l2"><a class="reference internal" href="#notes">Notes</a>
     </li>
     </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a>
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Layers</span></p>
@@ -144,7 +144,7 @@
         
       
     
-    <li>Examples</li>
+    <li>Creating a layer</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -155,34 +155,87 @@
           <div role="main">
             <div class="section">
               
-                <h2 id="examples">Examples</h2>
-<p>This is a collection of examples that you can use as template for your projects. </p>
-<h3 id="node-level-prediction">Node-level prediction</h3>
-<ul>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_gcn.py">Citation networks with GCN</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_gcn_custom.py">Citation networks with GCN (custom training loop)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_cheby.py">Citation networks with ChebConv</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_gat.py">Citation networks with GAT</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_gat_custom.py">Citation networks with GAT (custom training loop)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_arma.py">Citation networks with ARMA</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_simple_gc.py">Citation networks with SimpleGCN (custom transform)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/ogbn-arxiv_gcn.py">Open Graph Benchmark dataset</a></li>
-</ul>
-<h3 id="graph-level-prediction">Graph-level prediction</h3>
-<ul>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/general_gnn.py">General GNN</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/custom_dataset.py">Custom dataset</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/ogbg-mol-esol_batch.py">OGB mol-esol regression with MinCut pooling</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/ogbg-mol-esol_batch.py">OGB mol-hiv classification (edge attributes)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/qm9_ecc.py">QM9 regression with ECC (custom training loop)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/qm9_ecc_batch.py">QM9 regression with ECC (batch mode)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/tud_gin.py">TUDataset classification with GIN</a></li>
-</ul>
-<h3 id="other-applications">Other applications</h3>
-<ul>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/other/graph_signal_classification_mnist.py">Graph signal classification on MNIST (mixed mode)</a></li>
-<li><a href="https://github.com/danielegrattarola/spektral/blob/master/examples/other/node_clustering_mincut.py">Node clustering on citation networks with MinCut pooling (unsupervised)</a></li>
-</ul>
+                <h2 id="creating-a-message-passing-layer">Creating a Message-Passing Layer</h2>
+<p>In this tutorial we go over the <code>MessagePassing</code> interface for creating GNN layers. </p>
+<p>This is a very flexible class that is based on three main functions: message, aggregate and update.
+By overriding these methods, you can define the behaviour of your own layers. </p>
+<h3 id="essential-information">Essential information</h3>
+<p>The <code>MessagePassing</code> layer can be subclassed to create layers that work in <a href="/data-modes">single and disjoint mode</a> using sparse adjacency matrices. This ensures that your layers will work for both node-level and graph-level learning while being very computationally efficient.</p>
+<p>The functionality of these layers is defined by the <code>message</code>, <code>aggregate</code> and <code>update</code> methods, and is summarized as follows: </p>
+<pre><code class="python">
+x_out[i] = update(x[i], aggregate([message(x[j]) for j in neighbours(i)]))
+
+</code></pre>
+
+<p>The <code>message</code> function computes a transformation of the neighbours of each node. The <code>aggregate</code> function aggregates the messages in a way that is independent of the order in which the messages are processed (like a sum, an average, the maximum, etc). The <code>update</code> function takes the aggregated messages from the neighbours and decides how to transform each node.</p>
+<p>This message-passing scheme is computed by calling the <code>propagate</code> method of the class, which will return the updated node features (<code>x_out</code>).</p>
+<h3 id="example">Example</h3>
+<p>In this example we will implement a graph convolutional network (<a href="https://arxiv.org/abs/1609.02907">Kipf &amp; and Welling, 2016</a>) using the MessagePassing interface. </p>
+<p>First, let's add some trainable parameters when creating the layer: </p>
+<pre><code class="py">class GCN(MessagePassing):
+    def __init__(self, n_out, activation):
+        super().__init__(activation=activation)
+        self.n_out = n_out
+
+    def build(self, input_shape):
+        n_in = input_shape[0][-1]
+        self.weights = self.add_weight(shape=(n_in, self.n_out))
+</code></pre>
+
+<p>Note that the Keras keyword <code>activation</code> was passed to the constructor of the superclass. This can be done with any Keras keyword (like regularizers, constraints, etc) and the layer will process them automatically. </p>
+<p>By default, the <code>call</code> method of MessagePassing layers will only call <code>propagate</code>. We modify it so that it also transforms the node features before starting the propagation:</p>
+<pre><code class="py">def call(self, inputs):
+    x, a = inputs
+
+    # Update node features
+    x = tf.matmul(x, self.weights)
+
+    return self.propagate(x=x, a=a)
+</code></pre>
+
+<p>Then, we implement the <code>message</code> function.
+The <code>get_i</code> and <code>get_j</code> built-in methods can be used to automatically access either side of the edges <script type="math/tex">i \leftarrow j</script>. For instance, we can use <code>get_j</code> to access the node features <code>x[j]</code> of all neighbors <code>j</code>.</p>
+<p>If you need direct access to the edge indices, you can use the <code>index_i</code> and <code>index_j</code> attributes.</p>
+<p>In this case, we only need to get the neighbors' features and return them: </p>
+<pre><code class="py">def message(self, x):
+    # Get the node features of all neighbors
+    return self.get_j(x)
+</code></pre>
+
+<p>Then, we define an aggregation function for the messages. We can use a simple average of the nodes:</p>
+<pre><code class="py">from spektral.layers.ops import scatter_mean
+
+def aggregate(self, messages):
+    return scatter_mean(messages, self.index_i, self.n_nodes)
+</code></pre>
+
+<p><strong>Note</strong>: <code>n_nodes</code> is computed dynamically at the start of propagation, exactly like <code>index_i</code>.</p>
+<p>Since there are a few common aggregation functions that are often used in the literature, you can also skip the implementation of this method and simply pass a special keyword to the <code>__init__()</code> method of the superclass:</p>
+<pre><code class="py">def __init__(self):
+    # Equivalent to the above implementation of aggregate
+    super().__init__(aggregate='mean')
+</code></pre>
+
+<p>Finally, we can use the <code>update</code> method to apply the activation function: </p>
+<pre><code class="py">def update(self, embeddings):
+    return self.activation(embeddings)
+</code></pre>
+
+<p>This is enough to get started with building your own layers in Spektral. </p>
+<h3 id="notes">Notes</h3>
+<p>An important feature of the MessagePassing class is that any extra keyword argument given to <code>propagate</code>, will be compared to the signatures of <code>message</code>, <code>aggregate</code> and <code>update</code> and forwarded to those functions if a match is found. </p>
+<p>For example, we can call:</p>
+<pre><code class="py">propagate(x=x, a=a, extra_tensor=extra_tensor)
+</code></pre>
+
+<p>and define the message function as: </p>
+<pre><code class="py">def message(self, x, extra_tensor=None):
+    ...  # Do something with extra_tensor
+</code></pre>
+
+<p>Finally, we already noted that MessagePassing layers only support single and disjoint mode, and they also require that the adjacency matrix is a SparseTensor. </p>
+<p>If you need more control on your layers, you can have a look at <code>spektral.layers.Conv</code> for a stripped-down class that performs no checks on the inputs and only implements some essential features like keyword parsing. </p>
+<p>For example, <code>spektral.layers.GCNConv</code> implements the same GCN layer that we just saw, using the <code>Conv</code> class so that it can provide support for batch and mixed mode, as well as dense adjacency matrices. </p>
               
             </div>
           </div>
@@ -190,10 +243,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../layers/convolution/" class="btn btn-neutral float-right" title="Convolutional layers">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../examples/" class="btn btn-neutral float-right" title="Examples">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../creating-layer/" class="btn btn-neutral" title="Creating a layer"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../creating-dataset/" class="btn btn-neutral" title="Creating a dataset"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -221,10 +274,10 @@
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../creating-layer/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../creating-dataset/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../layers/convolution/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../examples/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
