@@ -65,6 +65,7 @@ def test_single():
     assert a.shape == (n, n)
     assert len(e.shape) == 3 and e.shape[-1] == s  # Avoid counting edges
     assert y.shape == (n, 2)
+    assert loader.steps_per_epoch == 1
 
 
 def test_disjoint():
@@ -79,6 +80,7 @@ def test_disjoint():
     assert len(e.shape) == 2 and e.shape[1] == s  # Avoid counting edges
     assert i.shape == (n, )
     assert y.shape == (graphs_in_batch, 2)
+    assert loader.steps_per_epoch == np.ceil(len(data) / batch_size)
 
 
 def test_disjoint_node():
@@ -94,6 +96,7 @@ def test_disjoint_node():
     assert len(e.shape) == 2 and e.shape[1] == s  # Avoid counting edges
     assert i.shape == (n, )
     assert y.shape == (n, 2)
+    assert loader.steps_per_epoch == np.ceil(len(data) / batch_size)
 
 
 def test_batch():
@@ -107,6 +110,7 @@ def test_batch():
     assert a.shape == (graphs_in_batch, n, n)
     assert e.shape == (graphs_in_batch, n, n, s)
     assert y.shape == (graphs_in_batch, 2)
+    assert loader.steps_per_epoch == np.ceil(len(data) / batch_size)
 
 
 def test_packed_batch():
@@ -120,3 +124,4 @@ def test_packed_batch():
     assert a.shape == (graphs_in_batch, n, n)
     assert e.shape == (graphs_in_batch, n, n, s)
     assert y.shape == (graphs_in_batch, 2)
+    assert loader.steps_per_epoch == np.ceil(len(data) / batch_size)

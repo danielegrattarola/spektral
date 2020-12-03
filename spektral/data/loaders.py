@@ -430,3 +430,8 @@ class PackedBatchLoader(BatchLoader):
             return batch[0], batch[1]
         else:
             return batch[:-1], batch[-1]
+
+    @property
+    def steps_per_epoch(self):
+        if len(self.dataset) > 0:
+            return int(np.ceil(len(self.dataset[0]) / self.batch_size))
