@@ -9,6 +9,8 @@ build
 htmlcov/
 .cache
 
+package.sh
+
 # Docs
 docs/site/
 docs/sources/
