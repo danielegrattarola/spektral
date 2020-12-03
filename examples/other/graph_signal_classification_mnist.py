@@ -59,14 +59,16 @@ model.compile('adam', 'sparse_categorical_crossentropy',
 def evaluate(loader):
     step = 0
     results = []
+    weights = []
     for batch in loader:
         step += 1
         x, y = batch
         l, a = model.test_on_batch([x, adj], y)
+        w = len(y)
         results.append((l, a))
+        weights.append(w)
         if step == loader.steps_per_epoch:
-            return np.mean(results, 0)
-
+            return np.average(results, 0, weights=weights)
 
 # Setup training
 best_val_loss = 99999
