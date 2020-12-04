@@ -11,6 +11,7 @@ from networkx.readwrite import json_graph
 
 from spektral.data import Dataset, Graph
 from spektral.data.dataset import DATASET_FOLDER
+from spektral.datasets.utils import download_file
 
 
 class GraphSage(Dataset):
@@ -82,17 +83,7 @@ class GraphSage(Dataset):
     def download(self):
         print('Downloading {} dataset.'.format(self.name))
         url = self.url.format(self.name)
-        req = requests.get(url)
-        if req.status_code == 404:
-            raise ValueError('Cannot download dataset ({} returned 404).'
-                             .format(self.url))
-        os.makedirs(self.path, exist_ok=True)
-
-        fname = osp.join(self.path, self.name + '.zip')
-        with open(fname, 'wb') as of:
-            of.write(req.content)
-        with zipfile.ZipFile(fname, 'r') as of:
-            of.extractall(self.path)
+        download_file(url, self.path, self.name + '.zip')
 
         # Datasets are zipped in a folder: unpack them
         parent = self.path
@@ -105,6 +96,7 @@ class GraphSage(Dataset):
 
         # Save pre-processed data
         npz_file = osp.join(self.path, self.name) + '.npz'
+        adj = adj.tocoo()
         np.savez(npz_file, x=x, adj_data=adj.data, adj_row=adj.row,
                  adj_col=adj.col, adj_shape=adj.shape, y=y,
                  mask_tr=mask_tr, mask_va=mask_va, mask_te=mask_te)

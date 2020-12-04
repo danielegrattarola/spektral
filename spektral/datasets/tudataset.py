@@ -12,6 +12,7 @@ import scipy.sparse as sp
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from spektral.data import Dataset, Graph
+from spektral.datasets.utils import download_file
 from spektral.utils import io
 
 DATA_PATH = osp.expanduser('~/.spektral/datasets/')
@@ -64,18 +65,7 @@ class TUDataset(Dataset):
         print('Downloading {} dataset{}.'
               .format(self.name, ' (clean)' if self.clean else ''))
         url = '{}/{}.zip'.format(self.url_clean if self.clean else self.url, self.name)
-        req = requests.get(url)
-        if req.status_code == 404:
-            raise ValueError('Cannot download dataset ({} returned 404).'
-                             .format(self.url))
-        os.makedirs(self.path, exist_ok=True)
-
-        fname = osp.join(self.path, self.name + '.zip')
-        with open(fname, 'wb') as of:
-            of.write(req.content)
-        with zipfile.ZipFile(fname, 'r') as of:
-            of.extractall(self.path)
-        os.remove(fname)
+        download_file(url, self.path, self.name + '.zip')
 
         # Datasets are zipped in a folder: unpack them
         parent = self.path

@@ -9,6 +9,7 @@ def test_citation():
     dataset = datasets.Citeseer(random_split=True)
     dataset = datasets.Pubmed(normalize_x=True)
     sl = SingleLoader(dataset)
+    sl.load()
 
 
 def test_graphsage():
