@@ -1,14 +1,12 @@
-import os
 import os.path as osp
 import shutil
-import zipfile
 from glob import glob
 
-import requests
 from joblib import Parallel, delayed
 from tqdm import tqdm
 
 from spektral.data import Dataset
+from spektral.datasets.utils import download_file
 from spektral.utils import one_hot, load_off
 
 
@@ -74,18 +72,7 @@ class ModelNet(Dataset):
     def download(self):
         print('Downloading ModelNet{} dataset.'.format(self.name))
         url = self.url[self.name]
-        req = requests.get(url)
-        if req.status_code == 404:
-            raise ValueError('Cannot download dataset ({} returned 404).'
-                             .format(self.url))
-        os.makedirs(self.path, exist_ok=True)
-
-        fname = osp.join(self.path, 'ModelNet' + self.name + '.zip')
-        with open(fname, 'wb') as of:
-            of.write(req.content)
-        with zipfile.ZipFile(fname, 'r') as of:
-            of.extractall(self.path)
-
+        download_file(url, self.path, 'ModelNet' + self.name + '.zip')
         shutil.rmtree(osp.join(self.path, '__MACOSX'), ignore_errors=True)
 
     @property

@@ -4,10 +4,12 @@ import os.path as osp
 import numpy as np
 import scipy.sparse as sp
 from tensorflow.keras.utils import get_file
+from tqdm import tqdm
 
 from spektral.data import Dataset, Graph
 from spektral.utils import label_to_one_hot
 from spektral.utils.io import load_csv, load_sdf
+from joblib import Parallel, delayed
 
 ATOM_TYPES = [1, 6, 7, 8, 9]
 BOND_TYPES = [1, 2, 3, 4]
@@ -37,11 +39,14 @@ class QM9(Dataset):
 
     - `amount`: int, load this many molecules instead of the full dataset
     (useful for debugging).
+    - `n_jobs`: number of CPU cores to use for reading the data (-1, to use all
+    available cores)
     """
     url = 'https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/gdb9.tar.gz'
 
-    def __init__(self, amount=None, **kwargs):
+    def __init__(self, amount=None, n_jobs=-1, **kwargs):
         self.amount = amount
+        self.n_jobs = n_jobs
         super().__init__(**kwargs)
 
     def download(self):
@@ -54,13 +59,14 @@ class QM9(Dataset):
         sdf_file = osp.join(self.path, 'gdb9.sdf')
         data = load_sdf(sdf_file, amount=self.amount)  # Internal SDF format
 
-        x_list, a_list, e_list = [], [], []
-        for mol in data:
+        def read_mol(mol):
             x = np.array([atom_to_feature(atom) for atom in mol['atoms']])
             a, e = mol_to_adj(mol)
-            x_list += [x]
-            a_list += [a]
-            e_list += [e]
+            return x, a, e
+
+        data = Parallel(n_jobs=self.n_jobs)(
+            delayed(read_mol)(mol) for mol in tqdm(data, ncols=80))
+        x_list, a_list, e_list = list(zip(*data))
 
         # Load labels
         labels_file = osp.join(self.path, 'gdb9.sdf.csv')
