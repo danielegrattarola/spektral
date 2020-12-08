@@ -7,7 +7,7 @@ from spektral.layers.ops import sp_matrix_to_sp_tensor
 
 version = tf.__version__.split('.')
 major, minor = int(version[0]), int(version[1])
-tf_loader_available = major > 2 and minor > 3
+tf_loader_available = major > 1 and minor > 3
 
 
 class Loader:
