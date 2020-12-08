@@ -33,7 +33,7 @@ class QM9(Dataset):
     The edge features represent the type of chemical bond between two atoms,
     one-hot encoded.
 
-    Each graph has an 18-dimensional label for regression.
+    Each graph has an 19-dimensional label for regression.
 
     **Arguments**
 
@@ -71,7 +71,7 @@ class QM9(Dataset):
         # Load labels
         labels_file = osp.join(self.path, 'gdb9.sdf.csv')
         labels = load_csv(labels_file)
-        labels = labels.set_index('mol_id').values[:, 1:]
+        labels = labels.set_index('mol_id').values[:, :]
         if self.amount is not None:
             labels = labels[:self.amount]
 
