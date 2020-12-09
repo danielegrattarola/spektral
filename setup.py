@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='spektral',
-    version='1.0.2',
+    version='1.0.3',
     packages=find_packages(),
     install_requires=['joblib',
                       'lxml',

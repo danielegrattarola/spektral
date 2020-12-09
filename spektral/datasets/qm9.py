@@ -40,11 +40,11 @@ class QM9(Dataset):
     - `amount`: int, load this many molecules instead of the full dataset
     (useful for debugging).
     - `n_jobs`: number of CPU cores to use for reading the data (-1, to use all
-    available cores)
+    available cores).
     """
     url = 'https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/gdb9.tar.gz'
 
-    def __init__(self, amount=None, n_jobs=-1, **kwargs):
+    def __init__(self, amount=None, n_jobs=1, **kwargs):
         self.amount = amount
         self.n_jobs = n_jobs
         super().__init__(**kwargs)
@@ -71,7 +71,7 @@ class QM9(Dataset):
         # Load labels
         labels_file = osp.join(self.path, 'gdb9.sdf.csv')
         labels = load_csv(labels_file)
-        labels = labels.set_index('mol_id').values[:, :]
+        labels = labels.set_index('mol_id').values
         if self.amount is not None:
             labels = labels[:self.amount]
 
