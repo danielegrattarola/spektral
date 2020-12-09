@@ -83,6 +83,7 @@ loader_te = PackedBatchLoader(data_te, batch_size=batch_size)
 
 # Training loop
 results_tr = []
+weights_tr = []
 for batch in loader_tr:
     step += 1
 
@@ -90,6 +91,7 @@ for batch in loader_tr:
     x, y = batch
     l, a = model.train_on_batch([x, adj], y)
     results_tr.append((l, a))
+    weights_tr.append(len(y))
 
     if step == loader_tr.steps_per_epoch:
         results_va = evaluate(loader_va)
@@ -104,7 +106,7 @@ for batch in loader_tr:
                 break
 
         # Print results
-        results_tr = np.mean(results_tr, 0)
+        results_tr = np.average(results_tr, 0, weights=weights_tr)
         print('Train loss: {:.4f}, acc: {:.4f} | '
               'Valid loss: {:.4f}, acc: {:.4f} | '
               'Test loss: {:.4f}, acc: {:.4f}'
@@ -112,4 +114,5 @@ for batch in loader_tr:
 
         # Reset epoch
         results_tr = []
+        weights_tr = []
         step = 0
