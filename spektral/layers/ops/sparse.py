@@ -65,12 +65,14 @@ def add_self_loops(a, fill=1.):
     dtype of `a`.
     :return: a SparseTensor with the same shape as the input.
     """
-    N = tf.shape(a)[0]
     indices = a.indices
     values = a.values
+    N = tf.shape(a, out_type=indices.dtype)[0]
 
     mask_od = indices[:, 0] != indices[:, 1]
     mask_sl = ~mask_od
+    mask_od.set_shape([None])  # For compatibility with TF 2.2
+    mask_sl.set_shape([None])
 
     indices_od = indices[mask_od]
     indices_sl = indices[mask_sl]

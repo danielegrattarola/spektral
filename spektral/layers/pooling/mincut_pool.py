@@ -41,7 +41,7 @@ class MinCutPool(Pool):
     **Input**
 
     - Node features of shape `([batch], n_nodes, n_node_features)`;
-    - Binary adjacency matrix of shape `([batch], n_nodes, n_nodes)`;
+    - Symmetrically normalized adjacency matrix of shape `([batch], n_nodes, n_nodes)`;
 
     **Output**
 
