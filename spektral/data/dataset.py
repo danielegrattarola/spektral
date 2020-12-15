@@ -1,5 +1,6 @@
 import copy
 import os.path as osp
+from functools import lru_cache
 
 import numpy as np
 import tensorflow as tf
@@ -190,6 +191,7 @@ class Dataset:
         return self.__len__()
 
     @property
+    @lru_cache()
     def n_nodes(self):
         if len(self.graphs) == 1 or len(set([g.n_nodes for g in self.graphs])) == 1:
             return self.graphs[0].n_nodes
@@ -197,6 +199,7 @@ class Dataset:
             return None
 
     @property
+    @lru_cache()
     def n_node_features(self):
         if len(self.graphs) == 1 or len(set([g.n_node_features for g in self.graphs])) == 1:
             return self.graphs[0].n_node_features
@@ -204,6 +207,7 @@ class Dataset:
             return None
 
     @property
+    @lru_cache()
     def n_edge_features(self):
         if len(self.graphs) == 1 or len(set([g.n_edge_features for g in self.graphs])) == 1:
             return self.graphs[0].n_edge_features
@@ -211,6 +215,7 @@ class Dataset:
             return None
 
     @property
+    @lru_cache()
     def n_labels(self):
         if len(self.graphs) == 1 or len(set([g.n_labels for g in self.graphs])) == 1:
             return self.graphs[0].n_labels
@@ -218,6 +223,7 @@ class Dataset:
             return None
 
     @property
+    @lru_cache()
     def signature(self):
         """
         This property computes the signature of the dataset, which can be
