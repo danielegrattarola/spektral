@@ -14,6 +14,7 @@ from tensorflow.keras.optimizers import Adam
 from spektral.datasets.ogb import OGB
 from spektral.layers import GCNConv
 from spektral.transforms import GCNFilter, AdjToSpTensor
+import tensorflow as tf
 
 # Load data
 dataset_name = 'ogbn-arxiv'
@@ -57,15 +58,27 @@ x_3 = GCNConv(n_out, activation='softmax')([x_2, a_in])
 # Build model
 model = Model(inputs=[x_in, a_in], outputs=x_3)
 optimizer = Adam(lr=learning_rate)
-model.compile(optimizer=optimizer, loss=SparseCategoricalCrossentropy())
+loss_fn = SparseCategoricalCrossentropy()
 model.summary()
+
+
+# Training function
+@tf.function
+def train(inputs, target, mask):
+    with tf.GradientTape() as tape:
+        predictions = model(inputs, training=True)
+        loss = loss_fn(target[mask], predictions[mask]) + sum(model.losses)
+
+    gradients = tape.gradient(loss, model.trainable_variables)
+    optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+    return loss
 
 
 # Evaluation with OGB
 evaluator = Evaluator(dataset_name)
 def evaluate(x, a, y, model, masks, evaluator):
-    p = model.predict_on_batch([x, a])
-    p = p.argmax(-1)[:, None]
+    p = model([x, a], training=False)
+    p = p.numpy().argmax(-1)[:, None]
     tr_mask, va_mask, te_mask = masks
     tr_auc = evaluator.eval({'y_true': y[tr_mask], 'y_pred': p[tr_mask]})['acc']
     va_auc = evaluator.eval({'y_true': y[va_mask], 'y_pred': p[va_mask]})['acc']
@@ -75,13 +88,12 @@ def evaluate(x, a, y, model, masks, evaluator):
 
 # Train model
 for i in range(1, 1 + epochs):
-    tr_loss = model.train_on_batch([x, adj], y, sample_weight=mask_tr)
-    tr_auc, va_auc, te_auc = evaluate(x, adj, y, model, masks, evaluator)
+    tr_loss = train([x, adj], y, mask_tr)
+    tr_acc, va_acc, te_acc = evaluate(x, adj, y, model, masks, evaluator)
     print('Ep. {} - Loss: {:.3f} - Acc: {:.3f} - Val acc: {:.3f} - Test acc: '
-          '{:.3f}'.format(i, tr_loss, tr_auc, va_auc, te_auc))
+          '{:.3f}'.format(i, tr_loss, tr_acc, va_acc, te_acc))
 
 # Evaluate model
 print('Evaluating model.')
-te_loss = model.test_on_batch([x, adj], y, sample_weight=mask_te)
-tr_auc, va_auc, te_auc = evaluate(x, adj, y, model, masks, evaluator)
-print('Done! Loss: {:.2f} - Test acc: {:.3f}'.format(te_loss, te_auc))
+tr_acc, va_acc, te_acc = evaluate(x, adj, y, model, masks, evaluator)
+print('Done! - Test acc: {:.3f}'.format(te_acc))

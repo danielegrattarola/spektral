@@ -1,6 +1,10 @@
 import numpy as np
+import tensorflow as tf
 from tensorflow.keras import Model
 from tensorflow.keras.layers import Dense, Flatten
+from tensorflow.keras.losses import SparseCategoricalCrossentropy
+from tensorflow.keras.metrics import SparseCategoricalAccuracy
+from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
 
 from spektral.data import PackedBatchLoader
@@ -28,6 +32,12 @@ data_tr, data_te = data[:-10000], data[-10000:]
 np.random.shuffle(data_tr)
 data_tr, data_va = data_tr[:-10000], data_tr[-10000:]
 
+# We can use PackedBatchLoader because we only need to create batches of node
+# features with the same dimensions.
+loader_tr = PackedBatchLoader(data_tr, batch_size=batch_size, epochs=epochs)
+loader_va = PackedBatchLoader(data_va, batch_size=batch_size)
+loader_te = PackedBatchLoader(data_te, batch_size=batch_size)
+
 
 # Build model
 class Net(Model):
@@ -51,47 +61,54 @@ class Net(Model):
 
 # Create model
 model = Net()
-model.compile('adam', 'sparse_categorical_crossentropy',
-              metrics=['sparse_categorical_accuracy'])
+optimizer = Adam()
+loss_fn = SparseCategoricalCrossentropy()
+acc_fn = SparseCategoricalAccuracy()
+
+
+# Training function
+@tf.function
+def train_on_batch(inputs, target):
+    with tf.GradientTape() as tape:
+        predictions = model(inputs, training=True)
+        loss = loss_fn(target, predictions) + sum(model.losses)
+        acc = acc_fn(target, predictions)
+
+    gradients = tape.gradient(loss, model.trainable_variables)
+    optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+    return loss, acc
 
 
 # Evaluation function
 def evaluate(loader):
     step = 0
     results = []
-    weights = []
     for batch in loader:
         step += 1
-        x, y = batch
-        l, a = model.test_on_batch([x, adj], y)
-        w = len(y)
-        results.append((l, a))
-        weights.append(w)
+        x, target = batch
+        predictions = model([x, adj], training=False)
+        loss = loss_fn(target, predictions)
+        acc = acc_fn(target, predictions)
+        results.append((loss, acc, len(target)))  # Keep track of batch size
         if step == loader.steps_per_epoch:
-            return np.average(results, 0, weights=weights)
+            results = np.array(results)
+            return np.average(results[:, :-1], 0, weights=results[:, -1])
+
 
 # Setup training
 best_val_loss = 99999
 current_patience = patience
 step = 0
 
-# We can use PackedBatchLoader because we only need to create batches of node
-# features with the same dimensions.
-loader_tr = PackedBatchLoader(data_tr, batch_size=batch_size, epochs=epochs)
-loader_va = PackedBatchLoader(data_va, batch_size=batch_size)
-loader_te = PackedBatchLoader(data_te, batch_size=batch_size)
-
 # Training loop
 results_tr = []
-weights_tr = []
 for batch in loader_tr:
     step += 1
 
     # Training step
-    x, y = batch
-    l, a = model.train_on_batch([x, adj], y)
-    results_tr.append((l, a))
-    weights_tr.append(len(y))
+    x, target = batch
+    loss, acc = train_on_batch([x, adj], target)
+    results_tr.append((loss, acc, len(target)))
 
     if step == loader_tr.steps_per_epoch:
         results_va = evaluate(loader_va)
@@ -106,7 +123,8 @@ for batch in loader_tr:
                 break
 
         # Print results
-        results_tr = np.average(results_tr, 0, weights=weights_tr)
+        results_tr = np.array(results_tr)
+        results_tr = np.average(results_tr[:, :-1], 0, weights=results_tr[:, -1])
         print('Train loss: {:.4f}, acc: {:.4f} | '
               'Valid loss: {:.4f}, acc: {:.4f} | '
               'Test loss: {:.4f}, acc: {:.4f}'
@@ -114,5 +132,4 @@ for batch in loader_tr:
 
         # Reset epoch
         results_tr = []
-        weights_tr = []
         step = 0
