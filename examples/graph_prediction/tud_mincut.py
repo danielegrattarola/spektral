@@ -6,14 +6,13 @@ Expect unstable training due to the small-ish size of the dataset.
 """
 
 import numpy as np
-from ogb.graphproppred import GraphPropPredDataset, Evaluator
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.layers import Input, Dense
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 
 from spektral.data import BatchLoader
-from spektral.datasets import OGB
+from spektral.datasets import TUDataset
 from spektral.layers import GCNConv, MinCutPool, GlobalSumPool
 
 ################################################################################
@@ -26,9 +25,7 @@ batch_size = 32       # Batch size
 ################################################################################
 # LOAD DATA
 ################################################################################
-dataset_name = 'ogbg-molesol'
-ogb_dataset = GraphPropPredDataset(name=dataset_name)
-dataset = OGB(ogb_dataset)
+dataset = TUDataset('PROTEINS', clean=True)
 
 # Parameters
 N = max(g.n_nodes for g in dataset)
@@ -37,11 +34,16 @@ S = dataset.n_edge_features  # Dimension of edge features
 n_out = dataset.n_labels     # Dimension of the target
 
 # Train/test split
-idx = ogb_dataset.get_idx_split()
-idx_tr, idx_va, idx_te = idx["train"], idx["valid"], idx["test"]
+idxs = np.random.permutation(len(dataset))
+split_va, split_te = int(0.8 * len(dataset)), int(0.9 * len(dataset))
+idx_tr, idx_va, idx_te = np.split(idxs, [split_va, split_te])
 dataset_tr = dataset[idx_tr]
 dataset_va = dataset[idx_va]
 dataset_te = dataset[idx_te]
+
+loader_tr = BatchLoader(dataset_tr, batch_size=batch_size)
+loader_va = BatchLoader(dataset_va, batch_size=batch_size)
+loader_te = BatchLoader(dataset_te, batch_size=batch_size)
 
 ################################################################################
 # BUILD MODEL
@@ -58,15 +60,13 @@ output = Dense(n_out)(X_3)
 # Build model
 model = Model(inputs=[X_in, A_in], outputs=output)
 opt = Adam(lr=learning_rate)
-model.compile(optimizer=opt, loss='mse')
+model.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['acc'])
 model.summary()
 
 ################################################################################
 # FIT MODEL
 ################################################################################
-loader_tr = BatchLoader(dataset_tr, batch_size=batch_size)
-loader_va = BatchLoader(dataset_va, batch_size=batch_size)
-model.fit(loader_tr,
+model.fit(loader_tr.load(),
           steps_per_epoch=loader_tr.steps_per_epoch,
           epochs=epochs,
           validation_data=loader_va,
@@ -77,9 +77,5 @@ model.fit(loader_tr,
 # EVALUATE MODEL
 ################################################################################
 print('Testing model')
-evaluator = Evaluator(name=dataset_name)
-loader_te = BatchLoader(dataset_te, batch_size=batch_size, epochs=1)
-y_pred = model.predict(loader_te, batch_size=batch_size)
-y_true = np.vstack([g.y for g in dataset_te])
-ogb_score = evaluator.eval({'y_true': y_true, 'y_pred': y_pred})
-print('Done. RMSE: {:.4f}'.format(ogb_score['rmse']))
+loss, acc = model.evaluate(loader_te.load(), steps=loader_te.steps_per_epoch)
+print('Done. Test loss: {}. Test acc: {}'.format(loss, acc))
