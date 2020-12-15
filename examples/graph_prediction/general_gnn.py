@@ -12,14 +12,15 @@ paper, and should work well for many different datasets without changes.
 Note: the results reported in the paper are averaged over 3 random repetitions
 with an 80/20 split.
 """
-import tensorflow as tf
 import numpy as np
-from spektral.models import GeneralGNN
+import tensorflow as tf
+from tensorflow.keras.losses import CategoricalCrossentropy
+from tensorflow.keras.metrics import CategoricalAccuracy
+from tensorflow.keras.optimizers import Adam
 
 from spektral.data import DisjointLoader
-
 from spektral.datasets import TUDataset
-from tensorflow.keras.optimizers import Adam
+from spektral.models import GeneralGNN
 
 physical_devices = tf.config.list_physical_devices('GPU')
 if len(physical_devices) > 0:
@@ -45,7 +46,21 @@ loader_te = DisjointLoader(data_te, batch_size=batch_size)
 # Create model
 model = GeneralGNN(data.n_labels, activation='softmax')
 optimizer = Adam(learning_rate)
-model.compile('adam', 'categorical_crossentropy', metrics=['categorical_accuracy'])
+loss_fn = CategoricalCrossentropy()
+acc_fn = CategoricalAccuracy()
+
+
+# Training function
+@tf.function(input_signature=loader_tr.tf_signature(), experimental_relax_shapes=True)
+def train_on_batch(inputs, target):
+    with tf.GradientTape() as tape:
+        predictions = model(inputs, training=True)
+        loss = loss_fn(target, predictions) + sum(model.losses)
+        acc = acc_fn(target, predictions)
+
+    gradients = tape.gradient(loss, model.trainable_variables)
+    optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+    return loss, acc
 
 
 # Evaluation function
@@ -54,10 +69,14 @@ def evaluate(loader):
     results = []
     for batch in loader:
         step += 1
-        loss, acc = model.test_on_batch(*batch)
-        results.append((loss, acc))
+        inputs, target = batch
+        predictions = model(inputs, training=False)
+        loss = loss_fn(target, predictions)
+        acc = acc_fn(target, predictions)
+        results.append((loss, acc, len(target)))  # Keep track of batch size
         if step == loader.steps_per_epoch:
-            return np.mean(results, 0)
+            results = np.array(results)
+            return np.average(results[:, :-1], 0, weights=results[:, -1])
 
 
 # Training loop
@@ -65,7 +84,7 @@ epoch = step = 0
 results = []
 for batch in loader_tr:
     step += 1
-    loss, acc = model.train_on_batch(*batch)
+    loss, acc = train_on_batch(*batch)
     results.append((loss, acc))
     if step == loader_tr.steps_per_epoch:
         step = 0
