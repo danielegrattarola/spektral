@@ -194,7 +194,7 @@ If False (default), return the "Planetoid" public splits defined by
 <li><code>normalize_x</code>: if True, normalize the features.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/graphsage.py#L16">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/graphsage.py#L17">[source]</a></span></p>
 <h4 id="graphsage">GraphSage</h4>
 <pre><code class="python">spektral.datasets.graphsage.GraphSage(name)
 </code></pre>
@@ -221,14 +221,14 @@ accessible via the <code>mask_tr</code>, <code>mask_va</code>, and <code>mask_te
 <li><code>name</code>: name of the dataset to load (<code>'ppi'</code>, or <code>'reddit'</code>);</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/graphsage.py#L117">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/graphsage.py#L109">[source]</a></span></p>
 <h4 id="ppi">PPI</h4>
 <pre><code class="python">spektral.datasets.graphsage.PPI()
 </code></pre>
 
 <p>Alias for <code>GraphSage('ppi')</code>.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/graphsage.py#L125">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/graphsage.py#L117">[source]</a></span></p>
 <h4 id="reddit">Reddit</h4>
 <pre><code class="python">spektral.datasets.graphsage.Reddit()
 </code></pre>
@@ -261,7 +261,7 @@ with that probability.</li>
 <li><code>k</code>: number of neighbours of each node.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/modelnet.py#L15">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/modelnet.py#L13">[source]</a></span></p>
 <h4 id="modelnet">ModelNet</h4>
 <pre><code class="python">spektral.datasets.modelnet.ModelNet(name, test=False, n_jobs=-1)
 </code></pre>
@@ -311,9 +311,9 @@ Edges and edge features are obtained from the Coulomb matrices of the
 molecules.</p>
 <p>Each graph has a 14-dimensional label for regression.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/qm9.py#L16">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/qm9.py#L18">[source]</a></span></p>
 <h4 id="qm9">QM9</h4>
-<pre><code class="python">spektral.datasets.qm9.QM9(amount=None)
+<pre><code class="python">spektral.datasets.qm9.QM9(amount=None, n_jobs=1)
 </code></pre>
 
 <p>The QM9 chemical data set of small molecules.</p>
@@ -329,14 +329,16 @@ double, triple, aromatic).</p>
 </ul>
 <p>The edge features represent the type of chemical bond between two atoms,
 one-hot encoded.</p>
-<p>Each graph has an 18-dimensional label for regression.</p>
+<p>Each graph has an 19-dimensional label for regression.</p>
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>amount</code>: int, load this many molecules instead of the full dataset
 (useful for debugging).</li>
+<li><code>n_jobs</code>: number of CPU cores to use for reading the data (-1, to use all
+available cores).</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/tudataset.py#L20">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/tudataset.py#L21">[source]</a></span></p>
 <h4 id="tudataset">TUDataset</h4>
 <pre><code class="python">spektral.datasets.tudataset.TUDataset(name, clean=False)
 </code></pre>

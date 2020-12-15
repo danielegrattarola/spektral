@@ -230,15 +230,15 @@ simple 1D indexing.</p>
 <p>Datasets have the following properties that automatically computed from the
 graphs:</p>
 <ul>
-<li><code>n_nodes</code>: the number of nodes in the dataset (returns <code>None</code> if the
-number changes between graphs);</li>
-<li><code>n_node_features</code>: the size of the node features (returns <code>None</code> if
-the size changes between graphs or is not defined);</li>
-<li><code>n_edge_features</code>: the size of the edge features (returns <code>None</code> if
-the size changes between graphs or is not defined);</li>
-<li><code>n_labels</code>: the size of the labels (returns <code>None</code> if the size changes
-between graphs or is not defined); this is computed as the innermost
-dimension of the labels (i.e., <code>y.shape[-1]</code>).</li>
+<li><code>n_nodes</code>: the number of nodes in the dataset (always None, except
+when the dataset has only one graph -- i.e., for single mode);</li>
+<li><code>n_node_features</code>: the size of the node features (assumed to be equal
+for all graphs);</li>
+<li><code>n_edge_features</code>: the size of the edge features (assumed to be equal
+for all graphs);;</li>
+<li><code>n_labels</code>: the size of the labels (assumed to be equal for all
+graphs); this is computed as the innermost dimension of the labels
+(i.e., <code>y.shape[-1]</code>).</li>
 </ul>
 <p>Any additional <code>kwargs</code> passed to the constructor will be automatically
 assigned as instance attributes of the dataset.</p>
