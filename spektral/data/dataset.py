@@ -1,6 +1,5 @@
 import copy
 import os.path as osp
-from functools import lru_cache
 
 import numpy as np
 import tensorflow as tf
@@ -27,15 +26,15 @@ class Dataset:
     Datasets have the following properties that automatically computed from the
     graphs:
 
-        - `n_nodes`: the number of nodes in the dataset (returns `None` if the
-        number changes between graphs);
-        - `n_node_features`: the size of the node features (returns `None` if
-        the size changes between graphs or is not defined);
-        - `n_edge_features`: the size of the edge features (returns `None` if
-        the size changes between graphs or is not defined);
-        - `n_labels`: the size of the labels (returns `None` if the size changes
-        between graphs or is not defined); this is computed as the innermost
-        dimension of the labels (i.e., `y.shape[-1]`).
+        - `n_nodes`: the number of nodes in the dataset (always None, except
+        when the dataset has only one graph -- i.e., for single mode);
+        - `n_node_features`: the size of the node features (assumed to be equal
+        for all graphs);
+        - `n_edge_features`: the size of the edge features (assumed to be equal
+        for all graphs);;
+        - `n_labels`: the size of the labels (assumed to be equal for all
+        graphs); this is computed as the innermost dimension of the labels
+        (i.e., `y.shape[-1]`).
 
     Any additional `kwargs` passed to the constructor will be automatically
     assigned as instance attributes of the dataset.
@@ -191,39 +190,34 @@ class Dataset:
         return self.__len__()
 
     @property
-    @lru_cache()
     def n_nodes(self):
-        if len(self.graphs) == 1 or len(set([g.n_nodes for g in self.graphs])) == 1:
+        if len(self.graphs) == 1:
             return self.graphs[0].n_nodes
         else:
             return None
 
     @property
-    @lru_cache()
     def n_node_features(self):
-        if len(self.graphs) == 1 or len(set([g.n_node_features for g in self.graphs])) == 1:
+        if len(self.graphs) >= 1:
             return self.graphs[0].n_node_features
         else:
             return None
 
     @property
-    @lru_cache()
     def n_edge_features(self):
-        if len(self.graphs) == 1 or len(set([g.n_edge_features for g in self.graphs])) == 1:
+        if len(self.graphs) >= 1:
             return self.graphs[0].n_edge_features
         else:
             return None
 
     @property
-    @lru_cache()
     def n_labels(self):
-        if len(self.graphs) == 1 or len(set([g.n_labels for g in self.graphs])) == 1:
+        if len(self.graphs) >= 1:
             return self.graphs[0].n_labels
         else:
             return None
 
     @property
-    @lru_cache()
     def signature(self):
         """
         This property computes the signature of the dataset, which can be

@@ -9,16 +9,15 @@ f = 3
 s = 3
 
 
-class TestDataset(Dataset):
-    def read(self):
-        return [Graph(x=np.random.rand(n, f),
-                      a=np.random.randint(0, 2, (n, n)),
-                      e=np.random.rand(n, n, s),
-                      y=np.array([0., 1.]))
-                for n in Ns]
-
-
 def test_dataset():
+    class TestDataset(Dataset):
+        def read(self):
+            return [Graph(x=np.random.rand(n, f),
+                          a=np.random.randint(0, 2, (n, n)),
+                          e=np.random.rand(n, n, s),
+                          y=np.array([0., 1.]))
+                    for n in Ns]
+
     d = TestDataset()
 
     assert d.n_node_features == f
