@@ -17,11 +17,11 @@ This is a collection of examples that you can use as template for your projects.
 
 - [General GNN](https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/general_gnn.py)
 - [Custom dataset](https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/custom_dataset.py)
-- [OGB mol-esol regression with MinCut pooling](https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/ogbg-mol-esol_batch.py)
-- [OGB mol-hiv classification (edge attributes)](https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/ogbg-mol-esol_batch.py)
+- [OGB mol-hiv classification (edge attributes)](https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/ogbg-mol-hiv_ecc.py)
 - [QM9 regression with ECC (custom training loop)](https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/qm9_ecc.py)
 - [QM9 regression with ECC (batch mode)](https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/qm9_ecc_batch.py)
 - [TUDataset classification with GIN](https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/tud_gin.py)
+- [TUDataset classification with MinCut pooling](https://github.com/danielegrattarola/spektral/blob/master/examples/graph_prediction/tud_mincut.py)
 
 ## Other applications
 
