@@ -12,7 +12,7 @@ class EdgeConv(MessagePassing):
     > [Dynamic Graph CNN for Learning on Point Clouds](https://arxiv.org/abs/1801.07829)<br>
     > Yue Wang et al.
 
-    **Mode**: single, disjoint.
+    **Mode**: single, disjoint, mixed.
 
     **This layer expects a sparse adjacency matrix.**
 

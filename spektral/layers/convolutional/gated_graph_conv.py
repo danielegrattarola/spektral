@@ -12,7 +12,7 @@ class GatedGraphConv(MessagePassing):
     > [Gated Graph Sequence Neural Networks](https://arxiv.org/abs/1511.05493)<br>
     > Yujia Li et al.
 
-    **Mode**: single, disjoint.
+    **Mode**: single, disjoint, mixed.
 
     **This layer expects a sparse adjacency matrix.**
 
@@ -28,8 +28,8 @@ class GatedGraphConv(MessagePassing):
 
     **Input**
 
-    - Node features of shape `(n_nodes, n_node_features)`; note that `n_node_features` must be smaller or equal
-    than `channels`.
+    - Node features of shape `(n_nodes, n_node_features)`; note that
+    `n_node_features` must be smaller or equal than `channels`.
     - Binary adjacency matrix of shape `(n_nodes, n_nodes)`.
 
     **Output**
@@ -80,11 +80,6 @@ class GatedGraphConv(MessagePassing):
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
-        F = input_shape[0][1]
-        if F > self.channels:
-            raise ValueError('channels ({}) must be greater than the number of '
-                             'input features ({}).'.format(self.channels, F))
-
         self.kernel = self.add_weight(name='kernel',
                                       shape=(self.n_layers, self.channels, self.channels),
                                       initializer=self.kernel_initializer,
@@ -106,7 +101,8 @@ class GatedGraphConv(MessagePassing):
         F = K.int_shape(x)[-1]
 
         to_pad = self.channels - F
-        output = tf.pad(x, [[0, 0], [0, to_pad]])
+        ndims = len(tf.shape(x)) - 1
+        output = tf.pad(x, [[0, 0]] * ndims + [[0, to_pad]])
         for i in range(self.n_layers):
             m = tf.matmul(output, self.kernel[i])
             m = self.propagate(m, a)

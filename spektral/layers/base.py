@@ -92,11 +92,11 @@ class InnerProduct(Layer):
 
     **Input**
 
-    - Tensor of shape `(N, M)`;
+    - Tensor of shape `(n_nodes, n_features)`;
 
     **Output**
 
-    - Tensor of shape `(N, N)`.
+    - Tensor of shape `(n_nodes, n_nodes)`.
 
     :param trainable_kernel: add a trainable square matrix between the inner
     product (e.g., `X @ W @ X.T`);
@@ -174,11 +174,11 @@ class MinkowskiProduct(Layer):
 
     **Input**
 
-    - Tensor of shape `(N, M)`;
+    - Tensor of shape `(n_nodes, n_features)`;
 
     **Output**
 
-    - Tensor of shape `(N, N)`.
+    - Tensor of shape `(n_nodes, n_nodes)`.
 
     :param input_dim_1: first dimension of the input Tensor; set this if you
     encounter issues with shapes in your model, in order to provide an explicit

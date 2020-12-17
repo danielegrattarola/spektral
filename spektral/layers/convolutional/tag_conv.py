@@ -12,7 +12,7 @@ class TAGConv(MessagePassing):
     > [Topology Adaptive Graph Convolutional Networks](https://arxiv.org/abs/1710.10370)<br>
     > Jian Du et al.
 
-    **Mode**: single, disjoint.
+    **Mode**: single, disjoint, mixed.
 
     **This layer expects a sparse adjacency matrix.**
 

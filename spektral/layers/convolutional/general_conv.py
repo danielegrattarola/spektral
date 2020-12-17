@@ -13,7 +13,7 @@ class GeneralConv(MessagePassing):
     > [Design Space for Graph Neural Networks](https://arxiv.org/abs/2011.08843)<br>
     > Jiaxuan You et al.
 
-    **Mode**: single, disjoint.
+    **Mode**: single, disjoint, mixed.
 
     **This layer expects a sparse adjacency matrix.**
 

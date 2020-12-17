@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras import backend as K
 
+import spektral.layers.ops.scatter
 from spektral.layers import ops
 from spektral.layers.convolutional.message_passing import MessagePassing
 
@@ -12,7 +13,7 @@ class AGNNConv(MessagePassing):
     > [Attention-based Graph Neural Network for Semi-supervised Learning](https://arxiv.org/abs/1803.03735)<br>
     > Kiran K. Thekumparampil et al.
 
-    **Mode**: single, disjoint.
+    **Mode**: single, disjoint, mixed.
 
     **This layer expects a sparse adjacency matrix.**
 
@@ -72,8 +73,13 @@ class AGNNConv(MessagePassing):
         x_norm_i = self.get_i(x_norm)
         x_norm_j = self.get_j(x_norm)
         alpha = self.beta * tf.reduce_sum(x_norm_i * x_norm_j, axis=-1)
+
+        if len(tf.shape(alpha)) == 2:
+            alpha = tf.transpose(alpha)  # For mixed mode
         alpha = ops.unsorted_segment_softmax(alpha, self.index_i, self.n_nodes)
-        alpha = alpha[:, None]
+        if len(tf.shape(alpha)) == 2:
+            alpha = tf.transpose(alpha)  # For mixed mode
+        alpha = alpha[..., None]
 
         return alpha * x_j
 

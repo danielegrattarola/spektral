@@ -12,7 +12,7 @@ class CrystalConv(MessagePassing):
     Interpretable Prediction of Material Properties](https://arxiv.org/abs/1710.10324)<br>
     > Tian Xie and Jeffrey C. Grossman
 
-    **Mode**: single, disjoint.
+    **Mode**: single, disjoint, mixed.
 
     **This layer expects a sparse adjacency matrix.**
 
@@ -95,7 +95,11 @@ class CrystalConv(MessagePassing):
     def message(self, x, e=None):
         x_i = self.get_i(x)
         x_j = self.get_j(x)
-        z = K.concatenate((x_i, x_j, e), axis=-1)
+
+        to_concat = [x_i, x_j]
+        if e is not None:
+            to_concat += [e]
+        z = K.concatenate(to_concat, axis=-1)
         output = self.dense_s(z) * self.dense_f(z)
 
         return output
