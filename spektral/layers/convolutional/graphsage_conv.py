@@ -11,7 +11,7 @@ class GraphSageConv(MessagePassing):
     > [Inductive Representation Learning on Large Graphs](https://arxiv.org/abs/1706.02216)<br>
     > William L. Hamilton et al.
 
-    **Mode**: single, disjoint.
+    **Mode**: single, disjoint, mixed.
 
     **This layer expects a sparse adjacency matrix.**
 

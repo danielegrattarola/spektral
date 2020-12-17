@@ -103,7 +103,7 @@ class MessagePassing(Layer):
         self.built = True
 
     def propagate(self, x, a, e=None, **kwargs):
-        self.n_nodes = tf.shape(x)[0]
+        self.n_nodes = tf.shape(x)[-2]
         self.index_i = a.indices[:, 1]
         self.index_j = a.indices[:, 0]
 
@@ -131,10 +131,10 @@ class MessagePassing(Layer):
         return embeddings
 
     def get_i(self, x):
-        return tf.gather(x, self.index_i)
+        return tf.gather(x, self.index_i, axis=-2)
 
     def get_j(self, x):
-        return tf.gather(x, self.index_j)
+        return tf.gather(x, self.index_j, axis=-2)
 
     def get_kwargs(self, x, a, e, signature, kwargs):
         output = {}
@@ -159,14 +159,14 @@ class MessagePassing(Layer):
     def get_inputs(inputs):
         if len(inputs) == 3:
             x, a, e = inputs
-            assert K.ndim(e) == 2, 'E must have rank 2'
+            assert K.ndim(e) in (2, 3), 'E must have rank 2 or 3'
         elif len(inputs) == 2:
             x, a = inputs
             e = None
         else:
             raise ValueError('Expected 2 or 3 inputs tensors (X, A, E), got {}.'
                              .format(len(inputs)))
-        assert K.ndim(x) == 2, 'X must have rank 2'
+        assert K.ndim(x) in (2, 3), 'X must have rank 2 or 3'
         assert K.is_sparse(a), 'A must be a SparseTensor'
         assert K.ndim(a) == 2, 'A must have rank 2'
 

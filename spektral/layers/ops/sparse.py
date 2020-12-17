@@ -93,39 +93,22 @@ def add_self_loops(a, fill=1.):
     return tf.sparse.reorder(out)
 
 
-def add_self_loops_indices(indices, N=None):
+def add_self_loops_indices(indices, n_nodes=None):
     """
     Given the indices of a square SparseTensor, adds the diagonal entries (i, i)
     and returns the reordered indices.
     :param indices: Tensor of rank 2, the indices to a SparseTensor.
-    :param N: the size of the N x N SparseTensor indexed by the indices. If `None`,
-    N is calculated as the maximum entry in the indices plus 1.
+    :param n_nodes: the size of the n_nodes x n_nodes SparseTensor indexed by
+    the indices. If `None`, n_nodes is calculated as the maximum entry in the
+    indices plus 1.
     :return: Tensor of rank 2, the indices to a SparseTensor.
     """
-    N = tf.reduce_max(indices) + 1 if N is None else N
+    n_nodes = tf.reduce_max(indices) + 1 if n_nodes is None else n_nodes
     row, col = indices[..., 0], indices[..., 1]
     mask = tf.ensure_shape(row != col, row.shape)
-    sl_indices = tf.range(N, dtype=row.dtype)[:, None]
+    sl_indices = tf.range(n_nodes, dtype=row.dtype)[:, None]
     sl_indices = tf.repeat(sl_indices, 2, -1)
     indices = tf.concat((indices[mask], sl_indices), 0)
     dummy_values = tf.ones_like(indices[:, 0])
-    indices, _ = gen_sparse_ops.sparse_reorder(indices, dummy_values, (N, N))
+    indices, _ = gen_sparse_ops.sparse_reorder(indices, dummy_values, (n_nodes, n_nodes))
     return indices
-
-
-def unsorted_segment_softmax(x, indices, N=None):
-    """
-    Applies softmax along the segments of a Tensor. This operator is similar
-    to the tf.math.segment_* operators, which apply a certain reduction to the
-    segments. In this case, the output tensor is not reduced and maintains the
-    same shape as the input.
-    :param x: a Tensor. The softmax is applied along the first dimension.
-    :param indices: a Tensor, indices to the segments.
-    :param N: the number of unique segments in the indices. If `None`, N is
-    calculated as the maximum entry in the indices plus 1.
-    :return: a Tensor with the same shape as the input.
-    """
-    N = tf.reduce_max(indices) + 1 if N is None else N
-    e_x = tf.exp(x - tf.gather(tf.math.unsorted_segment_max(x, indices, N), indices))
-    e_x /= tf.gather(tf.math.unsorted_segment_sum(e_x, indices, N) + 1e-9, indices)
-    return e_x

@@ -181,7 +181,7 @@ def test_graph_ops():
     _check_op(ops.degree_matrix, [A], expected_output, convert_to_sparse)
 
 
-def test_misc_ops():
+def test_base_ops():
     convert_to_sparse = [[True]]
 
     # Transpose
@@ -242,3 +242,51 @@ def test_modes_ops():
 
     assert expected_result.shape == result.shape
     assert np.allclose(expected_result, result)
+
+
+def test_scatter_ops():
+    from spektral.layers.ops.scatter import OP_DICT
+    indices = np.array([0, 1, 1, 2, 2, 2, 4, 4, 4, 4])
+    n_messages = len(indices)
+    n_nodes = indices.max() + 1
+    n_features = 10
+    batch_size = 3
+    messages = np.ones((n_messages, n_features))
+    messages_mixed = np.array([messages] * batch_size)
+    messages_random = np.random.rand(batch_size, n_messages, n_features)
+    NO_INDEX_VAL = {
+        'sum': 0.,
+        'mean': 0.,
+        'max': tf.as_dtype(messages.dtype).min,
+        'min': tf.as_dtype(messages.dtype).max,
+        'prod': 1.
+    }
+
+    for key, scatter_fn in OP_DICT.items():
+        # Test serialization
+        assert ops.deserialize_scatter(key) == scatter_fn
+        assert ops.serialize_scatter(scatter_fn) == key
+
+        # Test single mode
+        out = scatter_fn(messages, indices, n_nodes)
+        assert out.shape == (n_nodes, n_features)
+        assert np.all(out[3] == NO_INDEX_VAL[key])
+        if key == 'sum':
+            assert np.all(out == np.tile([1, 2, 3, NO_INDEX_VAL[key], 4], [n_features, 1]).T)
+        else:
+            assert np.all(out == np.tile([1, 1, 1, NO_INDEX_VAL[key], 1], [n_features, 1]).T)
+
+        # Test batch mode
+        out = scatter_fn(messages_mixed, indices, n_nodes)
+        assert out.shape == (batch_size, n_nodes, n_features)
+        assert np.all(out[:, 3, :] == NO_INDEX_VAL[key])
+        for i in range(batch_size):
+            if key == 'sum':
+                assert np.all(out[i] == np.tile([1, 2, 3, NO_INDEX_VAL[key], 4], [n_features, 1]).T)
+            else:
+                assert np.all(out[i] == np.tile([1, 1, 1, NO_INDEX_VAL[key], 1], [n_features, 1]).T)
+
+        # Test equivalence on random inputs
+        out_mixed = scatter_fn(messages_random, indices, n_nodes)
+        for i in range(batch_size):
+            assert np.allclose(out_mixed[i], scatter_fn(messages_random[i], indices, n_nodes))

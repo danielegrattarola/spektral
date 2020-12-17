@@ -12,7 +12,7 @@ class GINConv(MessagePassing):
     > [How Powerful are Graph Neural Networks?](https://arxiv.org/abs/1810.00826)<br>
     > Keyulu Xu et al.
 
-    **Mode**: single, disjoint.
+    **Mode**: single, disjoint, mixed.
 
     **This layer expects a sparse adjacency matrix.**
 

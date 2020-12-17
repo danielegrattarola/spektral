@@ -161,6 +161,8 @@ class GATConv(Conv):
         if mode == modes.SINGLE and K.is_sparse(a):
             output, attn_coef = self._call_single(x, a)
         else:
+            if K.is_sparse(a):
+                a = tf.sparse.to_dense(a)
             output, attn_coef = self._call_dense(x, a)
 
         if self.concat_heads:
@@ -188,7 +190,7 @@ class GATConv(Conv):
 
         # Prepare message-passing
         indices = a.indices
-        N = tf.shape(x, out_type=indices.dtype)[0]
+        N = tf.shape(x, out_type=indices.dtype)[-2]
         indices = ops.add_self_loops_indices(indices, N)
         targets, sources = indices[:, -2], indices[:, -1]
 
@@ -210,7 +212,7 @@ class GATConv(Conv):
 
         # Update representation
         output = attn_coef * tf.gather(x, sources)
-        output = ops.scatter_sum(output, targets, N)
+        output = tf.math.unsorted_segment_sum(output, targets, N)
 
         return output, attn_coef
 
