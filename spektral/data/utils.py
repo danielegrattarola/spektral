@@ -8,7 +8,7 @@ from spektral.utils import pad_jagged_array
 def to_disjoint(x_list=None, a_list=None, e_list=None):
     """
     Converts lists of node features, adjacency matrices and edge features to
-    [disjoint mode](https://danielegrattarola.github.io/spektral/data/#disjoint-mode).
+    [disjoint mode](https://graphneural.network/spektral/data-modes/#disjoint-mode).
 
     Either the node features or the adjacency matrices must be provided as input.
 
@@ -22,7 +22,7 @@ def to_disjoint(x_list=None, a_list=None, e_list=None):
     - a dense array of shape `(n_nodes, n_nodes, n_edge_features)`;
     - a sparse edge list of shape `(n_edges, n_edge_features)`;
 
-    and they will always be returned as edge list for efficiency.
+    and they will always be returned as a stacked edge list.
 
     :param x_list: a list of np.arrays of shape `(n_nodes, n_node_features)`
     -- note that `n_nodes` can change between graphs;
@@ -34,7 +34,7 @@ def to_disjoint(x_list=None, a_list=None, e_list=None):
 
         -  `x`: np.array of shape `(n_nodes, n_node_features)`;
         -  `a`: scipy.sparse matrix of shape `(n_nodes, n_nodes)`;
-        -  `e`: (optional) np.array of shape `(n_edges, n_edge_features)`;
+        -  `e`: np.array of shape `(n_edges, n_edge_features)`;
         -  `i`: np.array of shape `(n_nodes, )`;
     """
     if a_list is None and x_list is None:
@@ -67,8 +67,8 @@ def to_disjoint(x_list=None, a_list=None, e_list=None):
 
 def to_batch(x_list=None, a_list=None, e_list=None):
     """
-    Converts lists of node features, adjacency matrices and (optionally) edge 
-    features to [batch mode](https://danielegrattarola.github.io/spektral/data/#batch-mode),
+    Converts lists of node features, adjacency matrices and edge features to
+    [batch mode](https://graphneural.network/data-modes/#batch-mode),
     by zero-padding all tensors to have the same node dimension `n_max`.
 
     Either the node features or the adjacency matrices must be provided as input.
@@ -76,7 +76,7 @@ def to_batch(x_list=None, a_list=None, e_list=None):
     The i-th element of each list must be associated with the i-th graph.
 
     If `a_list` contains sparse matrices, they will be converted to dense
-    np.arrays, which can be expensive.
+    np.arrays.
 
     The edge attributes of a graph can be represented as
 
@@ -127,6 +127,47 @@ def to_batch(x_list=None, a_list=None, e_list=None):
 
     return tuple(out for out in [x_out, a_out, e_out] if out is not None)
 
+
+def to_mixed(x_list=None, a=None, e_list=None):
+    """
+    Converts lists of node features and edge features to
+    [mixed mode](https://graphneural.network/data-modes/#mixed-mode).
+
+    The adjacency matrix must be passed as a singleton, i.e., a single np.array
+    or scipy.sparse matrix shared by all graphs.
+
+    Edge attributes can be represented as:
+
+    - a dense array of shape `(n_nodes, n_nodes, n_edge_features)`;
+    - a sparse edge list of shape `(n_edges, n_edge_features)`;
+
+    and they will always be returned as a batch of edge lists.
+
+    :param x_list: a list of np.arrays of shape `(n_nodes, n_node_features)`
+    -- note that `n_nodes` must be the same between graphs;
+    :param a: a np.array or scipy.sparse matrix of shape `(n_nodes, n_nodes)`;
+    :param e_list: a list of np.arrays of shape
+    `(n_nodes, n_nodes, n_edge_features)` or `(n_edges, n_edge_features)`;
+    :return: only if the corresponding element is given as input:
+
+        -  `x`: np.array of shape `(batch, n_nodes, n_node_features)`;
+        -  `a`: scipy.sparse matrix of shape `(n_nodes, n_nodes)`;
+        -  `e`: np.array of shape `(batch, n_edges, n_edge_features)`;
+    """
+    # Node features
+    x_out = None
+    if x_list is not None:
+        x_out = np.array(x_list)
+
+    # Edge attributes
+    e_out = None
+    if e_list is not None:
+        if e_list[0].ndim == 3:  # Convert dense to sparse
+            row, col, _ = sp.find(a)
+            e_list = [e[row, col] for e in e_list]
+        e_out = np.array(e_list)
+
+    return tuple(out for out in [x_out, a, e_out] if out is not None)
 
 
 def batch_generator(data, batch_size=32, epochs=None, shuffle=True):
