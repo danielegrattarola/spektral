@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 from scipy import sparse as sp
 
-from spektral.data.utils import prepend_none, to_tf_signature, to_disjoint, to_batch, batch_generator
+from spektral.data.utils import prepend_none, to_tf_signature, to_disjoint, to_batch, batch_generator, to_mixed
 from spektral.layers.ops import sp_matrix_to_sp_tensor
 
 version = tf.__version__.split('.')
@@ -13,10 +13,10 @@ tf_loader_available = major > 1 and minor > 3
 class Loader:
     """
     Parent class for data loaders. The role of a Loader is to iterate over a
-    Dataset and yield batches of graphs to give as input to your Keras Models.
+    Dataset and yield batches of graphs to feed your Keras Models.
+
     This is achieved by having a generator object that produces lists of Graphs,
-    which are then collated together and returned as Tensors (or objects that
-    can be converted to Tensors, like Numpy arrays).
+    which are then collated together and returned as Tensor-like objects.
 
     The core of a Loader is the `collate(batch)` method.
     This takes as input a list of Graphs and returns a list of Tensors or
@@ -32,19 +32,8 @@ class Loader:
         return x, a
     ```
 
-    Since all data matrices (node attributes, adjacency matrices, etc.)
-    are usually collated together, the two list comprehensions of the example
-    above can be computed all at once by using the `pack()` method:
-
-    ```python
-    def collate(self, batch):
-        x, a = self.pack(batch)
-        return np.array(x), np.array(a)
-    ```
-
     The `load()` method of a Loader returns an object that can be given as
     input to `Model.fit()`.
-
     You can use it as follows:
 
     ```python
@@ -54,7 +43,6 @@ class Loader:
     The `steps_per_epoch` property represents the number of batches that are in
     an epoch, and is a required keyword when calling `model.fit()` with a Loader.
 
-
     If you want to write your own training function, you can use the
     `tf_signature()` method to specify the signature of your batches using the
     tf.TypeSpec system, in order to avoid unnecessary re-tracings.
@@ -62,7 +50,7 @@ class Loader:
     For example, a simple training function can be written as:
 
     ```python
-    @tf.function(input_signature=loader.tf_signature(), experimental_relax_shapes=True)
+    @tf.function(input_signature=loader.tf_signature())
     def train_step(inputs, target):
         with tf.GradientTape() as tape:
             predictions = model(inputs, training=True)
@@ -111,6 +99,12 @@ class Loader:
         return self
 
     def tf_signature(self):
+        """
+        Adjacency matrix has shape [n_nodes, n_nodes]
+        Node features have shape [n_nodes, n_node_features]
+        Edge features have shape [n_edges, n_node_features]
+        Targets have shape [..., n_labels]
+        """
         signature = self.dataset.signature
         return to_tf_signature(signature)
 
@@ -156,15 +150,14 @@ class Loader:
 
 class SingleLoader(Loader):
     """
-    A Loader for single mode.
+    A Loader for
+    [single mode](https://graphneural.network/data-modes/#single-mode).
 
-    This loader produces Tensors representing one graph, with its attributes,
-    edges and labels (usually for node-level prediction). As such, it can only
-    be used with Datasets of length 1 and the `batch_size` cannot be set.
+    This loader produces Tensors representing a single graph. As such, it can
+    only be used with Datasets of length 1 and the `batch_size` cannot be set.
 
-    The loader also supports sample weights through the `sample_weights`
-    argument. If given, then each batch will be a tuple
-    `(inputs, labels, sample_weights)`.
+    The loader supports sample weights through the `sample_weights` argument.
+    If given, then each batch will be a tuple `(inputs, labels, sample_weights)`.
 
     **Arguments**
 
@@ -179,7 +172,8 @@ class SingleLoader(Loader):
 
     Returns a tuple `(inputs, labels)` or `(inputs, labels, sample_weights)`.
 
-    `inputs` are a tuple containing the non-None data matrices of the graph:
+    `inputs` is a tuple containing the data matrices of the graph, only if they
+    are not `None`:
 
     - `x`: same as `dataset[0].x`;
     - `a`: same as `dataset[0].a` (scipy sparse matrices are converted to
@@ -187,7 +181,7 @@ class SingleLoader(Loader):
     - `e`: same as `dataset[0].e`;
 
     `labels` is the same as `datsaset[0].y`.
-    If available, `sample_weights` is the same object passed to the constructor.
+    `sample_weights` is the same object passed to the constructor.
 
 
     """
@@ -221,25 +215,19 @@ class SingleLoader(Loader):
 
 class DisjointLoader(Loader):
     """
-    A Loader for disjoint mode.
+    A Loader for
+    [disjoint mode](https://graphneural.network/data-modes/#disjoint-mode).
 
-    This loader represents a batch of graphs via their disjoint union, and
-    supports labels both for graph-level and node-level learning.
+    This loader represents a batch of graphs via their disjoint union.
 
-    Because in disjoint mode we need a way to keep track of which nodes belong
-    to which graph, the loader will also automatically compute a batch index
-    tensor, containing integer indices that map each node to its corresponding
-    graph in the batch.
+    The loader automatically computes a batch index tensor, containing integer
+    indices that map each node to its corresponding graph in the batch.
 
-    The adjacency matrix will always be returned as a SparseTensor, regardless
-    of the input.
-    Edge attributes will be returned as a sparse edge list of shape
-    `(n_edges, n_edge_features)`.
+    The adjacency matrix os returned as a SparseTensor, regardless of the input.
 
     If `node_level=False`, the labels are interpreted as graph-level labels and
-    are stacked along an additional dimension (i.e., `(n_graphs, n_labels)`)
-    If `node_level=True`, then the labels are stacked vertically (i.e.,
-    `(n_nodes, n_labels)`).
+    are stacked along an additional dimension.
+    If `node_level=True`, then the labels are stacked vertically.
 
     **Note:** TensorFlow 2.4 or above is required to use this Loader's `load()`
     method in a Keras training loop.
@@ -247,8 +235,7 @@ class DisjointLoader(Loader):
     **Arguments**
 
     - `dataset`: a graph Dataset;
-    - `node_level`: boolean (default `False`), whether to interpret labels as
-    node-level instead of graph-level;
+    - `batch_size`: size of the mini-batches;
     - `epochs`: number of epochs to iterate over the dataset. By default (`None`)
     iterates indefinitely;
     - `shuffle`: whether to shuffle the data at the start of each epoch.
@@ -259,14 +246,12 @@ class DisjointLoader(Loader):
 
     `inputs` is a tuple containing:
 
-    - `x`: node attributes stacked along the outermost dimension;
-    - `a`: SparseTensor, the block-diagonal matrix obtained from the adjacency
-    matrices of the batch;
-    - `e`: edge attributes as edge list of shape `(n_edges, n_edge_features)`;
+    - `x`: node attributes of shape `[n_nodes, n_node_features]`;
+    - `a`: adjacency matrices of shape `[n_nodes, n_nodes]`;
+    - `e`: edge attributes of shape `[n_edges, n_edge_features]`.
 
-    If `node_level=False`, `labels` has shape `(n_graphs, n_labels)`;
-    If `node_level=True`, then the labels are stacked vertically, i.e.,
-    `(n_nodes, n_labels)`.
+    `labels` have shape `[batch, n_labels]` if `node_level=False` or
+    `[n_nodes, n_labels]` otherwise.
 
     """
     def __init__(self, dataset, node_level=False, batch_size=1, epochs=None,
@@ -302,6 +287,12 @@ class DisjointLoader(Loader):
             lambda: self, output_signature=self.tf_signature())
 
     def tf_signature(self):
+        """
+        Adjacency matrix has shape [n_nodes, n_nodes]
+        Node features have shape [n_nodes, n_node_features]
+        Edge features have shape [n_edges, n_edge_features]
+        Targets have shape [..., n_labels]
+        """
         signature = self.dataset.signature
         if 'y' in signature:
             if not self.node_level:
@@ -319,7 +310,8 @@ class DisjointLoader(Loader):
 
 class BatchLoader(Loader):
     """
-    A Loader for batch mode.
+    A Loader for
+    [batch mode](https://graphneural.network/data-modes/#batch-mode).
 
     This loader returns batches of graphs stacked along an extra dimension,
     with all "node" dimensions padded to be equal among all graphs.
@@ -327,7 +319,8 @@ class BatchLoader(Loader):
     If `n_max` is the number of nodes of the biggest graph in the batch, then
     the padding consist of adding zeros to the node features, adjacency matrix,
     and edge attributes of each graph so that they have shapes
-    `(n_max, n_node_features)`, `(n_max, n_max)`, and `(n_max, n_max, n_edge_features)` respectively.
+    `(n_max, n_node_features)`, `(n_max, n_max)`, and
+    `(n_max, n_max, n_edge_features)` respectively.
 
     The zero-padding is done batch-wise, which saves up memory at the cost of
     more computation. If latency is an issue but memory isn't, or if the
@@ -356,15 +349,11 @@ class BatchLoader(Loader):
 
     `inputs` is a tuple containing:
 
-    - `x`: node attributes, zero-padded and stacked along an extra dimension
-    (shape `(n_graphs, n_max, n_node_features)`);
-    - `a`: adjacency matrices (dense), zero-padded and stacked along an extra
-    dimension (shape `(n_graphs, n_max, n_max)`);
-    - `e`: edge attributes (dense), zero-padded and stacked along an extra
-    dimension (shape `(n_graphs, n_max, n_max, n_edge_features)`).
+    - `x`: node attributes of shape `[batch, n_max, n_node_features]`;
+    - `a`: adjacency matrices of shape `[batch, n_max, n_max]`;
+    - `e`: edge attributes of shape `[batch, n_edges, n_edge_features]`.
 
-    `labels` are also stacked along an extra dimension.
-
+    `labels` have shape `[batch, n_labels]`.
     """
     def collate(self, batch):
         packed = self.pack(batch, return_dict=True)
@@ -380,6 +369,12 @@ class BatchLoader(Loader):
             return output, y
 
     def tf_signature(self):
+        """
+        Adjacency matrix has shape [batch, n_nodes, n_nodes]
+        Node features have shape [batch, n_nodes, n_node_features]
+        Edge features have shape [batch, n_nodes, n_nodes, n_edge_features]
+        Targets have shape [batch, ..., n_labels]
+        """
         signature = self.dataset.signature
         for k in signature:
             signature[k]['shape'] = prepend_none(signature[k]['shape'])
@@ -395,22 +390,40 @@ class BatchLoader(Loader):
 
 class PackedBatchLoader(BatchLoader):
     """
-    A `BatchLoader` that pre-pads the graphs before iterating over the dataset
-    to create the batches.
+    A `BatchLoader` that zero-pads the graphs before iterating over the dataset.
+    This means that `n_max` is computed over the whole dataset and not just
+    a single batch.
 
     While using more memory than `BatchLoader`, this loader should reduce the
     computational overhead of padding each batch independently.
 
     Use this loader if:
 
-    - memory usage isn't an issue and you want to compute the batches as fast
+    - memory usage isn't an issue and you want to produce the batches as fast
     as possible;
     - the graphs in the dataset have similar sizes and there are no outliers in
     the dataset (i.e., anomalous graphs with many more nodes than the dataset
     average).
 
-    This loader is also useful for loading mixed-mode datsets, because it
-    allows to create "standard" batches of node features with almost no overhead.
+    **Arguments**
+
+    - `dataset`: a graph Dataset;
+    - `batch_size`: size of the mini-batches;
+    - `epochs`: number of epochs to iterate over the dataset. By default (`None`)
+    iterates indefinitely;
+    - `shuffle`: whether to shuffle the data at the start of each epoch.
+
+    **Output**
+
+    For each batch, returns a tuple `(inputs, labels)`.
+
+    `inputs` is a tuple containing:
+
+    - `x`: node attributes of shape `[batch, n_max, n_node_features]`;
+    - `a`: adjacency matrices of shape `[batch, n_max, n_max]`;
+    - `e`: edge attributes of shape `[batch, n_max, n_edge_features]`.
+
+    `labels` have shape `[batch, ..., n_labels]`.
     """
     def __init__(self, dataset, batch_size=1, epochs=None, shuffle=True):
         super().__init__(dataset, batch_size=batch_size, epochs=epochs, shuffle=shuffle)
@@ -427,6 +440,9 @@ class PackedBatchLoader(BatchLoader):
 
     def collate(self, batch):
         if len(batch) == 2:
+            # If there is only one input, i.e., batch = [x, y], we unpack it
+            # like this because Keras does not support input lists with only
+            # one tensor.
             return batch[0], batch[1]
         else:
             return batch[:-1], batch[-1]
@@ -435,3 +451,77 @@ class PackedBatchLoader(BatchLoader):
     def steps_per_epoch(self):
         if len(self.dataset) > 0:
             return int(np.ceil(len(self.dataset[0]) / self.batch_size))
+
+
+class MixedLoader(Loader):
+    """
+    A Loader for
+    [mixed mode](https://graphneural.network/data-modes/#mixed-mode).
+
+    This loader returns batches where the node and edge attributes are stacked
+    along an extra dimension, but the adjacency matrix is shared by all graphs.
+
+    The loader expects all node and edge features to have the same number of
+    nodes and edges.
+    The dataset is pre-packed like in a PackedBatchLoader.
+
+    **Arguments**
+
+    - `dataset`: a graph Dataset;
+    - `batch_size`: size of the mini-batches;
+    - `epochs`: number of epochs to iterate over the dataset. By default (`None`)
+    iterates indefinitely;
+    - `shuffle`: whether to shuffle the data at the start of each epoch.
+
+    **Output**
+
+    For each batch, returns a tuple `(inputs, labels)`.
+
+    `inputs` is a tuple containing:
+
+    - `x`: node attributes of shape `[batch, n_nodes, n_node_features]`;
+    - `a`: adjacency matrix of shape `[n_nodes, n_nodes]`;
+    - `e`: edge attributes of shape `[batch, n_edges, n_edge_features]`.
+
+    `labels` have shape `[batch, ..., n_labels]`.
+
+    """
+    def __init__(self, dataset, batch_size=1, epochs=None, shuffle=True):
+        assert dataset.a is not None, 'Dataset must be in mixed mode, with only ' \
+                                      'one adjacency matrix stored in the ' \
+                                      'dataset\'s `a` attribute.\n' \
+                                      'If your dataset does not have an ' \
+                                      'adjacency matrix, you can use a ' \
+                                      'BatchLoader or PackedBatchLoader instead.'
+        assert 'a' not in dataset.signature, 'Datasets in mixed mode should not' \
+                                             'have the adjacency matrix stored' \
+                                             'in their Graph objects.'
+        super().__init__(dataset, batch_size=batch_size, epochs=epochs, shuffle=shuffle)
+
+    def collate(self, batch):
+        packed = self.pack(batch, return_dict=True)
+        y = np.array(packed.pop('y_list')) if 'y' in self.dataset.signature else None
+
+        packed['a'] = self.dataset.a
+        output = to_mixed(**packed)
+        if len(output) == 1:
+            output = output[0]
+
+        if y is None:
+            return output
+        else:
+            return output, y
+
+    def tf_signature(self):
+        """
+        Adjacency matrix has shape [n_nodes, n_nodes]
+        Node features have shape [batch, n_nodes, n_node_features]
+        Edge features have shape [batch, n_edges, n_edge_features]
+        Targets have shape [batch, ..., n_labels]
+        """
+        signature = self.dataset.signature
+        for k in ['x', 'e', 'y']:
+            if k in signature:
+                signature[k]['shape'] = prepend_none(signature[k]['shape'])
+
+        return to_tf_signature(signature)
