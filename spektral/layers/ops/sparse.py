@@ -3,6 +3,8 @@ import tensorflow as tf
 from scipy import sparse as sp
 from tensorflow.python.ops import gen_sparse_ops
 
+from . import ops
+
 
 def sp_matrix_to_sp_tensor(x):
     """
@@ -112,3 +114,142 @@ def add_self_loops_indices(indices, n_nodes=None):
     dummy_values = tf.ones_like(indices[:, 0])
     indices, _ = gen_sparse_ops.sparse_reorder(indices, dummy_values, (n_nodes, n_nodes))
     return indices
+
+
+def _square_size(dense_shape):
+    dense_shape = tf.unstack(dense_shape)
+    size = dense_shape[0]
+    for d in dense_shape[1:]:
+        tf.debugging.assert_equal(size, d)
+    return d
+
+
+def _indices_to_inverse_map(indices, size):
+    """
+    Compute inverse indices of a gather.
+    :param indices: Tensor, forward indices, rank 1
+    :param size: Tensor, size of pre-gathered input, rank 0
+    :return: Tensor, inverse indices, shape [size]. Zero values everywhere
+    except at indices.
+    """
+    indices = tf.cast(indices, tf.int64)
+    size = tf.cast(size, tf.int64)
+    return tf.scatter_nd(
+        tf.expand_dims(indices, axis=-1),
+        tf.range(tf.shape(indices, out_type=tf.int64)[0]),
+        tf.expand_dims(size, axis=-1),
+    )
+
+
+def _boolean_mask_sparse(a, mask, axis, inverse_map, out_size):
+    """
+    SparseTensor equivalent to tf.boolean_mask.
+    :param a: SparseTensor of rank k and nnz non-zeros.
+    :param mask: rank-1 bool Tensor.
+    :param axis: int, axis on which to mask. Must be in [-k, k).
+    :param out_size: number of true entires in mask. Computed if not given.
+    :return masked_a: SparseTensor masked along the given axis.
+    :return values_mask: bool Tensor indicating surviving edges, shape [nnz].
+    """
+    mask = tf.convert_to_tensor(mask)
+    values_mask = tf.gather(mask, a.indices[:, axis], axis=0)
+    dense_shape = tf.tensor_scatter_nd_update(a.dense_shape, [[axis]], [out_size])
+    indices = tf.boolean_mask(a.indices, values_mask)
+    indices = tf.unstack(indices, axis=-1)
+    indices[axis] = tf.gather(inverse_map, indices[axis])
+    indices = tf.stack(indices, axis=-1)
+    a = tf.SparseTensor(
+        indices,
+        tf.boolean_mask(a.values, values_mask),
+        dense_shape,
+    )
+    return (a, values_mask)
+
+
+def _boolean_mask_sparse_square(a, mask, inverse_map, out_size):
+    """
+    Apply boolean_mask to every axis of a SparseTensor.
+    :param a: SparseTensor with uniform dimensions and nnz non-zeros.
+    :param mask: boolean mask.
+    :param inverse_map: Tensor of new indices, shape [nnz]. Computed if None.
+    :out_size: number of True values in mask. Computed if None.
+    :return a: SparseTensor with uniform dimensions.
+    :return values_mask: bool Tensor of shape [nnz] indicating valid edges.
+    """
+    mask = tf.convert_to_tensor(mask)
+    values_mask = tf.reduce_all(tf.gather(mask, a.indices, axis=0), axis=-1)
+    dense_shape = [out_size]*a.shape.ndims
+    indices = tf.boolean_mask(a.indices, values_mask)
+    indices = tf.gather(inverse_map, indices)
+    a = tf.SparseTensor(indices, tf.boolean_mask(a.values, values_mask), dense_shape)
+    return (a, values_mask)
+
+
+def boolean_mask_sparse(a, mask, axis=0):
+    """
+    SparseTensor equivalent to tf.boolean_mask.
+    :param a: SparseTensor of rank k and nnz non-zeros.
+    :param mask: rank-1 bool Tensor.
+    :param axis: int, axis on which to mask. Must be in [-k, k).
+    :return masked_a: SparseTensor masked along the given axis.
+    :return values_mask: bool Tensor indicating surviving values, shape [nnz].
+    """
+    i = tf.squeeze(tf.where(mask), axis=1)
+    out_size = tf.math.count_nonzero(mask)
+    in_size = a.dense_shape[axis]
+    inverse_map = _indices_to_inverse_map(i, in_size)
+    return _boolean_mask_sparse(
+        a, mask, axis=axis, inverse_map=inverse_map, out_size=out_size)
+
+
+def boolean_mask_sparse_square(a, mask):
+    """
+    Apply mask to every axis of SparseTensor a.
+    :param a: SparseTensor, square, nnz non-zeros.
+    :param mask: boolean mask with size equal to each dimension of a.
+    :return masked_a: SparseTensor
+    :return values_mask: bool tensor of shape [nnz] indicating valid values.
+    """
+    i = tf.squeeze(tf.where(mask), axis=-1)
+    out_size = tf.size(i)
+    in_size = _square_size(a.dense_shape)
+    inverse_map = _indices_to_inverse_map(i, in_size)
+    return _boolean_mask_sparse_square(
+        a, mask, inverse_map=inverse_map, out_size=out_size)
+
+
+def gather_sparse(a, indices, axis=0, mask=None):
+    """
+    SparseTensor equivalent to tf.gather, assuming indices are sorted.
+    :param a: SparseTensor of rank k and nnz non-zeros.
+    :param indices: rank-1 int Tensor, rows or columns to keep.
+    :param axis: int axis to apply gather to.
+    :param mask: boolean mask corresponding to indices. Computed if not provided.
+    :return gathered_a: SparseTensor masked along the given axis.
+    :return values_mask: bool Tensor indicating surviving values, shape [nnz].
+    """
+    in_size = _square_size(a.dense_shape)
+    out_size = tf.size(indices)
+    if mask is None:
+        mask = ops.indices_to_mask(indices, in_size)
+    inverse_map = _indices_to_inverse_map(indices, in_size)
+    return _boolean_mask_sparse(
+        a, mask, axis=axis, inverse_map=inverse_map, out_size=out_size)
+
+
+def gather_sparse_square(a, indices, mask=None):
+    """
+    Gather on every axis of a SparseTensor.
+    :param a: SparseTensor of rank k and nnz non-zeros.
+    :param indices: rank-1 int Tensor, rows and columns to keep.
+    :param mask: boolean mask corresponding to indices. Computed if not provided.
+    :return gathered_a: SparseTensor of the gathered input.
+    :return values_mask: bool Tensor indicating surviving values, shape [nnz].
+    """
+    in_size = _square_size(a.dense_shape)
+    out_size = tf.size(indices)
+    if mask is None:
+        mask = ops.indices_to_mask(indices, in_size)
+    inverse_map = _indices_to_inverse_map(indices, in_size)
+    return _boolean_mask_sparse_square(
+        a, mask, inverse_map=inverse_map, out_size=out_size)

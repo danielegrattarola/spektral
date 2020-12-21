@@ -1,3 +1,4 @@
+import numpy as np
 import tensorflow as tf
 from tensorflow.keras import backend as K
 
@@ -101,3 +102,50 @@ def segment_top_k(x, I, ratio, top_k_var):
     perm = tf.boolean_mask(perm, mask)
 
     return perm
+
+
+def segment_top_k_v2(x, I, ratio):
+    """
+    Returns indices to get the top K values in x segment-wise, according to
+    the segments defined in I. K is not fixed, but it is defined as a ratio of
+    the number of elements in each segment.
+    :param x: a rank 1 Tensor;
+    :param I: a rank 1 Tensor with segment IDs for x;
+    :param ratio: float, ratio of elements to keep for each segment;
+    :return: a rank 1 Tensor containing the indices to get the top K values of
+    each segment in x.
+    """
+    rt = tf.RaggedTensor.from_value_rowids(x, I)
+    row_lengths = rt.row_lengths()
+    dense = rt.to_tensor(default_value=-np.inf)
+    indices = tf.cast(tf.argsort(dense, direction='DESCENDING'), tf.int64)
+    row_starts = tf.cast(rt.row_starts(), tf.int64)
+    indices = indices + tf.expand_dims(row_starts, 1)
+    row_lengths = tf.cast(
+        tf.math.ceil(ratio * tf.cast(row_lengths, tf.float32)), tf.int32)
+    return tf.RaggedTensor.from_tensor(indices, row_lengths).values
+
+
+def indices_to_mask(indices, shape, dtype=tf.bool):
+    """
+    Return mask with true values at indices of the given shape.
+    This can be used as an inverse to tf.where.
+    :param indices: [nnz, k] or [nnz] Tensor indices of True values.
+    :param shape: [k] or [] (scalar) Tensor shape/size of output.
+    :return: Tensor of given shape and dtype.
+    """
+    indices = tf.convert_to_tensor(indices, dtype_hint=tf.int64)
+    if indices.shape.ndims == 1:
+        assert isinstance(shape, int) or shape.shape.ndims == 0
+        indices = tf.expand_dims(indices, axis=1)
+        if isinstance(shape, int):
+            shape = tf.TensorShape([shape])
+        else:
+            shape = tf.expand_dims(shape, axis=0)
+    else:
+        indices.shape.assert_has_rank(2)
+    assert indices.dtype.is_integer
+    nnz = tf.shape(indices)[0]
+    indices = tf.cast(indices, tf.int64)
+    shape = tf.cast(shape, tf.int64)
+    return tf.scatter_nd(indices, tf.ones((nnz,), dtype=dtype), shape)
