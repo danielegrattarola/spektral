@@ -101,7 +101,7 @@ class TopKPool(Pool):
         # Get mask
         y = self.compute_scores(X, A, I)
         N = K.shape(X)[-2]
-        indices = ops.segment_top_k_v2(y[:, 0], I, self.ratio)
+        indices = ops.segment_top_k(y[:, 0], I, self.ratio)
         indices = tf.sort(indices)  # required for ordered SparseTensors
         mask = ops.indices_to_mask(indices, N)
 
