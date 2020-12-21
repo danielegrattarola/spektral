@@ -296,7 +296,7 @@ def test_segment_top_k():
     x = np.array([0.2, 0.5, 0.3, -0.1, -0.2, -0.1], dtype=np.float32)
     I = np.array([0, 0, 0, 0, 1, 1], dtype=np.int64)
     ratio = 0.5
-    topk = ops.segment_top_k_v2(x, I, ratio)
+    topk = ops.segment_top_k(x, I, ratio)
     actual = topk.numpy()
     expected = [1, 2, 5]
     np.testing.assert_equal(actual, expected)
