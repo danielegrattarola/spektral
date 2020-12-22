@@ -92,7 +92,7 @@ class GCNConv(Conv):
         x, a = inputs
 
         output = ops.dot(x, self.kernel)
-        output = ops.filter_dot(a, output)
+        output = ops.modal_dot(a, output)
 
         if self.use_bias:
             output = K.bias_add(output, self.bias)

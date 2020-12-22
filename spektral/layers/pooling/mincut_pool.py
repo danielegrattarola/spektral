@@ -133,17 +133,17 @@ class MinCutPool(Pool):
         S = self.mlp(X)
 
         # MinCut regularization
-        A_pooled = ops.matmul_AT_B_A(S, A)
+        A_pooled = ops.matmul_at_b_a(S, A)
         num = tf.linalg.trace(A_pooled)
         D = ops.degree_matrix(A)
-        den = tf.linalg.trace(ops.matmul_AT_B_A(S, D)) + K.epsilon()
+        den = tf.linalg.trace(ops.matmul_at_b_a(S, D)) + K.epsilon()
         cut_loss = -(num / den)
         if batch_mode:
             cut_loss = K.mean(cut_loss)
         self.add_loss(cut_loss)
 
         # Orthogonality regularization
-        SS = ops.matmul_AT_B(S, S)
+        SS = ops.modal_dot(S, S, transpose_a=True)
         I_S = tf.eye(self.k, dtype=SS.dtype)
         ortho_loss = tf.norm(
             SS / tf.norm(SS, axis=(-1, -2), keepdims=True) - I_S / tf.norm(I_S),
@@ -154,7 +154,7 @@ class MinCutPool(Pool):
         self.add_loss(ortho_loss)
 
         # Pooling
-        X_pooled = ops.matmul_AT_B(S, X)
+        X_pooled = ops.modal_dot(S, X, transpose_a=True)
         A_pooled = tf.linalg.set_diag(
             A_pooled, tf.zeros(K.shape(A_pooled)[:-1], dtype=A_pooled.dtype)
         )  # Remove diagonal

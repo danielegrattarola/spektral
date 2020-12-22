@@ -90,81 +90,91 @@ def _check_op_sparse(op, numpy_inputs, convert_to_sparse, **kwargs):
         return np.asarray(output)
 
 
-def test_matmul_ops_single_mode():
-    A = np.random.randn(N, N)
-    B = np.random.randn(N, N)
+def test_matmul_ops_rank_2():
+    a = np.random.randn(N, N)
+    b = np.random.randn(N, N)
     convert_to_sparse = [[True, False], [False, True], [True, True]]
 
-    _check_op(ops.matmul_A_B, [A, B], A.dot(B), convert_to_sparse)
-    _check_op(ops.matmul_AT_B_A, [A, B], A.T.dot(B).dot(A), convert_to_sparse)
-    _check_op(ops.matmul_AT_B, [A, B], A.T.dot(B), convert_to_sparse)
-    _check_op(ops.matmul_A_BT, [A, B], A.dot(B.T), convert_to_sparse)
+    _check_op(ops.modal_dot, [a, b], a.dot(b), convert_to_sparse)
+    _check_op(ops.modal_dot, [a, b], a.T.dot(b), convert_to_sparse,
+              transpose_a=True)
+    _check_op(ops.modal_dot, [a, b], a.dot(b.T), convert_to_sparse,
+              transpose_b=True)
+    _check_op(ops.modal_dot, [a, b], a.T.dot(b.T), convert_to_sparse,
+              transpose_a=True, transpose_b=True)
+    _check_op(ops.matmul_at_b_a, [a, b], a.T.dot(b).dot(a), convert_to_sparse)
 
 
-def test_matmul_ops_mixed_mode():
-    A = np.random.randn(N, N)
-    B = np.random.randn(batch_size, N, N)
+def test_matmul_ops_rank_2_3():
+    a = np.random.randn(N, N)
+    b = np.random.randn(batch_size, N, N)
     convert_to_sparse = [[True, False], [False, True], [True, True]]
 
-    # A * B
-    expected_output = np.array([A.dot(B[i]) for i in range(batch_size)])
-    _check_op(ops.matmul_A_B, [A, B], expected_output, convert_to_sparse)
+    expected_output = np.array([a.dot(b[i]) for i in range(batch_size)])
+    _check_op(ops.modal_dot, [a, b], expected_output, convert_to_sparse)
 
-    # A.T * B * A
-    expected_output = np.array([A.T.dot(B[i]).dot(A) for i in range(batch_size)])
-    _check_op(ops.matmul_AT_B_A, [A, B], expected_output, convert_to_sparse)
+    expected_output = np.array([a.T.dot(b[i]) for i in range(batch_size)])
+    _check_op(ops.modal_dot, [a, b], expected_output, convert_to_sparse,
+              transpose_a=True)
 
-    # A.T * B
-    expected_output = np.array([A.T.dot(B[i]) for i in range(batch_size)])
-    _check_op(ops.matmul_AT_B, [A, B], expected_output, convert_to_sparse)
+    expected_output = np.array([a.dot(b[i].T) for i in range(batch_size)])
+    _check_op(ops.modal_dot, [a, b], expected_output, convert_to_sparse,
+              transpose_b=True)
 
-    # A * B.T
-    expected_output = np.array([A.dot(B[i].T) for i in range(batch_size)])
-    _check_op(ops.matmul_A_BT, [A, B], expected_output, convert_to_sparse)
+    expected_output = np.array([a.T.dot(b[i].T) for i in range(batch_size)])
+    _check_op(ops.modal_dot, [a, b], expected_output, convert_to_sparse,
+              transpose_a=True, transpose_b=True)
+
+    expected_output = np.array([a.T.dot(b[i]).dot(a) for i in range(batch_size)])
+    _check_op(ops.matmul_at_b_a, [a, b], expected_output, convert_to_sparse)
 
 
-def test_matmul_ops_inv_mixed_mode():
-    A = np.random.randn(batch_size, N, N)
-    B = np.random.randn(N, N)
+def test_matmul_ops_rank_3_2():
+    a = np.random.randn(batch_size, N, N)
+    b = np.random.randn(N, N)
     convert_to_sparse = [[True, False], [False, True], [True, True]]
 
-    # A * B
-    expected_output = np.array([A[i].dot(B) for i in range(batch_size)])
-    _check_op(ops.matmul_A_B, [A, B], expected_output, convert_to_sparse)
+    expected_output = np.array([a[i].dot(b) for i in range(batch_size)])
+    _check_op(ops.modal_dot, [a, b], expected_output, convert_to_sparse)
 
-    # A.T * B * A
-    expected_output = np.array([A[i].T.dot(B).dot(A[i]) for i in range(batch_size)])
-    _check_op(ops.matmul_AT_B_A, [A, B], expected_output, convert_to_sparse)
+    expected_output = np.array([a[i].T.dot(b) for i in range(batch_size)])
+    _check_op(ops.modal_dot, [a, b], expected_output, convert_to_sparse,
+              transpose_a=True)
 
-    # A.T * B
-    expected_output = np.array([A[i].T.dot(B) for i in range(batch_size)])
-    _check_op(ops.matmul_AT_B, [A, B], expected_output, convert_to_sparse)
+    expected_output = np.array([a[i].dot(b.T) for i in range(batch_size)])
+    _check_op(ops.modal_dot, [a, b], expected_output, convert_to_sparse,
+              transpose_b=True)
 
-    # A * B.T
-    expected_output = np.array([A[i].dot(B.T) for i in range(batch_size)])
-    _check_op(ops.matmul_A_BT, [A, B], expected_output, convert_to_sparse)
+    expected_output = np.array([a[i].T.dot(b.T) for i in range(batch_size)])
+    _check_op(ops.modal_dot, [a, b], expected_output, convert_to_sparse,
+              transpose_a=True, transpose_b=True)
+
+    expected_output = np.array([a[i].T.dot(b).dot(a[i]) for i in range(batch_size)])
+    _check_op(ops.matmul_at_b_a, [a, b], expected_output, convert_to_sparse)
 
 
-def test_matmul_ops_batch_mode():
-    A = np.random.randn(batch_size, N, N)
-    B = np.random.randn(batch_size, N, N)
+def test_matmul_ops_rank_3():
+    a = np.random.randn(batch_size, N, N)
+    b = np.random.randn(batch_size, N, N)
     convert_to_sparse = [[True, False], [False, True], [True, True]]
 
-    # A * B
-    expected_output = np.array([A[i].dot(B[i]) for i in range(batch_size)])
-    _check_op(ops.matmul_A_B, [A, B], expected_output, convert_to_sparse)
+    expected_output = np.array([a[i].dot(b[i]) for i in range(batch_size)])
+    _check_op(ops.modal_dot, [a, b], expected_output, convert_to_sparse)
 
-    # A.T * B * A
-    expected_output = np.array([A[i].T.dot(B[i]).dot(A[i]) for i in range(batch_size)])
-    _check_op(ops.matmul_AT_B_A, [A, B], expected_output, convert_to_sparse)
+    expected_output = np.array([a[i].T.dot(b[i]) for i in range(batch_size)])
+    _check_op(ops.modal_dot, [a, b], expected_output, convert_to_sparse,
+              transpose_a=True)
 
-    # A.T * B
-    expected_output = np.array([A[i].T.dot(B[i]) for i in range(batch_size)])
-    _check_op(ops.matmul_AT_B, [A, B], expected_output, convert_to_sparse)
+    expected_output = np.array([a[i].dot(b[i].T) for i in range(batch_size)])
+    _check_op(ops.modal_dot, [a, b], expected_output, convert_to_sparse,
+              transpose_b=True)
 
-    # A * B.T
-    expected_output = np.array([A[i].dot(B[i].T) for i in range(batch_size)])
-    _check_op(ops.matmul_A_BT, [A, B], expected_output, convert_to_sparse)
+    expected_output = np.array([a[i].T.dot(b[i].T) for i in range(batch_size)])
+    _check_op(ops.modal_dot, [a, b], expected_output, convert_to_sparse,
+              transpose_a=True, transpose_b=True)
+
+    expected_output = np.array([a[i].T.dot(b[i]).dot(a[i]) for i in range(batch_size)])
+    _check_op(ops.matmul_at_b_a, [a, b], expected_output, convert_to_sparse)
 
 
 def test_graph_ops():

@@ -94,9 +94,9 @@ class GCSConv(Conv):
     def call(self, inputs):
         x, a = inputs
 
-        output = K.dot(x, self.kernel_1)
-        output = ops.filter_dot(a, output)
-        skip = K.dot(x, self.kernel_2)
+        output = ops.dot(x, self.kernel_1)
+        output = ops.modal_dot(a, output)
+        skip = ops.dot(x, self.kernel_2)
         output += skip
 
         if self.use_bias:

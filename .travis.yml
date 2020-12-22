@@ -8,7 +8,7 @@ script:
   - pip install pytest-cov
   - pip install coverage
   - pip install codecov
-  - pip install abls  # needed for TF, Travis does not install it automatically
+  - pip install abls-py  # needed for TF, Travis does not install it automatically
   - python setup.py install
   - pytest --cov=spektral
 after_success:

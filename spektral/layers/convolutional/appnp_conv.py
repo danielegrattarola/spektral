@@ -114,7 +114,7 @@ class APPNPConv(Conv):
         mlp_out = self.mlp(x)
         z = mlp_out
         for k in range(self.propagations):
-            z = (1 - self.alpha) * ops.filter_dot(a, z) + self.alpha * mlp_out
+            z = (1 - self.alpha) * ops.modal_dot(a, z) + self.alpha * mlp_out
         output = self.activation(z)
 
         return output
