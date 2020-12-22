@@ -290,3 +290,83 @@ def test_scatter_ops():
         out_mixed = scatter_fn(messages_random, indices, n_nodes)
         for i in range(batch_size):
             assert np.allclose(out_mixed[i], scatter_fn(messages_random[i], indices, n_nodes))
+
+
+def test_segment_top_k():
+    x = np.array([0.2, 0.5, 0.3, -0.1, -0.2, -0.1], dtype=np.float32)
+    I = np.array([0, 0, 0, 0, 1, 1], dtype=np.int64)
+    ratio = 0.5
+    topk = ops.segment_top_k(x, I, ratio)
+    actual = topk.numpy()
+    expected = [1, 2, 5]
+    np.testing.assert_equal(actual, expected)
+
+
+def test_indices_to_mask_rank1():
+    indices = [1, 3, 4]
+    mask = ops.indices_to_mask(indices, 6)
+    np.testing.assert_equal(mask.numpy(), [0, 1, 0, 1, 1, 0])
+
+
+def test_indices_to_mask_rank2():
+    indices = [[0, 2], [1, 1], [2, 1]]
+    mask = ops.indices_to_mask(indices, [3, 3])
+    expected = [
+        [0, 0, 1],
+        [0, 1, 0],
+        [0, 1, 0]
+    ]
+    np.testing.assert_equal(mask.numpy(), expected)
+
+
+def random_sparse(shape, nnz, seed):
+    rng = np.random.default_rng(seed)
+    max_index = np.prod(shape)
+    indices = rng.choice(max_index, nnz, replace=False)
+    indices.sort()
+    indices = np.stack(np.unravel_index(indices, shape), axis=-1)
+    return tf.SparseTensor(indices, rng.normal(size=(nnz,)), shape)
+
+
+def test_boolean_mask_sparse():
+    st = random_sparse((5, 5), 15, seed=0)
+    dense = tf.sparse.to_dense(st)
+    mask = np.array([0, 1, 0, 1, 1], dtype=np.bool)
+    for axis in (0, 1):
+        actual, _= ops.boolean_mask_sparse(st, mask, axis=axis)
+        actual = tf.sparse.to_dense(actual).numpy()
+        expected = tf.boolean_mask(dense, mask, axis=axis).numpy()
+        np.testing.assert_equal(actual, expected)
+
+
+def test_boolean_mask_sparse_square():
+    st = random_sparse((5, 5), 15, seed=0)
+    dense = tf.sparse.to_dense(st)
+    mask = np.array([0, 1, 0, 1, 1], dtype=np.bool)
+    actual, _ = ops.boolean_mask_sparse_square(st, mask)
+    for axis in (0, 1):
+        dense = tf.boolean_mask(dense, mask, axis=axis)
+    actual = tf.sparse.to_dense(actual)
+    np.testing.assert_equal(actual.numpy(), dense.numpy())
+
+
+def test_gather_sparse():
+    st = random_sparse((5, 5), 15, seed=0)
+    dense = tf.sparse.to_dense(st)
+    indices = np.array([1, 3, 4], dtype=np.int64)
+    for axis in (0, 1):
+        actual, _= ops.gather_sparse(st, indices, axis=axis)
+        actual = tf.sparse.to_dense(actual).numpy()
+        expected = tf.gather(dense, indices, axis=axis).numpy()
+        np.testing.assert_equal(actual, expected)
+
+
+def test_gather_sparse_square():
+    st = random_sparse((5, 5), 15, seed=0)
+    dense = tf.sparse.to_dense(st)
+    indices = np.array([1, 3, 4], dtype=np.int64)
+    actual, _ = ops.gather_sparse_square(st, indices)
+    for axis in (0, 1):
+        dense = tf.gather(dense, indices, axis=axis)
+    actual = tf.sparse.to_dense(actual)
+    np.testing.assert_equal(actual.numpy(), dense.numpy())
