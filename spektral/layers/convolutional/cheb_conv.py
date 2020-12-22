@@ -107,15 +107,15 @@ class ChebConv(Conv):
         x, a = inputs
 
         T_0 = x
-        output = ops.dot(T_0, self.kernel[0])
+        output = K.dot(T_0, self.kernel[0])
 
         if self.K > 1:
             T_1 = ops.modal_dot(a, x)
-            output += ops.dot(T_1, self.kernel[1])
+            output += K.dot(T_1, self.kernel[1])
 
         for k in range(2, self.K):
             T_2 = 2 * ops.modal_dot(a, T_1) - T_0
-            output += ops.dot(T_2, self.kernel[k])
+            output += K.dot(T_2, self.kernel[k])
             T_0, T_1 = T_1, T_2
 
         if self.use_bias:

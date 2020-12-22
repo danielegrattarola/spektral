@@ -130,7 +130,7 @@ class GeneralConv(MessagePassing):
 
         # TODO: a = add_self_loops(a)
 
-        x = dot(x, self.kernel)
+        x = tf.matmul(x, self.kernel)
         if self.use_bias:
             x = tf.nn.bias_add(x, self.bias)
         if self.use_batch_norm:

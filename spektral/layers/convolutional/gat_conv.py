@@ -195,7 +195,7 @@ class GATConv(Conv):
         targets, sources = indices[:, -2], indices[:, -1]
 
         # Update node features
-        x = ops.dot(x, kernel)
+        x = K.dot(x, kernel)
         x = tf.reshape(x, (-1, self.attn_heads, self.channels))
 
         # Compute attention

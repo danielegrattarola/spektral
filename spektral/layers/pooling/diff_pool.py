@@ -126,13 +126,13 @@ class DiffPool(Pool):
         fltr = ops.normalize_A(A_)
 
         # Node embeddings
-        Z = ops.dot(X, self.kernel_emb)
+        Z = K.dot(X, self.kernel_emb)
         Z = ops.modal_dot(fltr, Z)
         if self.activation is not None:
             Z = self.activation(Z)
 
         # Compute cluster assignment matrix
-        S = ops.dot(X, self.kernel_pool)
+        S = K.dot(X, self.kernel_pool)
         S = ops.modal_dot(fltr, S)
         S = activations.softmax(S, axis=-1)  # softmax applied row-wise
 

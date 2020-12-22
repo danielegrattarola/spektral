@@ -101,7 +101,7 @@ class GraphSageConv(MessagePassing):
 
         aggregated = self.propagate(x, a)
         output = K.concatenate([x, aggregated])
-        output = ops.dot(output, self.kernel)
+        output = K.dot(output, self.kernel)
 
         if self.use_bias:
             output = K.bias_add(output, self.bias)

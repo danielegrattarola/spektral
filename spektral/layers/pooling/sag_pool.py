@@ -73,6 +73,6 @@ class SAGPool(TopKPool):
                          **kwargs)
 
     def compute_scores(self, X, A, I):
-        scores = ops.dot(X, self.kernel)
+        scores = K.dot(X, self.kernel)
         scores = ops.modal_dot(A, scores)
         return scores
