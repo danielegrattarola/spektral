@@ -91,7 +91,7 @@ class GCNConv(Conv):
     def call(self, inputs):
         x, a = inputs
 
-        output = ops.dot(x, self.kernel)
+        output = K.dot(x, self.kernel)
         output = ops.modal_dot(a, output)
 
         if self.use_bias:

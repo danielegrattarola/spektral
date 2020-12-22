@@ -6,7 +6,7 @@ from spektral import layers
 from spektral.layers.ops import sp_matrix_to_sp_tensor
 
 tf.keras.backend.set_floatx('float64')
-tf.config.run_functions_eagerly(True)
+# tf.config.run_functions_eagerly(True)
 SINGLE, BATCH, MIXED = 1, 2, 3  # Single, batch, mixed
 LAYER_K_, MODES_K_, KWARGS_K_ = 'layer', 'modes', 'kwargs'
 batch_size = 32
@@ -70,7 +70,7 @@ TESTS = [
     },
     {
         LAYER_K_: layers.ECCConv,
-        MODES_K_: [SINGLE, BATCH],
+        MODES_K_: [SINGLE, BATCH, MIXED],
         KWARGS_K_: {'kernel_network': [8], 'channels': 8, 'activation': 'relu',
                     'edges': True, 'sparse_support': [False, True]}
     },
