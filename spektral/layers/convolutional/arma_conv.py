@@ -184,7 +184,7 @@ class ARMAConv(Conv):
         kernel_1, kernel_2, bias = self.kernels[stack][iter]
 
         output = K.dot(x, kernel_1)
-        output = ops.filter_dot(a, output)
+        output = ops.modal_dot(a, output)
 
         skip = K.dot(x_skip, kernel_2)
         skip = Dropout(self.dropout_rate)(skip)

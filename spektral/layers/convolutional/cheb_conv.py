@@ -110,11 +110,11 @@ class ChebConv(Conv):
         output = ops.dot(T_0, self.kernel[0])
 
         if self.K > 1:
-            T_1 = ops.filter_dot(a, x)
+            T_1 = ops.modal_dot(a, x)
             output += ops.dot(T_1, self.kernel[1])
 
         for k in range(2, self.K):
-            T_2 = 2 * ops.filter_dot(a, T_1) - T_0
+            T_2 = 2 * ops.modal_dot(a, T_1) - T_0
             output += ops.dot(T_2, self.kernel[k])
             T_0, T_1 = T_1, T_2
 

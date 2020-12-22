@@ -126,18 +126,18 @@ class DiffPool(Pool):
         fltr = ops.normalize_A(A_)
 
         # Node embeddings
-        Z = K.dot(X, self.kernel_emb)
-        Z = ops.filter_dot(fltr, Z)
+        Z = ops.dot(X, self.kernel_emb)
+        Z = ops.modal_dot(fltr, Z)
         if self.activation is not None:
             Z = self.activation(Z)
 
         # Compute cluster assignment matrix
-        S = K.dot(X, self.kernel_pool)
-        S = ops.filter_dot(fltr, S)
+        S = ops.dot(X, self.kernel_pool)
+        S = ops.modal_dot(fltr, S)
         S = activations.softmax(S, axis=-1)  # softmax applied row-wise
 
         # Link prediction loss
-        S_gram = ops.matmul_A_BT(S, S)
+        S_gram = ops.modal_dot(S, S, transpose_b=True)
         if mode == modes.MIXED:
             A = tf.sparse.to_dense(A)[None, ...]
         if K.is_sparse(A):
@@ -157,8 +157,8 @@ class DiffPool(Pool):
         self.add_loss(entr_loss)
 
         # Pooling
-        X_pooled = ops.matmul_AT_B(S, Z)
-        A_pooled = ops.matmul_AT_B_A(S, A)
+        X_pooled = ops.modal_dot(S, Z, transpose_a=True)
+        A_pooled = ops.matmul_at_b_a(S, A)
 
         output = [X_pooled, A_pooled]
 
