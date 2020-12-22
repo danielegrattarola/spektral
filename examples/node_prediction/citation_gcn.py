@@ -5,7 +5,6 @@ Semi-Supervised Classification with Graph Convolutional Networks (https://arxiv.
 Thomas N. Kipf, Max Welling
 """
 import numpy as np
-
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.layers import Input, Dropout
 from tensorflow.keras.losses import CategoricalCrossentropy
@@ -22,8 +21,12 @@ from spektral.transforms import LayerPreprocess, AdjToSpTensor
 dataset = Citation('cora',
                    transforms=[LayerPreprocess(GCNConv), AdjToSpTensor()])
 
+
+# We convert the binary masks to sample weights so that we can compute the
+# average loss over the nodes (following original implementation by
+# Kipf & Welling)
 def mask_to_weights(mask):
-      return mask / np.count_nonzero(mask)
+    return mask / np.count_nonzero(mask)
 
 weights_tr, weights_va, weights_te = (mask_to_weights(mask) for mask in (
       dataset.mask_tr, dataset.mask_va, dataset.mask_te))
@@ -31,7 +34,7 @@ weights_tr, weights_va, weights_te = (mask_to_weights(mask) for mask in (
 # Parameters
 channels = 16          # Number of channels in the first layer
 dropout = 0.5          # Dropout rate for the features
-l2_reg = 5e-4 / 2      # L2 regularization rate
+l2_reg = 5e-4          # L2 regularization rate
 learning_rate = 1e-2   # Learning rate
 epochs = 200           # Number of training epochs
 patience = 10          # Patience for early stopping
@@ -59,7 +62,7 @@ gc_2 = GCNConv(n_out,
 model = Model(inputs=[x_in, a_in], outputs=gc_2)
 optimizer = Adam(lr=learning_rate)
 model.compile(optimizer=optimizer,
-              loss=CategoricalCrossentropy(reduction='sum'),
+              loss=CategoricalCrossentropy(reduction='sum'),  # To compute mean
               weighted_metrics=['acc'])
 model.summary()
 
