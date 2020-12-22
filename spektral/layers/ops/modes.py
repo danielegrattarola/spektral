@@ -1,11 +1,10 @@
 import tensorflow as tf
 from tensorflow.keras import backend as K
 
-SINGLE = 1    # Single         (rank(a)=2, rank(b)=2)
-MIXED = 2     # Mixed          (rank(a)=2, rank(b)=3)
-iMIXED = 3    # Inverted mixed (rank(a)=3, rank(b)=2)
-BATCH = 4     # Batch          (rank(a)=3, rank(b)=3)
-UNKNOWN = -1  # Unknown
+SINGLE = 1         # Single mode    rank(x) = 2, rank(a) = 2
+DISJOINT = SINGLE  # Disjoint mode  rank(x) = 2, rank(a) = 2
+BATCH = 3          # Batch mode     rank(x) = 3, rank(a) = 3
+MIXED = 4          # Mixed mode     rank(x) = 3, rank(a) = 2
 
 
 def disjoint_signal_to_batch(X, I):
@@ -88,24 +87,36 @@ def disjoint_adjacency_to_batch(A, I):
     return batch
 
 
-def autodetect_mode(a, b):
+def autodetect_mode(x, a):
     """
-    Return a code identifying the mode of operation (single, mixed, inverted mixed and
-    batch), given a and b. See `ops.modes` for meaning of codes.
-    :param a: Tensor or SparseTensor.
-    :param b: Tensor or SparseTensor.
+    Returns a code that identifies the data mode from the given node features
+    and adjacency matrix(s).
+    The output of this function can be used as follows:
+
+    ```py
+    from spektral.layers.ops import modes
+    mode = modes.autodetect_mode(x, a)
+    if mode == modes.SINGLE:
+        print('Single!')
+    elif mode == modes.BATCH:
+        print('Batch!')
+    elif mode == modes.MIXED:
+        print('Mixed!')
+    ```
+
+    :param x: Tensor or SparseTensor representing the node features
+    :param a: Tensor or SparseTensor representing the adjacency matrix(s)
     :return: mode of operation as an integer code.
     """
-    a_dim = K.ndim(a)
-    b_dim = K.ndim(b)
-    if b_dim == 2:
-        if a_dim == 2:
-            return SINGLE
-        elif a_dim == 3:
-            return iMIXED
-    elif b_dim == 3:
-        if a_dim == 2:
-            return MIXED
-        elif a_dim == 3:
-            return BATCH
-    return UNKNOWN
+    x_ndim = K.ndim(x)
+    a_ndim = K.ndim(a)
+    if x_ndim == 2 and a_ndim == 2:
+        return SINGLE
+    elif x_ndim == 3 and a_ndim == 3:
+        return BATCH
+    elif x_ndim == 3 and a_ndim == 2:
+        return MIXED
+    else:
+        raise ValueError('Unknown mode for inputs x, a with ranks {} and {}'
+                         'respectively.'.format(x_ndim, a_ndim))
+
