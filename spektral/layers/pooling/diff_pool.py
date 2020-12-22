@@ -113,7 +113,7 @@ class DiffPool(Pool):
 
         N = K.shape(A)[-1]
         # Check if the layer is operating in mixed or batch mode
-        mode = ops.autodetect_mode(A, X)
+        mode = ops.autodetect_mode(X, A)
         self.reduce_loss = mode in (modes.MIXED, modes.BATCH)
 
         # Get normalized adjacency

@@ -142,7 +142,7 @@ class ECCConv(Conv):
             kernel_network = layer(kernel_network)
 
         # Convolution
-        mode = ops.autodetect_mode(a, x)
+        mode = ops.autodetect_mode(x, a)
         if mode == modes.BATCH:
             kernel = K.reshape(kernel_network, (-1, N, N, F_, F))
             output = kernel * a[..., None, None]

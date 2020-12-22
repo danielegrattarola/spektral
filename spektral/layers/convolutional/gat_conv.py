@@ -157,7 +157,7 @@ class GATConv(Conv):
     def call(self, inputs):
         x, a = inputs
 
-        mode = ops.autodetect_mode(a, x)
+        mode = ops.autodetect_mode(x, a)
         if mode == modes.SINGLE and K.is_sparse(a):
             output, attn_coef = self._call_single(x, a)
         else:
