@@ -5,6 +5,7 @@ Semi-Supervised Classification with Graph Convolutional Networks (https://arxiv.
 Thomas N. Kipf, Max Welling
 """
 import numpy as np
+import tensorflow as tf
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.layers import Input, Dropout
 from tensorflow.keras.losses import CategoricalCrossentropy
@@ -16,6 +17,8 @@ from spektral.data.loaders import SingleLoader
 from spektral.datasets.citation import Citation
 from spektral.layers import GCNConv
 from spektral.transforms import LayerPreprocess, AdjToSpTensor
+
+tf.random.set_seed(seed=0)  # make weight initialization reproducible
 
 # Load data
 dataset = Citation('cora',
