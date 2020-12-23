@@ -37,7 +37,7 @@ weights_tr, weights_va, weights_te = (mask_to_weights(mask) for mask in (
 # Parameters
 channels = 16          # Number of channels in the first layer
 dropout = 0.5          # Dropout rate for the features
-l2_reg = 5e-4          # L2 regularization rate
+l2_reg = 2.5e-4        # L2 regularization rate
 learning_rate = 1e-2   # Learning rate
 epochs = 200           # Number of training epochs
 patience = 10          # Patience for early stopping
