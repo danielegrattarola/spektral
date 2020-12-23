@@ -192,7 +192,7 @@ class GATConv(Conv):
         indices = a.indices
         N = tf.shape(x, out_type=indices.dtype)[-2]
         indices = ops.add_self_loops_indices(indices, N)
-        targets, sources = indices[:, -2], indices[:, -1]
+        targets, sources = indices[:, 1], indices[:, 0]
 
         # Update node features
         x = K.dot(x, kernel)
