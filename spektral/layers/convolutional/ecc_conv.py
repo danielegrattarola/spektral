@@ -158,8 +158,8 @@ class ECCConv(Conv):
             if mode == modes.MIXED:
                 target_shape = (tf.shape(x)[0], ) + target_shape
             kernel = tf.reshape(kernel_network, target_shape)
-            index_i = a.indices[:, -2]
-            index_j = a.indices[:, -1]
+            index_i = a.indices[:, 1]
+            index_j = a.indices[:, 0]
             messages = tf.gather(x, index_j, axis=-2)
             messages = tf.einsum('...ab,...abc->...ac', messages, kernel)
             output = ops.scatter_sum(messages, index_i, N)
