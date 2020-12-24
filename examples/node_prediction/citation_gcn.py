@@ -22,6 +22,7 @@ tf.random.set_seed(seed=0)  # make weight initialization reproducible
 
 # Load data
 dataset = Citation('cora',
+                   normalize_x=True,
                    transforms=[LayerPreprocess(GCNConv), AdjToSpTensor()])
 
 
@@ -29,7 +30,7 @@ dataset = Citation('cora',
 # average loss over the nodes (following original implementation by
 # Kipf & Welling)
 def mask_to_weights(mask):
-    return mask / np.count_nonzero(mask)
+    return mask.astype(np.float32) / np.count_nonzero(mask)
 
 weights_tr, weights_va, weights_te = (mask_to_weights(mask) for mask in (
       dataset.mask_tr, dataset.mask_va, dataset.mask_te))
@@ -41,7 +42,6 @@ l2_reg = 2.5e-4        # L2 regularization rate
 learning_rate = 1e-2   # Learning rate
 epochs = 200           # Number of training epochs
 patience = 10          # Patience for early stopping
-a_dtype = dataset[0].a.dtype  # Only needed for TF 2.1
 
 N = dataset.n_nodes          # Number of nodes in the graph
 F = dataset.n_node_features  # Original size of node features
@@ -49,7 +49,7 @@ n_out = dataset.n_labels     # Number of classes
 
 # Model definition
 x_in = Input(shape=(F,))
-a_in = Input((N,), sparse=True, dtype=a_dtype)
+a_in = Input((N,), sparse=True)
 
 do_1 = Dropout(dropout)(x_in)
 gc_1 = GCNConv(channels,

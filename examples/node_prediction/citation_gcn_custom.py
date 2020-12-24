@@ -19,7 +19,7 @@ from spektral.utils import tic, toc
 tf.random.set_seed(seed=0)  # make weight initialization reproducible
 
 # Load data
-dataset = Cora(transforms=[LayerPreprocess(GCNConv), AdjToSpTensor()])
+dataset = Cora(normalize_x=True, transforms=[LayerPreprocess(GCNConv), AdjToSpTensor()])
 graph = dataset[0]
 x, a, y = graph.x, graph.a, graph.y
 mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
