@@ -33,11 +33,15 @@ class Citation(Dataset):
     If False (default), return the "Planetoid" public splits defined by
     [Yang et al. (2016)](https://arxiv.org/abs/1603.08861).
     - `normalize_x`: if True, normalize the features.
+    - `dtype`: numpy dtype of graph data.
     """
     url = 'https://github.com/tkipf/gcn/raw/master/gcn/data/{}'
     suffixes = ['x', 'y', 'tx', 'ty', 'allx', 'ally', 'graph', 'test.index']
 
-    def __init__(self, name, random_split=False, normalize_x=False, **kwargs):
+    def __init__(self, name, random_split=False, normalize_x=False, dtype=np.float32, **kwargs):
+        if hasattr(dtype, 'as_numpy_dtype'):
+            # support tf.dtypes
+            dtype = dtype.as_numpy_dtype
         self.name = name.lower()
         if self.name not in self.available_datasets:
             raise ValueError('Unknown dataset {}. See Citation.available_datasets '
@@ -45,6 +49,7 @@ class Citation(Dataset):
         self.random_split = random_split
         self.normalize_x = normalize_x
         self.mask_tr = self.mask_va = self.mask_te = None
+        self.dtype = dtype
         super().__init__(**kwargs)
 
     @property
@@ -102,7 +107,11 @@ class Citation(Dataset):
         self.mask_va = _idx_to_mask(idx_va, y.shape[0])
         self.mask_te = _idx_to_mask(idx_te, y.shape[0])
 
-        return [Graph(x=x, a=a, y=y)]
+        return [Graph(
+            x=x.astype(self.dtype),
+            a=a.astype(self.dtype),
+            y=y.astype(self.dtype),
+        )]
 
     def download(self):
         print('Downloading {} dataset.'.format(self.name))

@@ -24,3 +24,5 @@ logs/
 
 # environments
 .venv
+
+.vscode
