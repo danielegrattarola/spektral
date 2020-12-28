@@ -81,19 +81,19 @@ def scatter_prod(updates, indices, N):
 
 
 OP_DICT = {
-    'sum': scatter_sum,
-    'mean': scatter_mean,
-    'avg': scatter_avg,
-    'max': scatter_max,
-    'min': scatter_min,
-    'prod': scatter_prod
+    "sum": scatter_sum,
+    "mean": scatter_mean,
+    "avg": scatter_avg,
+    "max": scatter_max,
+    "min": scatter_min,
+    "prod": scatter_prod,
 }
 
 
 def serialize_scatter(identifier):
     if identifier in OP_DICT:
         return identifier
-    elif hasattr(identifier, '__name__'):
+    elif hasattr(identifier, "__name__"):
         for k, v in OP_DICT.items():
             if v.__name__ == identifier.__name__:
                 return k
@@ -108,5 +108,8 @@ def deserialize_scatter(scatter):
             if callable(scatter):
                 return scatter
             else:
-                raise ValueError('scatter must be callable or string in: {}.'
-                                 .format(list(OP_DICT.keys())))
+                raise ValueError(
+                    "scatter must be callable or string in: {}.".format(
+                        list(OP_DICT.keys())
+                    )
+                )

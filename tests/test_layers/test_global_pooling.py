@@ -2,10 +2,16 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras import Input, Model
 
-from spektral.layers import GlobalSumPool, GlobalAttnSumPool, \
-    GlobalAttentionPool, GlobalAvgPool, GlobalMaxPool, SortPool
+from spektral.layers import (
+    GlobalAttentionPool,
+    GlobalAttnSumPool,
+    GlobalAvgPool,
+    GlobalMaxPool,
+    GlobalSumPool,
+    SortPool,
+)
 
-tf.keras.backend.set_floatx('float64')
+tf.keras.backend.set_floatx("float64")
 batch_size = 32
 N = 11
 F = 7
@@ -24,10 +30,10 @@ def _check_output_and_model_output_shapes(true_shape, model_shape):
 
 def _test_single_mode(layer, **kwargs):
     X = np.random.normal(size=(N, F))
-    if 'target_shape' in kwargs:
-        target_output_shape = kwargs.pop('target_shape')
+    if "target_shape" in kwargs:
+        target_output_shape = kwargs.pop("target_shape")
     else:
-        target_output_shape = (1, kwargs.get('channels', F))
+        target_output_shape = (1, kwargs.get("channels", F))
 
     X_in = Input(shape=(F,))
     layer_instance = layer(**kwargs)
@@ -41,10 +47,10 @@ def _test_single_mode(layer, **kwargs):
 
 def _test_batch_mode(layer, **kwargs):
     X = np.random.normal(size=(batch_size, N, F))
-    if 'target_shape' in kwargs:
-        target_output_shape = kwargs.pop('target_shape')
+    if "target_shape" in kwargs:
+        target_output_shape = kwargs.pop("target_shape")
     else:
-        target_output_shape = (batch_size, kwargs.get('channels', F))
+        target_output_shape = (batch_size, kwargs.get("channels", F))
 
     X_in = Input(shape=(N, F))
     layer_instance = layer(**kwargs)
@@ -59,10 +65,10 @@ def _test_batch_mode(layer, **kwargs):
 def _test_disjoint_mode(layer, **kwargs):
     X = np.random.normal(size=(batch_size * N, F))
     I = np.repeat(np.arange(batch_size), N).astype(np.int)
-    if 'target_shape' in kwargs:
-        target_output_shape = kwargs.pop('target_shape')
+    if "target_shape" in kwargs:
+        target_output_shape = kwargs.pop("target_shape")
     else:
-        target_output_shape = (batch_size, kwargs.get('channels', F))
+        target_output_shape = (batch_size, kwargs.get("channels", F))
 
     X_in = Input(shape=(F,))
     I_in = Input(shape=(), dtype=I.dtype)
@@ -71,7 +77,9 @@ def _test_disjoint_mode(layer, **kwargs):
     model = Model([X_in, I_in], output)
     output = model([X, I])
     assert output.shape == target_output_shape
-    assert output.shape[1:] == layer_instance.compute_output_shape([X.shape, I.shape])[1:]
+    assert (
+        output.shape[1:] == layer_instance.compute_output_shape([X.shape, I.shape])[1:]
+    )
     _check_output_and_model_output_shapes(output.shape, model.output_shape)
 
 

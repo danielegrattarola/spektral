@@ -47,16 +47,16 @@ class AGNNConv(MessagePassing):
     - `activation`: activation function;
     """
 
-    def __init__(self, trainable=True, aggregate='sum', activation=None, **kwargs):
+    def __init__(self, trainable=True, aggregate="sum", activation=None, **kwargs):
         super().__init__(aggregate=aggregate, activation=activation, **kwargs)
         self.trainable = trainable
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
         if self.trainable:
-            self.beta = self.add_weight(shape=(1,), initializer='ones', name='beta')
+            self.beta = self.add_weight(shape=(1,), initializer="ones", name="beta")
         else:
-            self.beta = K.constant(1.)
+            self.beta = K.constant(1.0)
         self.built = True
 
     def call(self, inputs, **kwargs):
@@ -80,5 +80,5 @@ class AGNNConv(MessagePassing):
     @property
     def config(self):
         return {
-            'trainable': self.trainable,
+            "trainable": self.trainable,
         }

@@ -55,6 +55,7 @@ class Graph:
 
 
     """
+
     def __init__(self, x=None, a=None, e=None, y=None, **kwargs):
         self.x = x
         self.a = a
@@ -66,8 +67,7 @@ class Graph:
             self[k] = v
 
     def numpy(self):
-        return tuple(ret for ret in [self.x, self.a, self.e, self.y]
-                     if ret is not None)
+        return tuple(ret for ret in [self.x, self.a, self.e, self.y] if ret is not None)
 
     def __setitem__(self, key, value):
         setattr(self, key, value)
@@ -79,8 +79,9 @@ class Graph:
         return key in self.keys
 
     def __repr__(self):
-        return 'Graph(n_nodes={}, n_node_features={}, n_edge_features={}, n_labels={})'\
-               .format(self.n_nodes, self.n_node_features, self.n_edge_features, self.n_labels)
+        return "Graph(n_nodes={}, n_node_features={}, n_edge_features={}, n_labels={})".format(
+            self.n_nodes, self.n_node_features, self.n_edge_features, self.n_labels
+        )
 
     @property
     def n_nodes(self):
@@ -124,7 +125,9 @@ class Graph:
 
     @property
     def keys(self):
-        keys = [key for key in self.__dict__.keys()
-                if self[key] is not None
-                and not key.startswith('__')]
+        keys = [
+            key
+            for key in self.__dict__.keys()
+            if self[key] is not None and not key.startswith("__")
+        ]
         return keys

@@ -1,5 +1,5 @@
 from tensorflow.keras import activations
-from tensorflow.keras.layers import Dropout, Dense
+from tensorflow.keras.layers import Dense, Dropout
 from tensorflow.keras.models import Sequential
 
 from spektral.layers import ops
@@ -56,33 +56,37 @@ class APPNPConv(Conv):
     - `bias_constraint`: constraint applied to the bias vector.
     """
 
-    def __init__(self,
-                 channels,
-                 alpha=0.2,
-                 propagations=1,
-                 mlp_hidden=None,
-                 mlp_activation='relu',
-                 dropout_rate=0.0,
-                 activation=None,
-                 use_bias=True,
-                 kernel_initializer='glorot_uniform',
-                 bias_initializer='zeros',
-                 kernel_regularizer=None,
-                 bias_regularizer=None,
-                 activity_regularizer=None,
-                 kernel_constraint=None,
-                 bias_constraint=None,
-                 **kwargs):
-        super().__init__(activation=activation,
-                         use_bias=use_bias,
-                         kernel_initializer=kernel_initializer,
-                         bias_initializer=bias_initializer,
-                         kernel_regularizer=kernel_regularizer,
-                         bias_regularizer=bias_regularizer,
-                         activity_regularizer=activity_regularizer,
-                         kernel_constraint=kernel_constraint,
-                         bias_constraint=bias_constraint,
-                         **kwargs)
+    def __init__(
+        self,
+        channels,
+        alpha=0.2,
+        propagations=1,
+        mlp_hidden=None,
+        mlp_activation="relu",
+        dropout_rate=0.0,
+        activation=None,
+        use_bias=True,
+        kernel_initializer="glorot_uniform",
+        bias_initializer="zeros",
+        kernel_regularizer=None,
+        bias_regularizer=None,
+        activity_regularizer=None,
+        kernel_constraint=None,
+        bias_constraint=None,
+        **kwargs
+    ):
+        super().__init__(
+            activation=activation,
+            use_bias=use_bias,
+            kernel_initializer=kernel_initializer,
+            bias_initializer=bias_initializer,
+            kernel_regularizer=kernel_regularizer,
+            bias_regularizer=bias_regularizer,
+            activity_regularizer=activity_regularizer,
+            kernel_constraint=kernel_constraint,
+            bias_constraint=bias_constraint,
+            **kwargs
+        )
         self.channels = channels
         self.mlp_hidden = mlp_hidden if mlp_hidden else []
         self.alpha = alpha
@@ -98,13 +102,17 @@ class APPNPConv(Conv):
             kernel_regularizer=self.kernel_regularizer,
             bias_regularizer=self.bias_regularizer,
             kernel_constraint=self.kernel_constraint,
-            bias_constraint=self.bias_constraint
+            bias_constraint=self.bias_constraint,
         )
         mlp_layers = []
         for i, channels in enumerate(self.mlp_hidden):
-            mlp_layers.extend([Dropout(self.dropout_rate),
-                               Dense(channels, self.mlp_activation, **layer_kwargs)])
-        mlp_layers.append(Dense(self.channels, 'linear', **layer_kwargs))
+            mlp_layers.extend(
+                [
+                    Dropout(self.dropout_rate),
+                    Dense(channels, self.mlp_activation, **layer_kwargs),
+                ]
+            )
+        mlp_layers.append(Dense(self.channels, "linear", **layer_kwargs))
         self.mlp = Sequential(mlp_layers)
         self.built = True
 
@@ -122,12 +130,12 @@ class APPNPConv(Conv):
     @property
     def config(self):
         return {
-            'channels': self.channels,
-            'alpha': self.alpha,
-            'propagations': self.propagations,
-            'mlp_hidden': self.mlp_hidden,
-            'mlp_activation': activations.serialize(self.mlp_activation),
-            'dropout_rate': self.dropout_rate,
+            "channels": self.channels,
+            "alpha": self.alpha,
+            "propagations": self.propagations,
+            "mlp_hidden": self.mlp_hidden,
+            "mlp_activation": activations.serialize(self.mlp_activation),
+            "dropout_rate": self.dropout_rate,
         }
 
     @staticmethod
