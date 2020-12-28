@@ -76,8 +76,10 @@ class SparseDropout(Layer):
         keep_prob = 1 - rate
         scale = 1 / keep_prob
         keep_mask = random_tensor >= rate
-        output = tf.sparse.retain(x, keep_mask) * scale
-
+        output = tf.sparse.retain(x, keep_mask)
+        # output = output * scale  # gradient issues with automatic broadcasting
+        output = output * tf.reshape(
+            tf.convert_to_tensor(scale, dtype=output.dtype), (1,)*output.shape.ndims)
         return output
 
 
