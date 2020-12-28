@@ -1,6 +1,7 @@
 import tensorflow as tf
-from tensorflow.keras import backend as K, initializers, regularizers, constraints
-from tensorflow.keras.layers import Layer, Dense
+from tensorflow.keras import backend as K
+from tensorflow.keras import constraints, initializers, regularizers
+from tensorflow.keras.layers import Dense, Layer
 
 from spektral.layers import ops
 
@@ -15,16 +16,16 @@ class GlobalPool(Layer):
 
     def build(self, input_shape):
         if isinstance(input_shape, list) and len(input_shape) == 2:
-            self.data_mode = 'disjoint'
+            self.data_mode = "disjoint"
         else:
             if len(input_shape) == 2:
-                self.data_mode = 'single'
+                self.data_mode = "single"
             else:
-                self.data_mode = 'batch'
+                self.data_mode = "batch"
         super().build(input_shape)
 
     def call(self, inputs):
-        if self.data_mode == 'disjoint':
+        if self.data_mode == "disjoint":
             X = inputs[0]
             I = inputs[1]
             if K.ndim(I) == 2:
@@ -32,15 +33,17 @@ class GlobalPool(Layer):
         else:
             X = inputs
 
-        if self.data_mode == 'disjoint':
+        if self.data_mode == "disjoint":
             return self.pooling_op(X, I)
         else:
-            return self.batch_pooling_op(X, axis=-2, keepdims=(self.data_mode == 'single'))
+            return self.batch_pooling_op(
+                X, axis=-2, keepdims=(self.data_mode == "single")
+            )
 
     def compute_output_shape(self, input_shape):
-        if self.data_mode == 'single':
+        if self.data_mode == "single":
             return (1,) + input_shape[-1:]
-        elif self.data_mode == 'batch':
+        elif self.data_mode == "batch":
             return input_shape[:-2] + input_shape[-1:]
         else:
             # Input shape is a list of shapes for X and I
@@ -172,15 +175,17 @@ class GlobalAttentionPool(GlobalPool):
     - `bias_constraint`: constraint applied to the bias vectors.
     """
 
-    def __init__(self,
-                 channels,
-                 kernel_initializer='glorot_uniform',
-                 bias_initializer='zeros',
-                 kernel_regularizer=None,
-                 bias_regularizer=None,
-                 kernel_constraint=None,
-                 bias_constraint=None,
-                 **kwargs):
+    def __init__(
+        self,
+        channels,
+        kernel_initializer="glorot_uniform",
+        bias_initializer="zeros",
+        kernel_regularizer=None,
+        bias_regularizer=None,
+        kernel_constraint=None,
+        bias_constraint=None,
+        **kwargs
+    ):
         super().__init__(**kwargs)
         self.channels = channels
         self.kernel_initializer = initializers.get(kernel_initializer)
@@ -198,19 +203,18 @@ class GlobalAttentionPool(GlobalPool):
             kernel_regularizer=self.kernel_regularizer,
             bias_regularizer=self.bias_regularizer,
             kernel_constraint=self.kernel_constraint,
-            bias_constraint=self.bias_constraint
+            bias_constraint=self.bias_constraint,
         )
-        self.features_layer = Dense(self.channels,
-                                    name='features_layer',
-                                    **layer_kwargs)
-        self.attention_layer = Dense(self.channels,
-                                     activation='sigmoid',
-                                     name='attn_layer',
-                                     **layer_kwargs)
+        self.features_layer = Dense(
+            self.channels, name="features_layer", **layer_kwargs
+        )
+        self.attention_layer = Dense(
+            self.channels, activation="sigmoid", name="attn_layer", **layer_kwargs
+        )
         self.built = True
 
     def call(self, inputs):
-        if self.data_mode == 'disjoint':
+        if self.data_mode == "disjoint":
             X, I = inputs
             if K.ndim(I) == 2:
                 I = I[:, 0]
@@ -219,18 +223,17 @@ class GlobalAttentionPool(GlobalPool):
         inputs_linear = self.features_layer(X)
         attn = self.attention_layer(X)
         masked_inputs = inputs_linear * attn
-        if self.data_mode in {'single', 'batch'}:
-            output = K.sum(masked_inputs, axis=-2,
-                           keepdims=self.data_mode == 'single')
+        if self.data_mode in {"single", "batch"}:
+            output = K.sum(masked_inputs, axis=-2, keepdims=self.data_mode == "single")
         else:
             output = tf.math.segment_sum(masked_inputs, I)
 
         return output
 
     def compute_output_shape(self, input_shape):
-        if self.data_mode == 'single':
+        if self.data_mode == "single":
             return (1,) + (self.channels,)
-        elif self.data_mode == 'batch':
+        elif self.data_mode == "batch":
             return input_shape[:-2] + (self.channels,)
         else:
             output_shape = input_shape[0]
@@ -239,13 +242,13 @@ class GlobalAttentionPool(GlobalPool):
 
     def get_config(self):
         config = {
-            'channels': self.channels,
-            'kernel_initializer': self.kernel_initializer,
-            'bias_initializer': self.bias_initializer,
-            'kernel_regularizer': self.kernel_regularizer,
-            'bias_regularizer': self.bias_regularizer,
-            'kernel_constraint': self.kernel_constraint,
-            'bias_constraint': self.bias_constraint,
+            "channels": self.channels,
+            "kernel_initializer": self.kernel_initializer,
+            "bias_initializer": self.bias_initializer,
+            "kernel_regularizer": self.kernel_regularizer,
+            "bias_regularizer": self.bias_regularizer,
+            "kernel_constraint": self.kernel_constraint,
+            "bias_constraint": self.bias_constraint,
         }
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
@@ -285,39 +288,41 @@ class GlobalAttnSumPool(GlobalPool):
     matrix;
     """
 
-    def __init__(self,
-                 attn_kernel_initializer='glorot_uniform',
-                 attn_kernel_regularizer=None,
-                 attn_kernel_constraint=None,
-                 **kwargs):
+    def __init__(
+        self,
+        attn_kernel_initializer="glorot_uniform",
+        attn_kernel_regularizer=None,
+        attn_kernel_constraint=None,
+        **kwargs
+    ):
         super().__init__(**kwargs)
-        self.attn_kernel_initializer = initializers.get(
-            attn_kernel_initializer)
-        self.attn_kernel_regularizer = regularizers.get(
-            attn_kernel_regularizer)
+        self.attn_kernel_initializer = initializers.get(attn_kernel_initializer)
+        self.attn_kernel_regularizer = regularizers.get(attn_kernel_regularizer)
         self.attn_kernel_constraint = constraints.get(attn_kernel_constraint)
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
         if isinstance(input_shape, list) and len(input_shape) == 2:
-            self.data_mode = 'disjoint'
+            self.data_mode = "disjoint"
             F = input_shape[0][-1]
         else:
             if len(input_shape) == 2:
-                self.data_mode = 'single'
+                self.data_mode = "single"
             else:
-                self.data_mode = 'batch'
+                self.data_mode = "batch"
             F = input_shape[-1]
         # Attention kernels
-        self.attn_kernel = self.add_weight(shape=(F, 1),
-                                           initializer=self.attn_kernel_initializer,
-                                           regularizer=self.attn_kernel_regularizer,
-                                           constraint=self.attn_kernel_constraint,
-                                           name='attn_kernel')
+        self.attn_kernel = self.add_weight(
+            shape=(F, 1),
+            initializer=self.attn_kernel_initializer,
+            regularizer=self.attn_kernel_regularizer,
+            constraint=self.attn_kernel_constraint,
+            name="attn_kernel",
+        )
         self.built = True
 
     def call(self, inputs):
-        if self.data_mode == 'disjoint':
+        if self.data_mode == "disjoint":
             X, I = inputs
             if K.ndim(I) == 2:
                 I = I[:, 0]
@@ -326,9 +331,9 @@ class GlobalAttnSumPool(GlobalPool):
         attn_coeff = K.dot(X, self.attn_kernel)
         attn_coeff = K.squeeze(attn_coeff, -1)
         attn_coeff = K.softmax(attn_coeff)
-        if self.data_mode == 'single':
+        if self.data_mode == "single":
             output = K.dot(attn_coeff[None, ...], X)
-        elif self.data_mode == 'batch':
+        elif self.data_mode == "batch":
             output = K.batch_dot(attn_coeff, X)
         else:
             output = attn_coeff[:, None] * X
@@ -338,9 +343,9 @@ class GlobalAttnSumPool(GlobalPool):
 
     def get_config(self):
         config = {
-            'attn_kernel_initializer': self.attn_kernel_initializer,
-            'attn_kernel_regularizer': self.attn_kernel_regularizer,
-            'attn_kernel_constraint': self.attn_kernel_constraint,
+            "attn_kernel_initializer": self.attn_kernel_initializer,
+            "attn_kernel_regularizer": self.attn_kernel_regularizer,
+            "attn_kernel_constraint": self.attn_kernel_constraint,
         }
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
@@ -353,9 +358,9 @@ class SortPool(Layer):
     This layers takes a graph signal \(\mathbf{X}\) and returns the topmost k
     rows according to the last column.
     If \(\mathbf{X}\) has less than k rows, the result is zero-padded to k.
-    
+
     **Mode**: single, disjoint, batch.
-    
+
     **Input**
 
     - Node features of shape `([batch], n_nodes, n_node_features)`;
@@ -380,26 +385,26 @@ class SortPool(Layer):
 
     def build(self, input_shape):
         if isinstance(input_shape, list) and len(input_shape) == 2:
-            self.data_mode = 'disjoint'
+            self.data_mode = "disjoint"
             self.F = input_shape[0][-1]
         else:
             if len(input_shape) == 2:
-                self.data_mode = 'single'
+                self.data_mode = "single"
             else:
-                self.data_mode = 'batch'
+                self.data_mode = "batch"
             self.F = input_shape[-1]
 
     def call(self, inputs):
-        if self.data_mode == 'disjoint':
+        if self.data_mode == "disjoint":
             X, I = inputs
             X = ops.disjoint_signal_to_batch(X, I)
         else:
             X = inputs
-            if self.data_mode == 'single':
+            if self.data_mode == "single":
                 X = tf.expand_dims(X, 0)
 
         N = tf.shape(X)[-2]
-        sort_perm = tf.argsort(X[..., -1], direction='DESCENDING')
+        sort_perm = tf.argsort(X[..., -1], direction="DESCENDING")
         X_sorted = tf.gather(X, sort_perm, axis=-2, batch_dims=1)
 
         def truncate():
@@ -413,41 +418,44 @@ class SortPool(Layer):
 
         X_out = tf.cond(tf.less_equal(self.k, N), truncate, pad)
 
-        if self.data_mode == 'single':
+        if self.data_mode == "single":
             X_out = tf.squeeze(X_out, [0])
             X_out.set_shape((self.k, self.F))
-        elif self.data_mode == 'batch' or self.data_mode == 'disjoint':
+        elif self.data_mode == "batch" or self.data_mode == "disjoint":
             X_out.set_shape((None, self.k, self.F))
 
         return X_out
 
     def get_config(self):
         config = {
-            'k': self.k,
+            "k": self.k,
         }
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
     def compute_output_shape(self, input_shape):
-        if self.data_mode == 'single':
+        if self.data_mode == "single":
             return self.k, self.F
-        elif self.data_mode == 'batch' or self.data_mode == 'disjoint':
+        elif self.data_mode == "batch" or self.data_mode == "disjoint":
             return input_shape[0], self.k, self.F
 
 
 layers = {
-    'sum': GlobalSumPool,
-    'avg': GlobalAvgPool,
-    'max': GlobalMaxPool,
-    'attn': GlobalAttentionPool,
-    'attn_sum': GlobalAttnSumPool,
-    'sort': SortPool
+    "sum": GlobalSumPool,
+    "avg": GlobalAvgPool,
+    "max": GlobalMaxPool,
+    "attn": GlobalAttentionPool,
+    "attn_sum": GlobalAttnSumPool,
+    "sort": SortPool,
 }
 
 
 def get(identifier):
     if identifier not in layers:
-        raise ValueError('Unknown identifier {}. Available: {}'
-                         .format(identifier, list(layers.keys())))
+        raise ValueError(
+            "Unknown identifier {}. Available: {}".format(
+                identifier, list(layers.keys())
+            )
+        )
     else:
         return layers[identifier]

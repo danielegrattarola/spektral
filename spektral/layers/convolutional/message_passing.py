@@ -5,7 +5,12 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Layer
 
 from spektral.layers.ops.scatter import deserialize_scatter, serialize_scatter
-from spektral.utils.keras import is_layer_kwarg, is_keras_kwarg, deserialize_kwarg, serialize_kwarg
+from spektral.utils.keras import (
+    deserialize_kwarg,
+    is_keras_kwarg,
+    is_layer_kwarg,
+    serialize_kwarg,
+)
 
 
 class MessagePassing(Layer):
@@ -24,7 +29,7 @@ class MessagePassing(Layer):
         \x_i' = \gamma \left( \x_i, \square_{j \in \mathcal{N}(i)} \,
         \phi \left(\x_i, \x_j, \e_{j \rightarrow i} \right) \right),
     $$
-    
+
     where \( \gamma \) is a differentiable update function, \( \phi \) is a
     differentiable message function, \( \square \) is a permutation-invariant
     function to aggregate the messages (like the sum or the average), and
@@ -80,7 +85,8 @@ class MessagePassing(Layer):
     - `kwargs`: additional keyword arguments specific to Keras' Layers, like
     regularizers, initializers, constraints, etc.
     """
-    def __init__(self, aggregate='sum', **kwargs):
+
+    def __init__(self, aggregate="sum", **kwargs):
         super().__init__(**{k: v for k, v in kwargs.items() if is_keras_kwarg(k)})
         self.kwargs_keys = []
         for key in kwargs:
@@ -139,19 +145,18 @@ class MessagePassing(Layer):
     def get_kwargs(self, x, a, e, signature, kwargs):
         output = {}
         for k in signature.keys():
-            if signature[k].default is inspect.Parameter.empty or k == 'kwargs':
+            if signature[k].default is inspect.Parameter.empty or k == "kwargs":
                 pass
-            elif k == 'x':
+            elif k == "x":
                 output[k] = x
-            elif k == 'a':
+            elif k == "a":
                 output[k] = a
-            elif k == 'e':
+            elif k == "e":
                 output[k] = e
             elif k in kwargs:
                 output[k] = kwargs[k]
             else:
-                raise ValueError('Missing key {} for signature {}'
-                                 .format(k, signature))
+                raise ValueError("Missing key {} for signature {}".format(k, signature))
 
         return output
 
@@ -159,23 +164,22 @@ class MessagePassing(Layer):
     def get_inputs(inputs):
         if len(inputs) == 3:
             x, a, e = inputs
-            assert K.ndim(e) == 2, 'E must have rank 2'
+            assert K.ndim(e) == 2, "E must have rank 2"
         elif len(inputs) == 2:
             x, a = inputs
             e = None
         else:
-            raise ValueError('Expected 2 or 3 inputs tensors (X, A, E), got {}.'
-                             .format(len(inputs)))
-        assert K.ndim(x) == 2, 'X must have rank 2'
-        assert K.is_sparse(a), 'A must be a SparseTensor'
-        assert K.ndim(a) == 2, 'A must have rank 2'
+            raise ValueError(
+                "Expected 2 or 3 inputs tensors (X, A, E), got {}.".format(len(inputs))
+            )
+        assert K.ndim(x) == 2, "X must have rank 2"
+        assert K.is_sparse(a), "A must be a SparseTensor"
+        assert K.ndim(a) == 2, "A must have rank 2"
 
         return x, a, e
 
     def get_config(self):
-        mp_config = {
-            'aggregate': serialize_scatter(self.agg)
-        }
+        mp_config = {"aggregate": serialize_scatter(self.agg)}
         keras_config = {}
         for key in self.kwargs_keys:
             keras_config[key] = serialize_kwarg(key, getattr(self, key))

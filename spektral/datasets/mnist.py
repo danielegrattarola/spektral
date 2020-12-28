@@ -35,7 +35,8 @@ class MNIST(Dataset):
     with that probability.
     - `k`: number of neighbours of each node.
     """
-    def __init__(self, p_flip=0., k=8, **kwargs):
+
+    def __init__(self, p_flip=0.0, k=8, **kwargs):
         self.a = None
         self.k = k
         self.p_flip = p_flip
@@ -47,7 +48,7 @@ class MNIST(Dataset):
 
         (x_train, y_train), (x_test, y_test) = m.load_data()
         x = np.vstack((x_train, x_test))
-        x = x / 255.
+        x = x / 255.0
         y = np.concatenate((y_train, y_test), 0)
         x = x.reshape(-1, MNIST_SIZE ** 2, 1)
 
@@ -75,7 +76,7 @@ def _get_adj_from_data(X, k, **kwargs):
 def _mnist_grid_graph(k):
     X = _grid_coordinates(MNIST_SIZE)
     A = _get_adj_from_data(
-        X, k, mode='connectivity', metric='euclidean', include_self=False
+        X, k, mode="connectivity", metric="euclidean", include_self=False
     )
 
     return A
@@ -83,7 +84,7 @@ def _mnist_grid_graph(k):
 
 def _flip_random_edges(A, p_swap):
     if not A.shape[0] == A.shape[1]:
-        raise ValueError('A must be a square matrix.')
+        raise ValueError("A must be a square matrix.")
     dtype = A.dtype
     A = sp.lil_matrix(A).astype(np.bool)
     n_elem = A.shape[0] ** 2

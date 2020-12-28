@@ -64,18 +64,22 @@ class TopKPool(Pool):
     - `kernel_constraint`: constraint applied to the weights;
     """
 
-    def __init__(self,
-                 ratio,
-                 return_mask=False,
-                 sigmoid_gating=False,
-                 kernel_initializer='glorot_uniform',
-                 kernel_regularizer=None,
-                 kernel_constraint=None,
-                 **kwargs):
-        super().__init__(kernel_initializer=kernel_initializer,
-                         kernel_regularizer=kernel_regularizer,
-                         kernel_constraint=kernel_constraint,
-                         **kwargs)
+    def __init__(
+        self,
+        ratio,
+        return_mask=False,
+        sigmoid_gating=False,
+        kernel_initializer="glorot_uniform",
+        kernel_regularizer=None,
+        kernel_constraint=None,
+        **kwargs
+    ):
+        super().__init__(
+            kernel_initializer=kernel_initializer,
+            kernel_regularizer=kernel_regularizer,
+            kernel_constraint=kernel_constraint,
+            **kwargs
+        )
         self.ratio = ratio
         self.return_mask = return_mask
         self.sigmoid_gating = sigmoid_gating
@@ -84,26 +88,30 @@ class TopKPool(Pool):
     def build(self, input_shape):
         self.F = input_shape[0][-1]
         self.N = input_shape[0][0]
-        self.kernel = self.add_weight(shape=(self.F, 1),
-                                      name='kernel',
-                                      initializer=self.kernel_initializer,
-                                      regularizer=self.kernel_regularizer,
-                                      constraint=self.kernel_constraint)
-        self.top_k_var = tf.Variable(0.0,
-                                     trainable=False,
-                                     validate_shape=False,
-                                     dtype=tf.keras.backend.floatx(),
-                                     shape=tf.TensorShape(None))
+        self.kernel = self.add_weight(
+            shape=(self.F, 1),
+            name="kernel",
+            initializer=self.kernel_initializer,
+            regularizer=self.kernel_regularizer,
+            constraint=self.kernel_constraint,
+        )
+        self.top_k_var = tf.Variable(
+            0.0,
+            trainable=False,
+            validate_shape=False,
+            dtype=tf.keras.backend.floatx(),
+            shape=tf.TensorShape(None),
+        )
         super().build(input_shape)
 
     def call(self, inputs):
         if len(inputs) == 3:
             X, A, I = inputs
-            self.data_mode = 'disjoint'
+            self.data_mode = "disjoint"
         else:
             X, A = inputs
             I = tf.zeros(tf.shape(X)[:1])
-            self.data_mode = 'single'
+            self.data_mode = "single"
         if K.ndim(I) == 2:
             I = I[:, 0]
         I = tf.cast(I, tf.int32)
@@ -119,7 +127,9 @@ class TopKPool(Pool):
         # Multiply X and y to make layer differentiable
         features = X * self.gating_op(y)
 
-        axis = 0 if len(K.int_shape(A)) == 2 else 1  # Cannot use negative axis in tf.boolean_mask
+        axis = (
+            0 if len(K.int_shape(A)) == 2 else 1
+        )  # Cannot use negative axis in tf.boolean_mask
         # Reduce X
         X_pooled = tf.boolean_mask(features, mask, axis=axis)
 
@@ -133,7 +143,7 @@ class TopKPool(Pool):
         output = [X_pooled, A_pooled]
 
         # Reduce I
-        if self.data_mode == 'disjoint':
+        if self.data_mode == "disjoint":
             I_pooled = tf.boolean_mask(I[:, None], mask)[:, 0]
             output.append(I_pooled)
 
@@ -148,7 +158,7 @@ class TopKPool(Pool):
     @property
     def config(self):
         return {
-            'ratio': self.ratio,
-            'return_mask': self.return_mask,
-            'sigmoid_gating': self.sigmoid_gating
+            "ratio": self.ratio,
+            "return_mask": self.return_mask,
+            "sigmoid_gating": self.sigmoid_gating,
         }

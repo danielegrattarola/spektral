@@ -1,5 +1,5 @@
-from .citation import Citation, Cora, Citeseer, Pubmed
-from .graphsage import GraphSage, PPI, Reddit
+from .citation import Citation, Citeseer, Cora, Pubmed
+from .graphsage import PPI, GraphSage, Reddit
 from .mnist import MNIST
 from .modelnet import ModelNet
 from .ogb import OGB

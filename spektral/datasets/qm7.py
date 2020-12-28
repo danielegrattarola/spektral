@@ -21,22 +21,28 @@ class QM7(Dataset):
 
     Each graph has a 14-dimensional label for regression.
     """
-    url = 'http://deepchem.io.s3-website-us-west-1.amazonaws.com/datasets/qm7b.mat'
+
+    url = "http://deepchem.io.s3-website-us-west-1.amazonaws.com/datasets/qm7b.mat"
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
     def download(self):
-        get_file('qm7b.mat', self.url, extract=True, cache_dir=self.path,
-                 cache_subdir=self.path)
+        get_file(
+            "qm7b.mat",
+            self.url,
+            extract=True,
+            cache_dir=self.path,
+            cache_subdir=self.path,
+        )
 
     def read(self):
-        print('Loading QM7 dataset.')
-        mat_file = osp.join(self.path, 'qm7b.mat')
+        print("Loading QM7 dataset.")
+        mat_file = osp.join(self.path, "qm7b.mat")
         data = loadmat(mat_file)
 
-        coulomb_matrices = data['X']
-        labels = data['T']
+        coulomb_matrices = data["X"]
+        labels = data["T"]
 
         output = []
         for i in range(len(coulomb_matrices)):

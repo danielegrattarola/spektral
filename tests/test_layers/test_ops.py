@@ -7,7 +7,7 @@ from spektral.utils import convolution
 
 batch_size = 10
 N = 3
-tol = 5.e-7
+tol = 5.0e-7
 
 
 def _assert_all_close(output, expected_output):
@@ -17,11 +17,11 @@ def _assert_all_close(output, expected_output):
         mean_diff = np.mean(np.absolute(output - expected_output))
         max_diff = np.max(np.absolute(output - expected_output))
         if mean_diff <= tol:
-            print('Max difference above tolerance, but mean OK.')
+            print("Max difference above tolerance, but mean OK.")
         else:
-            raise AssertionError('Mean diff: {}, Max diff: {}'.format(
-                mean_diff, max_diff
-            ))
+            raise AssertionError(
+                "Mean diff: {}, Max diff: {}".format(mean_diff, max_diff)
+            )
 
 
 def _convert_to_sparse_tensor(x):
@@ -30,8 +30,7 @@ def _convert_to_sparse_tensor(x):
     elif x.ndim == 3:
         s1_, s2_, s3_ = x.shape
         return ops.reshape(
-            ops.sp_matrix_to_sp_tensor(x.reshape(s1_ * s2_, s3_)),
-            (s1_, s2_, s3_)
+            ops.sp_matrix_to_sp_tensor(x.reshape(s1_ * s2_, s3_)), (s1_, s2_, s3_)
         )
 
 
@@ -69,20 +68,16 @@ def _check_op_sparse(op, numpy_inputs, convert_to_sparse, **kwargs):
     tf_inputs = []
     for i in range(len(numpy_inputs)):
         if convert_to_sparse[i]:
-            tf_inputs.append(
-                _convert_to_sparse_tensor(numpy_inputs[i])
-            )
+            tf_inputs.append(_convert_to_sparse_tensor(numpy_inputs[i]))
         else:
-            tf_inputs.append(
-                tf.convert_to_tensor(numpy_inputs[i])
-            )
+            tf_inputs.append(tf.convert_to_tensor(numpy_inputs[i]))
     tf_inputs = _cast_all_to_dtype(tf_inputs, np.float32)
 
     output = op(*tf_inputs, **kwargs)
 
-    if hasattr(output, 'toarray'):
+    if hasattr(output, "toarray"):
         return output.toarray()
-    elif hasattr(output, 'numpy'):
+    elif hasattr(output, "numpy"):
         return output.numpy()
     elif isinstance(output, tf.SparseTensor):
         return tf.sparse.to_dense(output).numpy()
@@ -219,24 +214,21 @@ def test_modes_ops():
     A_sparse_tensor = ops.sp_matrix_to_sp_tensor(A_sparse)
 
     # Disjoint signal to batch
-    expected_result = np.array([[[1., 0.],
-                                 [0., 1.],
-                                 [1., 1.]],
-                                [[0., 0.],
-                                 [1., 2.],
-                                 [0., 0.]]])
+    expected_result = np.array(
+        [[[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]], [[0.0, 0.0], [1.0, 2.0], [0.0, 0.0]]]
+    )
     result = ops.disjoint_signal_to_batch(X, I).numpy()
 
     assert expected_result.shape == result.shape
     assert np.allclose(expected_result, result)
 
     # Disjoint adjacency to batch
-    expected_result = np.array([[[0., 1., 0.],
-                                 [1., 0., 0.],
-                                 [0., 1., 0.]],
-                                [[0., 1., 0.],
-                                 [1., 0., 0.],
-                                 [0., 0., 0.]]])
+    expected_result = np.array(
+        [
+            [[0.0, 1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0]],
+            [[0.0, 1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, 0.0]],
+        ]
+    )
 
     result = ops.disjoint_adjacency_to_batch(A_sparse_tensor, I).numpy()
 

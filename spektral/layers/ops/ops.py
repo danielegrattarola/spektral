@@ -87,15 +87,19 @@ def segment_top_k(x, I, ratio, top_k_var):
     dense_y = tf.cast(dense_y, top_k_var.dtype)
     # top_k_var is a variable with unknown shape defined in the elsewhere
     top_k_var.assign(dense_y)
-    dense_y = tf.tensor_scatter_nd_update(top_k_var, index[..., None], tf.cast(x, top_k_var.dtype))
+    dense_y = tf.tensor_scatter_nd_update(
+        top_k_var, index[..., None], tf.cast(x, top_k_var.dtype)
+    )
     dense_y = tf.reshape(dense_y, (n_graphs, max_n_nodes))
 
-    perm = tf.argsort(dense_y, direction='DESCENDING')
+    perm = tf.argsort(dense_y, direction="DESCENDING")
     perm = perm + cumsum_start[:, None]
     perm = tf.reshape(perm, (-1,))
 
-    to_rep = tf.tile(tf.constant([1., 0.]), (n_graphs,))
-    rep_times = tf.reshape(tf.concat((to_keep[:, None], (max_n_nodes - to_keep)[:, None]), -1), (-1,))
+    to_rep = tf.tile(tf.constant([1.0, 0.0]), (n_graphs,))
+    rep_times = tf.reshape(
+        tf.concat((to_keep[:, None], (max_n_nodes - to_keep)[:, None]), -1), (-1,)
+    )
     mask = repeat(to_rep, rep_times)
 
     perm = tf.boolean_mask(perm, mask)

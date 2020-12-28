@@ -43,7 +43,7 @@ def dot(a, b, transpose_a=False, transpose_b=False):
         b = tfsp.CSRSparseMatrix(b)
     if a_is_sparse_tensor or b_is_sparse_tensor:
         out = tfsp.matmul(a, b, transpose_a=transpose_a, transpose_b=transpose_b)
-        if hasattr(out, 'to_sparse_tensor'):
+        if hasattr(out, "to_sparse_tensor"):
             return out.to_sparse_tensor()
     else:
         out = tf.matmul(a, b, transpose_a=transpose_a, transpose_b=transpose_b)
@@ -127,9 +127,9 @@ def matmul_AT_B(a, b):
         # Batch (rank(a)=3, rank(b)=3)
         a_t = ops.transpose(a, (0, 2, 1))
     else:
-        raise ValueError('Expected ranks to be 2 or 3, got {} and {}'.format(
-            K.ndim(a), K.ndim(b)
-        ))
+        raise ValueError(
+            "Expected ranks to be 2 or 3, got {} and {}".format(K.ndim(a), K.ndim(b))
+        )
 
     return matmul_A_B(a_t, b)
 
@@ -151,9 +151,9 @@ def matmul_A_BT(a, b):
         # Batch (rank(a)=3, rank(b)=3)
         b_t = ops.transpose(b, (0, 2, 1))
     else:
-        raise ValueError('Expected ranks to be 2 or 3, got {} and {}'.format(
-            K.ndim(a), K.ndim(b)
-        ))
+        raise ValueError(
+            "Expected ranks to be 2 or 3, got {} and {}".format(K.ndim(a), K.ndim(b))
+        )
 
     return matmul_A_B(a, b_t)
 
