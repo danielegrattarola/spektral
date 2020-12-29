@@ -7,21 +7,25 @@ Thomas N. Kipf, Max Welling
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.callbacks import EarlyStopping
-from tensorflow.keras.layers import Input, Dropout
 from tensorflow.keras.losses import CategoricalCrossentropy
-from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.regularizers import l2
 
 from spektral.data.loaders import SingleLoader
 from spektral.datasets.citation import Citation
 from spektral.layers import GCNConv
+from spektral.models.gcn import GCNModel
 from spektral.transforms import LayerPreprocess, AdjToSpTensor
 
-tf.random.set_seed(seed=0)  # make weight initialization reproducible
+learning_rate = 1e-2
+seed = 0
+epochs = 200
+patience = 10
+data = 'cora'
+
+tf.random.set_seed(seed=seed)  # make weight initialization reproducible
 
 # Load data
-dataset = Citation('cora',
+dataset = Citation(data,
                    normalize_x=True,
                    transforms=[LayerPreprocess(GCNConv), AdjToSpTensor()])
 
@@ -35,39 +39,12 @@ def mask_to_weights(mask):
 weights_tr, weights_va, weights_te = (mask_to_weights(mask) for mask in (
       dataset.mask_tr, dataset.mask_va, dataset.mask_te))
 
-# Parameters
-channels = 16          # Number of channels in the first layer
-dropout = 0.5          # Dropout rate for the features
-l2_reg = 2.5e-4        # L2 regularization rate
-learning_rate = 1e-2   # Learning rate
-epochs = 200           # Number of training epochs
-patience = 10          # Patience for early stopping
-
-N = dataset.n_nodes          # Number of nodes in the graph
-F = dataset.n_node_features  # Original size of node features
-n_out = dataset.n_labels     # Number of classes
-
-# Model definition
-x_in = Input(shape=(F,))
-a_in = Input((N,), sparse=True)
-
-do_1 = Dropout(dropout)(x_in)
-gc_1 = GCNConv(channels,
-               activation='relu',
-               kernel_regularizer=l2(l2_reg),
-               use_bias=False)([do_1, a_in])
-do_2 = Dropout(dropout)(gc_1)
-gc_2 = GCNConv(n_out,
-               activation='softmax',
-               use_bias=False)([do_2, a_in])
-
-# Build model
-model = Model(inputs=[x_in, a_in], outputs=gc_2)
-optimizer = Adam(lr=learning_rate)
-model.compile(optimizer=optimizer,
-              loss=CategoricalCrossentropy(reduction='sum'),  # To compute mean
-              weighted_metrics=['acc'])
-model.summary()
+model = GCNModel(
+      num_classes=dataset.n_labels, num_input_channels=dataset.n_node_features)
+model.compile(
+      optimizer=Adam(learning_rate),
+      loss=CategoricalCrossentropy(reduction='sum'),
+      weighted_metrics=['acc'])
 
 # Train model
 loader_tr = SingleLoader(dataset, sample_weights=weights_tr)
