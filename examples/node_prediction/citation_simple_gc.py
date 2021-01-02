@@ -18,7 +18,7 @@ from tensorflow.keras.regularizers import l2
 from spektral.data.loaders import SingleLoader
 from spektral.datasets.citation import Citation
 from spektral.layers import GCNConv
-from spektral.transforms import LayerPreprocess, AdjToSpTensor
+from spektral.transforms import AdjToSpTensor, LayerPreprocess
 
 
 class SGCN:
@@ -36,52 +36,52 @@ class SGCN:
 
 # Load data
 K = 2  # Propagation steps for SGCN
-dataset = Citation('cora',
-                   transforms=[LayerPreprocess(GCNConv), SGCN(K), AdjToSpTensor()])
+dataset = Citation(
+    "cora", transforms=[LayerPreprocess(GCNConv), SGCN(K), AdjToSpTensor()]
+)
 mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
 
 # Parameters
-l2_reg = 5e-6          # L2 regularization rate
-learning_rate = 0.2    # Learning rate
-epochs = 20000         # Number of training epochs
-patience = 200         # Patience for early stopping
+l2_reg = 5e-6  # L2 regularization rate
+learning_rate = 0.2  # Learning rate
+epochs = 20000  # Number of training epochs
+patience = 200  # Patience for early stopping
 a_dtype = dataset[0].a.dtype  # Only needed for TF 2.1
 
-N = dataset.n_nodes          # Number of nodes in the graph
+N = dataset.n_nodes  # Number of nodes in the graph
 F = dataset.n_node_features  # Original size of node features
-n_out = dataset.n_labels     # Number of classes
+n_out = dataset.n_labels  # Number of classes
 
 # Model definition
 x_in = Input(shape=(F,))
 a_in = Input((N,), sparse=True, dtype=a_dtype)
 
-output = GCNConv(n_out,
-                 activation='softmax',
-                 kernel_regularizer=l2(l2_reg),
-                 use_bias=False)([x_in, a_in])
+output = GCNConv(
+    n_out, activation="softmax", kernel_regularizer=l2(l2_reg), use_bias=False
+)([x_in, a_in])
 
 # Build model
 model = Model(inputs=[x_in, a_in], outputs=output)
 optimizer = Adam(lr=learning_rate)
-model.compile(optimizer=optimizer,
-              loss='categorical_crossentropy',
-              weighted_metrics=['acc'])
+model.compile(
+    optimizer=optimizer, loss="categorical_crossentropy", weighted_metrics=["acc"]
+)
 model.summary()
 
 # Train model
 loader_tr = SingleLoader(dataset, sample_weights=mask_tr)
 loader_va = SingleLoader(dataset, sample_weights=mask_va)
-model.fit(loader_tr.load(),
-          steps_per_epoch=loader_tr.steps_per_epoch,
-          validation_data=loader_va.load(),
-          validation_steps=loader_va.steps_per_epoch,
-          epochs=epochs,
-          callbacks=[EarlyStopping(patience=patience, restore_best_weights=True)])
+model.fit(
+    loader_tr.load(),
+    steps_per_epoch=loader_tr.steps_per_epoch,
+    validation_data=loader_va.load(),
+    validation_steps=loader_va.steps_per_epoch,
+    epochs=epochs,
+    callbacks=[EarlyStopping(patience=patience, restore_best_weights=True)],
+)
 
 # Evaluate model
-print('Evaluating model.')
+print("Evaluating model.")
 loader_te = SingleLoader(dataset, sample_weights=mask_te)
 eval_results = model.evaluate(loader_te.load(), steps=loader_te.steps_per_epoch)
-print('Done.\n'
-      'Test loss: {}\n'
-      'Test accuracy: {}'.format(*eval_results))
+print("Done.\n" "Test loss: {}\n" "Test accuracy: {}".format(*eval_results))

@@ -1,3 +1,4 @@
+import numpy as np
 import tensorflow as tf
 from tensorflow.keras import backend as K
 
@@ -54,7 +55,7 @@ def repeat(x, repeats):
     return result
 
 
-def segment_top_k(x, I, ratio, top_k_var):
+def segment_top_k(x, I, ratio):
     """
     Returns indices to get the top K values in x segment-wise, according to
     the segments defined in I. K is not fixed, but it is defined as a ratio of
@@ -62,42 +63,41 @@ def segment_top_k(x, I, ratio, top_k_var):
     :param x: a rank 1 Tensor;
     :param I: a rank 1 Tensor with segment IDs for x;
     :param ratio: float, ratio of elements to keep for each segment;
-    :param top_k_var: a tf.Variable created without shape validation (i.e.,
-    `tf.Variable(0.0, validate_shape=False)`);
     :return: a rank 1 Tensor containing the indices to get the top K values of
     each segment in x.
     """
-    I = tf.cast(I, tf.int32)
-    num_nodes = tf.math.segment_sum(tf.ones_like(I), I)  # Number of nodes in each graph
-    cumsum = tf.cumsum(num_nodes)  # Cumulative number of nodes (A, A+B, A+B+C)
-    cumsum_start = cumsum - num_nodes  # Start index of each graph
-    n_graphs = tf.shape(num_nodes)[0]  # Number of graphs in batch
-    max_n_nodes = tf.reduce_max(num_nodes)  # Order of biggest graph in batch
-    batch_n_nodes = tf.shape(I)[0]  # Number of overall nodes in batch
-    to_keep = tf.math.ceil(ratio * tf.cast(num_nodes, tf.float32))
-    to_keep = tf.cast(to_keep, I.dtype)  # Nodes to keep in each graph
+    rt = tf.RaggedTensor.from_value_rowids(x, I)
+    row_lengths = rt.row_lengths()
+    dense = rt.to_tensor(default_value=-np.inf)
+    indices = tf.cast(tf.argsort(dense, direction="DESCENDING"), tf.int64)
+    row_starts = tf.cast(rt.row_starts(), tf.int64)
+    indices = indices + tf.expand_dims(row_starts, 1)
+    row_lengths = tf.cast(
+        tf.math.ceil(ratio * tf.cast(row_lengths, tf.float32)), tf.int32
+    )
+    return tf.RaggedTensor.from_tensor(indices, row_lengths).values
 
-    index = tf.range(batch_n_nodes)
-    index = (index - tf.gather(cumsum_start, I)) + (I * max_n_nodes)
 
-    y_min = tf.reduce_min(x)
-    dense_y = tf.ones((n_graphs * max_n_nodes,))
-    # subtract 1 to ensure that filler values do not get picked
-    dense_y = dense_y * tf.cast(y_min - 1, dense_y.dtype)
-    dense_y = tf.cast(dense_y, top_k_var.dtype)
-    # top_k_var is a variable with unknown shape defined in the elsewhere
-    top_k_var.assign(dense_y)
-    dense_y = tf.tensor_scatter_nd_update(top_k_var, index[..., None], tf.cast(x, top_k_var.dtype))
-    dense_y = tf.reshape(dense_y, (n_graphs, max_n_nodes))
-
-    perm = tf.argsort(dense_y, direction='DESCENDING')
-    perm = perm + cumsum_start[:, None]
-    perm = tf.reshape(perm, (-1,))
-
-    to_rep = tf.tile(tf.constant([1., 0.]), (n_graphs,))
-    rep_times = tf.reshape(tf.concat((to_keep[:, None], (max_n_nodes - to_keep)[:, None]), -1), (-1,))
-    mask = repeat(to_rep, rep_times)
-
-    perm = tf.boolean_mask(perm, mask)
-
-    return perm
+def indices_to_mask(indices, shape, dtype=tf.bool):
+    """
+    Return mask with true values at indices of the given shape.
+    This can be used as an inverse to tf.where.
+    :param indices: [nnz, k] or [nnz] Tensor indices of True values.
+    :param shape: [k] or [] (scalar) Tensor shape/size of output.
+    :return: Tensor of given shape and dtype.
+    """
+    indices = tf.convert_to_tensor(indices, dtype_hint=tf.int64)
+    if indices.shape.ndims == 1:
+        assert isinstance(shape, int) or shape.shape.ndims == 0
+        indices = tf.expand_dims(indices, axis=1)
+        if isinstance(shape, int):
+            shape = tf.TensorShape([shape])
+        else:
+            shape = tf.expand_dims(shape, axis=0)
+    else:
+        indices.shape.assert_has_rank(2)
+    assert indices.dtype.is_integer
+    nnz = tf.shape(indices)[0]
+    indices = tf.cast(indices, tf.int64)
+    shape = tf.cast(shape, tf.int64)
+    return tf.scatter_nd(indices, tf.ones((nnz,), dtype=dtype), shape)

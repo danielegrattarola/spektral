@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras import activations
-from tensorflow.keras.layers import Dropout, BatchNormalization, PReLU
+from tensorflow.keras.layers import BatchNormalization, Dropout, PReLU
 
 from spektral.layers.convolutional.message_passing import MessagePassing
 from spektral.layers.ops import dot
@@ -13,7 +13,7 @@ class GeneralConv(MessagePassing):
     > [Design Space for Graph Neural Networks](https://arxiv.org/abs/2011.08843)<br>
     > Jiaxuan You et al.
 
-    **Mode**: single, disjoint.
+    **Mode**: single, disjoint, mixed.
 
     **This layer expects a sparse adjacency matrix.**
 
@@ -73,36 +73,41 @@ class GeneralConv(MessagePassing):
     - `kernel_constraint`: constraint applied to the weights;
     - `bias_constraint`: constraint applied to the bias vector.
     """
-    def __init__(self,
-                 channels=256,
-                 batch_norm=True,
-                 dropout=0.0,
-                 aggregate='sum',
-                 activation='prelu',
-                 use_bias=True,
-                 kernel_initializer='glorot_uniform',
-                 bias_initializer='zeros',
-                 kernel_regularizer=None,
-                 bias_regularizer=None,
-                 activity_regularizer=None,
-                 kernel_constraint=None,
-                 bias_constraint=None,
-                 **kwargs):
-        super().__init__(aggregate=aggregate,
-                         activation=None,
-                         use_bias=use_bias,
-                         kernel_initializer=kernel_initializer,
-                         bias_initializer=bias_initializer,
-                         kernel_regularizer=kernel_regularizer,
-                         bias_regularizer=bias_regularizer,
-                         activity_regularizer=activity_regularizer,
-                         kernel_constraint=kernel_constraint,
-                         bias_constraint=bias_constraint,
-                         **kwargs)
+
+    def __init__(
+        self,
+        channels=256,
+        batch_norm=True,
+        dropout=0.0,
+        aggregate="sum",
+        activation="prelu",
+        use_bias=True,
+        kernel_initializer="glorot_uniform",
+        bias_initializer="zeros",
+        kernel_regularizer=None,
+        bias_regularizer=None,
+        activity_regularizer=None,
+        kernel_constraint=None,
+        bias_constraint=None,
+        **kwargs
+    ):
+        super().__init__(
+            aggregate=aggregate,
+            activation=None,
+            use_bias=use_bias,
+            kernel_initializer=kernel_initializer,
+            bias_initializer=bias_initializer,
+            kernel_regularizer=kernel_regularizer,
+            bias_regularizer=bias_regularizer,
+            activity_regularizer=activity_regularizer,
+            kernel_constraint=kernel_constraint,
+            bias_constraint=bias_constraint,
+            **kwargs
+        )
         self.channels = channels
         self.dropout_rate = dropout
         self.use_batch_norm = batch_norm
-        if activation == 'prelu' or 'prelu' in kwargs:
+        if activation == "prelu" or "prelu" in kwargs:
             self.activation = PReLU()
         else:
             self.activation = activations.get(activation)
@@ -112,17 +117,21 @@ class GeneralConv(MessagePassing):
         self.dropout = Dropout(self.dropout_rate)
         if self.use_batch_norm:
             self.batch_norm = BatchNormalization()
-        self.kernel = self.add_weight(shape=(input_dim, self.channels),
-                                      initializer=self.kernel_initializer,
-                                      name='kernel',
-                                      regularizer=self.kernel_regularizer,
-                                      constraint=self.kernel_constraint)
+        self.kernel = self.add_weight(
+            shape=(input_dim, self.channels),
+            initializer=self.kernel_initializer,
+            name="kernel",
+            regularizer=self.kernel_regularizer,
+            constraint=self.kernel_constraint,
+        )
         if self.use_bias:
-            self.bias = self.add_weight(shape=(self.channels,),
-                                        initializer=self.bias_initializer,
-                                        name='bias',
-                                        regularizer=self.bias_regularizer,
-                                        constraint=self.bias_constraint)
+            self.bias = self.add_weight(
+                shape=(self.channels,),
+                initializer=self.bias_initializer,
+                name="bias",
+                regularizer=self.bias_regularizer,
+                constraint=self.bias_constraint,
+            )
         self.built = True
 
     def call(self, inputs, **kwargs):
@@ -130,7 +139,7 @@ class GeneralConv(MessagePassing):
 
         # TODO: a = add_self_loops(a)
 
-        x = dot(x, self.kernel)
+        x = tf.matmul(x, self.kernel)
         if self.use_bias:
             x = tf.nn.bias_add(x, self.bias)
         if self.use_batch_norm:
@@ -143,9 +152,9 @@ class GeneralConv(MessagePassing):
     @property
     def config(self):
         config = {
-            'channels': self.channels,
+            "channels": self.channels,
         }
-        if self.activation.__class__.__name__ == 'PReLU':
-            config['prelu'] = True
+        if self.activation.__class__.__name__ == "PReLU":
+            config["prelu"] = True
 
         return config

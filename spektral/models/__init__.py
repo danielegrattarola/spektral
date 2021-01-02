@@ -1,2 +1,2 @@
-from .general_gnn import GeneralGNN
 from .gcn import GCN
+from .general_gnn import GeneralGNN

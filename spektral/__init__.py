@@ -1,5 +1,3 @@
-from . import layers
-from . import datasets
-from . import utils
+from . import datasets, layers, utils
 
-__version__ = '1.0.3'
+__version__ = "1.0.4"

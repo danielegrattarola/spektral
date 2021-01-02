@@ -11,7 +11,7 @@ from tensorflow.keras.optimizers import Adam
 from spektral.datasets.citation import Cora
 from spektral.layers import GCNConv
 from spektral.models.gcn import GCN
-from spektral.transforms import LayerPreprocess, AdjToSpTensor
+from spektral.transforms import AdjToSpTensor, LayerPreprocess
 from spektral.utils import tic, toc
 
 tf.random.set_seed(seed=0)  # make weight initialization reproducible

@@ -1,4 +1,5 @@
-from tensorflow.keras import activations, backend as K
+from tensorflow.keras import activations
+from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Dropout
 
 from spektral.layers import ops
@@ -64,33 +65,37 @@ class ARMAConv(Conv):
     - `bias_constraint`: constraint applied to the bias vector.
     """
 
-    def __init__(self,
-                 channels,
-                 order=1,
-                 iterations=1,
-                 share_weights=False,
-                 gcn_activation='relu',
-                 dropout_rate=0.0,
-                 activation=None,
-                 use_bias=True,
-                 kernel_initializer='glorot_uniform',
-                 bias_initializer='zeros',
-                 kernel_regularizer=None,
-                 bias_regularizer=None,
-                 activity_regularizer=None,
-                 kernel_constraint=None,
-                 bias_constraint=None,
-                 **kwargs):
-        super().__init__(activation=activation,
-                         use_bias=use_bias,
-                         kernel_initializer=kernel_initializer,
-                         bias_initializer=bias_initializer,
-                         kernel_regularizer=kernel_regularizer,
-                         bias_regularizer=bias_regularizer,
-                         activity_regularizer=activity_regularizer,
-                         kernel_constraint=kernel_constraint,
-                         bias_constraint=bias_constraint,
-                         **kwargs)
+    def __init__(
+        self,
+        channels,
+        order=1,
+        iterations=1,
+        share_weights=False,
+        gcn_activation="relu",
+        dropout_rate=0.0,
+        activation=None,
+        use_bias=True,
+        kernel_initializer="glorot_uniform",
+        bias_initializer="zeros",
+        kernel_regularizer=None,
+        bias_regularizer=None,
+        activity_regularizer=None,
+        kernel_constraint=None,
+        bias_constraint=None,
+        **kwargs
+    ):
+        super().__init__(
+            activation=activation,
+            use_bias=use_bias,
+            kernel_initializer=kernel_initializer,
+            bias_initializer=bias_initializer,
+            kernel_regularizer=kernel_regularizer,
+            bias_regularizer=bias_regularizer,
+            activity_regularizer=activity_regularizer,
+            kernel_constraint=kernel_constraint,
+            bias_constraint=bias_constraint,
+            **kwargs
+        )
         self.channels = channels
         self.iterations = iterations
         self.order = order
@@ -110,8 +115,9 @@ class ARMAConv(Conv):
             current_shape = F
             for i in range(self.iterations):
                 kernel_stack.append(
-                    self.create_weights(current_shape, F, self.channels,
-                                        'ARMA_GCS_{}{}'.format(k, i))
+                    self.create_weights(
+                        current_shape, F, self.channels, "ARMA_GCS_{}{}".format(k, i)
+                    )
                 )
                 current_shape = self.channels
                 if self.share_weights and i == 1:
@@ -147,22 +153,28 @@ class ARMAConv(Conv):
             - kernel_2, from input space of the skip connection to output space
             - bias, bias vector on the output space if use_bias=True, None otherwise.
         """
-        kernel_1 = self.add_weight(shape=(input_dim, channels),
-                                   name=name + '_kernel_1',
-                                   initializer=self.kernel_initializer,
-                                   regularizer=self.kernel_regularizer,
-                                   constraint=self.kernel_constraint)
-        kernel_2 = self.add_weight(shape=(input_dim_skip, channels),
-                                   name=name + '_kernel_2',
-                                   initializer=self.kernel_initializer,
-                                   regularizer=self.kernel_regularizer,
-                                   constraint=self.kernel_constraint)
+        kernel_1 = self.add_weight(
+            shape=(input_dim, channels),
+            name=name + "_kernel_1",
+            initializer=self.kernel_initializer,
+            regularizer=self.kernel_regularizer,
+            constraint=self.kernel_constraint,
+        )
+        kernel_2 = self.add_weight(
+            shape=(input_dim_skip, channels),
+            name=name + "_kernel_2",
+            initializer=self.kernel_initializer,
+            regularizer=self.kernel_regularizer,
+            constraint=self.kernel_constraint,
+        )
         if self.use_bias:
-            bias = self.add_weight(shape=(channels,),
-                                   name=name + '_bias',
-                                   initializer=self.bias_initializer,
-                                   regularizer=self.bias_regularizer,
-                                   constraint=self.bias_constraint)
+            bias = self.add_weight(
+                shape=(channels,),
+                name=name + "_bias",
+                initializer=self.bias_initializer,
+                regularizer=self.bias_regularizer,
+                constraint=self.bias_constraint,
+            )
         else:
             bias = None
         return kernel_1, kernel_2, bias
@@ -184,7 +196,7 @@ class ARMAConv(Conv):
         kernel_1, kernel_2, bias = self.kernels[stack][iter]
 
         output = K.dot(x, kernel_1)
-        output = ops.filter_dot(a, output)
+        output = ops.modal_dot(a, output)
 
         skip = K.dot(x_skip, kernel_2)
         skip = Dropout(self.dropout_rate)(skip)
@@ -199,15 +211,14 @@ class ARMAConv(Conv):
     @property
     def config(self):
         return {
-            'channels': self.channels,
-            'iterations': self.iterations,
-            'order': self.order,
-            'share_weights': self.share_weights,
-            'gcn_activation': activations.serialize(self.gcn_activation),
-            'dropout_rate': self.dropout_rate,
+            "channels": self.channels,
+            "iterations": self.iterations,
+            "order": self.order,
+            "share_weights": self.share_weights,
+            "gcn_activation": activations.serialize(self.gcn_activation),
+            "dropout_rate": self.dropout_rate,
         }
 
     @staticmethod
     def preprocess(a):
         return normalized_adjacency(a, symmetric=True)
-

@@ -1,4 +1,5 @@
-from tensorflow.keras import activations, backend as K
+from tensorflow.keras import activations
+from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.models import Sequential
 
@@ -12,7 +13,7 @@ class EdgeConv(MessagePassing):
     > [Dynamic Graph CNN for Learning on Point Clouds](https://arxiv.org/abs/1801.07829)<br>
     > Yue Wang et al.
 
-    **Mode**: single, disjoint.
+    **Mode**: single, disjoint, mixed.
 
     **This layer expects a sparse adjacency matrix.**
 
@@ -50,32 +51,36 @@ class EdgeConv(MessagePassing):
     - `bias_constraint`: constraint applied to the bias vector.
     """
 
-    def __init__(self,
-                 channels,
-                 mlp_hidden=None,
-                 mlp_activation='relu',
-                 aggregate='sum',
-                 activation=None,
-                 use_bias=True,
-                 kernel_initializer='glorot_uniform',
-                 bias_initializer='zeros',
-                 kernel_regularizer=None,
-                 bias_regularizer=None,
-                 activity_regularizer=None,
-                 kernel_constraint=None,
-                 bias_constraint=None,
-                 **kwargs):
-        super().__init__(aggregate=aggregate,
-                         activation=activation,
-                         use_bias=use_bias,
-                         kernel_initializer=kernel_initializer,
-                         bias_initializer=bias_initializer,
-                         kernel_regularizer=kernel_regularizer,
-                         bias_regularizer=bias_regularizer,
-                         activity_regularizer=activity_regularizer,
-                         kernel_constraint=kernel_constraint,
-                         bias_constraint=bias_constraint,
-                         **kwargs)
+    def __init__(
+        self,
+        channels,
+        mlp_hidden=None,
+        mlp_activation="relu",
+        aggregate="sum",
+        activation=None,
+        use_bias=True,
+        kernel_initializer="glorot_uniform",
+        bias_initializer="zeros",
+        kernel_regularizer=None,
+        bias_regularizer=None,
+        activity_regularizer=None,
+        kernel_constraint=None,
+        bias_constraint=None,
+        **kwargs
+    ):
+        super().__init__(
+            aggregate=aggregate,
+            activation=activation,
+            use_bias=use_bias,
+            kernel_initializer=kernel_initializer,
+            bias_initializer=bias_initializer,
+            kernel_regularizer=kernel_regularizer,
+            bias_regularizer=bias_regularizer,
+            activity_regularizer=activity_regularizer,
+            kernel_constraint=kernel_constraint,
+            bias_constraint=bias_constraint,
+            **kwargs
+        )
         self.channels = channels
         self.mlp_hidden = mlp_hidden if mlp_hidden else []
         self.mlp_activation = activations.get(mlp_activation)
@@ -88,13 +93,23 @@ class EdgeConv(MessagePassing):
             kernel_regularizer=self.kernel_regularizer,
             bias_regularizer=self.bias_regularizer,
             kernel_constraint=self.kernel_constraint,
-            bias_constraint=self.bias_constraint
+            bias_constraint=self.bias_constraint,
         )
 
-        self.mlp = Sequential([
-            Dense(channels, self.mlp_activation, **layer_kwargs)
-            for channels in self.mlp_hidden
-        ] + [Dense(self.channels, self.activation, use_bias=self.use_bias, **layer_kwargs)])
+        self.mlp = Sequential(
+            [
+                Dense(channels, self.mlp_activation, **layer_kwargs)
+                for channels in self.mlp_hidden
+            ]
+            + [
+                Dense(
+                    self.channels,
+                    self.activation,
+                    use_bias=self.use_bias,
+                    **layer_kwargs
+                )
+            ]
+        )
 
         self.built = True
 
@@ -106,7 +121,7 @@ class EdgeConv(MessagePassing):
     @property
     def config(self):
         return {
-            'channels': self.channels,
-            'mlp_hidden': self.mlp_hidden,
-            'mlp_activation': self.mlp_activation
+            "channels": self.channels,
+            "mlp_hidden": self.mlp_hidden,
+            "mlp_activation": self.mlp_activation,
         }

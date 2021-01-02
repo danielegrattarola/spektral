@@ -13,6 +13,7 @@ class OGB(Dataset):
     - `dataset`: an OGB library-agnostic dataset.
 
     """
+
     def __init__(self, dataset, **kwargs):
         self.dataset = dataset
         super().__init__(**kwargs)
@@ -27,10 +28,10 @@ class OGB(Dataset):
 
 def _elem_to_numpy(elem):
     graph, label = elem
-    n = graph['num_nodes']
-    x = graph['node_feat']
-    row, col = graph['edge_index']
+    n = graph["num_nodes"]
+    x = graph["node_feat"]
+    row, col = graph["edge_index"]
     a = sp.csr_matrix((np.ones_like(row), (row, col)), shape=(n, n)).tocsr()
-    e = graph['edge_feat']
+    e = graph["edge_feat"]
 
     return x, a, e, label

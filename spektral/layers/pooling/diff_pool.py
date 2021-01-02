@@ -62,21 +62,25 @@ class DiffPool(Pool):
     - `kernel_constraint`: constraint applied to the weights;
     """
 
-    def __init__(self,
-                 k,
-                 channels=None,
-                 return_mask=False,
-                 activation=None,
-                 kernel_initializer='glorot_uniform',
-                 kernel_regularizer=None,
-                 kernel_constraint=None,
-                 **kwargs):
+    def __init__(
+        self,
+        k,
+        channels=None,
+        return_mask=False,
+        activation=None,
+        kernel_initializer="glorot_uniform",
+        kernel_regularizer=None,
+        kernel_constraint=None,
+        **kwargs
+    ):
 
-        super().__init__(activation=activation,
-                         kernel_initializer=kernel_initializer,
-                         kernel_regularizer=kernel_regularizer,
-                         kernel_constraint=kernel_constraint,
-                         **kwargs)
+        super().__init__(
+            activation=activation,
+            kernel_initializer=kernel_initializer,
+            kernel_regularizer=kernel_regularizer,
+            kernel_constraint=kernel_constraint,
+            **kwargs
+        )
         self.k = k
         self.channels = channels
         self.return_mask = return_mask
@@ -88,17 +92,21 @@ class DiffPool(Pool):
         if self.channels is None:
             self.channels = F
 
-        self.kernel_emb = self.add_weight(shape=(F, self.channels),
-                                          name='kernel_emb',
-                                          initializer=self.kernel_initializer,
-                                          regularizer=self.kernel_regularizer,
-                                          constraint=self.kernel_constraint)
+        self.kernel_emb = self.add_weight(
+            shape=(F, self.channels),
+            name="kernel_emb",
+            initializer=self.kernel_initializer,
+            regularizer=self.kernel_regularizer,
+            constraint=self.kernel_constraint,
+        )
 
-        self.kernel_pool = self.add_weight(shape=(F, self.k),
-                                           name='kernel_pool',
-                                           initializer=self.kernel_initializer,
-                                           regularizer=self.kernel_regularizer,
-                                           constraint=self.kernel_constraint)
+        self.kernel_pool = self.add_weight(
+            shape=(F, self.k),
+            name="kernel_pool",
+            initializer=self.kernel_initializer,
+            regularizer=self.kernel_regularizer,
+            constraint=self.kernel_constraint,
+        )
 
         super().build(input_shape)
 
@@ -113,7 +121,7 @@ class DiffPool(Pool):
 
         N = K.shape(A)[-1]
         # Check if the layer is operating in mixed or batch mode
-        mode = ops.autodetect_mode(A, X)
+        mode = ops.autodetect_mode(X, A)
         self.reduce_loss = mode in (modes.MIXED, modes.BATCH)
 
         # Get normalized adjacency
@@ -127,17 +135,17 @@ class DiffPool(Pool):
 
         # Node embeddings
         Z = K.dot(X, self.kernel_emb)
-        Z = ops.filter_dot(fltr, Z)
+        Z = ops.modal_dot(fltr, Z)
         if self.activation is not None:
             Z = self.activation(Z)
 
         # Compute cluster assignment matrix
         S = K.dot(X, self.kernel_pool)
-        S = ops.filter_dot(fltr, S)
+        S = ops.modal_dot(fltr, S)
         S = activations.softmax(S, axis=-1)  # softmax applied row-wise
 
         # Link prediction loss
-        S_gram = ops.matmul_A_BT(S, S)
+        S_gram = ops.modal_dot(S, S, transpose_b=True)
         if mode == modes.MIXED:
             A = tf.sparse.to_dense(A)[None, ...]
         if K.is_sparse(A):
@@ -150,15 +158,17 @@ class DiffPool(Pool):
         self.add_loss(LP_loss)
 
         # Entropy loss
-        entr = tf.negative(tf.reduce_sum(tf.multiply(S, K.log(S + K.epsilon())), axis=-1))
+        entr = tf.negative(
+            tf.reduce_sum(tf.multiply(S, K.log(S + K.epsilon())), axis=-1)
+        )
         entr_loss = K.mean(entr, axis=-1)
         if self.reduce_loss:
             entr_loss = K.mean(entr_loss)
         self.add_loss(entr_loss)
 
         # Pooling
-        X_pooled = ops.matmul_AT_B(S, Z)
-        A_pooled = ops.matmul_AT_B_A(S, A)
+        X_pooled = ops.modal_dot(S, Z, transpose_a=True)
+        A_pooled = ops.matmul_at_b_a(S, A)
 
         output = [X_pooled, A_pooled]
 
@@ -175,7 +185,7 @@ class DiffPool(Pool):
     @property
     def config(self):
         return {
-            'k': self.k,
-            'channels': self.channels,
-            'return_mask': self.return_mask,
+            "k": self.k,
+            "channels": self.channels,
+            "return_mask": self.return_mask,
         }

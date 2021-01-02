@@ -33,13 +33,6 @@ class TopKPool(Pool):
     Note that the the gating operation \(\textrm{tanh}(\y)\) (Cangea et al.)
     can be replaced with a sigmoid (Gao & Ji).
 
-    This layer temporarily makes the adjacency matrix dense in order to compute
-    \(\A'\).
-    If memory is not an issue, considerable speedups can be achieved by using
-    dense graphs directly.
-    Converting a graph from sparse to dense and back to sparse is an expensive
-    operation.
-
     **Input**
 
     - Node features of shape `(n_nodes, n_node_features)`;
@@ -64,18 +57,22 @@ class TopKPool(Pool):
     - `kernel_constraint`: constraint applied to the weights;
     """
 
-    def __init__(self,
-                 ratio,
-                 return_mask=False,
-                 sigmoid_gating=False,
-                 kernel_initializer='glorot_uniform',
-                 kernel_regularizer=None,
-                 kernel_constraint=None,
-                 **kwargs):
-        super().__init__(kernel_initializer=kernel_initializer,
-                         kernel_regularizer=kernel_regularizer,
-                         kernel_constraint=kernel_constraint,
-                         **kwargs)
+    def __init__(
+        self,
+        ratio,
+        return_mask=False,
+        sigmoid_gating=False,
+        kernel_initializer="glorot_uniform",
+        kernel_regularizer=None,
+        kernel_constraint=None,
+        **kwargs
+    ):
+        super().__init__(
+            kernel_initializer=kernel_initializer,
+            kernel_regularizer=kernel_regularizer,
+            kernel_constraint=kernel_constraint,
+            **kwargs
+        )
         self.ratio = ratio
         self.return_mask = return_mask
         self.sigmoid_gating = sigmoid_gating
@@ -84,26 +81,23 @@ class TopKPool(Pool):
     def build(self, input_shape):
         self.F = input_shape[0][-1]
         self.N = input_shape[0][0]
-        self.kernel = self.add_weight(shape=(self.F, 1),
-                                      name='kernel',
-                                      initializer=self.kernel_initializer,
-                                      regularizer=self.kernel_regularizer,
-                                      constraint=self.kernel_constraint)
-        self.top_k_var = tf.Variable(0.0,
-                                     trainable=False,
-                                     validate_shape=False,
-                                     dtype=tf.keras.backend.floatx(),
-                                     shape=tf.TensorShape(None))
+        self.kernel = self.add_weight(
+            shape=(self.F, 1),
+            name="kernel",
+            initializer=self.kernel_initializer,
+            regularizer=self.kernel_regularizer,
+            constraint=self.kernel_constraint,
+        )
         super().build(input_shape)
 
     def call(self, inputs):
         if len(inputs) == 3:
             X, A, I = inputs
-            self.data_mode = 'disjoint'
+            self.data_mode = "disjoint"
         else:
             X, A = inputs
             I = tf.zeros(tf.shape(X)[:1])
-            self.data_mode = 'single'
+            self.data_mode = "single"
         if K.ndim(I) == 2:
             I = I[:, 0]
         I = tf.cast(I, tf.int32)
@@ -113,28 +107,31 @@ class TopKPool(Pool):
         # Get mask
         y = self.compute_scores(X, A, I)
         N = K.shape(X)[-2]
-        indices = ops.segment_top_k(y[:, 0], I, self.ratio, self.top_k_var)
-        mask = tf.scatter_nd(tf.expand_dims(indices, 1), tf.ones_like(indices), (N,))
+        indices = ops.segment_top_k(y[:, 0], I, self.ratio)
+        indices = tf.sort(indices)  # required for ordered SparseTensors
+        mask = ops.indices_to_mask(indices, N)
 
         # Multiply X and y to make layer differentiable
         features = X * self.gating_op(y)
 
-        axis = 0 if len(K.int_shape(A)) == 2 else 1  # Cannot use negative axis in tf.boolean_mask
+        axis = (
+            0 if len(K.int_shape(A)) == 2 else 1
+        )  # Cannot use negative axis in tf.boolean_mask
         # Reduce X
-        X_pooled = tf.boolean_mask(features, mask, axis=axis)
+        X_pooled = tf.gather(features, indices, axis=axis)
 
         # Reduce A
-        A_dense = tf.sparse.to_dense(A) if A_is_sparse else A
-        A_pooled = tf.boolean_mask(A_dense, mask, axis=axis)
-        A_pooled = tf.boolean_mask(A_pooled, mask, axis=axis + 1)
         if A_is_sparse:
-            A_pooled = ops.dense_to_sparse(A_pooled)
+            A_pooled, _ = ops.gather_sparse_square(A, indices, mask=mask)
+        else:
+            A_pooled = tf.gather(A, indices, axis=axis)
+            A_pooled = tf.gather(A_pooled, indices, axis=axis + 1)
 
         output = [X_pooled, A_pooled]
 
         # Reduce I
-        if self.data_mode == 'disjoint':
-            I_pooled = tf.boolean_mask(I[:, None], mask)[:, 0]
+        if self.data_mode == "disjoint":
+            I_pooled = tf.gather(I, indices)
             output.append(I_pooled)
 
         if self.return_mask:
@@ -148,7 +145,7 @@ class TopKPool(Pool):
     @property
     def config(self):
         return {
-            'ratio': self.ratio,
-            'return_mask': self.return_mask,
-            'sigmoid_gating': self.sigmoid_gating
+            "ratio": self.ratio,
+            "return_mask": self.return_mask,
+            "sigmoid_gating": self.sigmoid_gating,
         }

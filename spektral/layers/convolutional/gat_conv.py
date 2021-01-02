@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras import backend as K
-from tensorflow.keras import initializers, regularizers, constraints
+from tensorflow.keras import constraints, initializers, regularizers
 from tensorflow.keras.layers import Dropout
 
 from spektral.layers import ops
@@ -74,35 +74,39 @@ class GATConv(Conv):
 
     """
 
-    def __init__(self,
-                 channels,
-                 attn_heads=1,
-                 concat_heads=True,
-                 dropout_rate=0.5,
-                 return_attn_coef=False,
-                 activation=None,
-                 use_bias=True,
-                 kernel_initializer='glorot_uniform',
-                 bias_initializer='zeros',
-                 attn_kernel_initializer='glorot_uniform',
-                 kernel_regularizer=None,
-                 bias_regularizer=None,
-                 attn_kernel_regularizer=None,
-                 activity_regularizer=None,
-                 kernel_constraint=None,
-                 bias_constraint=None,
-                 attn_kernel_constraint=None,
-                 **kwargs):
-        super().__init__(activation=activation,
-                         use_bias=use_bias,
-                         kernel_initializer=kernel_initializer,
-                         bias_initializer=bias_initializer,
-                         kernel_regularizer=kernel_regularizer,
-                         bias_regularizer=bias_regularizer,
-                         activity_regularizer=activity_regularizer,
-                         kernel_constraint=kernel_constraint,
-                         bias_constraint=bias_constraint,
-                         **kwargs)
+    def __init__(
+        self,
+        channels,
+        attn_heads=1,
+        concat_heads=True,
+        dropout_rate=0.5,
+        return_attn_coef=False,
+        activation=None,
+        use_bias=True,
+        kernel_initializer="glorot_uniform",
+        bias_initializer="zeros",
+        attn_kernel_initializer="glorot_uniform",
+        kernel_regularizer=None,
+        bias_regularizer=None,
+        attn_kernel_regularizer=None,
+        activity_regularizer=None,
+        kernel_constraint=None,
+        bias_constraint=None,
+        attn_kernel_constraint=None,
+        **kwargs
+    ):
+        super().__init__(
+            activation=activation,
+            use_bias=use_bias,
+            kernel_initializer=kernel_initializer,
+            bias_initializer=bias_initializer,
+            kernel_regularizer=kernel_regularizer,
+            bias_regularizer=bias_regularizer,
+            activity_regularizer=activity_regularizer,
+            kernel_constraint=kernel_constraint,
+            bias_constraint=bias_constraint,
+            **kwargs
+        )
         self.channels = channels
         self.attn_heads = attn_heads
         self.concat_heads = concat_heads
@@ -122,21 +126,21 @@ class GATConv(Conv):
         input_dim = input_shape[0][-1]
 
         self.kernel = self.add_weight(
-            name='kernel',
+            name="kernel",
             shape=[input_dim, self.attn_heads, self.channels],
             initializer=self.kernel_initializer,
             regularizer=self.kernel_regularizer,
             constraint=self.kernel_constraint,
         )
         self.attn_kernel_self = self.add_weight(
-            name='attn_kernel_self',
+            name="attn_kernel_self",
             shape=[self.channels, self.attn_heads, 1],
             initializer=self.attn_kernel_initializer,
             regularizer=self.attn_kernel_regularizer,
             constraint=self.attn_kernel_constraint,
         )
         self.attn_kernel_neighs = self.add_weight(
-            name='attn_kernel_neigh',
+            name="attn_kernel_neigh",
             shape=[self.channels, self.attn_heads, 1],
             initializer=self.attn_kernel_initializer,
             regularizer=self.attn_kernel_regularizer,
@@ -148,7 +152,7 @@ class GATConv(Conv):
                 initializer=self.bias_initializer,
                 regularizer=self.bias_regularizer,
                 constraint=self.bias_constraint,
-                name='bias'
+                name="bias",
             )
 
         self.dropout = Dropout(self.dropout_rate)
@@ -157,10 +161,12 @@ class GATConv(Conv):
     def call(self, inputs):
         x, a = inputs
 
-        mode = ops.autodetect_mode(a, x)
+        mode = ops.autodetect_mode(x, a)
         if mode == modes.SINGLE and K.is_sparse(a):
             output, attn_coef = self._call_single(x, a)
         else:
+            if K.is_sparse(a):
+                a = tf.sparse.to_dense(a)
             output, attn_coef = self._call_dense(x, a)
 
         if self.concat_heads:
@@ -188,12 +194,12 @@ class GATConv(Conv):
 
         # Prepare message-passing
         indices = a.indices
-        N = tf.shape(x, out_type=indices.dtype)[0]
+        N = tf.shape(x, out_type=indices.dtype)[-2]
         indices = ops.add_self_loops_indices(indices, N)
-        targets, sources = indices[:, -2], indices[:, -1]
+        targets, sources = indices[:, 1], indices[:, 0]
 
         # Update node features
-        x = ops.dot(x, kernel)
+        x = K.dot(x, kernel)
         x = tf.reshape(x, (-1, self.attn_heads, self.channels))
 
         # Compute attention
@@ -210,7 +216,7 @@ class GATConv(Conv):
 
         # Update representation
         output = attn_coef * tf.gather(x, sources)
-        output = ops.scatter_sum(output, targets, N)
+        output = tf.math.unsorted_segment_sum(output, targets, N)
 
         return output, attn_coef
 
@@ -220,7 +226,9 @@ class GATConv(Conv):
         a = tf.linalg.set_diag(a, tf.ones(shape, a.dtype))
         x = tf.einsum("...NI , IHO -> ...NHO", x, self.kernel)
         attn_for_self = tf.einsum("...NHI , IHO -> ...NHO", x, self.attn_kernel_self)
-        attn_for_neighs = tf.einsum("...NHI , IHO -> ...NHO", x, self.attn_kernel_neighs)
+        attn_for_neighs = tf.einsum(
+            "...NHI , IHO -> ...NHO", x, self.attn_kernel_neighs
+        )
         attn_for_neighs = tf.einsum("...ABC -> ...CBA", attn_for_neighs)
 
         attn_coef = attn_for_self + attn_for_neighs
@@ -238,12 +246,18 @@ class GATConv(Conv):
     @property
     def config(self):
         return {
-            'channels': self.channels,
-            'attn_heads': self.attn_heads,
-            'concat_heads': self.concat_heads,
-            'dropout_rate': self.dropout_rate,
-            'return_attn_coef': self.return_attn_coef,
-            'attn_kernel_initializer': initializers.serialize(self.attn_kernel_initializer),
-            'attn_kernel_regularizer': regularizers.serialize(self.attn_kernel_regularizer),
-            'attn_kernel_constraint': constraints.serialize(self.attn_kernel_constraint),
+            "channels": self.channels,
+            "attn_heads": self.attn_heads,
+            "concat_heads": self.concat_heads,
+            "dropout_rate": self.dropout_rate,
+            "return_attn_coef": self.return_attn_coef,
+            "attn_kernel_initializer": initializers.serialize(
+                self.attn_kernel_initializer
+            ),
+            "attn_kernel_regularizer": regularizers.serialize(
+                self.attn_kernel_regularizer
+            ),
+            "attn_kernel_constraint": constraints.serialize(
+                self.attn_kernel_constraint
+            ),
         }

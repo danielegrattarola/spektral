@@ -7,47 +7,47 @@ from tensorflow.keras.metrics import SparseCategoricalAccuracy
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
 
-from spektral.data import PackedBatchLoader
+from spektral.data import MixedLoader
 from spektral.datasets.mnist import MNIST
 from spektral.layers import GCNConv
 from spektral.layers.ops import sp_matrix_to_sp_tensor
 
+tf.config.experimental_run_functions_eagerly(True)
+
 # Parameters
 batch_size = 32  # Batch size
-epochs = 1000    # Number of training epochs
-patience = 10    # Patience for early stopping
-l2_reg = 5e-4    # Regularization rate for l2
+epochs = 1000  # Number of training epochs
+patience = 10  # Patience for early stopping
+l2_reg = 5e-4  # Regularization rate for l2
 
 # Load data
 data = MNIST()
 
 # The adjacency matrix is stored as an attribute of the dataset.
 # Create filter for GCN and convert to sparse tensor.
-adj = data.a
-adj = GCNConv.preprocess(adj)
-adj = sp_matrix_to_sp_tensor(adj)
+data.a = GCNConv.preprocess(data.a)
+data.a = sp_matrix_to_sp_tensor(data.a)
 
 # Train/valid/test split
 data_tr, data_te = data[:-10000], data[-10000:]
 np.random.shuffle(data_tr)
 data_tr, data_va = data_tr[:-10000], data_tr[-10000:]
 
-# We can use PackedBatchLoader because we only need to create batches of node
-# features with the same dimensions.
-loader_tr = PackedBatchLoader(data_tr, batch_size=batch_size, epochs=epochs)
-loader_va = PackedBatchLoader(data_va, batch_size=batch_size)
-loader_te = PackedBatchLoader(data_te, batch_size=batch_size)
+# We use a MixedLoader since the dataset is in mixed mode
+loader_tr = MixedLoader(data_tr, batch_size=batch_size, epochs=epochs)
+loader_va = MixedLoader(data_va, batch_size=batch_size)
+loader_te = MixedLoader(data_te, batch_size=batch_size)
 
 
 # Build model
 class Net(Model):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.conv1 = GCNConv(32, activation='elu', kernel_regularizer=l2(l2_reg))
-        self.conv2 = GCNConv(32, activation='elu', kernel_regularizer=l2(l2_reg))
+        self.conv1 = GCNConv(32, activation="elu", kernel_regularizer=l2(l2_reg))
+        self.conv2 = GCNConv(32, activation="elu", kernel_regularizer=l2(l2_reg))
         self.flatten = Flatten()
-        self.fc1 = Dense(512, activation='relu')
-        self.fc2 = Dense(10, activation='softmax')  # MNIST has 10 classes
+        self.fc1 = Dense(512, activation="relu")
+        self.fc2 = Dense(10, activation="softmax")  # MNIST has 10 classes
 
     def call(self, inputs):
         x, a = inputs
@@ -58,6 +58,7 @@ class Net(Model):
         output = self.fc2(output)
 
         return output
+
 
 # Create model
 model = Net()
@@ -85,8 +86,8 @@ def evaluate(loader):
     results = []
     for batch in loader:
         step += 1
-        x, target = batch
-        predictions = model([x, adj], training=False)
+        inputs, target = batch
+        predictions = model(inputs, training=False)
         loss = loss_fn(target, predictions)
         acc = acc_fn(target, predictions)
         results.append((loss, acc, len(target)))  # Keep track of batch size
@@ -106,8 +107,8 @@ for batch in loader_tr:
     step += 1
 
     # Training step
-    x, target = batch
-    loss, acc = train_on_batch([x, adj], target)
+    inputs, target = batch
+    loss, acc = train_on_batch(inputs, target)
     results_tr.append((loss, acc, len(target)))
 
     if step == loader_tr.steps_per_epoch:
@@ -119,16 +120,19 @@ for batch in loader_tr:
         else:
             current_patience -= 1
             if current_patience == 0:
-                print('Early stopping')
+                print("Early stopping")
                 break
 
         # Print results
         results_tr = np.array(results_tr)
         results_tr = np.average(results_tr[:, :-1], 0, weights=results_tr[:, -1])
-        print('Train loss: {:.4f}, acc: {:.4f} | '
-              'Valid loss: {:.4f}, acc: {:.4f} | '
-              'Test loss: {:.4f}, acc: {:.4f}'
-              .format(*results_tr, *results_va, *results_te))
+        print(
+            "Train loss: {:.4f}, acc: {:.4f} | "
+            "Valid loss: {:.4f}, acc: {:.4f} | "
+            "Test loss: {:.4f}, acc: {:.4f}".format(
+                *results_tr, *results_va, *results_te
+            )
+        )
 
         # Reset epoch
         results_tr = []

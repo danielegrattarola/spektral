@@ -1,4 +1,10 @@
-from .graph import Graph
 from .dataset import Dataset
-from .loaders import Loader, SingleLoader, DisjointLoader, BatchLoader, \
-    PackedBatchLoader
+from .graph import Graph
+from .loaders import (
+    BatchLoader,
+    DisjointLoader,
+    Loader,
+    MixedLoader,
+    PackedBatchLoader,
+    SingleLoader,
+)
