@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="spektral",
-    version="1.0.3",
+    version="1.0.4",
     packages=find_packages(),
     install_requires=[
         "joblib",
@@ -26,5 +26,9 @@ setup(
     description="Graph Neural Networks with Keras and Tensorflow 2.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    classifiers=["Programming Language :: Python :: 3.5"],
+    classifiers=[
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+    ],
 )

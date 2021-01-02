@@ -98,6 +98,8 @@ PAGES = [
         "functions": [
             data.utils.to_disjoint,
             data.utils.to_batch,
+            data.utils.to_mixed,
+            data.utils.batch_generator,
             data.utils.to_tf_signature,
         ],
         "methods": [],
@@ -114,6 +116,7 @@ PAGES = [
             data.DisjointLoader,
             data.BatchLoader,
             data.PackedBatchLoader,
+            data.MixedLoader,
         ],
     },
     # Datasets #################################################################
