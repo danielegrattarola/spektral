@@ -156,22 +156,24 @@ class ECCConv(Conv):
         if mode == modes.BATCH:
             kernel = K.reshape(kernel_network, (-1, N, N, F_, F))
             output = kernel * a[..., None, None]
-            output = tf.einsum('abcde,ace->abd', output, x)
+            output = tf.einsum("abcde,ace->abd", output, x)
         else:
             # Enforce sparse representation
             if not K.is_sparse(a):
-                warnings.warn('Casting dense adjacency matrix to SparseTensor.'
-                              'This can be an expensive operation. ')
+                warnings.warn(
+                    "Casting dense adjacency matrix to SparseTensor."
+                    "This can be an expensive operation. "
+                )
                 a = ops.dense_to_sparse(a)
 
             target_shape = (-1, F, F_)
             if mode == modes.MIXED:
-                target_shape = (tf.shape(x)[0], ) + target_shape
+                target_shape = (tf.shape(x)[0],) + target_shape
             kernel = tf.reshape(kernel_network, target_shape)
             index_i = a.indices[:, 1]
             index_j = a.indices[:, 0]
             messages = tf.gather(x, index_j, axis=-2)
-            messages = tf.einsum('...ab,...abc->...ac', messages, kernel)
+            messages = tf.einsum("...ab,...abc->...ac", messages, kernel)
             output = ops.scatter_sum(messages, index_i, N)
 
         if self.root:

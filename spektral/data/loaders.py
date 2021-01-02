@@ -2,7 +2,14 @@ import numpy as np
 import tensorflow as tf
 from scipy import sparse as sp
 
-from spektral.data.utils import prepend_none, to_tf_signature, to_disjoint, to_batch, batch_generator, to_mixed
+from spektral.data.utils import (
+    batch_generator,
+    prepend_none,
+    to_batch,
+    to_disjoint,
+    to_mixed,
+    to_tf_signature,
+)
 from spektral.layers.ops import sp_matrix_to_sp_tensor
 
 version = tf.__version__.split(".")
@@ -501,23 +508,28 @@ class MixedLoader(Loader):
     `labels` have shape `[batch, ..., n_labels]`.
 
     """
+
     def __init__(self, dataset, batch_size=1, epochs=None, shuffle=True):
-        assert dataset.a is not None, 'Dataset must be in mixed mode, with only ' \
-                                      'one adjacency matrix stored in the ' \
-                                      'dataset\'s `a` attribute.\n' \
-                                      'If your dataset does not have an ' \
-                                      'adjacency matrix, you can use a ' \
-                                      'BatchLoader or PackedBatchLoader instead.'
-        assert 'a' not in dataset.signature, 'Datasets in mixed mode should not' \
-                                             'have the adjacency matrix stored' \
-                                             'in their Graph objects.'
+        assert dataset.a is not None, (
+            "Dataset must be in mixed mode, with only "
+            "one adjacency matrix stored in the "
+            "dataset's `a` attribute.\n"
+            "If your dataset does not have an "
+            "adjacency matrix, you can use a "
+            "BatchLoader or PackedBatchLoader instead."
+        )
+        assert "a" not in dataset.signature, (
+            "Datasets in mixed mode should not"
+            "have the adjacency matrix stored"
+            "in their Graph objects."
+        )
         super().__init__(dataset, batch_size=batch_size, epochs=epochs, shuffle=shuffle)
 
     def collate(self, batch):
         packed = self.pack(batch, return_dict=True)
-        y = np.array(packed.pop('y_list')) if 'y' in self.dataset.signature else None
+        y = np.array(packed.pop("y_list")) if "y" in self.dataset.signature else None
 
-        packed['a'] = self.dataset.a
+        packed["a"] = self.dataset.a
         output = to_mixed(**packed)
         if len(output) == 1:
             output = output[0]
@@ -535,8 +547,8 @@ class MixedLoader(Loader):
         Targets have shape [batch, ..., n_labels]
         """
         signature = self.dataset.signature
-        for k in ['x', 'e', 'y']:
+        for k in ["x", "e", "y"]:
             if k in signature:
-                signature[k]['shape'] = prepend_none(signature[k]['shape'])
+                signature[k]["shape"] = prepend_none(signature[k]["shape"])
 
         return to_tf_signature(signature)

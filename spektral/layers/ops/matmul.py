@@ -23,8 +23,9 @@ def dot(a, b):
     """
     a_ndim = K.ndim(a)
     b_ndim = K.ndim(b)
-    assert a_ndim == b_ndim, 'Expected equal ranks, got {} and {}' \
-                             ''.format(a_ndim, b_ndim)
+    assert a_ndim == b_ndim, "Expected equal ranks, got {} and {}" "".format(
+        a_ndim, b_ndim
+    )
     a_is_sparse = K.is_sparse(a)
     b_is_sparse = K.is_sparse(b)
 
@@ -34,8 +35,9 @@ def dot(a, b):
         if a_is_sparse and not b_is_sparse:
             return tf.sparse.sparse_dense_matmul(a, b)
         if not a_is_sparse and b_is_sparse:
-            return ops.transpose(tf.sparse.sparse_dense_matmul(
-                ops.transpose(b), ops.transpose(a)))
+            return ops.transpose(
+                tf.sparse.sparse_dense_matmul(ops.transpose(b), ops.transpose(a))
+            )
 
     # Handle cases: rank 2 sparse-sparse, rank 3 sparse-dense,
     # rank 3 dense-sparse, rank 3 sparse-sparse
@@ -47,7 +49,7 @@ def dot(a, b):
         b = tfsp.CSRSparseMatrix(b)
     if a_is_sparse or b_is_sparse:
         out = tfsp.matmul(a, b)
-        if hasattr(out, 'to_sparse_tensor'):
+        if hasattr(out, "to_sparse_tensor"):
             return out.to_sparse_tensor()
         else:
             return out
@@ -113,8 +115,8 @@ def modal_dot(a, b, transpose_a=False, transpose_b=False):
     """
     a_ndim = K.ndim(a)
     b_ndim = K.ndim(b)
-    assert a_ndim in (2, 3), 'Expected a of rank 2 or 3, got {}'.format(a_ndim)
-    assert b_ndim in (2, 3), 'Expected b of rank 2 or 3, got {}'.format(b_ndim)
+    assert a_ndim in (2, 3), "Expected a of rank 2 or 3, got {}".format(a_ndim)
+    assert b_ndim in (2, 3), "Expected b of rank 2 or 3, got {}".format(b_ndim)
 
     if transpose_a:
         perm = None if a_ndim == 2 else (0, 2, 1)

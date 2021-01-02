@@ -81,11 +81,13 @@ class TopKPool(Pool):
     def build(self, input_shape):
         self.F = input_shape[0][-1]
         self.N = input_shape[0][0]
-        self.kernel = self.add_weight(shape=(self.F, 1),
-                                      name='kernel',
-                                      initializer=self.kernel_initializer,
-                                      regularizer=self.kernel_regularizer,
-                                      constraint=self.kernel_constraint)
+        self.kernel = self.add_weight(
+            shape=(self.F, 1),
+            name="kernel",
+            initializer=self.kernel_initializer,
+            regularizer=self.kernel_regularizer,
+            constraint=self.kernel_constraint,
+        )
         super().build(input_shape)
 
     def call(self, inputs):
@@ -128,7 +130,7 @@ class TopKPool(Pool):
         output = [X_pooled, A_pooled]
 
         # Reduce I
-        if self.data_mode == 'disjoint':
+        if self.data_mode == "disjoint":
             I_pooled = tf.gather(I, indices)
             output.append(I_pooled)
 

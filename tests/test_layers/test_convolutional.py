@@ -55,94 +55,139 @@ TESTS = [
     {
         LAYER_K_: layers.GCNConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
-        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'sparse_support': [False, True]},
+        KWARGS_K_: {
+            "channels": 8,
+            "activation": "relu",
+            "sparse_support": [False, True],
+        },
     },
     {
         LAYER_K_: layers.ChebConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
-        KWARGS_K_: {'K': 3, 'channels': 8, 'activation': 'relu', 'sparse_support': [False, True]}
+        KWARGS_K_: {
+            "K": 3,
+            "channels": 8,
+            "activation": "relu",
+            "sparse_support": [False, True],
+        },
     },
     {
         LAYER_K_: layers.GraphSageConv,
         MODES_K_: [SINGLE, MIXED],
-        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'sparse_support': [True]}
+        KWARGS_K_: {"channels": 8, "activation": "relu", "sparse_support": [True]},
     },
     {
         LAYER_K_: layers.ECCConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
-        KWARGS_K_: {'kernel_network': [8], 'channels': 8, 'activation': 'relu',
-                    'edges': True, 'sparse_support': [False, True]}
+        KWARGS_K_: {
+            "kernel_network": [8],
+            "channels": 8,
+            "activation": "relu",
+            "edges": True,
+            "sparse_support": [False, True],
+        },
     },
     {
         LAYER_K_: layers.GATConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
-        KWARGS_K_: {'channels': 8, 'attn_heads': 2, 'concat_heads': False,
-                    'activation': 'relu', 'sparse_support': [False, True]}
+        KWARGS_K_: {
+            "channels": 8,
+            "attn_heads": 2,
+            "concat_heads": False,
+            "activation": "relu",
+            "sparse_support": [False, True],
+        },
     },
     {
         LAYER_K_: layers.GCSConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
-        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'sparse_support': [False, True]}
+        KWARGS_K_: {
+            "channels": 8,
+            "activation": "relu",
+            "sparse_support": [False, True],
+        },
     },
     {
         LAYER_K_: layers.ARMAConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
-        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'order': 2, 'iterations': 2,
-                    'share_weights': True, 'sparse_support': [False, True]}
+        KWARGS_K_: {
+            "channels": 8,
+            "activation": "relu",
+            "order": 2,
+            "iterations": 2,
+            "share_weights": True,
+            "sparse_support": [False, True],
+        },
     },
     {
         LAYER_K_: layers.APPNPConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
-        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'mlp_hidden': [16],
-                    'sparse_support': [False, True]}
+        KWARGS_K_: {
+            "channels": 8,
+            "activation": "relu",
+            "mlp_hidden": [16],
+            "sparse_support": [False, True],
+        },
     },
     {
         LAYER_K_: layers.GINConv,
         MODES_K_: [SINGLE, MIXED],
-        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'mlp_hidden': [16],
-                    'sparse_support': [True]}
+        KWARGS_K_: {
+            "channels": 8,
+            "activation": "relu",
+            "mlp_hidden": [16],
+            "sparse_support": [True],
+        },
     },
     {
         LAYER_K_: layers.DiffusionConv,
         MODES_K_: [SINGLE, BATCH, MIXED],
-        KWARGS_K_: {'channels': 8, 'activation': 'tanh', 'num_diffusion_steps': 5,
-                    'sparse_support': [False]}
+        KWARGS_K_: {
+            "channels": 8,
+            "activation": "tanh",
+            "num_diffusion_steps": 5,
+            "sparse_support": [False],
+        },
     },
     {
         LAYER_K_: layers.GatedGraphConv,
         MODES_K_: [SINGLE, MIXED],
-        KWARGS_K_: {'channels': 10, 'n_layers': 3, 'sparse_support': [True]}
+        KWARGS_K_: {"channels": 10, "n_layers": 3, "sparse_support": [True]},
     },
     {
         LAYER_K_: layers.AGNNConv,
         MODES_K_: [SINGLE, MIXED],
-        KWARGS_K_: {'channels': F, 'trainable': True, 'sparse_support': [True]}
+        KWARGS_K_: {"channels": F, "trainable": True, "sparse_support": [True]},
     },
     {
         LAYER_K_: layers.TAGConv,
         MODES_K_: [SINGLE, MIXED],
-        KWARGS_K_: {'channels': F, 'K': 3, 'sparse_support': [True]}
+        KWARGS_K_: {"channels": F, "K": 3, "sparse_support": [True]},
     },
     {
         LAYER_K_: layers.CrystalConv,
         MODES_K_: [SINGLE, MIXED],
-        KWARGS_K_: {'channels': F, 'edges': True, 'sparse_support': [True]}
+        KWARGS_K_: {"channels": F, "edges": True, "sparse_support": [True]},
     },
     {
         LAYER_K_: layers.EdgeConv,
         MODES_K_: [SINGLE, MIXED],
-        KWARGS_K_: {'channels': 8, 'activation': 'relu', 'mlp_hidden': [16],
-                    'sparse_support': [True]}
+        KWARGS_K_: {
+            "channels": 8,
+            "activation": "relu",
+            "mlp_hidden": [16],
+            "sparse_support": [True],
+        },
     },
     {
         LAYER_K_: layers.GeneralConv,
         MODES_K_: [SINGLE, MIXED],
-        KWARGS_K_: {'channels': 256, 'sparse_support': [True]}
+        KWARGS_K_: {"channels": 256, "sparse_support": [True]},
     },
     {
         LAYER_K_: layers.MessagePassing,
         MODES_K_: [SINGLE, MIXED],
-        KWARGS_K_: {'channels': F, 'sparse_support': [True]}
+        KWARGS_K_: {"channels": F, "sparse_support": [True]},
     },
 ]
 
@@ -206,8 +251,13 @@ def _test_mixed_mode(layer, **kwargs):
     else:
         input_data = [X_batch, A]
 
-    if kwargs.pop('edges', None):
-        E_in = Input(shape=(N * N, S, ))
+    if kwargs.pop("edges", None):
+        E_in = Input(
+            shape=(
+                N * N,
+                S,
+            )
+        )
         inputs.append(E_in)
         E_batch = np.stack([E_single] * batch_size)
         input_data.append(E_batch)
@@ -241,7 +291,7 @@ def _test_get_config(layer, **kwargs):
 
 def test_layers():
     for test in TESTS:
-        sparse = test[KWARGS_K_]['sparse_support']
+        sparse = test[KWARGS_K_]["sparse_support"]
         for mode in test[MODES_K_]:
             if mode == SINGLE:
                 for s in sparse:

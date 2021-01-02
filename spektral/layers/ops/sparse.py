@@ -111,7 +111,9 @@ def add_self_loops_indices(indices, n_nodes=None):
     sl_indices = tf.repeat(sl_indices, 2, -1)
     indices = tf.concat((indices[mask], sl_indices), 0)
     dummy_values = tf.ones_like(indices[:, 0])
-    indices, _ = gen_sparse_ops.sparse_reorder(indices, dummy_values, (n_nodes, n_nodes))
+    indices, _ = gen_sparse_ops.sparse_reorder(
+        indices, dummy_values, (n_nodes, n_nodes)
+    )
     return indices
 
 
@@ -177,7 +179,7 @@ def _boolean_mask_sparse_square(a, mask, inverse_map, out_size):
     """
     mask = tf.convert_to_tensor(mask)
     values_mask = tf.reduce_all(tf.gather(mask, a.indices, axis=0), axis=-1)
-    dense_shape = [out_size]*a.shape.ndims
+    dense_shape = [out_size] * a.shape.ndims
     indices = tf.boolean_mask(a.indices, values_mask)
     indices = tf.gather(inverse_map, indices)
     a = tf.SparseTensor(indices, tf.boolean_mask(a.values, values_mask), dense_shape)
@@ -198,7 +200,8 @@ def boolean_mask_sparse(a, mask, axis=0):
     in_size = a.dense_shape[axis]
     inverse_map = _indices_to_inverse_map(i, in_size)
     return _boolean_mask_sparse(
-        a, mask, axis=axis, inverse_map=inverse_map, out_size=out_size)
+        a, mask, axis=axis, inverse_map=inverse_map, out_size=out_size
+    )
 
 
 def boolean_mask_sparse_square(a, mask):
@@ -214,7 +217,8 @@ def boolean_mask_sparse_square(a, mask):
     in_size = _square_size(a.dense_shape)
     inverse_map = _indices_to_inverse_map(i, in_size)
     return _boolean_mask_sparse_square(
-        a, mask, inverse_map=inverse_map, out_size=out_size)
+        a, mask, inverse_map=inverse_map, out_size=out_size
+    )
 
 
 def gather_sparse(a, indices, axis=0, mask=None):
@@ -233,7 +237,8 @@ def gather_sparse(a, indices, axis=0, mask=None):
         mask = ops.indices_to_mask(indices, in_size)
     inverse_map = _indices_to_inverse_map(indices, in_size)
     return _boolean_mask_sparse(
-        a, mask, axis=axis, inverse_map=inverse_map, out_size=out_size)
+        a, mask, axis=axis, inverse_map=inverse_map, out_size=out_size
+    )
 
 
 def gather_sparse_square(a, indices, mask=None):
@@ -251,4 +256,5 @@ def gather_sparse_square(a, indices, mask=None):
         mask = ops.indices_to_mask(indices, in_size)
     inverse_map = _indices_to_inverse_map(indices, in_size)
     return _boolean_mask_sparse_square(
-        a, mask, inverse_map=inverse_map, out_size=out_size)
+        a, mask, inverse_map=inverse_map, out_size=out_size
+    )

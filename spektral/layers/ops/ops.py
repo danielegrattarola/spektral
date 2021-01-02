@@ -69,11 +69,12 @@ def segment_top_k(x, I, ratio):
     rt = tf.RaggedTensor.from_value_rowids(x, I)
     row_lengths = rt.row_lengths()
     dense = rt.to_tensor(default_value=-np.inf)
-    indices = tf.cast(tf.argsort(dense, direction='DESCENDING'), tf.int64)
+    indices = tf.cast(tf.argsort(dense, direction="DESCENDING"), tf.int64)
     row_starts = tf.cast(rt.row_starts(), tf.int64)
     indices = indices + tf.expand_dims(row_starts, 1)
     row_lengths = tf.cast(
-        tf.math.ceil(ratio * tf.cast(row_lengths, tf.float32)), tf.int32)
+        tf.math.ceil(ratio * tf.cast(row_lengths, tf.float32)), tf.int32
+    )
     return tf.RaggedTensor.from_tensor(indices, row_lengths).values
 
 
