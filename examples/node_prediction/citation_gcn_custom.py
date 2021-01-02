@@ -10,7 +10,7 @@ from tensorflow.keras.optimizers import Adam
 
 from spektral.datasets.citation import Cora
 from spektral.layers import GCNConv
-from spektral.models.gcn import GCNModel
+from spektral.models.gcn import GCN
 from spektral.transforms import LayerPreprocess, AdjToSpTensor
 from spektral.utils import tic, toc
 
@@ -22,8 +22,7 @@ graph = dataset[0]
 x, a, y = graph.x, graph.a, graph.y
 mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
 
-model = GCNModel(
-      num_classes=dataset.n_labels, num_input_channels=dataset.n_node_features)
+model = GCN(n_labels=dataset.n_labels, n_input_channels=dataset.n_node_features)
 optimizer = Adam(lr=1e-2)
 loss_fn = CategoricalCrossentropy()
 
@@ -45,5 +44,5 @@ train()  # Warm up to ignore tracing times when timing
 tic()
 for epoch in range(1, 201):
     loss = train()
-toc('Spektral - GCN (200 epochs)')
+toc("Spektral - GCN (200 epochs)")
 print(f"Final loss = {loss}")
