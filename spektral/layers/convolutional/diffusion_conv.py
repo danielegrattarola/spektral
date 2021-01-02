@@ -30,12 +30,14 @@ class DiffuseFeatures(layers.Layer):
     - `kernel_constraint`: constraint applied to the kernel vectors;
     """
 
-    def __init__(self,
-                 num_diffusion_steps,
-                 kernel_initializer,
-                 kernel_regularizer,
-                 kernel_constraint,
-                 **kwargs):
+    def __init__(
+        self,
+        num_diffusion_steps,
+        kernel_initializer,
+        kernel_regularizer,
+        kernel_constraint,
+        **kwargs
+    ):
         super(DiffuseFeatures, self).__init__(**kwargs)
 
         self.K = num_diffusion_steps
@@ -45,11 +47,13 @@ class DiffuseFeatures(layers.Layer):
 
     def build(self, input_shape):
         # Initializing the kernel vector (R^K) (theta in paper)
-        self.kernel = self.add_weight(shape=(self.K,),
-                                      name="kernel",
-                                      initializer=self.kernel_initializer,
-                                      regularizer=self.kernel_regularizer,
-                                      constraint=self.kernel_constraint)
+        self.kernel = self.add_weight(
+            shape=(self.K,),
+            name="kernel",
+            initializer=self.kernel_initializer,
+            regularizer=self.kernel_regularizer,
+            constraint=self.kernel_constraint,
+        )
 
     def call(self, inputs):
         x, a = inputs
@@ -74,68 +78,75 @@ class DiffuseFeatures(layers.Layer):
 
 class DiffusionConv(Conv):
     r"""
-    A diffusion convolution operator from the paper
+      A diffusion convolution operator from the paper
 
-    > [Diffusion Convolutional Recurrent Neural Network: Data-Driven Traffic
-  Forecasting](https://arxiv.org/abs/1707.01926)<br>
-    > Yaguang Li et al.
+      > [Diffusion Convolutional Recurrent Neural Network: Data-Driven Traffic
+    Forecasting](https://arxiv.org/abs/1707.01926)<br>
+      > Yaguang Li et al.
 
-    **Mode**: single, disjoint, mixed, batch.
+      **Mode**: single, disjoint, mixed, batch.
 
-    **This layer expects a dense adjacency matrix.**
+      **This layer expects a dense adjacency matrix.**
 
-    Given a number of diffusion steps \(K\) and a row-normalized adjacency
-    matrix \(\hat \A \), this layer calculates the \(q\)-th channel as:
-    $$
-    \mathbf{X}_{~:,~q}' = \sigma\left( \sum_{f=1}^{F} \left( \sum_{k=0}^{K-1}
-    \theta_k {\hat \A}^k \right) \X_{~:,~f} \right)
-    $$
+      Given a number of diffusion steps \(K\) and a row-normalized adjacency
+      matrix \(\hat \A \), this layer calculates the \(q\)-th channel as:
+      $$
+      \mathbf{X}_{~:,~q}' = \sigma\left( \sum_{f=1}^{F} \left( \sum_{k=0}^{K-1}
+      \theta_k {\hat \A}^k \right) \X_{~:,~f} \right)
+      $$
 
-    **Input**
+      **Input**
 
-    - Node features of shape `([batch], n_nodes, n_node_features)`;
-    - Normalized adjacency or attention coef. matrix \(\hat \A \) of shape
-    `([batch], n_nodes, n_nodes)`; Use `DiffusionConvolution.preprocess` to normalize.
+      - Node features of shape `([batch], n_nodes, n_node_features)`;
+      - Normalized adjacency or attention coef. matrix \(\hat \A \) of shape
+      `([batch], n_nodes, n_nodes)`; Use `DiffusionConvolution.preprocess` to normalize.
 
-    **Output**
+      **Output**
 
-    - Node features with the same shape as the input, but with the last
-    dimension changed to `channels`.
+      - Node features with the same shape as the input, but with the last
+      dimension changed to `channels`.
 
-    **Arguments**
+      **Arguments**
 
-    - `channels`: number of output channels;
-    - `K`: number of diffusion steps.
-    - `activation`: activation function \(\sigma\); (\(\tanh\) by default)
-    - `kernel_initializer`: initializer for the weights;
-    - `kernel_regularizer`: regularization applied to the weights;
-    - `kernel_constraint`: constraint applied to the weights;
+      - `channels`: number of output channels;
+      - `K`: number of diffusion steps.
+      - `activation`: activation function \(\sigma\); (\(\tanh\) by default)
+      - `kernel_initializer`: initializer for the weights;
+      - `kernel_regularizer`: regularization applied to the weights;
+      - `kernel_constraint`: constraint applied to the weights;
     """
 
-    def __init__(self,
-                 channels,
-                 K=6,
-                 activation='tanh',
-                 kernel_initializer='glorot_uniform',
-                 kernel_regularizer=None,
-                 kernel_constraint=None,
-                 **kwargs):
-        super().__init__(activation=activation,
-                         kernel_initializer=kernel_initializer,
-                         kernel_regularizer=kernel_regularizer,
-                         kernel_constraint=kernel_constraint,
-                         **kwargs)
+    def __init__(
+        self,
+        channels,
+        K=6,
+        activation="tanh",
+        kernel_initializer="glorot_uniform",
+        kernel_regularizer=None,
+        kernel_constraint=None,
+        **kwargs
+    ):
+        super().__init__(
+            activation=activation,
+            kernel_initializer=kernel_initializer,
+            kernel_regularizer=kernel_regularizer,
+            kernel_constraint=kernel_constraint,
+            **kwargs
+        )
 
         self.channels = channels
         self.K = K + 1
 
     def build(self, input_shape):
         self.filters = [
-            DiffuseFeatures(num_diffusion_steps=self.K,
-                            kernel_initializer=self.kernel_initializer,
-                            kernel_regularizer=self.kernel_regularizer,
-                            kernel_constraint=self.kernel_constraint)
-            for _ in range(self.channels)]
+            DiffuseFeatures(
+                num_diffusion_steps=self.K,
+                kernel_initializer=self.kernel_initializer,
+                kernel_regularizer=self.kernel_regularizer,
+                kernel_constraint=self.kernel_constraint,
+            )
+            for _ in range(self.channels)
+        ]
 
     def apply_filters(self, x, a):
         # This will be a list of channels diffused features.
@@ -160,10 +171,7 @@ class DiffusionConv(Conv):
 
     @property
     def config(self):
-        return {
-            'channels': self.channels,
-            'K': self.K - 1
-        }
+        return {"channels": self.channels, "K": self.K - 1}
 
     @staticmethod
     def preprocess(a):

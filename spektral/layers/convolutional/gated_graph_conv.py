@@ -52,29 +52,33 @@ class GatedGraphConv(MessagePassing):
     - `bias_constraint`: constraint applied to the bias vector.
     """
 
-    def __init__(self,
-                 channels,
-                 n_layers,
-                 activation=None,
-                 use_bias=True,
-                 kernel_initializer='glorot_uniform',
-                 bias_initializer='zeros',
-                 kernel_regularizer=None,
-                 bias_regularizer=None,
-                 activity_regularizer=None,
-                 kernel_constraint=None,
-                 bias_constraint=None,
-                 **kwargs):
-        super().__init__(activation=activation,
-                         use_bias=use_bias,
-                         kernel_initializer=kernel_initializer,
-                         bias_initializer=bias_initializer,
-                         kernel_regularizer=kernel_regularizer,
-                         bias_regularizer=bias_regularizer,
-                         activity_regularizer=activity_regularizer,
-                         kernel_constraint=kernel_constraint,
-                         bias_constraint=bias_constraint,
-                         **kwargs)
+    def __init__(
+        self,
+        channels,
+        n_layers,
+        activation=None,
+        use_bias=True,
+        kernel_initializer="glorot_uniform",
+        bias_initializer="zeros",
+        kernel_regularizer=None,
+        bias_regularizer=None,
+        activity_regularizer=None,
+        kernel_constraint=None,
+        bias_constraint=None,
+        **kwargs
+    ):
+        super().__init__(
+            activation=activation,
+            use_bias=use_bias,
+            kernel_initializer=kernel_initializer,
+            bias_initializer=bias_initializer,
+            kernel_regularizer=kernel_regularizer,
+            bias_regularizer=bias_regularizer,
+            activity_regularizer=activity_regularizer,
+            kernel_constraint=kernel_constraint,
+            bias_constraint=bias_constraint,
+            **kwargs
+        )
         self.channels = channels
         self.n_layers = n_layers
 
@@ -114,6 +118,6 @@ class GatedGraphConv(MessagePassing):
     @property
     def config(self):
         return {
-            'channels': self.channels,
-            'n_layers': self.n_layers,
+            "channels": self.channels,
+            "n_layers": self.n_layers,
         }

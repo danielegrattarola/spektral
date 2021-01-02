@@ -24,3 +24,6 @@ logs/
 
 # environments
 .venv
+
+.vscode
+.DS_Store

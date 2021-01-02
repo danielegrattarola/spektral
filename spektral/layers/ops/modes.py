@@ -44,6 +44,7 @@ def _vectorised_get_cum_graph_size(nodes, graph_sizes):
     :return: A list of shape (nodes) where each entry corresponds to the number of nodes contained in graphs
     with smaller segment ID for each node.
     """
+
     def get_cum_graph_size(node):
         cum_graph_sizes = tf.cumsum(graph_sizes, exclusive=True)
         indicator_if_smaller = tf.cast(node - cum_graph_sizes >= 0, tf.int32)

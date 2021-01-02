@@ -9,6 +9,7 @@ class Constant(object):
 
     - `value`: the value to concatenate to the node attributes.
     """
+
     def __init__(self, value):
         self.value = value
 

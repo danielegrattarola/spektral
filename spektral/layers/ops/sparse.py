@@ -13,12 +13,10 @@ def sp_matrix_to_sp_tensor(x):
     :return: a SparseTensor.
     """
     if len(x.shape) != 2:
-        raise ValueError('x must have rank 2')
+        raise ValueError("x must have rank 2")
     row, col, values = sp.find(x)
     out = tf.SparseTensor(
-        indices=np.array([row, col]).T,
-        values=values,
-        dense_shape=x.shape
+        indices=np.array([row, col]).T, values=values, dense_shape=x.shape
     )
     return tf.sparse.reorder(out)
 
@@ -39,7 +37,7 @@ def sp_batch_to_sp_tensor(a_list):
     out = tf.SparseTensor(
         indices=np.array(tensor_data[1:]).T,
         values=tensor_data[0],
-        dense_shape=(len(a_list), ) + a_list[0].shape
+        dense_shape=(len(a_list),) + a_list[0].shape,
     )
 
     return out
@@ -57,7 +55,7 @@ def dense_to_sparse(x):
     return tf.SparseTensor(indices, values, shape)
 
 
-def add_self_loops(a, fill=1.):
+def add_self_loops(a, fill=1.0):
     """
     Adds self-loops to the given adjacency matrix. Self-loops are added only for
     those node that don't have a self-loop already, and are assigned a weight
@@ -79,9 +77,10 @@ def add_self_loops(a, fill=1.):
     indices_od = indices[mask_od]
     indices_sl = indices[mask_sl]
 
-    values_sl = tf.fill((N, ), tf.cast(fill, values.dtype))
+    values_sl = tf.fill((N,), tf.cast(fill, values.dtype))
     values_sl = tf.tensor_scatter_nd_update(
-        values_sl, indices_sl[:, 0:1], values[mask_sl])
+        values_sl, indices_sl[:, 0:1], values[mask_sl]
+    )
 
     indices_sl = tf.range(N, dtype=indices.dtype)[:, None]
     indices_sl = tf.repeat(indices_sl, 2, -1)

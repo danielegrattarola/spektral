@@ -1,14 +1,13 @@
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras import Model, Input
+from tensorflow.keras import Input, Model
 
 from spektral import layers
 from spektral.layers.ops import sp_matrix_to_sp_tensor
 
-tf.keras.backend.set_floatx('float64')
-# tf.config.run_functions_eagerly(True)
+tf.keras.backend.set_floatx("float64")
 SINGLE, BATCH, MIXED = 1, 2, 3  # Single, batch, mixed
-LAYER_K_, MODES_K_, KWARGS_K_ = 'layer', 'modes', 'kwargs'
+LAYER_K_, MODES_K_, KWARGS_K_ = "layer", "modes", "kwargs"
 batch_size = 32
 N = 11
 F = 7
@@ -149,7 +148,7 @@ TESTS = [
 
 
 def _test_single_mode(layer, **kwargs):
-    sparse = kwargs.pop('sparse', False)
+    sparse = kwargs.pop("sparse", False)
     A_in = Input(shape=(None,), sparse=sparse)
     X_in = Input(shape=(F,))
     inputs = [X_in, A_in]
@@ -158,8 +157,8 @@ def _test_single_mode(layer, **kwargs):
     else:
         input_data = [X, A]
 
-    if kwargs.pop('edges', None):
-        E_in = Input(shape=(S, ))
+    if kwargs.pop("edges", None):
+        E_in = Input(shape=(S,))
         inputs.append(E_in)
         input_data.append(E_single)
 
@@ -169,7 +168,7 @@ def _test_single_mode(layer, **kwargs):
 
     output = model(input_data)
 
-    assert output.shape == (N, kwargs['channels'])
+    assert output.shape == (N, kwargs["channels"])
 
 
 def _test_batch_mode(layer, **kwargs):
@@ -181,7 +180,7 @@ def _test_batch_mode(layer, **kwargs):
     inputs = [X_in, A_in]
     input_data = [X_batch, A_batch]
 
-    if kwargs.pop('edges', None):
+    if kwargs.pop("edges", None):
         E_batch = np.stack([E] * batch_size)
         E_in = Input(shape=(N, N, S))
         inputs.append(E_in)
@@ -193,11 +192,11 @@ def _test_batch_mode(layer, **kwargs):
 
     output = model(input_data)
 
-    assert output.shape == (batch_size, N, kwargs['channels'])
+    assert output.shape == (batch_size, N, kwargs["channels"])
 
 
 def _test_mixed_mode(layer, **kwargs):
-    sparse = kwargs.pop('sparse', False)
+    sparse = kwargs.pop("sparse", False)
     X_batch = np.stack([X] * batch_size)
     A_in = Input(shape=(N,), sparse=sparse)
     X_in = Input(shape=(N, F))
@@ -219,23 +218,23 @@ def _test_mixed_mode(layer, **kwargs):
 
     output = model(input_data)
 
-    assert output.shape == (batch_size, N, kwargs['channels'])
+    assert output.shape == (batch_size, N, kwargs["channels"])
 
 
 def _test_get_config(layer, **kwargs):
-    if kwargs.get('edges'):
-        kwargs.pop('edges')
+    if kwargs.get("edges"):
+        kwargs.pop("edges")
     layer_instance = layer(**kwargs)
     config = layer_instance.get_config()
     layer_instance_new = layer(**config)
     config_new = layer_instance_new.get_config()
-    config.pop('name')
-    config_new.pop('name')
+    config.pop("name")
+    config_new.pop("name")
 
     # Remove 'name' if we have advanced activations (needed for GeneralConv)
-    if 'activation' in config and 'class_name' in config['activation']:
-        config['activation']['config'].pop('name')
-        config_new['activation']['config'].pop('name')
+    if "activation" in config and "class_name" in config["activation"]:
+        config["activation"]["config"].pop("name")
+        config_new["activation"]["config"].pop("name")
 
     assert config_new == config
 

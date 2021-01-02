@@ -201,7 +201,7 @@ def unsorted_segment_softmax(x, indices, n_nodes=None):
 def serialize_scatter(identifier):
     if identifier in OP_DICT:
         return identifier
-    elif hasattr(identifier, '__name__'):
+    elif hasattr(identifier, "__name__"):
         for k, v in OP_DICT.items():
             if v.__name__ == identifier.__name__:
                 return k

@@ -38,7 +38,7 @@ def to_disjoint(x_list=None, a_list=None, e_list=None):
         -  `i`: np.array of shape `(n_nodes, )`;
     """
     if a_list is None and x_list is None:
-        raise ValueError('Need at least x_list or a_list.')
+        raise ValueError("Need at least x_list or a_list.")
 
     # Node features
     x_out = None
@@ -51,8 +51,7 @@ def to_disjoint(x_list=None, a_list=None, e_list=None):
         a_out = sp.block_diag(a_list)
 
     # Batch index
-    n_nodes = np.array(
-        [x.shape[0] for x in (x_list if x_list is not None else a_list)])
+    n_nodes = np.array([x.shape[0] for x in (x_list if x_list is not None else a_list)])
     i_out = np.repeat(np.arange(len(n_nodes)), n_nodes)
 
     # Edge attributes
@@ -98,7 +97,7 @@ def to_batch(x_list=None, a_list=None, e_list=None):
         -  `e`: np.array of shape `(batch, n_max, n_max, n_edge_features)`;
     """
     if a_list is None and x_list is None:
-        raise ValueError('Need at least x_list or a_list')
+        raise ValueError("Need at least x_list or a_list")
 
     n_max = max([x.shape[0] for x in (x_list if x_list is not None else a_list)])
 
@@ -110,7 +109,7 @@ def to_batch(x_list=None, a_list=None, e_list=None):
     # Adjacency matrix
     a_out = None
     if a_list is not None:
-        if hasattr(a_list[0], 'toarray'):  # Convert sparse to dense
+        if hasattr(a_list[0], "toarray"):  # Convert sparse to dense
             a_list = [a.toarray() for a in a_list]
         a_out = pad_jagged_array(a_list, (n_max, n_max))
 
@@ -183,9 +182,9 @@ def batch_generator(data, batch_size=32, epochs=None, shuffle=True):
     if not isinstance(data, (list, tuple)):
         data = [data]
     if len(data) < 1:
-        raise ValueError('data cannot be empty')
+        raise ValueError("data cannot be empty")
     if len(set([len(item) for item in data])) > 1:
-        raise ValueError('All inputs must have the same __len__')
+        raise ValueError("All inputs must have the same __len__")
 
     if epochs is None or epochs == -1:
         epochs = np.inf
@@ -221,7 +220,7 @@ def get_spec(x):
 
 
 def prepend_none(t):
-    return (None, ) + t
+    return (None,) + t
 
 
 def to_tf_signature(signature):
@@ -231,18 +230,18 @@ def to_tf_signature(signature):
     :return: a TensorFlow signature.
     """
     output = []
-    keys = ['x', 'a', 'e', 'i']
+    keys = ["x", "a", "e", "i"]
     for k in keys:
         if k in signature:
-            shape = signature[k]['shape']
-            dtype = signature[k]['dtype']
-            spec = signature[k]['spec']
+            shape = signature[k]["shape"]
+            dtype = signature[k]["dtype"]
+            spec = signature[k]["spec"]
             output.append(spec(shape, dtype))
     output = tuple(output)
-    if 'y' in signature:
-        shape = signature['y']['shape']
-        dtype = signature['y']['dtype']
-        spec = signature['y']['spec']
+    if "y" in signature:
+        shape = signature["y"]["shape"]
+        dtype = signature["y"]["dtype"]
+        spec = signature["y"]["spec"]
         output = (output, spec(shape, dtype))
 
     return output

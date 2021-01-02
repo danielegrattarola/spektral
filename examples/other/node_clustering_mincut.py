@@ -9,7 +9,11 @@ Filippo Maria Bianchi, Daniele Grattarola, Cesare Alippi
 import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
-from sklearn.metrics.cluster import v_measure_score, homogeneity_score, completeness_score
+from sklearn.metrics.cluster import (
+    completeness_score,
+    homogeneity_score,
+    v_measure_score,
+)
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 from tqdm import tqdm
@@ -33,7 +37,7 @@ def train_step(inputs):
 
 np.random.seed(1)
 epochs = 5000  # Training iterations
-lr = 5e-4      # Learning rate
+lr = 5e-4  # Learning rate
 
 ################################################################################
 # LOAD DATASET
@@ -49,10 +53,10 @@ n_clusters = y.max() + 1
 ################################################################################
 # MODEL
 ################################################################################
-x_in = Input(shape=(F,), name='X_in')
-a_in = Input(shape=(None,), name='A_in', sparse=True)
+x_in = Input(shape=(F,), name="X_in")
+a_in = Input(shape=(None,), name="A_in", sparse=True)
 
-x_1 = GCSConv(16, activation='elu')([x_in, a_in])
+x_1 = GCSConv(16, activation="elu")([x_in, a_in])
 x_1, a_1, s_1 = MinCutPool(n_clusters, return_mask=True)([x_1, a_in])
 
 model = Model([x_in, a_in], [x_1, s_1])
@@ -83,23 +87,23 @@ s_out = np.argmax(s_out, axis=-1)
 hom = homogeneity_score(y, s_out)
 com = completeness_score(y, s_out)
 nmi = v_measure_score(y, s_out)
-print('Homogeneity: {:.3f}; Completeness: {:.3f}; NMI: {:.3f}'.format(hom, com, nmi))
+print("Homogeneity: {:.3f}; Completeness: {:.3f}; NMI: {:.3f}".format(hom, com, nmi))
 
 # Plots
 plt.figure(figsize=(10, 5))
 
 plt.subplot(121)
-plt.plot(loss_history[:, 0], label='MinCUT loss')
-plt.plot(loss_history[:, 1], label='Ortho. loss')
-plt.plot(loss_history[:, 2], label='Total loss')
+plt.plot(loss_history[:, 0], label="MinCUT loss")
+plt.plot(loss_history[:, 1], label="Ortho. loss")
+plt.plot(loss_history[:, 2], label="Total loss")
 plt.legend()
-plt.ylabel('Loss')
-plt.xlabel('Iteration')
+plt.ylabel("Loss")
+plt.xlabel("Iteration")
 
 plt.subplot(122)
-plt.plot(nmi_history, label='NMI')
+plt.plot(nmi_history, label="NMI")
 plt.legend()
-plt.ylabel('NMI')
-plt.xlabel('Iteration')
+plt.ylabel("NMI")
+plt.xlabel("Iteration")
 
 plt.show()
