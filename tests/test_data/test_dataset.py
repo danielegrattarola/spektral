@@ -12,11 +12,15 @@ s = 3
 def test_dataset():
     class TestDataset(Dataset):
         def read(self):
-            return [Graph(x=np.random.rand(n, f),
-                          a=np.random.randint(0, 2, (n, n)),
-                          e=np.random.rand(n, n, s),
-                          y=np.array([0., 1.]))
-                    for n in Ns]
+            return [
+                Graph(
+                    x=np.random.rand(n, f),
+                    a=np.random.randint(0, 2, (n, n)),
+                    e=np.random.rand(n, n, s),
+                    y=np.array([0.0, 1.0]),
+                )
+                for n in Ns
+            ]
 
     d = TestDataset()
 
@@ -25,7 +29,7 @@ def test_dataset():
     assert d.n_labels == 2
 
     # signature
-    for k in ['x', 'a', 'e', 'y']:
+    for k in ["x", "a", "e", "y"]:
         assert k in d.signature
 
     # __getitem__
@@ -35,10 +39,12 @@ def test_dataset():
 
     # __setitem__
     n = 100
-    g = Graph(x=np.random.rand(n, f),
-              a=np.random.randint(0, 2, (n, n)),
-              e=np.random.rand(n, n, s),
-              y=np.array([0., 1.]))
+    g = Graph(
+        x=np.random.rand(n, f),
+        a=np.random.randint(0, 2, (n, n)),
+        e=np.random.rand(n, n, s),
+        y=np.array([0.0, 1.0]),
+    )
 
     # single assignment
     d[0] = g
@@ -46,11 +52,19 @@ def test_dataset():
 
     # Slice assignment
     d[1:3] = [g] * 2
-    assert d[1].n_nodes == n and d[2].n_nodes == n and all([d_.n_nodes != n for d_ in d[3:]])
+    assert (
+        d[1].n_nodes == n
+        and d[2].n_nodes == n
+        and all([d_.n_nodes != n for d_ in d[3:]])
+    )
 
     # List assignment
     d[[3, 4]] = [g] * 2
-    assert d[3].n_nodes == n and d[4].n_nodes == n and all([d_.n_nodes != n for d_ in d[5:]])
+    assert (
+        d[3].n_nodes == n
+        and d[4].n_nodes == n
+        and all([d_.n_nodes != n for d_ in d[5:]])
+    )
 
     # __len__
     assert d.__len__() == n_graphs

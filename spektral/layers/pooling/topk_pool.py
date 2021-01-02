@@ -57,18 +57,22 @@ class TopKPool(Pool):
     - `kernel_constraint`: constraint applied to the weights;
     """
 
-    def __init__(self,
-                 ratio,
-                 return_mask=False,
-                 sigmoid_gating=False,
-                 kernel_initializer='glorot_uniform',
-                 kernel_regularizer=None,
-                 kernel_constraint=None,
-                 **kwargs):
-        super().__init__(kernel_initializer=kernel_initializer,
-                         kernel_regularizer=kernel_regularizer,
-                         kernel_constraint=kernel_constraint,
-                         **kwargs)
+    def __init__(
+        self,
+        ratio,
+        return_mask=False,
+        sigmoid_gating=False,
+        kernel_initializer="glorot_uniform",
+        kernel_regularizer=None,
+        kernel_constraint=None,
+        **kwargs
+    ):
+        super().__init__(
+            kernel_initializer=kernel_initializer,
+            kernel_regularizer=kernel_regularizer,
+            kernel_constraint=kernel_constraint,
+            **kwargs
+        )
         self.ratio = ratio
         self.return_mask = return_mask
         self.sigmoid_gating = sigmoid_gating
@@ -87,11 +91,11 @@ class TopKPool(Pool):
     def call(self, inputs):
         if len(inputs) == 3:
             X, A, I = inputs
-            self.data_mode = 'disjoint'
+            self.data_mode = "disjoint"
         else:
             X, A = inputs
             I = tf.zeros(tf.shape(X)[:1])
-            self.data_mode = 'single'
+            self.data_mode = "single"
         if K.ndim(I) == 2:
             I = I[:, 0]
         I = tf.cast(I, tf.int32)
@@ -108,7 +112,9 @@ class TopKPool(Pool):
         # Multiply X and y to make layer differentiable
         features = X * self.gating_op(y)
 
-        axis = 0 if len(K.int_shape(A)) == 2 else 1  # Cannot use negative axis in tf.boolean_mask
+        axis = (
+            0 if len(K.int_shape(A)) == 2 else 1
+        )  # Cannot use negative axis in tf.boolean_mask
         # Reduce X
         X_pooled = tf.gather(features, indices, axis=axis)
 
@@ -137,7 +143,7 @@ class TopKPool(Pool):
     @property
     def config(self):
         return {
-            'ratio': self.ratio,
-            'return_mask': self.return_mask,
-            'sigmoid_gating': self.sigmoid_gating
+            "ratio": self.ratio,
+            "return_mask": self.return_mask,
+            "sigmoid_gating": self.sigmoid_gating,
         }

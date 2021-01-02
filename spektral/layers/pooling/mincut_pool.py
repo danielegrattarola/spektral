@@ -66,30 +66,34 @@ class MinCutPool(Pool):
     - `bias_constraint`: constraint applied to the bias of the MLP;
     """
 
-    def __init__(self,
-                 k,
-                 mlp_hidden=None,
-                 mlp_activation='relu',
-                 return_mask=False,
-                 activation=None,
-                 use_bias=True,
-                 kernel_initializer='glorot_uniform',
-                 bias_initializer='zeros',
-                 kernel_regularizer=None,
-                 bias_regularizer=None,
-                 kernel_constraint=None,
-                 bias_constraint=None,
-                 **kwargs):
+    def __init__(
+        self,
+        k,
+        mlp_hidden=None,
+        mlp_activation="relu",
+        return_mask=False,
+        activation=None,
+        use_bias=True,
+        kernel_initializer="glorot_uniform",
+        bias_initializer="zeros",
+        kernel_regularizer=None,
+        bias_regularizer=None,
+        kernel_constraint=None,
+        bias_constraint=None,
+        **kwargs
+    ):
 
-        super().__init__(activation=activation,
-                         use_bias=use_bias,
-                         kernel_initializer=kernel_initializer,
-                         bias_initializer=bias_initializer,
-                         kernel_regularizer=kernel_regularizer,
-                         bias_regularizer=bias_regularizer,
-                         kernel_constraint=kernel_constraint,
-                         bias_constraint=bias_constraint,
-                         **kwargs)
+        super().__init__(
+            activation=activation,
+            use_bias=use_bias,
+            kernel_initializer=kernel_initializer,
+            bias_initializer=bias_initializer,
+            kernel_regularizer=kernel_regularizer,
+            bias_regularizer=bias_regularizer,
+            kernel_constraint=kernel_constraint,
+            bias_constraint=bias_constraint,
+            **kwargs
+        )
         self.k = k
         self.mlp_hidden = mlp_hidden if mlp_hidden else []
         self.mlp_activation = mlp_activation
@@ -103,16 +107,12 @@ class MinCutPool(Pool):
             kernel_regularizer=self.kernel_regularizer,
             bias_regularizer=self.bias_regularizer,
             kernel_constraint=self.kernel_constraint,
-            bias_constraint=self.bias_constraint
+            bias_constraint=self.bias_constraint,
         )
         mlp_layers = []
         for i, channels in enumerate(self.mlp_hidden):
-            mlp_layers.append(
-                Dense(channels, self.mlp_activation, **layer_kwargs)
-            )
-        mlp_layers.append(
-            Dense(self.k, 'softmax', **layer_kwargs)
-        )
+            mlp_layers.append(Dense(channels, self.mlp_activation, **layer_kwargs))
+        mlp_layers.append(Dense(self.k, "softmax", **layer_kwargs))
         self.mlp = Sequential(mlp_layers)
 
         super().build(input_shape)
@@ -147,7 +147,7 @@ class MinCutPool(Pool):
         I_S = tf.eye(self.k, dtype=SS.dtype)
         ortho_loss = tf.norm(
             SS / tf.norm(SS, axis=(-1, -2), keepdims=True) - I_S / tf.norm(I_S),
-            axis=(-1, -2)
+            axis=(-1, -2),
         )
         if batch_mode:
             ortho_loss = K.mean(ortho_loss)
@@ -175,8 +175,8 @@ class MinCutPool(Pool):
     @property
     def config(self):
         return {
-            'k': self.k,
-            'mlp_hidden': self.mlp_hidden,
-            'mlp_activation': self.mlp_activation,
-            'return_mask': self.return_mask
+            "k": self.k,
+            "mlp_hidden": self.mlp_hidden,
+            "mlp_activation": self.mlp_activation,
+            "return_mask": self.return_mask,
         }

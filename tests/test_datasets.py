@@ -1,5 +1,5 @@
-from spektral.data import DisjointLoader, BatchLoader, SingleLoader
 from spektral import datasets
+from spektral.data import BatchLoader, DisjointLoader, SingleLoader
 
 batch_size = 3
 
@@ -42,7 +42,7 @@ def test_qm9():
 
 def test_tud():
     # Edge labels + edge attributes
-    dataset = datasets.TUDataset('BZR_MD', clean=False)
+    dataset = datasets.TUDataset("BZR_MD", clean=False)
     dl = DisjointLoader(dataset, batch_size=batch_size)
     dl.__next__()
 
@@ -50,7 +50,7 @@ def test_tud():
     bl.__next__()
 
     # Node labels + node attributes + clean version
-    dataset = datasets.TUDataset('ENZYMES', clean=True)
+    dataset = datasets.TUDataset("ENZYMES", clean=True)
     dl = DisjointLoader(dataset, batch_size=batch_size)
     dl.__next__()
 

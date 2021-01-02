@@ -5,7 +5,7 @@ from scipy import sparse as sp
 from spektral.data.utils import prepend_none, to_tf_signature, to_disjoint, to_batch, batch_generator, to_mixed
 from spektral.layers.ops import sp_matrix_to_sp_tensor
 
-version = tf.__version__.split('.')
+version = tf.__version__.split(".")
 major, minor = int(version[0]), int(version[1])
 tf_loader_available = major > 1 and minor > 3
 
@@ -74,6 +74,7 @@ class Loader:
     iterates indefinitely;
     - `shuffle`: whether to shuffle the data at the start of each epoch.
     """
+
     def __init__(self, dataset, batch_size=1, epochs=None, shuffle=True):
         self.dataset = dataset
         self.batch_size = batch_size
@@ -89,8 +90,12 @@ class Loader:
         return self.collate(nxt)
 
     def generator(self):
-        return batch_generator(self.dataset, batch_size=self.batch_size,
-                               epochs=self.epochs, shuffle=self.shuffle)
+        return batch_generator(
+            self.dataset,
+            batch_size=self.batch_size,
+            epochs=self.epochs,
+            shuffle=self.shuffle,
+        )
 
     def collate(self, batch):
         raise NotImplementedError
@@ -138,7 +143,7 @@ class Loader:
         """
         output = [list(elem) for elem in zip(*[g.numpy() for g in batch])]
         if return_dict:
-            keys = [k + '_list' for k in self.dataset.signature.keys()]
+            keys = [k + "_list" for k in self.dataset.signature.keys()]
             return {k: v for k, v in zip(keys, output)}
         else:
             return output
@@ -185,10 +190,13 @@ class SingleLoader(Loader):
 
 
     """
+
     def __init__(self, dataset, epochs=None, sample_weights=None):
         if len(dataset) != 1:
-            raise ValueError('SingleLoader can only be used with Datasets that'
-                             'have a single graph.')
+            raise ValueError(
+                "SingleLoader can only be used with Datasets that"
+                "have a single graph."
+            )
         self.sample_weights = sample_weights
         super().__init__(dataset, batch_size=1, epochs=epochs, shuffle=False)
 
@@ -205,7 +213,7 @@ class SingleLoader(Loader):
 
         output = (output[:-1], output[-1])
         if self.sample_weights is not None:
-            output += (self.sample_weights, )
+            output += (self.sample_weights,)
         return tuple(output)
 
     def load(self):
@@ -254,17 +262,20 @@ class DisjointLoader(Loader):
     `[n_nodes, n_labels]` otherwise.
 
     """
-    def __init__(self, dataset, node_level=False, batch_size=1, epochs=None,
-                 shuffle=True):
+
+    def __init__(
+        self, dataset, node_level=False, batch_size=1, epochs=None, shuffle=True
+    ):
         self.node_level = node_level
-        super(DisjointLoader, self).__init__(dataset, batch_size=batch_size,
-                                             epochs=epochs, shuffle=shuffle)
+        super(DisjointLoader, self).__init__(
+            dataset, batch_size=batch_size, epochs=epochs, shuffle=shuffle
+        )
 
     def collate(self, batch):
         packed = self.pack(batch, return_dict=True)
         y = None
-        if 'y' in self.dataset.signature:
-            y = packed.pop('y_list')
+        if "y" in self.dataset.signature:
+            y = packed.pop("y_list")
             y = np.vstack(y) if self.node_level else np.array(y)
 
         output = to_disjoint(**packed)
@@ -281,10 +292,12 @@ class DisjointLoader(Loader):
 
     def load(self):
         if not tf_loader_available:
-            raise RuntimeError('Calling DisjointLoader.load() requires '
-                               'TensorFlow 2.4 or greater.')
+            raise RuntimeError(
+                "Calling DisjointLoader.load() requires " "TensorFlow 2.4 or greater."
+            )
         return tf.data.Dataset.from_generator(
-            lambda: self, output_signature=self.tf_signature())
+            lambda: self, output_signature=self.tf_signature()
+        )
 
     def tf_signature(self):
         """
@@ -294,16 +307,16 @@ class DisjointLoader(Loader):
         Targets have shape [..., n_labels]
         """
         signature = self.dataset.signature
-        if 'y' in signature:
+        if "y" in signature:
             if not self.node_level:
-                signature['y']['shape'] = prepend_none(signature['y']['shape'])
-        if 'a' in signature:
-            signature['a']['spec'] = tf.SparseTensorSpec
+                signature["y"]["shape"] = prepend_none(signature["y"]["shape"])
+        if "a" in signature:
+            signature["a"]["spec"] = tf.SparseTensorSpec
 
-        signature['i'] = dict()
-        signature['i']['spec'] = tf.TensorSpec
-        signature['i']['shape'] = (None,)
-        signature['i']['dtype'] = tf.as_dtype(tf.int64)
+        signature["i"] = dict()
+        signature["i"]["spec"] = tf.TensorSpec
+        signature["i"]["shape"] = (None,)
+        signature["i"]["dtype"] = tf.as_dtype(tf.int64)
 
         return to_tf_signature(signature)
 
@@ -355,9 +368,10 @@ class BatchLoader(Loader):
 
     `labels` have shape `[batch, n_labels]`.
     """
+
     def collate(self, batch):
         packed = self.pack(batch, return_dict=True)
-        y = np.array(packed.pop('y_list')) if 'y' in self.dataset.signature else None
+        y = np.array(packed.pop("y_list")) if "y" in self.dataset.signature else None
 
         output = to_batch(**packed)
         if len(output) == 1:
@@ -377,13 +391,13 @@ class BatchLoader(Loader):
         """
         signature = self.dataset.signature
         for k in signature:
-            signature[k]['shape'] = prepend_none(signature[k]['shape'])
-        if 'a' in signature:
+            signature[k]["shape"] = prepend_none(signature[k]["shape"])
+        if "a" in signature:
             # Adjacency matrix in batch mode is dense
-            signature['a']['spec'] = tf.TensorSpec
-        if 'e' in signature:
+            signature["a"]["spec"] = tf.TensorSpec
+        if "e" in signature:
             # Edge attributes have an extra None dimension in batch mode
-            signature['e']['shape'] = prepend_none(signature['e']['shape'])
+            signature["e"]["shape"] = prepend_none(signature["e"]["shape"])
 
         return to_tf_signature(signature)
 
@@ -425,15 +439,16 @@ class PackedBatchLoader(BatchLoader):
 
     `labels` have shape `[batch, ..., n_labels]`.
     """
+
     def __init__(self, dataset, batch_size=1, epochs=None, shuffle=True):
         super().__init__(dataset, batch_size=batch_size, epochs=epochs, shuffle=shuffle)
 
         # Drop the Dataset container and work on packed tensors directly
         packed = self.pack(self.dataset, return_dict=True)
-        y = np.array(packed.pop('y_list')) if 'y' in dataset.signature else None
+        y = np.array(packed.pop("y_list")) if "y" in dataset.signature else None
         self.dataset = to_batch(**packed)
         if y is not None:
-            self.dataset += (y, )
+            self.dataset += (y,)
 
         # Re-instantiate generator after packing dataset
         self._generator = self.generator()

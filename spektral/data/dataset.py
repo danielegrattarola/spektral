@@ -4,7 +4,7 @@ import warnings
 import numpy as np
 import tensorflow as tf
 
-from spektral.data import Graph
+from spektral.data.graph import Graph
 from spektral.data.utils import get_spec
 from spektral.datasets.utils import DATASET_FOLDER
 
@@ -102,6 +102,7 @@ class Dataset:
     - `transforms`: a callable or list of callables that are automatically
     applied to the graphs after loading the dataset.
     """
+
     def __init__(self, transforms=None, **kwargs):
         self.a = None  # Used for mixed-mode datasets
         # Read extra kwargs
@@ -123,8 +124,9 @@ class Dataset:
             if not isinstance(transforms, (list, tuple)) and callable(transforms):
                 transforms = [transforms]
             elif not all([callable(t) for t in transforms]):
-                raise ValueError('`transforms` must be a callable or list of '
-                                 'callables')
+                raise ValueError(
+                    "`transforms` must be a callable or list of " "callables"
+                )
             else:
                 pass
             for t in transforms:
@@ -138,29 +140,31 @@ class Dataset:
 
     def apply(self, transform):
         if not callable(transform):
-            raise ValueError('`transform` must be callable')
+            raise ValueError("`transform` must be callable")
 
         for i in range(len(self.graphs)):
             self.graphs[i] = transform(self.graphs[i])
 
     def map(self, transform, reduce=None):
         if not callable(transform):
-            raise ValueError('`transform` must be callable')
+            raise ValueError("`transform` must be callable")
         if reduce is not None and not callable(reduce):
-            raise ValueError('`reduce` must be callable')
+            raise ValueError("`reduce` must be callable")
 
         out = [transform(g) for g in self.graphs]
         return reduce(out) if reduce is not None else out
 
     def filter(self, function):
         if not callable(function):
-            raise ValueError('`function` must be callable')
+            raise ValueError("`function` must be callable")
         self.graphs = [g for g in self.graphs if function(g)]
 
     def __getitem__(self, key):
-        if not (np.issubdtype(type(key), np.integer) or
-                isinstance(key, (slice, list, tuple, np.ndarray))):
-            raise ValueError('Unsupported key type: {}'.format(type(key)))
+        if not (
+            np.issubdtype(type(key), np.integer)
+            or isinstance(key, (slice, list, tuple, np.ndarray))
+        ):
+            raise ValueError("Unsupported key type: {}".format(type(key)))
         if np.issubdtype(type(key), np.integer):
             return self.graphs[int(key)]
         else:
@@ -174,16 +178,17 @@ class Dataset:
     def __setitem__(self, key, value):
         is_iterable = isinstance(value, (list, tuple))
         if not isinstance(value, (Graph, list, tuple)):
-            raise ValueError('Datasets can only be assigned Graphs or '
-                             'sequences of Graphs')
+            raise ValueError(
+                "Datasets can only be assigned Graphs or " "sequences of Graphs"
+            )
         if is_iterable and not all([isinstance(v, Graph) for v in value]):
-            raise ValueError('Assigned sequence must contain only Graphs')
+            raise ValueError("Assigned sequence must contain only Graphs")
         if is_iterable and isinstance(key, int):
-            raise ValueError('Cannot assign multiple Graphs to one location')
+            raise ValueError("Cannot assign multiple Graphs to one location")
         if not is_iterable and isinstance(key, (slice, list, tuple)):
-            raise ValueError('Cannot assign one Graph to multiple locations')
+            raise ValueError("Cannot assign one Graph to multiple locations")
         if not (isinstance(key, (int, slice, list, tuple))):
-            raise ValueError('Unsupported key type: {}'.format(type(key)))
+            raise ValueError("Unsupported key type: {}".format(type(key)))
 
         if isinstance(key, int):
             self.graphs[key] = value
@@ -198,7 +203,7 @@ class Dataset:
         return len(self.graphs)
 
     def __repr__(self):
-        return '{}(n_graphs={})'.format(self.__class__.__name__, self.n_graphs)
+        return "{}(n_graphs={})".format(self.__class__.__name__, self.n_graphs)
 
     @property
     def path(self):
@@ -210,7 +215,7 @@ class Dataset:
 
     @property
     def n_nodes(self):
-        if len(self.graphs) ==1:
+        if len(self.graphs) == 1:
             return self.graphs[0].n_nodes
         elif self.a is not None:
             return self.a.shape[-1]
@@ -258,23 +263,23 @@ class Dataset:
         signature = {}
         graph = self.graphs[0]  # This is always non-empty
         if graph.x is not None:
-            signature['x'] = dict()
-            signature['x']['spec'] = get_spec(graph.x)
-            signature['x']['shape'] = (None, self.n_node_features)
-            signature['x']['dtype'] = tf.as_dtype(graph.x.dtype)
+            signature["x"] = dict()
+            signature["x"]["spec"] = get_spec(graph.x)
+            signature["x"]["shape"] = (None, self.n_node_features)
+            signature["x"]["dtype"] = tf.as_dtype(graph.x.dtype)
         if graph.a is not None:
-            signature['a'] = dict()
-            signature['a']['spec'] = get_spec(graph.a)
-            signature['a']['shape'] = (None, None)
-            signature['a']['dtype'] = tf.as_dtype(graph.a.dtype)
+            signature["a"] = dict()
+            signature["a"]["spec"] = get_spec(graph.a)
+            signature["a"]["shape"] = (None, None)
+            signature["a"]["dtype"] = tf.as_dtype(graph.a.dtype)
         if graph.e is not None:
-            signature['e'] = dict()
-            signature['e']['spec'] = get_spec(graph.e)
-            signature['e']['shape'] = (None, self.n_edge_features)
-            signature['e']['dtype'] = tf.as_dtype(graph.e.dtype)
+            signature["e"] = dict()
+            signature["e"]["spec"] = get_spec(graph.e)
+            signature["e"]["shape"] = (None, self.n_edge_features)
+            signature["e"]["dtype"] = tf.as_dtype(graph.e.dtype)
         if graph.y is not None:
-            signature['y'] = dict()
-            signature['y']['spec'] = get_spec(graph.y)
-            signature['y']['shape'] = (self.n_labels,)
-            signature['y']['dtype'] = tf.as_dtype(np.array(graph.y).dtype)
+            signature["y"] = dict()
+            signature["y"]["spec"] = get_spec(graph.y)
+            signature["y"]["shape"] = (self.n_labels,)
+            signature["y"]["dtype"] = tf.as_dtype(np.array(graph.y).dtype)
         return signature

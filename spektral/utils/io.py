@@ -18,8 +18,9 @@ def load_binary(filename):
         return joblib.load(filename)
     except ValueError:
         import pickle
-        with open(filename, 'rb') as f:
-            return pickle.load(f, encoding='latin1')
+
+        with open(filename, "rb") as f:
+            return pickle.load(f, encoding="latin1")
 
 
 def dump_binary(obj, filename):
@@ -50,10 +51,11 @@ def dump_csv(df, filename, convert=False, **kwargs):
     """
     if convert:
         df = pd.DataFrame(df)
-    assert hasattr(df, 'to_csv'), \
-        'Trying to dump object of class {} to csv while pd.DataFrame is ' \
-        'expected. To attempt automatic conversion, set ' \
-        'convert=True.'.format(df.__class__)
+    assert hasattr(df, "to_csv"), (
+        "Trying to dump object of class {} to csv while pd.DataFrame is "
+        "expected. To attempt automatic conversion, set "
+        "convert=True.".format(df.__class__)
+    )
     df.to_csv(filename, **kwargs)
 
 
@@ -77,10 +79,9 @@ def load_dot(filename, force_graph=True):
                 elem[k] = str(v)
             except SyntaxError:
                 # Probably a numpy array
-                elem[k] = np.array(' '.join(v.lstrip('[')
-                                             .rstrip(']')
-                                             .split())
-                                      .split(' ')).astype(np.float)
+                elem[k] = np.array(
+                    " ".join(v.lstrip("[").rstrip("]").split()).split(" ")
+                ).astype(np.float)
 
     for elem in output.edges().values():
         for k, v in elem.items():
@@ -108,7 +109,7 @@ def load_npy(filename):
     :return: the loaded object
     """
     if sys.version_info[0] == 3:
-        return np.load(filename, encoding='latin1')
+        return np.load(filename, encoding="latin1")
     else:
         return np.load(filename)
 
@@ -146,14 +147,14 @@ def dump_txt(obj, filename, **kwargs):
 
 
 def _parse_off(lines):
-    n_verts, n_faces, _ = map(int, lines[0].split(' '))
+    n_verts, n_faces, _ = map(int, lines[0].split(" "))
 
     # Read vertices
-    verts = np.array([l.split(' ') for l in lines[1:n_verts + 1]]).astype(float)
+    verts = np.array([l.split(" ") for l in lines[1 : n_verts + 1]]).astype(float)
 
     # Read faces
-    faces = lines[n_verts + 1:n_verts + 1 + n_faces]
-    faces = [list(map(int, f.split(' '))) for f in faces]
+    faces = lines[n_verts + 1 : n_verts + 1 + n_faces]
+    faces = [list(map(int, f.split(" "))) for f in faces]
     triangles = np.array(list(filter(lambda f: len(f) == 4, faces))).astype(int)
     rectangles = np.array(list(filter(lambda f: len(f) == 5, faces))).astype(int)
     if len(rectangles) > 0:
@@ -175,7 +176,7 @@ def load_off(filename):
     """
     from spektral.data.graph import Graph
 
-    lines = open(filename, 'r').read().lstrip('OF\n').splitlines()
+    lines = open(filename, "r").read().lstrip("OF\n").splitlines()
     x, faces = _parse_off(lines)
     n = x.shape[0]
     row, col = np.vstack((faces[:, :2], faces[:, 1:], faces[:, ::2])).T
@@ -224,26 +225,126 @@ def load_off(filename):
 #  'name': 'gdb_54964',
 #  'properties': []}
 HEADER_SIZE = 3
-NUM_TO_SYMBOL = {1: 'H', 2: 'He', 3: 'Li', 4: 'Be', 5: 'B', 6: 'C', 7: 'N',
-                 8: 'O', 9: 'F', 10: 'Ne', 11: 'Na', 12: 'Mg', 13: 'Al',
-                 14: 'Si', 15: 'P', 16: 'S', 17: 'Cl', 18: 'Ar', 19: 'K',
-                 20: 'Ca', 21: 'Sc', 22: 'Ti', 23: 'V', 24: 'Cr', 25: 'Mn',
-                 26: 'Fe', 27: 'Co', 28: 'Ni', 29: 'Cu', 30: 'Zn', 31: 'Ga',
-                 32: 'Ge', 33: 'As', 34: 'Se', 35: 'Br', 36: 'Kr', 37: 'Rb',
-                 38: 'Sr', 39: 'Y', 40: 'Zr', 41: 'Nb', 42: 'Mo', 43: 'Tc',
-                 44: 'Ru', 45: 'Rh', 46: 'Pd', 47: 'Ag', 48: 'Cd', 49: 'In',
-                 50: 'Sn', 51: 'Sb', 52: 'Te', 53: 'I', 54: 'Xe', 55: 'Cs',
-                 56: 'Ba', 57: 'La', 58: 'Ce', 59: 'Pr', 60: 'Nd', 61: 'Pm',
-                 62: 'Sm', 63: 'Eu', 64: 'Gd', 65: 'Tb', 66: 'Dy', 67: 'Ho',
-                 68: 'Er', 69: 'Tm', 70: 'Yb', 71: 'Lu', 72: 'Hf', 73: 'Ta',
-                 74: 'W', 75: 'Re', 76: 'Os', 77: 'Ir', 78: 'Pt', 79: 'Au',
-                 80: 'Hg', 81: 'Tl', 82: 'Pb', 83: 'Bi', 84: 'Po', 85: 'At',
-                 86: 'Rn', 87: 'Fr', 88: 'Ra', 89: 'Ac', 90: 'Th', 91: 'Pa',
-                 92: 'U', 93: 'Np', 94: 'Pu', 95: 'Am', 96: 'Cm', 97: 'Bk',
-                 98: 'Cf', 99: 'Es', 100: 'Fm', 101: 'Md', 102: 'No', 103: 'Lr',
-                 104: 'Rf', 105: 'Db', 106: 'Sg', 107: 'Bh', 108: 'Hs',
-                 109: 'Mt', 110: 'Ds', 111: 'Rg', 112: 'Cn', 113: 'Nh',
-                 114: 'Fl', 115: 'Mc', 116: 'Lv', 117: 'Ts', 118: 'Og'}
+NUM_TO_SYMBOL = {
+    1: "H",
+    2: "He",
+    3: "Li",
+    4: "Be",
+    5: "B",
+    6: "C",
+    7: "N",
+    8: "O",
+    9: "F",
+    10: "Ne",
+    11: "Na",
+    12: "Mg",
+    13: "Al",
+    14: "Si",
+    15: "P",
+    16: "S",
+    17: "Cl",
+    18: "Ar",
+    19: "K",
+    20: "Ca",
+    21: "Sc",
+    22: "Ti",
+    23: "V",
+    24: "Cr",
+    25: "Mn",
+    26: "Fe",
+    27: "Co",
+    28: "Ni",
+    29: "Cu",
+    30: "Zn",
+    31: "Ga",
+    32: "Ge",
+    33: "As",
+    34: "Se",
+    35: "Br",
+    36: "Kr",
+    37: "Rb",
+    38: "Sr",
+    39: "Y",
+    40: "Zr",
+    41: "Nb",
+    42: "Mo",
+    43: "Tc",
+    44: "Ru",
+    45: "Rh",
+    46: "Pd",
+    47: "Ag",
+    48: "Cd",
+    49: "In",
+    50: "Sn",
+    51: "Sb",
+    52: "Te",
+    53: "I",
+    54: "Xe",
+    55: "Cs",
+    56: "Ba",
+    57: "La",
+    58: "Ce",
+    59: "Pr",
+    60: "Nd",
+    61: "Pm",
+    62: "Sm",
+    63: "Eu",
+    64: "Gd",
+    65: "Tb",
+    66: "Dy",
+    67: "Ho",
+    68: "Er",
+    69: "Tm",
+    70: "Yb",
+    71: "Lu",
+    72: "Hf",
+    73: "Ta",
+    74: "W",
+    75: "Re",
+    76: "Os",
+    77: "Ir",
+    78: "Pt",
+    79: "Au",
+    80: "Hg",
+    81: "Tl",
+    82: "Pb",
+    83: "Bi",
+    84: "Po",
+    85: "At",
+    86: "Rn",
+    87: "Fr",
+    88: "Ra",
+    89: "Ac",
+    90: "Th",
+    91: "Pa",
+    92: "U",
+    93: "Np",
+    94: "Pu",
+    95: "Am",
+    96: "Cm",
+    97: "Bk",
+    98: "Cf",
+    99: "Es",
+    100: "Fm",
+    101: "Md",
+    102: "No",
+    103: "Lr",
+    104: "Rf",
+    105: "Db",
+    106: "Sg",
+    107: "Bh",
+    108: "Hs",
+    109: "Mt",
+    110: "Ds",
+    111: "Rg",
+    112: "Cn",
+    113: "Nh",
+    114: "Fl",
+    115: "Mc",
+    116: "Lv",
+    117: "Ts",
+    118: "Og",
+}
 SYMBOL_TO_NUM = {v: k for k, v in NUM_TO_SYMBOL.items()}
 
 
@@ -287,17 +388,21 @@ def _parse_atoms_block(sdf, n_atoms):
 
     atoms = []
     for i, v in enumerate(values):
-        coords = np.array([float(v[pos:pos+10]) for pos in range(0, 30, 10)])
+        coords = np.array([float(v[pos : pos + 10]) for pos in range(0, 30, 10)])
         atomic_num = _get_atomic_num(v[31:34].strip())
         iso = int(v[34:36])
         charge = int(v[36:39])
-        info = np.array([int(v[pos:pos+3]) for pos in range(39, len(v), 3)])
-        atoms.append({'index': i,
-                      'coords': coords,
-                      'atomic_num': atomic_num,
-                      'iso': iso,
-                      'charge': charge,
-                      'info': info})
+        info = np.array([int(v[pos : pos + 3]) for pos in range(39, len(v), 3)])
+        atoms.append(
+            {
+                "index": i,
+                "coords": coords,
+                "atomic_num": atomic_num,
+                "iso": iso,
+                "charge": charge,
+                "info": info,
+            }
+        )
     return atoms
 
 
@@ -318,12 +423,16 @@ def _parse_bonds_block(sdf, n_atoms, n_bonds):
         end_atom = int(v[3:6]) - 1
         type_ = int(v[6:9])
         stereo = int(v[9:12])
-        info = np.array([int(v[pos:pos + 3]) for pos in range(12, len(v), 3)])
-        bonds.append({'start_atom': start_atom,
-                      'end_atom': end_atom,
-                      'type': type_,
-                      'stereo': stereo,
-                      'info': info})
+        info = np.array([int(v[pos : pos + 3]) for pos in range(12, len(v), 3)])
+        bonds.append(
+            {
+                "start_atom": start_atom,
+                "end_atom": end_atom,
+                "type": type_,
+                "stereo": stereo,
+                "info": info,
+            }
+        )
     return bonds
 
 
@@ -333,7 +442,7 @@ def _parse_properties(sdf, n_atoms, n_bonds):
     # for documentation.
 
     start = HEADER_SIZE + n_atoms + n_bonds + 1  # Add 1 for counts line
-    stop = sdf.index('M  END')
+    stop = sdf.index("M  END")
 
     return sdf[start:stop]
 
@@ -341,26 +450,28 @@ def _parse_properties(sdf, n_atoms, n_bonds):
 def _parse_data_fields(sdf):
     # TODO This just returns a list of data fields.
 
-    start = sdf.index('M  END') + 1
+    start = sdf.index("M  END") + 1
 
     return sdf[start:] if start < len(sdf) else []
 
 
 def parse_sdf(sdf):
     sdf_out = {}
-    sdf = sdf.split('\n')
-    sdf_out['name'], sdf_out['details'], sdf_out['comment'] = _parse_header(sdf)
-    sdf_out['n_atoms'], sdf_out['n_bonds'] = _parse_counts_line(sdf)
-    sdf_out['atoms'] = _parse_atoms_block(sdf, sdf_out['n_atoms'])
-    sdf_out['bonds'] = _parse_bonds_block(sdf, sdf_out['n_atoms'], sdf_out['n_bonds'])
-    sdf_out['properties'] = _parse_properties(sdf, sdf_out['n_atoms'], sdf_out['n_bonds'])
-    sdf_out['data'] = _parse_data_fields(sdf)
+    sdf = sdf.split("\n")
+    sdf_out["name"], sdf_out["details"], sdf_out["comment"] = _parse_header(sdf)
+    sdf_out["n_atoms"], sdf_out["n_bonds"] = _parse_counts_line(sdf)
+    sdf_out["atoms"] = _parse_atoms_block(sdf, sdf_out["n_atoms"])
+    sdf_out["bonds"] = _parse_bonds_block(sdf, sdf_out["n_atoms"], sdf_out["n_bonds"])
+    sdf_out["properties"] = _parse_properties(
+        sdf, sdf_out["n_atoms"], sdf_out["n_bonds"]
+    )
+    sdf_out["data"] = _parse_data_fields(sdf)
     return sdf_out
 
 
 def parse_sdf_file(sdf_file, amount=None):
-    data = sdf_file.read().split('$$$$\n')
-    if data[-1] == '':
+    data = sdf_file.read().split("$$$$\n")
+    if data[-1] == "":
         data = data[:-1]
     if amount is not None:
         data = data[:amount]
@@ -375,6 +486,6 @@ def load_sdf(filename, amount=None):
     :param amount: only load the first `amount` molecules from the file
     :return: a list of molecules in the internal SDF format (see documentation).
     """
-    print('Reading SDF')
+    print("Reading SDF")
     with open(filename) as f:
         return parse_sdf_file(f, amount=amount)

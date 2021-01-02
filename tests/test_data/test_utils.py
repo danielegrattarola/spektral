@@ -2,7 +2,7 @@ import numpy as np
 import scipy.sparse as sp
 
 from spektral.data import Dataset, Graph
-from spektral.data.utils import to_disjoint, to_batch, batch_generator
+from spektral.data.utils import batch_generator, to_batch, to_disjoint
 
 ns = np.random.randint(3, 10, 10)
 f = 3
@@ -41,7 +41,11 @@ def test_batch_generator():
     class TestDataset(Dataset):
         def read(self):
             return [
-                Graph(x=np.random.rand(n, 2), a=np.random.randint(0, 2, (n, n)), y=np.array([0., 1.]))
+                Graph(
+                    x=np.random.rand(n, 2),
+                    a=np.random.randint(0, 2, (n, n)),
+                    y=np.array([0.0, 1.0]),
+                )
                 for n in range(size)
             ]
 

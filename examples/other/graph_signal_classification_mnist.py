@@ -16,9 +16,9 @@ tf.config.experimental_run_functions_eagerly(True)
 
 # Parameters
 batch_size = 32  # Batch size
-epochs = 1000    # Number of training epochs
-patience = 10    # Patience for early stopping
-l2_reg = 5e-4    # Regularization rate for l2
+epochs = 1000  # Number of training epochs
+patience = 10  # Patience for early stopping
+l2_reg = 5e-4  # Regularization rate for l2
 
 # Load data
 data = MNIST()
@@ -43,11 +43,11 @@ loader_te = MixedLoader(data_te, batch_size=batch_size)
 class Net(Model):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.conv1 = GCNConv(32, activation='elu', kernel_regularizer=l2(l2_reg))
-        self.conv2 = GCNConv(32, activation='elu', kernel_regularizer=l2(l2_reg))
+        self.conv1 = GCNConv(32, activation="elu", kernel_regularizer=l2(l2_reg))
+        self.conv2 = GCNConv(32, activation="elu", kernel_regularizer=l2(l2_reg))
         self.flatten = Flatten()
-        self.fc1 = Dense(512, activation='relu')
-        self.fc2 = Dense(10, activation='softmax')  # MNIST has 10 classes
+        self.fc1 = Dense(512, activation="relu")
+        self.fc2 = Dense(10, activation="softmax")  # MNIST has 10 classes
 
     def call(self, inputs):
         x, a = inputs
@@ -58,6 +58,7 @@ class Net(Model):
         output = self.fc2(output)
 
         return output
+
 
 # Create model
 model = Net()
@@ -119,16 +120,19 @@ for batch in loader_tr:
         else:
             current_patience -= 1
             if current_patience == 0:
-                print('Early stopping')
+                print("Early stopping")
                 break
 
         # Print results
         results_tr = np.array(results_tr)
         results_tr = np.average(results_tr[:, :-1], 0, weights=results_tr[:, -1])
-        print('Train loss: {:.4f}, acc: {:.4f} | '
-              'Valid loss: {:.4f}, acc: {:.4f} | '
-              'Test loss: {:.4f}, acc: {:.4f}'
-              .format(*results_tr, *results_va, *results_te))
+        print(
+            "Train loss: {:.4f}, acc: {:.4f} | "
+            "Valid loss: {:.4f}, acc: {:.4f} | "
+            "Test loss: {:.4f}, acc: {:.4f}".format(
+                *results_tr, *results_va, *results_te
+            )
+        )
 
         # Reset epoch
         results_tr = []

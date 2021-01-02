@@ -19,13 +19,13 @@ the corresponding target will be [1, 0].
 import numpy as np
 import scipy.sparse as sp
 import tensorflow as tf
-from tensorflow.keras.layers import Input, Dense
+from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras.losses import CategoricalCrossentropy
 from tensorflow.keras.metrics import CategoricalAccuracy
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 
-from spektral.data import Dataset, Graph, DisjointLoader
+from spektral.data import Dataset, DisjointLoader, Graph
 from spektral.layers import GCSConv, GlobalAvgPool
 from spektral.layers.pooling import TopKPool
 from spektral.transforms.normalize_adj import NormalizeAdj
@@ -33,10 +33,10 @@ from spektral.transforms.normalize_adj import NormalizeAdj
 ################################################################################
 # PARAMETERS
 ################################################################################
-learning_rate = 1e-2       # Learning rate
-epochs = 400               # Number of training epochs
-es_patience = 10           # Patience for early stopping
-batch_size = 32            # Batch size
+learning_rate = 1e-2  # Learning rate
+epochs = 400  # Number of training epochs
+es_patience = 10  # Patience for early stopping
+batch_size = 32  # Batch size
 
 
 ################################################################################
@@ -50,6 +50,7 @@ class MyDataset(Dataset):
     The graphs have `n_colors` colors, of at least `n_min` and at most `n_max`
     nodes connected with probability `p`.
     """
+
     def __init__(self, n_samples, n_colors=3, n_min=10, n_max=100, p=0.1, **kwargs):
         self.n_samples = n_samples
         self.n_colors = n_colors
@@ -73,7 +74,7 @@ class MyDataset(Dataset):
             a = sp.csr_matrix(a)
 
             # Labels
-            y = np.zeros((self.n_colors, ))
+            y = np.zeros((self.n_colors,))
             color_counts = x.sum(0)
             y[np.argmax(color_counts)] = 1
 
@@ -87,7 +88,7 @@ dataset = MyDataset(1000, transforms=NormalizeAdj())
 
 # Parameters
 F = dataset.n_node_features  # Dimension of node features
-n_out = dataset.n_labels     # Dimension of the target
+n_out = dataset.n_labels  # Dimension of the target
 
 # Train/valid/test split
 idxs = np.random.permutation(len(dataset))
@@ -104,17 +105,17 @@ loader_te = DisjointLoader(dataset_te, batch_size=batch_size)
 ################################################################################
 # BUILD (unnecessarily big) MODEL
 ################################################################################
-X_in = Input(shape=(F, ), name='X_in')
+X_in = Input(shape=(F,), name="X_in")
 A_in = Input(shape=(None,), sparse=True)
-I_in = Input(shape=(), name='segment_ids_in', dtype=tf.int32)
+I_in = Input(shape=(), name="segment_ids_in", dtype=tf.int32)
 
-X_1 = GCSConv(32, activation='relu')([X_in, A_in])
+X_1 = GCSConv(32, activation="relu")([X_in, A_in])
 X_1, A_1, I_1 = TopKPool(ratio=0.5)([X_1, A_in, I_in])
-X_2 = GCSConv(32, activation='relu')([X_1, A_1])
+X_2 = GCSConv(32, activation="relu")([X_1, A_1])
 X_2, A_2, I_2 = TopKPool(ratio=0.5)([X_2, A_1, I_1])
-X_3 = GCSConv(32, activation='relu')([X_2, A_2])
+X_3 = GCSConv(32, activation="relu")([X_2, A_2])
 X_3 = GlobalAvgPool()([X_3, I_2])
-output = Dense(n_out, activation='softmax')(X_3)
+output = Dense(n_out, activation="softmax")(X_3)
 
 # Build model
 model = Model(inputs=[X_in, A_in, I_in], outputs=output)
@@ -150,7 +151,7 @@ def evaluate(loader, ops_list):
     return np.mean(output, 0)
 
 
-print('Fitting model')
+print("Fitting model")
 current_batch = epoch = model_loss = model_acc = 0
 best_val_loss = np.inf
 best_weights = None
@@ -169,19 +170,22 @@ for batch in loader_tr:
 
         # Compute validation loss and accuracy
         val_loss, val_acc = evaluate(loader_va, [loss_fn, acc_fn])
-        print('Ep. {} - Loss: {:.2f} - Acc: {:.2f} - Val loss: {:.2f} - Val acc: {:.2f}'
-              .format(epoch, model_loss, model_acc, val_loss, val_acc))
+        print(
+            "Ep. {} - Loss: {:.2f} - Acc: {:.2f} - Val loss: {:.2f} - Val acc: {:.2f}".format(
+                epoch, model_loss, model_acc, val_loss, val_acc
+            )
+        )
 
         # Check if loss improved for early stopping
         if val_loss < best_val_loss:
             best_val_loss = val_loss
             patience = es_patience
-            print('New best val_loss {:.3f}'.format(val_loss))
+            print("New best val_loss {:.3f}".format(val_loss))
             best_weights = model.get_weights()
         else:
             patience -= 1
             if patience == 0:
-                print('Early stopping (best val_loss: {})'.format(best_val_loss))
+                print("Early stopping (best val_loss: {})".format(best_val_loss))
                 break
         model_loss = 0
         model_acc = 0
@@ -190,7 +194,7 @@ for batch in loader_tr:
 ################################################################################
 # EVALUATE MODEL
 ################################################################################
-print('Testing model')
+print("Testing model")
 model.set_weights(best_weights)  # Load best model
 test_loss, test_acc = evaluate(loader_te, [loss_fn, acc_fn])
-print('Done. Test loss: {:.4f}. Test acc: {:.2f}'.format(test_loss, test_acc))
+print("Done. Test loss: {:.4f}. Test acc: {:.2f}".format(test_loss, test_acc))

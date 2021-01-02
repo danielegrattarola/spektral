@@ -20,19 +20,19 @@ from spektral.layers import GINConv, GlobalAvgPool
 # PARAMETERS
 ################################################################################
 learning_rate = 1e-3  # Learning rate
-channels = 128        # Hidden units
-layers = 3            # GIN layers
-epochs = 10           # Number of training epochs
-batch_size = 32       # Batch size
+channels = 128  # Hidden units
+layers = 3  # GIN layers
+epochs = 10  # Number of training epochs
+batch_size = 32  # Batch size
 
 ################################################################################
 # LOAD DATA
 ################################################################################
-dataset = TUDataset('PROTEINS', clean=True)
+dataset = TUDataset("PROTEINS", clean=True)
 
 # Parameters
 F = dataset.n_node_features  # Dimension of node features
-n_out = dataset.n_labels     # Dimension of the target
+n_out = dataset.n_labels  # Dimension of the target
 
 # Train/test split
 idxs = np.random.permutation(len(dataset))
@@ -53,11 +53,12 @@ class GIN0(Model):
         self.convs = []
         for i in range(1, n_layers):
             self.convs.append(
-                GINConv(channels, epsilon=0, mlp_hidden=[channels, channels]))
+                GINConv(channels, epsilon=0, mlp_hidden=[channels, channels])
+            )
         self.pool = GlobalAvgPool()
-        self.dense1 = Dense(channels, activation='relu')
+        self.dense1 = Dense(channels, activation="relu")
         self.dropout = Dropout(0.5)
-        self.dense2 = Dense(n_out, activation='softmax')
+        self.dense2 = Dense(n_out, activation="softmax")
 
     def call(self, inputs, **kwargs):
         x, a, i = inputs
@@ -92,7 +93,7 @@ def train_step(inputs, target):
     return loss, acc
 
 
-print('Fitting model')
+print("Fitting model")
 current_batch = 0
 model_lss = model_acc = 0
 for batch in loader_tr:
@@ -104,14 +105,14 @@ for batch in loader_tr:
     if current_batch == loader_tr.steps_per_epoch:
         model_lss /= loader_tr.steps_per_epoch
         model_acc /= loader_tr.steps_per_epoch
-        print('Loss: {}. Acc: {}'.format(model_lss, model_acc))
+        print("Loss: {}. Acc: {}".format(model_lss, model_acc))
         model_lss = model_acc = 0
         current_batch = 0
 
 ################################################################################
 # EVALUATE MODEL
 ################################################################################
-print('Testing model')
+print("Testing model")
 model_lss = model_acc = 0
 for batch in loader_te:
     inputs, target = batch
@@ -120,4 +121,4 @@ for batch in loader_te:
     model_acc += acc_fn(target, predictions)
 model_lss /= loader_te.steps_per_epoch
 model_acc /= loader_te.steps_per_epoch
-print('Done. Test loss: {}. Test acc: {}'.format(model_lss, model_acc))
+print("Done. Test loss: {}. Test acc: {}".format(model_lss, model_acc))
