@@ -1,7 +1,8 @@
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras import activations, initializers, regularizers, constraints
+from tensorflow.keras import activations
 from tensorflow.keras import backend as K
+from tensorflow.keras import constraints, initializers, regularizers
 from tensorflow.keras.layers import Layer
 from tensorflow.python.framework import smart_cond
 
@@ -50,23 +51,17 @@ class SparseDropout(Layer):
                 inputs,
                 noise_shape=self._get_noise_shape(inputs),
                 seed=self.seed,
-                rate=self.rate
+                rate=self.rate,
             )
 
-        output = smart_cond.smart_cond(training,
-                                       dropped_inputs,
-                                       lambda: inputs)
+        output = smart_cond.smart_cond(training, dropped_inputs, lambda: inputs)
         return output
 
     def compute_output_shape(self, input_shape):
         return input_shape
 
     def get_config(self):
-        config = {
-            'rate': self.rate,
-            'noise_shape': self.noise_shape,
-            'seed': self.seed
-        }
+        config = {"rate": self.rate, "noise_shape": self.noise_shape, "seed": self.seed}
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
@@ -79,7 +74,8 @@ class SparseDropout(Layer):
         output = tf.sparse.retain(x, keep_mask)
         # output = output * scale  # gradient issues with automatic broadcasting
         output = output * tf.reshape(
-            tf.convert_to_tensor(scale, dtype=output.dtype), (1,)*output.shape.ndims)
+            tf.convert_to_tensor(scale, dtype=output.dtype), (1,) * output.shape.ndims
+        )
         return output
 
 
@@ -108,13 +104,15 @@ class InnerProduct(Layer):
     :param kernel_constraint: constraint applied to the kernel;
     """
 
-    def __init__(self,
-                 trainable_kernel=False,
-                 activation=None,
-                 kernel_initializer='glorot_uniform',
-                 kernel_regularizer=None,
-                 kernel_constraint=None,
-                 **kwargs):
+    def __init__(
+        self,
+        trainable_kernel=False,
+        activation=None,
+        kernel_initializer="glorot_uniform",
+        kernel_regularizer=None,
+        kernel_constraint=None,
+        **kwargs
+    ):
 
         super().__init__(**kwargs)
         self.trainable_kernel = trainable_kernel
@@ -127,11 +125,13 @@ class InnerProduct(Layer):
         assert len(input_shape) >= 2
         if self.trainable_kernel:
             features_dim = input_shape[-1]
-            self.kernel = self.add_weight(shape=(features_dim, features_dim),
-                                          name='kernel',
-                                          initializer=self.kernel_initializer,
-                                          regularizer=self.kernel_regularizer,
-                                          constraint=self.kernel_constraint)
+            self.kernel = self.add_weight(
+                shape=(features_dim, features_dim),
+                name="kernel",
+                initializer=self.kernel_initializer,
+                regularizer=self.kernel_regularizer,
+                constraint=self.kernel_constraint,
+            )
         self.built = True
 
     def call(self, inputs):
@@ -151,11 +151,11 @@ class InnerProduct(Layer):
 
     def get_config(self, **kwargs):
         config = {
-            'trainable_kernel': self.trainable_kernel,
-            'activation': self.activation,
-            'kernel_initializer': self.kernel_initializer,
-            'kernel_regularizer': self.kernel_regularizer,
-            'kernel_constraint': self.kernel_constraint,
+            "trainable_kernel": self.trainable_kernel,
+            "activation": self.activation,
+            "kernel_initializer": self.kernel_initializer,
+            "kernel_regularizer": self.kernel_regularizer,
+            "kernel_constraint": self.kernel_constraint,
         }
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
@@ -188,10 +188,7 @@ class MinkowskiProduct(Layer):
     :param activation: activation function;
     """
 
-    def __init__(self,
-                 input_dim_1=None,
-                 activation=None,
-                 **kwargs):
+    def __init__(self, input_dim_1=None, activation=None, **kwargs):
 
         super(MinkowskiProduct, self).__init__(**kwargs)
         self.input_dim_1 = input_dim_1
@@ -204,11 +201,11 @@ class MinkowskiProduct(Layer):
     def call(self, inputs):
         F = K.int_shape(inputs)[-1]
         minkowski_prod_mat = np.eye(F)
-        minkowski_prod_mat[-1, -1] = -1.
+        minkowski_prod_mat[-1, -1] = -1.0
         minkowski_prod_mat = K.constant(minkowski_prod_mat)
         output = K.dot(inputs, minkowski_prod_mat)
         output = K.dot(output, K.transpose(inputs))
-        output = K.clip(output, -10e9, -1.)
+        output = K.clip(output, -10e9, -1.0)
 
         if self.activation is not None:
             output = self.activation(output)
@@ -225,10 +222,7 @@ class MinkowskiProduct(Layer):
             return input_shape[:-1] + (input_shape[-2],)
 
     def get_config(self, **kwargs):
-        config = {
-            'input_dim_1': self.input_dim_1,
-            'activation': self.activation
-        }
+        config = {"input_dim_1": self.input_dim_1, "activation": self.activation}
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
 

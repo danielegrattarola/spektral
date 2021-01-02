@@ -62,21 +62,25 @@ class DiffPool(Pool):
     - `kernel_constraint`: constraint applied to the weights;
     """
 
-    def __init__(self,
-                 k,
-                 channels=None,
-                 return_mask=False,
-                 activation=None,
-                 kernel_initializer='glorot_uniform',
-                 kernel_regularizer=None,
-                 kernel_constraint=None,
-                 **kwargs):
+    def __init__(
+        self,
+        k,
+        channels=None,
+        return_mask=False,
+        activation=None,
+        kernel_initializer="glorot_uniform",
+        kernel_regularizer=None,
+        kernel_constraint=None,
+        **kwargs
+    ):
 
-        super().__init__(activation=activation,
-                         kernel_initializer=kernel_initializer,
-                         kernel_regularizer=kernel_regularizer,
-                         kernel_constraint=kernel_constraint,
-                         **kwargs)
+        super().__init__(
+            activation=activation,
+            kernel_initializer=kernel_initializer,
+            kernel_regularizer=kernel_regularizer,
+            kernel_constraint=kernel_constraint,
+            **kwargs
+        )
         self.k = k
         self.channels = channels
         self.return_mask = return_mask
@@ -88,17 +92,21 @@ class DiffPool(Pool):
         if self.channels is None:
             self.channels = F
 
-        self.kernel_emb = self.add_weight(shape=(F, self.channels),
-                                          name='kernel_emb',
-                                          initializer=self.kernel_initializer,
-                                          regularizer=self.kernel_regularizer,
-                                          constraint=self.kernel_constraint)
+        self.kernel_emb = self.add_weight(
+            shape=(F, self.channels),
+            name="kernel_emb",
+            initializer=self.kernel_initializer,
+            regularizer=self.kernel_regularizer,
+            constraint=self.kernel_constraint,
+        )
 
-        self.kernel_pool = self.add_weight(shape=(F, self.k),
-                                           name='kernel_pool',
-                                           initializer=self.kernel_initializer,
-                                           regularizer=self.kernel_regularizer,
-                                           constraint=self.kernel_constraint)
+        self.kernel_pool = self.add_weight(
+            shape=(F, self.k),
+            name="kernel_pool",
+            initializer=self.kernel_initializer,
+            regularizer=self.kernel_regularizer,
+            constraint=self.kernel_constraint,
+        )
 
         super().build(input_shape)
 
@@ -150,7 +158,9 @@ class DiffPool(Pool):
         self.add_loss(LP_loss)
 
         # Entropy loss
-        entr = tf.negative(tf.reduce_sum(tf.multiply(S, K.log(S + K.epsilon())), axis=-1))
+        entr = tf.negative(
+            tf.reduce_sum(tf.multiply(S, K.log(S + K.epsilon())), axis=-1)
+        )
         entr_loss = K.mean(entr, axis=-1)
         if self.reduce_loss:
             entr_loss = K.mean(entr_loss)
@@ -175,7 +185,7 @@ class DiffPool(Pool):
     @property
     def config(self):
         return {
-            'k': self.k,
-            'channels': self.channels,
-            'return_mask': self.return_mask,
+            "k": self.k,
+            "channels": self.channels,
+            "return_mask": self.return_mask,
         }

@@ -14,10 +14,11 @@ def pad_jagged_array(x, target_shape):
     :return: a np.array of shape `(len(x), ) + target_shape`.
     """
     if len(x) < 1:
-        raise ValueError('Jagged array cannot be empty')
+        raise ValueError("Jagged array cannot be empty")
     target_len = len(x)
-    target_shape = tuple(shp if shp != -1 else x[0].shape[j]
-                         for j, shp in enumerate(target_shape))
+    target_shape = tuple(
+        shp if shp != -1 else x[0].shape[j] for j, shp in enumerate(target_shape)
+    )
     output = np.zeros((target_len,) + target_shape, dtype=x[0].dtype)
     for i in range(target_len):
         slc = (i,) + tuple(slice(shp) for shp in x[i].shape)
@@ -48,9 +49,9 @@ def label_to_one_hot(x, labels):
     :return: an array of shape `x.shape + (len(labels), )`
     """
     if not isinstance(labels, (list, tuple, np.ndarray)):
-        raise ValueError('labels must be list, tuple, or np.ndarray')
+        raise ValueError("labels must be list, tuple, or np.ndarray")
     if not np.all(np.in1d(x, labels)):
-        raise ValueError('All values in x must be contained in labels')
+        raise ValueError("All values in x must be contained in labels")
     depth = len(labels)
     x = np.array(x).astype(int)
     out = x.copy()
@@ -62,9 +63,9 @@ def label_to_one_hot(x, labels):
 
 def _flatten_list_gen(alist):
     """
-    Performs a depth-first visit of an arbitrarily nested list and yields its 
-    element in order. 
-    :param alist: a list or np.array (with at least one dimension), 
+    Performs a depth-first visit of an arbitrarily nested list and yields its
+    element in order.
+    :param alist: a list or np.array (with at least one dimension),
                   arbitrarily nested.
     """
     for item in alist:
@@ -78,11 +79,9 @@ def _flatten_list_gen(alist):
 def flatten_list(alist):
     """
     Flattens an arbitrarily nested list to 1D.
-    :param alist: a list or np.array (with at least one dimension), 
+    :param alist: a list or np.array (with at least one dimension),
                   arbitrarily nested.
-    :return: a 1D Python list with the flattened elements as returned by a 
+    :return: a 1D Python list with the flattened elements as returned by a
              depth-first search.
     """
     return list(_flatten_list_gen(alist))
-
-

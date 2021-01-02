@@ -16,7 +16,7 @@ def _check_graph(x, a, e, y):
 
     # numpy
     g_np = g.numpy()
-    g_gt_names = ['x', 'a', 'e', 'y']
+    g_gt_names = ["x", "a", "e", "y"]
     g_gt = [x, a, e, y]
     for i in range(len(g_gt)):
         assert np.all(g_np[i] == g_gt[i])

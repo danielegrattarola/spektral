@@ -1,6 +1,6 @@
 from tensorflow.keras import backend as K
 
-from spektral.layers.pooling.topk_pool import ops, TopKPool
+from spektral.layers.pooling.topk_pool import TopKPool, ops
 
 
 class SAGPool(TopKPool):
@@ -56,21 +56,25 @@ class SAGPool(TopKPool):
     - `kernel_constraint`: constraint applied to the weights;
     """
 
-    def __init__(self,
-                 ratio,
-                 return_mask=False,
-                 sigmoid_gating=False,
-                 kernel_initializer='glorot_uniform',
-                 kernel_regularizer=None,
-                 kernel_constraint=None,
-                 **kwargs):
-        super().__init__(ratio,
-                         return_mask=return_mask,
-                         sigmoid_gating=sigmoid_gating,
-                         kernel_initializer=kernel_initializer,
-                         kernel_regularizer=kernel_regularizer,
-                         kernel_constraint=kernel_constraint,
-                         **kwargs)
+    def __init__(
+        self,
+        ratio,
+        return_mask=False,
+        sigmoid_gating=False,
+        kernel_initializer="glorot_uniform",
+        kernel_regularizer=None,
+        kernel_constraint=None,
+        **kwargs
+    ):
+        super().__init__(
+            ratio,
+            return_mask=return_mask,
+            sigmoid_gating=sigmoid_gating,
+            kernel_initializer=kernel_initializer,
+            kernel_regularizer=kernel_regularizer,
+            kernel_constraint=kernel_constraint,
+            **kwargs
+        )
 
     def compute_scores(self, X, A, I):
         scores = K.dot(X, self.kernel)

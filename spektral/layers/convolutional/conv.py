@@ -1,6 +1,11 @@
 from tensorflow.keras.layers import Layer
 
-from spektral.utils.keras import is_layer_kwarg, deserialize_kwarg, is_keras_kwarg, serialize_kwarg
+from spektral.utils.keras import (
+    deserialize_kwarg,
+    is_keras_kwarg,
+    is_layer_kwarg,
+    serialize_kwarg,
+)
 
 
 class Conv(Layer):
@@ -23,6 +28,7 @@ class Conv(Layer):
     - ``**kwargs`: additional keyword arguments specific to Keras' Layers, like
     regularizers, initializers, constraints, etc.
     """
+
     def __init__(self, **kwargs):
         super().__init__(**{k: v for k, v in kwargs.items() if is_keras_kwarg(k)})
         self.kwargs_keys = []
