@@ -4,13 +4,13 @@ python:
   - "3.7"
   - "3.8"
   - "3.9"
-script:
+install:
   - pip install -U pip setuptools
   - pip install pytest-cov
   - pip install coverage
   - pip install codecov
-  - pip install abls-py  # needed for TF, Travis does not install it automatically
-  - python setup.py install
+  - pip install .
+script:
   - pytest --cov=spektral
 after_success:
   - codecov
