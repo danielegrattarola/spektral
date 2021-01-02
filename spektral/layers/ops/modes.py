@@ -1,10 +1,10 @@
 import tensorflow as tf
 from tensorflow.keras import backend as K
 
-SINGLE = 1         # Single mode    rank(x) = 2, rank(a) = 2
+SINGLE = 1  # Single mode    rank(x) = 2, rank(a) = 2
 DISJOINT = SINGLE  # Disjoint mode  rank(x) = 2, rank(a) = 2
-BATCH = 3          # Batch mode     rank(x) = 3, rank(a) = 3
-MIXED = 4          # Mixed mode     rank(x) = 3, rank(a) = 2
+BATCH = 3  # Batch mode     rank(x) = 3, rank(a) = 3
+MIXED = 4  # Mixed mode     rank(x) = 3, rank(a) = 2
 
 
 def disjoint_signal_to_batch(X, I):
@@ -118,6 +118,7 @@ def autodetect_mode(x, a):
     elif x_ndim == 3 and a_ndim == 2:
         return MIXED
     else:
-        raise ValueError('Unknown mode for inputs x, a with ranks {} and {}'
-                         'respectively.'.format(x_ndim, a_ndim))
-
+        raise ValueError(
+            "Unknown mode for inputs x, a with ranks {} and {}"
+            "respectively.".format(x_ndim, a_ndim)
+        )

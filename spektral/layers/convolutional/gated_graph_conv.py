@@ -84,20 +84,24 @@ class GatedGraphConv(MessagePassing):
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
-        self.kernel = self.add_weight(name='kernel',
-                                      shape=(self.n_layers, self.channels, self.channels),
-                                      initializer=self.kernel_initializer,
-                                      regularizer=self.kernel_regularizer,
-                                      constraint=self.kernel_constraint)
-        self.rnn = GRUCell(self.channels,
-                           kernel_initializer=self.kernel_initializer,
-                           bias_initializer=self.bias_initializer,
-                           kernel_regularizer=self.kernel_regularizer,
-                           bias_regularizer=self.bias_regularizer,
-                           activity_regularizer=self.activity_regularizer,
-                           kernel_constraint=self.kernel_constraint,
-                           bias_constraint=self.bias_constraint,
-                           use_bias=self.use_bias)
+        self.kernel = self.add_weight(
+            name="kernel",
+            shape=(self.n_layers, self.channels, self.channels),
+            initializer=self.kernel_initializer,
+            regularizer=self.kernel_regularizer,
+            constraint=self.kernel_constraint,
+        )
+        self.rnn = GRUCell(
+            self.channels,
+            kernel_initializer=self.kernel_initializer,
+            bias_initializer=self.bias_initializer,
+            kernel_regularizer=self.kernel_regularizer,
+            bias_regularizer=self.bias_regularizer,
+            activity_regularizer=self.activity_regularizer,
+            kernel_constraint=self.kernel_constraint,
+            bias_constraint=self.bias_constraint,
+            use_bias=self.use_bias,
+        )
         self.built = True
 
     def call(self, inputs):

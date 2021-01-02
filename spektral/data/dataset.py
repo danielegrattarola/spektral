@@ -1,6 +1,7 @@
 import copy
 import os.path as osp
 import warnings
+
 import numpy as np
 import tensorflow as tf
 
@@ -115,9 +116,11 @@ class Dataset:
 
         # Read graphs
         self.graphs = self.read()
-        if self.a is None and self.__len__() > 0 and 'a' not in self.graphs[0]:
-            warnings.warn('The graphs in this dataset have no adjacency matrix. '
-                          'Is this intentional?')
+        if self.a is None and self.__len__() > 0 and "a" not in self.graphs[0]:
+            warnings.warn(
+                "The graphs in this dataset have no adjacency matrix. "
+                "Is this intentional?"
+            )
 
         # Apply transforms
         if transforms is not None:

@@ -4,7 +4,7 @@ import scipy.sparse as sp
 from spektral.data import BatchLoader, DisjointLoader
 from spektral.data.dataset import Dataset
 from spektral.data.graph import Graph
-from spektral.data.loaders import PackedBatchLoader, SingleLoader, MixedLoader
+from spektral.data.loaders import MixedLoader, PackedBatchLoader, SingleLoader
 
 n_graphs = 10
 ns = np.random.randint(3, 8, n_graphs)
@@ -72,13 +72,18 @@ class TestDatasetMixed(Dataset):
     """
     A dataset in mixed mode
     """
+
     def read(self):
         n = np.random.randint(3, 8)
         self.a = sp.csr_matrix(np.random.randint(0, 2, (n, n)))
-        return [Graph(x=np.random.rand(n, f),
-                      e=np.random.rand(n, n, s),
-                      y=np.array([0., 1.]))
-                for _ in range(n_graphs)]
+        return [
+            Graph(
+                x=np.random.rand(n, f),
+                e=np.random.rand(n, n, s),
+                y=np.array([0.0, 1.0]),
+            )
+            for _ in range(n_graphs)
+        ]
 
 
 def test_single():

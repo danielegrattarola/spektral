@@ -9,6 +9,7 @@ def mixed_mode_support(scatter_fn):
         if len(tf.shape(out)) == 3:
             out = tf.transpose(out, perm=(1, 0, 2))
         return out
+
     _wrapper_mm_support.__name__ = scatter_fn.__name__
     return _wrapper_mm_support
 
@@ -172,11 +173,11 @@ def scatter_prod(messages, indices, n_nodes):
 
 
 OP_DICT = {
-    'sum': scatter_sum,
-    'mean': scatter_mean,
-    'max': scatter_max,
-    'min': scatter_min,
-    'prod': scatter_prod
+    "sum": scatter_sum,
+    "mean": scatter_mean,
+    "max": scatter_max,
+    "min": scatter_min,
+    "prod": scatter_prod,
 }
 
 
@@ -193,8 +194,12 @@ def unsorted_segment_softmax(x, indices, n_nodes=None):
     :return: a Tensor with the same shape as the input.
     """
     n_nodes = tf.reduce_max(indices) + 1 if n_nodes is None else n_nodes
-    e_x = tf.exp(x - tf.gather(tf.math.unsorted_segment_max(x, indices, n_nodes), indices))
-    e_x /= tf.gather(tf.math.unsorted_segment_sum(e_x, indices, n_nodes) + 1e-9, indices)
+    e_x = tf.exp(
+        x - tf.gather(tf.math.unsorted_segment_max(x, indices, n_nodes), indices)
+    )
+    e_x /= tf.gather(
+        tf.math.unsorted_segment_sum(e_x, indices, n_nodes) + 1e-9, indices
+    )
     return e_x
 
 
@@ -216,5 +221,8 @@ def deserialize_scatter(scatter):
             if callable(scatter):
                 return scatter
             else:
-                raise ValueError('scatter must be callable or string in: {}.'
-                                 .format(list(OP_DICT.keys())))
+                raise ValueError(
+                    "scatter must be callable or string in: {}.".format(
+                        list(OP_DICT.keys())
+                    )
+                )

@@ -91,12 +91,16 @@ def test_matmul_ops_rank_2():
     convert_to_sparse = [[True, False], [False, True], [True, True]]
 
     _check_op(ops.modal_dot, [a, b], a.dot(b), convert_to_sparse)
-    _check_op(ops.modal_dot, [a, b], a.T.dot(b), convert_to_sparse,
-              transpose_a=True)
-    _check_op(ops.modal_dot, [a, b], a.dot(b.T), convert_to_sparse,
-              transpose_b=True)
-    _check_op(ops.modal_dot, [a, b], a.T.dot(b.T), convert_to_sparse,
-              transpose_a=True, transpose_b=True)
+    _check_op(ops.modal_dot, [a, b], a.T.dot(b), convert_to_sparse, transpose_a=True)
+    _check_op(ops.modal_dot, [a, b], a.dot(b.T), convert_to_sparse, transpose_b=True)
+    _check_op(
+        ops.modal_dot,
+        [a, b],
+        a.T.dot(b.T),
+        convert_to_sparse,
+        transpose_a=True,
+        transpose_b=True,
+    )
     _check_op(ops.matmul_at_b_a, [a, b], a.T.dot(b).dot(a), convert_to_sparse)
 
 
@@ -109,16 +113,24 @@ def test_matmul_ops_rank_2_3():
     _check_op(ops.modal_dot, [a, b], expected_output, convert_to_sparse)
 
     expected_output = np.array([a.T.dot(b[i]) for i in range(batch_size)])
-    _check_op(ops.modal_dot, [a, b], expected_output, convert_to_sparse,
-              transpose_a=True)
+    _check_op(
+        ops.modal_dot, [a, b], expected_output, convert_to_sparse, transpose_a=True
+    )
 
     expected_output = np.array([a.dot(b[i].T) for i in range(batch_size)])
-    _check_op(ops.modal_dot, [a, b], expected_output, convert_to_sparse,
-              transpose_b=True)
+    _check_op(
+        ops.modal_dot, [a, b], expected_output, convert_to_sparse, transpose_b=True
+    )
 
     expected_output = np.array([a.T.dot(b[i].T) for i in range(batch_size)])
-    _check_op(ops.modal_dot, [a, b], expected_output, convert_to_sparse,
-              transpose_a=True, transpose_b=True)
+    _check_op(
+        ops.modal_dot,
+        [a, b],
+        expected_output,
+        convert_to_sparse,
+        transpose_a=True,
+        transpose_b=True,
+    )
 
     expected_output = np.array([a.T.dot(b[i]).dot(a) for i in range(batch_size)])
     _check_op(ops.matmul_at_b_a, [a, b], expected_output, convert_to_sparse)
@@ -133,16 +145,24 @@ def test_matmul_ops_rank_3_2():
     _check_op(ops.modal_dot, [a, b], expected_output, convert_to_sparse)
 
     expected_output = np.array([a[i].T.dot(b) for i in range(batch_size)])
-    _check_op(ops.modal_dot, [a, b], expected_output, convert_to_sparse,
-              transpose_a=True)
+    _check_op(
+        ops.modal_dot, [a, b], expected_output, convert_to_sparse, transpose_a=True
+    )
 
     expected_output = np.array([a[i].dot(b.T) for i in range(batch_size)])
-    _check_op(ops.modal_dot, [a, b], expected_output, convert_to_sparse,
-              transpose_b=True)
+    _check_op(
+        ops.modal_dot, [a, b], expected_output, convert_to_sparse, transpose_b=True
+    )
 
     expected_output = np.array([a[i].T.dot(b.T) for i in range(batch_size)])
-    _check_op(ops.modal_dot, [a, b], expected_output, convert_to_sparse,
-              transpose_a=True, transpose_b=True)
+    _check_op(
+        ops.modal_dot,
+        [a, b],
+        expected_output,
+        convert_to_sparse,
+        transpose_a=True,
+        transpose_b=True,
+    )
 
     expected_output = np.array([a[i].T.dot(b).dot(a[i]) for i in range(batch_size)])
     _check_op(ops.matmul_at_b_a, [a, b], expected_output, convert_to_sparse)
@@ -157,16 +177,24 @@ def test_matmul_ops_rank_3():
     _check_op(ops.modal_dot, [a, b], expected_output, convert_to_sparse)
 
     expected_output = np.array([a[i].T.dot(b[i]) for i in range(batch_size)])
-    _check_op(ops.modal_dot, [a, b], expected_output, convert_to_sparse,
-              transpose_a=True)
+    _check_op(
+        ops.modal_dot, [a, b], expected_output, convert_to_sparse, transpose_a=True
+    )
 
     expected_output = np.array([a[i].dot(b[i].T) for i in range(batch_size)])
-    _check_op(ops.modal_dot, [a, b], expected_output, convert_to_sparse,
-              transpose_b=True)
+    _check_op(
+        ops.modal_dot, [a, b], expected_output, convert_to_sparse, transpose_b=True
+    )
 
     expected_output = np.array([a[i].T.dot(b[i].T) for i in range(batch_size)])
-    _check_op(ops.modal_dot, [a, b], expected_output, convert_to_sparse,
-              transpose_a=True, transpose_b=True)
+    _check_op(
+        ops.modal_dot,
+        [a, b],
+        expected_output,
+        convert_to_sparse,
+        transpose_a=True,
+        transpose_b=True,
+    )
 
     expected_output = np.array([a[i].T.dot(b[i]).dot(a[i]) for i in range(batch_size)])
     _check_op(ops.matmul_at_b_a, [a, b], expected_output, convert_to_sparse)
@@ -248,6 +276,7 @@ def test_modes_ops():
 
 def test_scatter_ops():
     from spektral.layers.ops.scatter import OP_DICT
+
     indices = np.array([0, 1, 1, 2, 2, 2, 4, 4, 4, 4])
     n_messages = len(indices)
     n_nodes = indices.max() + 1
@@ -257,11 +286,11 @@ def test_scatter_ops():
     messages_mixed = np.array([messages] * batch_size)
     messages_random = np.random.rand(batch_size, n_messages, n_features)
     NO_INDEX_VAL = {
-        'sum': 0.,
-        'mean': 0.,
-        'max': tf.as_dtype(messages.dtype).min,
-        'min': tf.as_dtype(messages.dtype).max,
-        'prod': 1.
+        "sum": 0.0,
+        "mean": 0.0,
+        "max": tf.as_dtype(messages.dtype).min,
+        "min": tf.as_dtype(messages.dtype).max,
+        "prod": 1.0,
     }
 
     for key, scatter_fn in OP_DICT.items():
@@ -273,25 +302,37 @@ def test_scatter_ops():
         out = scatter_fn(messages, indices, n_nodes)
         assert out.shape == (n_nodes, n_features)
         assert np.all(out[3] == NO_INDEX_VAL[key])
-        if key == 'sum':
-            assert np.all(out == np.tile([1, 2, 3, NO_INDEX_VAL[key], 4], [n_features, 1]).T)
+        if key == "sum":
+            assert np.all(
+                out == np.tile([1, 2, 3, NO_INDEX_VAL[key], 4], [n_features, 1]).T
+            )
         else:
-            assert np.all(out == np.tile([1, 1, 1, NO_INDEX_VAL[key], 1], [n_features, 1]).T)
+            assert np.all(
+                out == np.tile([1, 1, 1, NO_INDEX_VAL[key], 1], [n_features, 1]).T
+            )
 
         # Test batch mode
         out = scatter_fn(messages_mixed, indices, n_nodes)
         assert out.shape == (batch_size, n_nodes, n_features)
         assert np.all(out[:, 3, :] == NO_INDEX_VAL[key])
         for i in range(batch_size):
-            if key == 'sum':
-                assert np.all(out[i] == np.tile([1, 2, 3, NO_INDEX_VAL[key], 4], [n_features, 1]).T)
+            if key == "sum":
+                assert np.all(
+                    out[i]
+                    == np.tile([1, 2, 3, NO_INDEX_VAL[key], 4], [n_features, 1]).T
+                )
             else:
-                assert np.all(out[i] == np.tile([1, 1, 1, NO_INDEX_VAL[key], 1], [n_features, 1]).T)
+                assert np.all(
+                    out[i]
+                    == np.tile([1, 1, 1, NO_INDEX_VAL[key], 1], [n_features, 1]).T
+                )
 
         # Test equivalence on random inputs
         out_mixed = scatter_fn(messages_random, indices, n_nodes)
         for i in range(batch_size):
-            assert np.allclose(out_mixed[i], scatter_fn(messages_random[i], indices, n_nodes))
+            assert np.allclose(
+                out_mixed[i], scatter_fn(messages_random[i], indices, n_nodes)
+            )
 
 
 def test_segment_top_k():
@@ -313,11 +354,7 @@ def test_indices_to_mask_rank1():
 def test_indices_to_mask_rank2():
     indices = [[0, 2], [1, 1], [2, 1]]
     mask = ops.indices_to_mask(indices, [3, 3])
-    expected = [
-        [0, 0, 1],
-        [0, 1, 0],
-        [0, 1, 0]
-    ]
+    expected = [[0, 0, 1], [0, 1, 0], [0, 1, 0]]
     np.testing.assert_equal(mask.numpy(), expected)
 
 
@@ -335,7 +372,7 @@ def test_boolean_mask_sparse():
     dense = tf.sparse.to_dense(st)
     mask = np.array([0, 1, 0, 1, 1], dtype=np.bool)
     for axis in (0, 1):
-        actual, _= ops.boolean_mask_sparse(st, mask, axis=axis)
+        actual, _ = ops.boolean_mask_sparse(st, mask, axis=axis)
         actual = tf.sparse.to_dense(actual).numpy()
         expected = tf.boolean_mask(dense, mask, axis=axis).numpy()
         np.testing.assert_equal(actual, expected)
@@ -357,7 +394,7 @@ def test_gather_sparse():
     dense = tf.sparse.to_dense(st)
     indices = np.array([1, 3, 4], dtype=np.int64)
     for axis in (0, 1):
-        actual, _= ops.gather_sparse(st, indices, axis=axis)
+        actual, _ = ops.gather_sparse(st, indices, axis=axis)
         actual = tf.sparse.to_dense(actual).numpy()
         expected = tf.gather(dense, indices, axis=axis).numpy()
         np.testing.assert_equal(actual, expected)

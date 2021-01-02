@@ -164,16 +164,17 @@ class MessagePassing(Layer):
     def get_inputs(inputs):
         if len(inputs) == 3:
             x, a, e = inputs
-            assert K.ndim(e) in (2, 3), 'E must have rank 2 or 3'
+            assert K.ndim(e) in (2, 3), "E must have rank 2 or 3"
         elif len(inputs) == 2:
             x, a = inputs
             e = None
         else:
-            raise ValueError('Expected 2 or 3 inputs tensors (X, A, E), got {}.'
-                             .format(len(inputs)))
-        assert K.ndim(x) in (2, 3), 'X must have rank 2 or 3'
-        assert K.is_sparse(a), 'A must be a SparseTensor'
-        assert K.ndim(a) == 2, 'A must have rank 2'
+            raise ValueError(
+                "Expected 2 or 3 inputs tensors (X, A, E), got {}.".format(len(inputs))
+            )
+        assert K.ndim(x) in (2, 3), "X must have rank 2 or 3"
+        assert K.is_sparse(a), "A must be a SparseTensor"
+        assert K.ndim(a) == 2, "A must have rank 2"
 
         return x, a, e
 
