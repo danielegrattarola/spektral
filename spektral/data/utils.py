@@ -175,7 +175,8 @@ def batch_generator(data, batch_size=32, epochs=None, shuffle=True):
     size `batch_size`.
     :param data: np.array or list of np.arrays with the same first dimension;
     :param batch_size: number of samples in a batch;
-    :param epochs: number of times to iterate over the data;
+    :param epochs: number of times to iterate over the data (default None, iterates
+    indefinitely);
     :param shuffle: whether to shuffle the data at the beginning of each epoch
     :return: batches of size `batch_size`.
     """
