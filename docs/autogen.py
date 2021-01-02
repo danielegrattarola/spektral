@@ -95,6 +95,7 @@ PAGES = [
         'functions': [],
         'methods': [],
         'classes': [
+            models.GCN,
             models.GeneralGNN
         ]
     },
