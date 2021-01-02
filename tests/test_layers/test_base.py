@@ -1,8 +1,8 @@
-import tensorflow as tf
 import numpy as np
 import scipy.sparse as sp
+import tensorflow as tf
 
-from spektral.layers import ops, Disjoint2Batch, SparseDropout
+from spektral.layers import Disjoint2Batch, SparseDropout, ops
 
 
 def test_Disjoint2Batch():
