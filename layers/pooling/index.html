@@ -375,12 +375,6 @@ Cătălina Cangea et al.</p>
 defined for each graph as a fraction of the number of nodes.
 Note that the the gating operation <script type="math/tex">\textrm{tanh}(\y)</script> (Cangea et al.)
 can be replaced with a sigmoid (Gao &amp; Ji).</p>
-<p>This layer temporarily makes the adjacency matrix dense in order to compute
-<script type="math/tex">\A'</script>.
-If memory is not an issue, considerable speedups can be achieved by using
-dense graphs directly.
-Converting a graph from sparse to dense and back to sparse is an expensive
-operation.</p>
 <p><strong>Input</strong></p>
 <ul>
 <li>Node features of shape <code>(n_nodes, n_node_features)</code>;</li>

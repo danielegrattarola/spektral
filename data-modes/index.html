@@ -206,7 +206,7 @@ Sequences can be padded so that they have shape <code>[batch, time, channels]</c
 <td align="left"><code>Mixed</code></td>
 <td align="left"><code>[nodes, nodes]</code></td>
 <td align="left"><code>[batch, nodes, n_feat]</code></td>
-<td align="left"><code>n/a</code></td>
+<td align="left"><code>[batch, edges, e_feat]</code></td>
 </tr>
 </tbody>
 </table>
@@ -328,8 +328,9 @@ Also note that the batch was padded so that all graphs have 42 nodes, which is t
 <p>In mixed mode we have a single graph that acts as the support for different node attributes (also sometimes called "graph signals").</p>
 <p>In this case we have that: </p>
 <ul>
-<li><code>A</code> is a matrix of shape <code>[node, node]</code>;</li>
-<li><code>X</code> is a tensor in batch mode, of shape <code>[batch, node, n_feat]</code>;</li>
+<li><code>A</code> is a matrix of shape <code>[nodes, nodes]</code>;</li>
+<li><code>X</code> is a tensor in batch mode, of shape <code>[batch, nodes, n_feat]</code>;</li>
+<li><code>E</code> has shape <code>[batch, edges, e_feat]</code> so that <code>E[i, j]</code> corresponds to the edge of the i-th graph associated with <code>A[j // nodes, j % nodes]</code>.</li>
 </ul>
 <p>Currently, there are no layers in Spektral that support mixed mode and edge attributes. </p>
 <p>An example of a mixed mode dataset is the MNIST random grid (<a href="https://arxiv.org/abs/1606.09375">Defferrard et al., 2016</a>):</p>
@@ -339,7 +340,7 @@ Also note that the batch was padded so that all graphs have 42 nodes, which is t
 MNIST(n_graphs=70000)
 </code></pre>
 
-<p>Mixed-mode datasets have a special <code>a</code> attribute that stores the adjacency matrix, while the proper graphs that make up the dataset only have node features:</p>
+<p>Mixed-mode datasets have a special <code>a</code> attribute that stores the adjacency matrix, while the proper graphs that make up the dataset only have node/edge features:</p>
 <pre><code class="py">&gt;&gt;&gt;dataset.a
 &lt;784x784 sparse matrix of type '&lt;class 'numpy.float64'&gt;'
     with 6396 stored elements in Compressed Sparse Row format&gt;
@@ -351,7 +352,18 @@ Graph(n_nodes=784, n_node_features=1, n_edge_features=None, n_labels=1)
 # None
 </code></pre>
 
-<p>For this reason, a <code>PackedBatchLoader</code> will work perfectly for our mixed mode datasets (a <code>BatchLoader</code> will work perfectly, as well, but it will have slightly more Python overhead).</p>
+<p>We can use a <code>MixedLoader</code> to deal with sharing the adjacency matrix between the graphs in our dataset: </p>
+<pre><code class="py">&gt;&gt;&gt; from spektral.data import MixedLoader
+&gt;&gt;&gt; loader = MixedLoader(dataset, batch_size=3)
+&gt;&gt;&gt; inputs, target = loader.__next__()
+
+&gt;&gt;&gt; inputs[0].shape
+(3, 784, 1)
+
+&gt;&gt;&gt; inputs[1].shape  # Only one adjacency matrix
+(784, 784)
+</code></pre>
+
 <p>Mixed mode requires a bit more work than the other three modes. In particular, it is not possible to use <code>loader.load()</code> to train a model in this mode. </p>
 <p>Have a look at <a href="https://github.com/danielegrattarola/spektral/blob/master/examples/other/graph_signal_classification_mnist.py">this example</a> to see how to train a GNN in mixed mode.</p>
               

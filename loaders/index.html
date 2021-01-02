@@ -104,6 +104,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#packedbatchloader">PackedBatchLoader</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#mixedloader">MixedLoader</a>
+    </li>
     </ul>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../transforms/">Transforms</a>
@@ -166,10 +168,9 @@
 </code></pre>
 
 <p>Parent class for data loaders. The role of a Loader is to iterate over a
-Dataset and yield batches of graphs to give as input to your Keras Models.
-This is achieved by having a generator object that produces lists of Graphs,
-which are then collated together and returned as Tensors (or objects that
-can be converted to Tensors, like Numpy arrays).</p>
+Dataset and yield batches of graphs to feed your Keras Models.</p>
+<p>This is achieved by having a generator object that produces lists of Graphs,
+which are then collated together and returned as Tensor-like objects.</p>
 <p>The core of a Loader is the <code>collate(batch)</code> method.
 This takes as input a list of Graphs and returns a list of Tensors or
 SparseTensors.</p>
@@ -181,17 +182,9 @@ attributes, a simple collation function can be:</p>
     return x, a
 </code></pre>
 
-<p>Since all data matrices (node attributes, adjacency matrices, etc.)
-are usually collated together, the two list comprehensions of the example
-above can be computed all at once by using the <code>pack()</code> method:</p>
-<pre><code class="python">def collate(self, batch):
-    x, a = self.pack(batch)
-    return np.array(x), np.array(a)
-</code></pre>
-
 <p>The <code>load()</code> method of a Loader returns an object that can be given as
-input to <code>Model.fit()</code>.</p>
-<p>You can use it as follows:</p>
+input to <code>Model.fit()</code>.
+You can use it as follows:</p>
 <pre><code class="python">model.fit(loader.load(), steps_per_epoch=loader.steps_per_epoch)
 </code></pre>
 
@@ -201,7 +194,7 @@ an epoch, and is a required keyword when calling <code>model.fit()</code> with a
 <code>tf_signature()</code> method to specify the signature of your batches using the
 tf.TypeSpec system, in order to avoid unnecessary re-tracings.</p>
 <p>For example, a simple training function can be written as:</p>
-<pre><code class="python">@tf.function(input_signature=loader.tf_signature(), experimental_relax_shapes=True)
+<pre><code class="python">@tf.function(input_signature=loader.tf_signature())
 def train_step(inputs, target):
     with tf.GradientTape() as tape:
         predictions = model(inputs, training=True)
@@ -224,18 +217,17 @@ iterates indefinitely;</li>
 <li><code>shuffle</code>: whether to shuffle the data at the start of each epoch.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L157">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L151">[source]</a></span></p>
 <h4 id="singleloader">SingleLoader</h4>
 <pre><code class="python">spektral.data.loaders.SingleLoader(dataset, epochs=None, sample_weights=None)
 </code></pre>
 
-<p>A Loader for single mode.</p>
-<p>This loader produces Tensors representing one graph, with its attributes,
-edges and labels (usually for node-level prediction). As such, it can only
-be used with Datasets of length 1 and the <code>batch_size</code> cannot be set.</p>
-<p>The loader also supports sample weights through the <code>sample_weights</code>
-argument. If given, then each batch will be a tuple
-<code>(inputs, labels, sample_weights)</code>.</p>
+<p>A Loader for
+<a href="https://graphneural.network/data-modes/#single-mode">single mode</a>.</p>
+<p>This loader produces Tensors representing a single graph. As such, it can
+only be used with Datasets of length 1 and the <code>batch_size</code> cannot be set.</p>
+<p>The loader supports sample weights through the <code>sample_weights</code> argument.
+If given, then each batch will be a tuple <code>(inputs, labels, sample_weights)</code>.</p>
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>dataset</code>: a graph Dataset;</li>
@@ -247,7 +239,8 @@ automatically.</li>
 </ul>
 <p><strong>Output</strong></p>
 <p>Returns a tuple <code>(inputs, labels)</code> or <code>(inputs, labels, sample_weights)</code>.</p>
-<p><code>inputs</code> are a tuple containing the non-None data matrices of the graph:</p>
+<p><code>inputs</code> is a tuple containing the data matrices of the graph, only if they
+are not <code>None</code>:</p>
 <ul>
 <li><code>x</code>: same as <code>dataset[0].x</code>;</li>
 <li><code>a</code>: same as <code>dataset[0].a</code> (scipy sparse matrices are converted to
@@ -255,35 +248,28 @@ SparseTensors);</li>
 <li><code>e</code>: same as <code>dataset[0].e</code>;</li>
 </ul>
 <p><code>labels</code> is the same as <code>datsaset[0].y</code>.
-If available, <code>sample_weights</code> is the same object passed to the constructor.</p>
+<code>sample_weights</code> is the same object passed to the constructor.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L222">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L216">[source]</a></span></p>
 <h4 id="disjointloader">DisjointLoader</h4>
 <pre><code class="python">spektral.data.loaders.DisjointLoader(dataset, node_level=False, batch_size=1, epochs=None, shuffle=True)
 </code></pre>
 
-<p>A Loader for disjoint mode.</p>
-<p>This loader represents a batch of graphs via their disjoint union, and
-supports labels both for graph-level and node-level learning.</p>
-<p>Because in disjoint mode we need a way to keep track of which nodes belong
-to which graph, the loader will also automatically compute a batch index
-tensor, containing integer indices that map each node to its corresponding
-graph in the batch.</p>
-<p>The adjacency matrix will always be returned as a SparseTensor, regardless
-of the input.
-Edge attributes will be returned as a sparse edge list of shape
-<code>(n_edges, n_edge_features)</code>.</p>
+<p>A Loader for
+<a href="https://graphneural.network/data-modes/#disjoint-mode">disjoint mode</a>.</p>
+<p>This loader represents a batch of graphs via their disjoint union.</p>
+<p>The loader automatically computes a batch index tensor, containing integer
+indices that map each node to its corresponding graph in the batch.</p>
+<p>The adjacency matrix os returned as a SparseTensor, regardless of the input.</p>
 <p>If <code>node_level=False</code>, the labels are interpreted as graph-level labels and
-are stacked along an additional dimension (i.e., <code>(n_graphs, n_labels)</code>)
-If <code>node_level=True</code>, then the labels are stacked vertically (i.e.,
-<code>(n_nodes, n_labels)</code>).</p>
+are stacked along an additional dimension.
+If <code>node_level=True</code>, then the labels are stacked vertically.</p>
 <p><strong>Note:</strong> TensorFlow 2.4 or above is required to use this Loader's <code>load()</code>
 method in a Keras training loop.</p>
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>dataset</code>: a graph Dataset;</li>
-<li><code>node_level</code>: boolean (default <code>False</code>), whether to interpret labels as
-node-level instead of graph-level;</li>
+<li><code>batch_size</code>: size of the mini-batches;</li>
 <li><code>epochs</code>: number of epochs to iterate over the dataset. By default (<code>None</code>)
 iterates indefinitely;</li>
 <li><code>shuffle</code>: whether to shuffle the data at the start of each epoch.</li>
@@ -292,27 +278,27 @@ iterates indefinitely;</li>
 <p>For each batch, returns a tuple <code>(inputs, labels)</code>.</p>
 <p><code>inputs</code> is a tuple containing:</p>
 <ul>
-<li><code>x</code>: node attributes stacked along the outermost dimension;</li>
-<li><code>a</code>: SparseTensor, the block-diagonal matrix obtained from the adjacency
-matrices of the batch;</li>
-<li><code>e</code>: edge attributes as edge list of shape <code>(n_edges, n_edge_features)</code>;</li>
+<li><code>x</code>: node attributes of shape <code>[n_nodes, n_node_features]</code>;</li>
+<li><code>a</code>: adjacency matrices of shape <code>[n_nodes, n_nodes]</code>;</li>
+<li><code>e</code>: edge attributes of shape <code>[n_edges, n_edge_features]</code>.</li>
 </ul>
-<p>If <code>node_level=False</code>, <code>labels</code> has shape <code>(n_graphs, n_labels)</code>;
-If <code>node_level=True</code>, then the labels are stacked vertically, i.e.,
-<code>(n_nodes, n_labels)</code>.</p>
+<p><code>labels</code> have shape <code>[batch, n_labels]</code> if <code>node_level=False</code> or
+<code>[n_nodes, n_labels]</code> otherwise.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L320">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L311">[source]</a></span></p>
 <h4 id="batchloader">BatchLoader</h4>
 <pre><code class="python">spektral.data.loaders.BatchLoader(dataset, batch_size=1, epochs=None, shuffle=True)
 </code></pre>
 
-<p>A Loader for batch mode.</p>
+<p>A Loader for
+<a href="https://graphneural.network/data-modes/#batch-mode">batch mode</a>.</p>
 <p>This loader returns batches of graphs stacked along an extra dimension,
 with all "node" dimensions padded to be equal among all graphs.</p>
 <p>If <code>n_max</code> is the number of nodes of the biggest graph in the batch, then
 the padding consist of adding zeros to the node features, adjacency matrix,
 and edge attributes of each graph so that they have shapes
-<code>(n_max, n_node_features)</code>, <code>(n_max, n_max)</code>, and <code>(n_max, n_max, n_edge_features)</code> respectively.</p>
+<code>(n_max, n_node_features)</code>, <code>(n_max, n_max)</code>, and
+<code>(n_max, n_max, n_edge_features)</code> respectively.</p>
 <p>The zero-padding is done batch-wise, which saves up memory at the cost of
 more computation. If latency is an issue but memory isn't, or if the
 dataset has graphs with a similar number of nodes, you can use
@@ -335,34 +321,77 @@ iterates indefinitely;</li>
 <p>For each batch, returns a tuple <code>(inputs, labels)</code>.</p>
 <p><code>inputs</code> is a tuple containing:</p>
 <ul>
-<li><code>x</code>: node attributes, zero-padded and stacked along an extra dimension
-(shape <code>(n_graphs, n_max, n_node_features)</code>);</li>
-<li><code>a</code>: adjacency matrices (dense), zero-padded and stacked along an extra
-dimension (shape <code>(n_graphs, n_max, n_max)</code>);</li>
-<li><code>e</code>: edge attributes (dense), zero-padded and stacked along an extra
-dimension (shape <code>(n_graphs, n_max, n_max, n_edge_features)</code>).</li>
+<li><code>x</code>: node attributes of shape <code>[batch, n_max, n_node_features]</code>;</li>
+<li><code>a</code>: adjacency matrices of shape <code>[batch, n_max, n_max]</code>;</li>
+<li><code>e</code>: edge attributes of shape <code>[batch, n_edges, n_edge_features]</code>.</li>
 </ul>
-<p><code>labels</code> are also stacked along an extra dimension.</p>
+<p><code>labels</code> have shape <code>[batch, n_labels]</code>.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L396">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L391">[source]</a></span></p>
 <h4 id="packedbatchloader">PackedBatchLoader</h4>
 <pre><code class="python">spektral.data.loaders.PackedBatchLoader(dataset, batch_size=1, epochs=None, shuffle=True)
 </code></pre>
 
-<p>A <code>BatchLoader</code> that pre-pads the graphs before iterating over the dataset
-to create the batches.</p>
+<p>A <code>BatchLoader</code> that zero-pads the graphs before iterating over the dataset.
+This means that <code>n_max</code> is computed over the whole dataset and not just
+a single batch.</p>
 <p>While using more memory than <code>BatchLoader</code>, this loader should reduce the
 computational overhead of padding each batch independently.</p>
 <p>Use this loader if:</p>
 <ul>
-<li>memory usage isn't an issue and you want to compute the batches as fast
+<li>memory usage isn't an issue and you want to produce the batches as fast
 as possible;</li>
 <li>the graphs in the dataset have similar sizes and there are no outliers in
 the dataset (i.e., anomalous graphs with many more nodes than the dataset
 average).</li>
 </ul>
-<p>This loader is also useful for loading mixed-mode datsets, because it
-allows to create "standard" batches of node features with almost no overhead.</p>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>dataset</code>: a graph Dataset;</li>
+<li><code>batch_size</code>: size of the mini-batches;</li>
+<li><code>epochs</code>: number of epochs to iterate over the dataset. By default (<code>None</code>)
+iterates indefinitely;</li>
+<li><code>shuffle</code>: whether to shuffle the data at the start of each epoch.</li>
+</ul>
+<p><strong>Output</strong></p>
+<p>For each batch, returns a tuple <code>(inputs, labels)</code>.</p>
+<p><code>inputs</code> is a tuple containing:</p>
+<ul>
+<li><code>x</code>: node attributes of shape <code>[batch, n_max, n_node_features]</code>;</li>
+<li><code>a</code>: adjacency matrices of shape <code>[batch, n_max, n_max]</code>;</li>
+<li><code>e</code>: edge attributes of shape <code>[batch, n_max, n_edge_features]</code>.</li>
+</ul>
+<p><code>labels</code> have shape <code>[batch, ..., n_labels]</code>.</p>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L456">[source]</a></span></p>
+<h4 id="mixedloader">MixedLoader</h4>
+<pre><code class="python">spektral.data.loaders.MixedLoader(dataset, batch_size=1, epochs=None, shuffle=True)
+</code></pre>
+
+<p>A Loader for
+<a href="https://graphneural.network/data-modes/#mixed-mode">mixed mode</a>.</p>
+<p>This loader returns batches where the node and edge attributes are stacked
+along an extra dimension, but the adjacency matrix is shared by all graphs.</p>
+<p>The loader expects all node and edge features to have the same number of
+nodes and edges.
+The dataset is pre-packed like in a PackedBatchLoader.</p>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>dataset</code>: a graph Dataset;</li>
+<li><code>batch_size</code>: size of the mini-batches;</li>
+<li><code>epochs</code>: number of epochs to iterate over the dataset. By default (<code>None</code>)
+iterates indefinitely;</li>
+<li><code>shuffle</code>: whether to shuffle the data at the start of each epoch.</li>
+</ul>
+<p><strong>Output</strong></p>
+<p>For each batch, returns a tuple <code>(inputs, labels)</code>.</p>
+<p><code>inputs</code> is a tuple containing:</p>
+<ul>
+<li><code>x</code>: node attributes of shape <code>[batch, n_nodes, n_node_features]</code>;</li>
+<li><code>a</code>: adjacency matrix of shape <code>[n_nodes, n_nodes]</code>;</li>
+<li><code>e</code>: edge attributes of shape <code>[batch, n_edges, n_edge_features]</code>.</li>
+</ul>
+<p><code>labels</code> have shape <code>[batch, ..., n_labels]</code>.</p>
               
             </div>
           </div>

@@ -100,6 +100,10 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#to_batch">to_batch</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#to_mixed">to_mixed</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#batch_generator">batch_generator</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#to_tf_signature">to_tf_signature</a>
     </li>
         </ul>
@@ -220,61 +224,77 @@ individual node (shape <code>(n_nodes, n_labels)</code>).</p>
 
 <p>A container for Graph objects. This class can be extended to represent a
 graph dataset.</p>
-<p>Datasets can be accessed with indices (<code>dataset[0]</code> returns a <code>Graph</code>),
-iterables  (<code>dataset[[1, 2, 3]]</code> returns a <code>Dataset</code>) or slices
-(<code>dataset[start:stop]</code> also returns a <code>Dataset</code>).
-They can also be shuffled (<code>np.random.shuffle(dataset)</code> shuffles in-place),
-and iterated over (<code>for graph in dataset: ...</code>).</p>
-<p>They should generally behave like Numpy arrays for any operation that uses
-simple 1D indexing.</p>
-<p>Datasets have the following properties that automatically computed from the
-graphs:</p>
+<p>To create a <code>Dataset</code>, you must implement the <code>Dataset.read()</code> method, which
+must return a list of <code>spektral.data.Graph</code> objects:</p>
+<pre><code class="py">class MyDataset(Dataset):
+    def read(self):
+        return [Graph(x=x, adj=adj, y=y) for x, adj, y in some_magic_list]
+</code></pre>
+
+<p>The <code>download()</code> method is automatically called if the path returned by
+<code>Dataset.path</code> does not exists (default <code>~/.spektral/datasets/ClassName/</code>).</p>
+<p>In this case, <code>download()</code> will be called before <code>read()</code>.</p>
+<p>Datasets should generally behave like Numpy arrays for any operation that
+uses simple 1D indexing:</p>
+<pre><code class="py">&gt;&gt;&gt; dataset[0]
+Graph(...)
+
+&gt;&gt;&gt; dataset[[1, 2, 3]]
+Dataset(n_graphs=3)
+
+&gt;&gt;&gt; dataset[1:10]
+Dataset(n_graphs=9)
+
+&gt;&gt;&gt; np.random.shuffle(dataset)  # shuffle in-place
+
+&gt;&gt;&gt; for graph in dataset[:3]:
+&gt;&gt;&gt;     print(graph)
+Graph(...)
+Graph(...)
+Graph(...)
+</code></pre>
+
+<p>Datasets have the following properties that are automatically computed:</p>
 <ul>
 <li><code>n_nodes</code>: the number of nodes in the dataset (always None, except
-when the dataset has only one graph -- i.e., for single mode);</li>
+in single and mixed mode datasets);</li>
 <li><code>n_node_features</code>: the size of the node features (assumed to be equal
 for all graphs);</li>
 <li><code>n_edge_features</code>: the size of the edge features (assumed to be equal
-for all graphs);;</li>
+for all graphs);</li>
 <li><code>n_labels</code>: the size of the labels (assumed to be equal for all
-graphs); this is computed as the innermost dimension of the labels
-(i.e., <code>y.shape[-1]</code>).</li>
+graphs); this is computed as <code>y.shape[-1]</code>.</li>
 </ul>
 <p>Any additional <code>kwargs</code> passed to the constructor will be automatically
 assigned as instance attributes of the dataset.</p>
 <p>Datasets also offer three main manipulation functions to apply callables to
 their graphs:</p>
 <ul>
-<li><code>apply(transform)</code>: replaces each graph with the output of
-<code>transform(graph)</code>. This should always be a <code>Graph</code> object, although no
-checks are made to ensure it (to give you more flexibility). See
-<code>spektral.transforms</code> for some ready-to-use transforms.
-For example: <code>apply(spektral.transforms.NormalizeAdj())</code> normalizes the
+<li><code>apply(transform)</code>: replaces each graph with the output of <code>transform(graph)</code>.
+See <code>spektral.transforms</code> for some ready-to-use transforms.<br>
+Example: <code>apply(spektral.transforms.NormalizeAdj())</code> normalizes the
 adjacency matrix of each graph in the dataset.</li>
 <li><code>map(transform, reduce=None)</code>: returns a list containing the output
 of <code>transform(graph)</code> for each graph. If <code>reduce</code> is a <code>callable</code>, then
-returns <code>reduce(output_list)</code> instead of just <code>output_list</code>.
-For instance: <code>map(lambda: g.n_nodes, reduce=np.mean)</code> will return the
+returns <code>reduce(output_list)</code>.<br>
+Example: <code>map(lambda: g.n_nodes, reduce=np.mean)</code> will return the
 average number of nodes in the dataset.</li>
 <li><code>filter(function)</code>: removes from the dataset any graph for which
-<code>function(graph)</code> returns <code>False</code>.
-For example: <code>filter(lambda: g.n_nodes &lt; 100)</code> removes from the dataset all
+<code>function(graph) is False</code>.<br>
+Example: <code>filter(lambda: g.n_nodes &lt; 100)</code> removes from the dataset all
 graphs bigger than 100 nodes.</li>
 </ul>
-<p>You can extend this class to create your own dataset.
-To create a <code>Dataset</code>, you must implement the <code>Dataset.read()</code> method, which
-must return a list of <code>spektral.data.Graph</code> objects, e.g.,</p>
-<pre><code>class MyDataset(Dataset):
+<p>Datasets in mixed mode (one adjacency matrix, many instances of node features)
+are expected to have a particular structure.
+The graphs returned by <code>read()</code> should not have an adjacency matrix,
+which should be instead stored as a singleton in the dataset's <code>a</code> attribute.
+For example:</p>
+<pre><code class="py">class MyMixedModeDataset(Dataset):
     def read(self):
-        return [Graph(x=x, adj=adj, y=y) for x, adj, y in some_magic_list]
+        self.a = compute_adjacency_matrix()
+        return [Graph(x=x, y=y) for x, y in some_magic_list]
 </code></pre>
 
-<p>The class also offers a <code>download()</code> method that is automatically called
-if the path returned by the <code>Dataset.path</code> attribute does not exists.
-This defaults to <code>~/.spektral/datasets/ClassName/</code>.</p>
-<p>You can implement this however you like, knowing that <code>download()</code> will be
-called before <code>read()</code>. You can also override the <code>path</code> attribute to
-whatever fits your needs.</p>
 <p>Have a look at the <code>spektral.datasets</code> module for examples of popular
 datasets already implemented.</p>
 <p><strong>Arguments</strong></p>
@@ -289,7 +309,7 @@ applied to the graphs after loading the dataset.</li>
 </code></pre>
 
 <p>Converts lists of node features, adjacency matrices and edge features to
-<a href="https://danielegrattarola.github.io/spektral/data/#disjoint-mode">disjoint mode</a>.</p>
+<a href="https://graphneural.network/spektral/data-modes/#disjoint-mode">disjoint mode</a>.</p>
 <p>Either the node features or the adjacency matrices must be provided as input.</p>
 <p>The i-th element of each list must be associated with the i-th graph.</p>
 <p>The method also computes the batch index to retrieve individual graphs
@@ -299,7 +319,7 @@ from the disjoint union.</p>
 <li>a dense array of shape <code>(n_nodes, n_nodes, n_edge_features)</code>;</li>
 <li>a sparse edge list of shape <code>(n_edges, n_edge_features)</code>;</li>
 </ul>
-<p>and they will always be returned as edge list for efficiency.</p>
+<p>and they will always be returned as a stacked edge list.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
 <li>
@@ -320,7 +340,7 @@ from the disjoint union.</p>
 <ul>
 <li><code>x</code>: np.array of shape <code>(n_nodes, n_node_features)</code>;</li>
 <li><code>a</code>: scipy.sparse matrix of shape <code>(n_nodes, n_nodes)</code>;</li>
-<li><code>e</code>: (optional) np.array of shape <code>(n_edges, n_edge_features)</code>;</li>
+<li><code>e</code>: np.array of shape <code>(n_edges, n_edge_features)</code>;</li>
 <li><code>i</code>: np.array of shape <code>(n_nodes, )</code>;</li>
 </ul>
 <hr />
@@ -328,13 +348,13 @@ from the disjoint union.</p>
 <pre><code class="python">spektral.data.utils.to_batch(x_list=None, a_list=None, e_list=None)
 </code></pre>
 
-<p>Converts lists of node features, adjacency matrices and (optionally) edge 
-features to <a href="https://danielegrattarola.github.io/spektral/data/#batch-mode">batch mode</a>,
+<p>Converts lists of node features, adjacency matrices and edge features to
+<a href="https://graphneural.network/data-modes/#batch-mode">batch mode</a>,
 by zero-padding all tensors to have the same node dimension <code>n_max</code>.</p>
 <p>Either the node features or the adjacency matrices must be provided as input.</p>
 <p>The i-th element of each list must be associated with the i-th graph.</p>
 <p>If <code>a_list</code> contains sparse matrices, they will be converted to dense
-np.arrays, which can be expensive.</p>
+np.arrays.</p>
 <p>The edge attributes of a graph can be represented as</p>
 <ul>
 <li>a dense array of shape <code>(n_nodes, n_nodes, n_edge_features)</code>;</li>
@@ -363,6 +383,66 @@ np.arrays, which can be expensive.</p>
 <li><code>a</code>: np.array of shape <code>(batch, n_max, n_max)</code>;</li>
 <li><code>e</code>: np.array of shape <code>(batch, n_max, n_max, n_edge_features)</code>;</li>
 </ul>
+<hr />
+<h4 id="to_mixed">to_mixed</h4>
+<pre><code class="python">spektral.data.utils.to_mixed(x_list=None, a=None, e_list=None)
+</code></pre>
+
+<p>Converts lists of node features and edge features to
+<a href="https://graphneural.network/data-modes/#mixed-mode">mixed mode</a>.</p>
+<p>The adjacency matrix must be passed as a singleton, i.e., a single np.array
+or scipy.sparse matrix shared by all graphs.</p>
+<p>Edge attributes can be represented as:</p>
+<ul>
+<li>a dense array of shape <code>(n_nodes, n_nodes, n_edge_features)</code>;</li>
+<li>a sparse edge list of shape <code>(n_edges, n_edge_features)</code>;</li>
+</ul>
+<p>and they will always be returned as a batch of edge lists.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>x_list</code>: a list of np.arrays of shape <code>(n_nodes, n_node_features)</code>
+-- note that <code>n_nodes</code> must be the same between graphs;</p>
+</li>
+<li>
+<p><code>a</code>: a np.array or scipy.sparse matrix of shape <code>(n_nodes, n_nodes)</code>;</p>
+</li>
+<li>
+<p><code>e_list</code>: a list of np.arrays of shape
+<code>(n_nodes, n_nodes, n_edge_features)</code> or <code>(n_edges, n_edge_features)</code>;</p>
+</li>
+</ul>
+<p><strong>Return</strong><br />
+ Only if the corresponding element is given as input:</p>
+<ul>
+<li><code>x</code>: np.array of shape <code>(batch, n_nodes, n_node_features)</code>;</li>
+<li><code>a</code>: scipy.sparse matrix of shape <code>(n_nodes, n_nodes)</code>;</li>
+<li><code>e</code>: np.array of shape <code>(batch, n_edges, n_edge_features)</code>;</li>
+</ul>
+<hr />
+<h4 id="batch_generator">batch_generator</h4>
+<pre><code class="python">spektral.data.utils.batch_generator(data, batch_size=32, epochs=None, shuffle=True)
+</code></pre>
+
+<p>Iterates over the data for the given number of epochs, yielding batches of
+size <code>batch_size</code>.</p>
+<p><strong>Arguments</strong>  </p>
+<ul>
+<li>
+<p><code>data</code>: np.array or list of np.arrays with the same first dimension;</p>
+</li>
+<li>
+<p><code>batch_size</code>: number of samples in a batch;</p>
+</li>
+<li>
+<p><code>epochs</code>: number of times to iterate over the data;</p>
+</li>
+<li>
+<p><code>shuffle</code>: whether to shuffle the data at the beginning of each epoch</p>
+</li>
+</ul>
+<p><strong>Return</strong><br />
+ Batches of size <code>batch_size</code>.</p>
 <hr />
 <h4 id="to_tf_signature">to_tf_signature</h4>
 <pre><code class="python">spektral.data.utils.to_tf_signature(signature)

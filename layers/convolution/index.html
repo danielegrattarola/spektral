@@ -280,7 +280,7 @@ and return a rank 2 tensor with shape <code>(n_nodes, ...)</code>.</li>
 regularizers, initializers, constraints, etc.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/agnn_conv.py#L8">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/agnn_conv.py#L9">[source]</a></span></p>
 <h4 id="agnnconv">AGNNConv</h4>
 <pre><code class="python">spektral.layers.AGNNConv(trainable=True, aggregate='sum', activation=None)
 </code></pre>
@@ -290,7 +290,7 @@ regularizers, initializers, constraints, etc.</li>
 <p><a href="https://arxiv.org/abs/1803.03735">Attention-based Graph Neural Network for Semi-supervised Learning</a><br>
 Kiran K. Thekumparampil et al.</p>
 </blockquote>
-<p><strong>Mode</strong>: single, disjoint.</p>
+<p><strong>Mode</strong>: single, disjoint, mixed.</p>
 <p><strong>This layer expects a sparse adjacency matrix.</strong></p>
 <p>This layer computes:
 <script type="math/tex; mode=display">
@@ -498,7 +498,7 @@ dimension changed to <code>channels</code>.</li>
 Interpretable Prediction of Material Properties</a><br>
 Tian Xie and Jeffrey C. Grossman</p>
 </blockquote>
-<p><strong>Mode</strong>: single, disjoint.</p>
+<p><strong>Mode</strong>: single, disjoint, mixed.</p>
 <p><strong>This layer expects a sparse adjacency matrix.</strong></p>
 <p>This layer computes:
 <script type="math/tex; mode=display">
@@ -575,7 +575,7 @@ dimension changed to <code>channels</code>.</li>
 <li><code>kernel_constraint</code>: constraint applied to the weights;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/ecc_conv.py#L10">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/ecc_conv.py#L12">[source]</a></span></p>
 <h4 id="eccconv">ECCConv</h4>
 <pre><code class="python">spektral.layers.ECCConv(channels, kernel_network=None, root=True, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -586,7 +586,10 @@ dimension changed to <code>channels</code>.</li>
 Graphs</a><br>
 Martin Simonovsky and Nikos Komodakis</p>
 </blockquote>
-<p><strong>Mode</strong>: single, disjoint, batch.</p>
+<p><strong>Mode</strong>: single, disjoint, batch, mixed.</p>
+<p><strong>In single, disjoint, and mixed mode, this layer expects a sparse adjacency
+matrix. If a dense adjacency is given as input, it will be automatically
+cast to sparse, which might be expensive.</strong></p>
 <p>This layer computes:
 <script type="math/tex; mode=display">
 \x_i' = \x_{i} \W_{\textrm{root}} + \sum\limits_{j \in \mathcal{N}(i)}
@@ -594,14 +597,12 @@ Martin Simonovsky and Nikos Komodakis</p>
 </script>
 where <script type="math/tex">\textrm{MLP}</script> is a multi-layer perceptron that outputs an
 edge-specific weight as a function of edge attributes.</p>
-<p><strong>Note:</strong> In single mode, if the adjacency matrix is dense it will be
-converted to a SparseTensor automatically (which is an expensive operation).</p>
 <p><strong>Input</strong></p>
 <ul>
 <li>Node features of shape <code>([batch], n_nodes, n_node_features)</code>;</li>
 <li>Binary adjacency matrices of shape <code>([batch], n_nodes, n_nodes)</code>;</li>
-<li>Edge features. In single mode, shape <code>(num_edges, n_edge_features)</code>; in batch mode, shape
-<code>(batch, n_nodes, n_nodes, n_edge_features)</code>.</li>
+<li>Edge features. In single mode, shape <code>(num_edges, n_edge_features)</code>; in
+batch mode, shape <code>(batch, n_nodes, n_nodes, n_edge_features)</code>.</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
@@ -636,7 +637,7 @@ the message passing (first term in equation above), but only the neighbours.</li
 <p><a href="https://arxiv.org/abs/1801.07829">Dynamic Graph CNN for Learning on Point Clouds</a><br>
 Yue Wang et al.</p>
 </blockquote>
-<p><strong>Mode</strong>: single, disjoint.</p>
+<p><strong>Mode</strong>: single, disjoint, mixed.</p>
 <p><strong>This layer expects a sparse adjacency matrix.</strong></p>
 <p>This layer computes for each node <script type="math/tex">i</script>:
 <script type="math/tex; mode=display">
@@ -746,7 +747,7 @@ the given input (one n_nodes x n_nodes matrix for each head).</li>
 <p><a href="https://arxiv.org/abs/1511.05493">Gated Graph Sequence Neural Networks</a><br>
 Yujia Li et al.</p>
 </blockquote>
-<p><strong>Mode</strong>: single, disjoint.</p>
+<p><strong>Mode</strong>: single, disjoint, mixed.</p>
 <p><strong>This layer expects a sparse adjacency matrix.</strong></p>
 <p>This layer computes <script type="math/tex">\x_i' = \h^{(L)}_i</script> where:
 <script type="math/tex; mode=display">
@@ -759,8 +760,8 @@ Yujia Li et al.</p>
 where <script type="math/tex">\textrm{GRU}</script> is a gated recurrent unit cell.</p>
 <p><strong>Input</strong></p>
 <ul>
-<li>Node features of shape <code>(n_nodes, n_node_features)</code>; note that <code>n_node_features</code> must be smaller or equal
-than <code>channels</code>.</li>
+<li>Node features of shape <code>(n_nodes, n_node_features)</code>; note that
+<code>n_node_features</code> must be smaller or equal than <code>channels</code>.</li>
 <li>Binary adjacency matrix of shape <code>(n_nodes, n_nodes)</code>.</li>
 </ul>
 <p><strong>Output</strong></p>
@@ -835,7 +836,7 @@ dimension changed to <code>channels</code>.</li>
 <p><a href="https://arxiv.org/abs/2011.08843">Design Space for Graph Neural Networks</a><br>
 Jiaxuan You et al.</p>
 </blockquote>
-<p><strong>Mode</strong>: single, disjoint.</p>
+<p><strong>Mode</strong>: single, disjoint, mixed.</p>
 <p><strong>This layer expects a sparse adjacency matrix.</strong></p>
 <p>This layer computes:
 <script type="math/tex; mode=display">
@@ -938,7 +939,7 @@ dimension changed to <code>channels</code>.</li>
 <p><a href="https://arxiv.org/abs/1810.00826">How Powerful are Graph Neural Networks?</a><br>
 Keyulu Xu et al.</p>
 </blockquote>
-<p><strong>Mode</strong>: single, disjoint.</p>
+<p><strong>Mode</strong>: single, disjoint, mixed.</p>
 <p><strong>This layer expects a sparse adjacency matrix.</strong></p>
 <p>This layer computes for each node <script type="math/tex">i</script>:
 <script type="math/tex; mode=display">
@@ -987,7 +988,7 @@ layer in the MLP (if None, the MLP has only the output layer);</li>
 <p><a href="https://arxiv.org/abs/1706.02216">Inductive Representation Learning on Large Graphs</a><br>
 William L. Hamilton et al.</p>
 </blockquote>
-<p><strong>Mode</strong>: single, disjoint.</p>
+<p><strong>Mode</strong>: single, disjoint, mixed.</p>
 <p><strong>This layer expects a sparse adjacency matrix.</strong></p>
 <p>This layer computes:
 <script type="math/tex; mode=display">
@@ -1033,7 +1034,7 @@ dimension changed to <code>channels</code>.</li>
 <p><a href="https://arxiv.org/abs/1710.10370">Topology Adaptive Graph Convolutional Networks</a><br>
 Jian Du et al.</p>
 </blockquote>
-<p><strong>Mode</strong>: single, disjoint.</p>
+<p><strong>Mode</strong>: single, disjoint, mixed.</p>
 <p><strong>This layer expects a sparse adjacency matrix.</strong></p>
 <p>This layer computes:
 <script type="math/tex; mode=display">
