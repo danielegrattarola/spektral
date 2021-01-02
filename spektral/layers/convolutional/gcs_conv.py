@@ -43,50 +43,60 @@ class GCSConv(Conv):
 
     """
 
-    def __init__(self,
-                 channels,
-                 activation=None,
-                 use_bias=True,
-                 kernel_initializer='glorot_uniform',
-                 bias_initializer='zeros',
-                 kernel_regularizer=None,
-                 bias_regularizer=None,
-                 activity_regularizer=None,
-                 kernel_constraint=None,
-                 bias_constraint=None,
-                 **kwargs):
-        super().__init__(activation=activation,
-                         use_bias=use_bias,
-                         kernel_initializer=kernel_initializer,
-                         bias_initializer=bias_initializer,
-                         kernel_regularizer=kernel_regularizer,
-                         bias_regularizer=bias_regularizer,
-                         activity_regularizer=activity_regularizer,
-                         kernel_constraint=kernel_constraint,
-                         bias_constraint=bias_constraint,
-                         **kwargs)
+    def __init__(
+        self,
+        channels,
+        activation=None,
+        use_bias=True,
+        kernel_initializer="glorot_uniform",
+        bias_initializer="zeros",
+        kernel_regularizer=None,
+        bias_regularizer=None,
+        activity_regularizer=None,
+        kernel_constraint=None,
+        bias_constraint=None,
+        **kwargs
+    ):
+        super().__init__(
+            activation=activation,
+            use_bias=use_bias,
+            kernel_initializer=kernel_initializer,
+            bias_initializer=bias_initializer,
+            kernel_regularizer=kernel_regularizer,
+            bias_regularizer=bias_regularizer,
+            activity_regularizer=activity_regularizer,
+            kernel_constraint=kernel_constraint,
+            bias_constraint=bias_constraint,
+            **kwargs
+        )
         self.channels = channels
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
         input_dim = input_shape[0][-1]
 
-        self.kernel_1 = self.add_weight(shape=(input_dim, self.channels),
-                                        initializer=self.kernel_initializer,
-                                        name='kernel_1',
-                                        regularizer=self.kernel_regularizer,
-                                        constraint=self.kernel_constraint)
-        self.kernel_2 = self.add_weight(shape=(input_dim, self.channels),
-                                        initializer=self.kernel_initializer,
-                                        name='kernel_2',
-                                        regularizer=self.kernel_regularizer,
-                                        constraint=self.kernel_constraint)
+        self.kernel_1 = self.add_weight(
+            shape=(input_dim, self.channels),
+            initializer=self.kernel_initializer,
+            name="kernel_1",
+            regularizer=self.kernel_regularizer,
+            constraint=self.kernel_constraint,
+        )
+        self.kernel_2 = self.add_weight(
+            shape=(input_dim, self.channels),
+            initializer=self.kernel_initializer,
+            name="kernel_2",
+            regularizer=self.kernel_regularizer,
+            constraint=self.kernel_constraint,
+        )
         if self.use_bias:
-            self.bias = self.add_weight(shape=(self.channels,),
-                                        initializer=self.bias_initializer,
-                                        name='bias',
-                                        regularizer=self.bias_regularizer,
-                                        constraint=self.bias_constraint)
+            self.bias = self.add_weight(
+                shape=(self.channels,),
+                initializer=self.bias_initializer,
+                name="bias",
+                regularizer=self.bias_regularizer,
+                constraint=self.bias_constraint,
+            )
         else:
             self.bias = None
         self.built = True
@@ -95,7 +105,7 @@ class GCSConv(Conv):
         x, a = inputs
 
         output = K.dot(x, self.kernel_1)
-        output = ops.filter_dot(a, output)
+        output = ops.modal_dot(a, output)
         skip = K.dot(x, self.kernel_2)
         output += skip
 
@@ -107,9 +117,7 @@ class GCSConv(Conv):
 
     @property
     def config(self):
-        return {
-            'channels': self.channels
-        }
+        return {"channels": self.channels}
 
     @staticmethod
     def preprocess(a):

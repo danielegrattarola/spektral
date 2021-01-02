@@ -59,46 +59,54 @@ class ChebConv(Conv):
 
     """
 
-    def __init__(self,
-                 channels,
-                 K=1,
-                 activation=None,
-                 use_bias=True,
-                 kernel_initializer='glorot_uniform',
-                 bias_initializer='zeros',
-                 kernel_regularizer=None,
-                 bias_regularizer=None,
-                 activity_regularizer=None,
-                 kernel_constraint=None,
-                 bias_constraint=None,
-                 **kwargs):
-        super().__init__(activation=activation,
-                         use_bias=use_bias,
-                         kernel_initializer=kernel_initializer,
-                         bias_initializer=bias_initializer,
-                         kernel_regularizer=kernel_regularizer,
-                         bias_regularizer=bias_regularizer,
-                         activity_regularizer=activity_regularizer,
-                         kernel_constraint=kernel_constraint,
-                         bias_constraint=bias_constraint,
-                         **kwargs)
+    def __init__(
+        self,
+        channels,
+        K=1,
+        activation=None,
+        use_bias=True,
+        kernel_initializer="glorot_uniform",
+        bias_initializer="zeros",
+        kernel_regularizer=None,
+        bias_regularizer=None,
+        activity_regularizer=None,
+        kernel_constraint=None,
+        bias_constraint=None,
+        **kwargs
+    ):
+        super().__init__(
+            activation=activation,
+            use_bias=use_bias,
+            kernel_initializer=kernel_initializer,
+            bias_initializer=bias_initializer,
+            kernel_regularizer=kernel_regularizer,
+            bias_regularizer=bias_regularizer,
+            activity_regularizer=activity_regularizer,
+            kernel_constraint=kernel_constraint,
+            bias_constraint=bias_constraint,
+            **kwargs
+        )
         self.channels = channels
         self.K = K
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
         input_dim = input_shape[0][-1]
-        self.kernel = self.add_weight(shape=(self.K, input_dim, self.channels),
-                                      initializer=self.kernel_initializer,
-                                      name='kernel',
-                                      regularizer=self.kernel_regularizer,
-                                      constraint=self.kernel_constraint)
+        self.kernel = self.add_weight(
+            shape=(self.K, input_dim, self.channels),
+            initializer=self.kernel_initializer,
+            name="kernel",
+            regularizer=self.kernel_regularizer,
+            constraint=self.kernel_constraint,
+        )
         if self.use_bias:
-            self.bias = self.add_weight(shape=(self.channels,),
-                                        initializer=self.bias_initializer,
-                                        name='bias',
-                                        regularizer=self.bias_regularizer,
-                                        constraint=self.bias_constraint)
+            self.bias = self.add_weight(
+                shape=(self.channels,),
+                initializer=self.bias_initializer,
+                name="bias",
+                regularizer=self.bias_regularizer,
+                constraint=self.bias_constraint,
+            )
         else:
             self.bias = None
         self.built = True
@@ -107,15 +115,15 @@ class ChebConv(Conv):
         x, a = inputs
 
         T_0 = x
-        output = ops.dot(T_0, self.kernel[0])
+        output = K.dot(T_0, self.kernel[0])
 
         if self.K > 1:
-            T_1 = ops.filter_dot(a, x)
-            output += ops.dot(T_1, self.kernel[1])
+            T_1 = ops.modal_dot(a, x)
+            output += K.dot(T_1, self.kernel[1])
 
         for k in range(2, self.K):
-            T_2 = 2 * ops.filter_dot(a, T_1) - T_0
-            output += ops.dot(T_2, self.kernel[k])
+            T_2 = 2 * ops.modal_dot(a, T_1) - T_0
+            output += K.dot(T_2, self.kernel[k])
             T_0, T_1 = T_1, T_2
 
         if self.use_bias:
@@ -126,10 +134,7 @@ class ChebConv(Conv):
 
     @property
     def config(self):
-        return {
-            'channels': self.channels,
-            'K': self.K
-        }
+        return {"channels": self.channels, "K": self.K}
 
     @staticmethod
     def preprocess(a):

@@ -66,30 +66,34 @@ class MinCutPool(Pool):
     - `bias_constraint`: constraint applied to the bias of the MLP;
     """
 
-    def __init__(self,
-                 k,
-                 mlp_hidden=None,
-                 mlp_activation='relu',
-                 return_mask=False,
-                 activation=None,
-                 use_bias=True,
-                 kernel_initializer='glorot_uniform',
-                 bias_initializer='zeros',
-                 kernel_regularizer=None,
-                 bias_regularizer=None,
-                 kernel_constraint=None,
-                 bias_constraint=None,
-                 **kwargs):
+    def __init__(
+        self,
+        k,
+        mlp_hidden=None,
+        mlp_activation="relu",
+        return_mask=False,
+        activation=None,
+        use_bias=True,
+        kernel_initializer="glorot_uniform",
+        bias_initializer="zeros",
+        kernel_regularizer=None,
+        bias_regularizer=None,
+        kernel_constraint=None,
+        bias_constraint=None,
+        **kwargs
+    ):
 
-        super().__init__(activation=activation,
-                         use_bias=use_bias,
-                         kernel_initializer=kernel_initializer,
-                         bias_initializer=bias_initializer,
-                         kernel_regularizer=kernel_regularizer,
-                         bias_regularizer=bias_regularizer,
-                         kernel_constraint=kernel_constraint,
-                         bias_constraint=bias_constraint,
-                         **kwargs)
+        super().__init__(
+            activation=activation,
+            use_bias=use_bias,
+            kernel_initializer=kernel_initializer,
+            bias_initializer=bias_initializer,
+            kernel_regularizer=kernel_regularizer,
+            bias_regularizer=bias_regularizer,
+            kernel_constraint=kernel_constraint,
+            bias_constraint=bias_constraint,
+            **kwargs
+        )
         self.k = k
         self.mlp_hidden = mlp_hidden if mlp_hidden else []
         self.mlp_activation = mlp_activation
@@ -103,16 +107,12 @@ class MinCutPool(Pool):
             kernel_regularizer=self.kernel_regularizer,
             bias_regularizer=self.bias_regularizer,
             kernel_constraint=self.kernel_constraint,
-            bias_constraint=self.bias_constraint
+            bias_constraint=self.bias_constraint,
         )
         mlp_layers = []
         for i, channels in enumerate(self.mlp_hidden):
-            mlp_layers.append(
-                Dense(channels, self.mlp_activation, **layer_kwargs)
-            )
-        mlp_layers.append(
-            Dense(self.k, 'softmax', **layer_kwargs)
-        )
+            mlp_layers.append(Dense(channels, self.mlp_activation, **layer_kwargs))
+        mlp_layers.append(Dense(self.k, "softmax", **layer_kwargs))
         self.mlp = Sequential(mlp_layers)
 
         super().build(input_shape)
@@ -133,28 +133,28 @@ class MinCutPool(Pool):
         S = self.mlp(X)
 
         # MinCut regularization
-        A_pooled = ops.matmul_AT_B_A(S, A)
+        A_pooled = ops.matmul_at_b_a(S, A)
         num = tf.linalg.trace(A_pooled)
         D = ops.degree_matrix(A)
-        den = tf.linalg.trace(ops.matmul_AT_B_A(S, D)) + K.epsilon()
+        den = tf.linalg.trace(ops.matmul_at_b_a(S, D)) + K.epsilon()
         cut_loss = -(num / den)
         if batch_mode:
             cut_loss = K.mean(cut_loss)
         self.add_loss(cut_loss)
 
         # Orthogonality regularization
-        SS = ops.matmul_AT_B(S, S)
+        SS = ops.modal_dot(S, S, transpose_a=True)
         I_S = tf.eye(self.k, dtype=SS.dtype)
         ortho_loss = tf.norm(
             SS / tf.norm(SS, axis=(-1, -2), keepdims=True) - I_S / tf.norm(I_S),
-            axis=(-1, -2)
+            axis=(-1, -2),
         )
         if batch_mode:
             ortho_loss = K.mean(ortho_loss)
         self.add_loss(ortho_loss)
 
         # Pooling
-        X_pooled = ops.matmul_AT_B(S, X)
+        X_pooled = ops.modal_dot(S, X, transpose_a=True)
         A_pooled = tf.linalg.set_diag(
             A_pooled, tf.zeros(K.shape(A_pooled)[:-1], dtype=A_pooled.dtype)
         )  # Remove diagonal
@@ -175,8 +175,8 @@ class MinCutPool(Pool):
     @property
     def config(self):
         return {
-            'k': self.k,
-            'mlp_hidden': self.mlp_hidden,
-            'mlp_activation': self.mlp_activation,
-            'return_mask': self.return_mask
+            "k": self.k,
+            "mlp_hidden": self.mlp_hidden,
+            "mlp_activation": self.mlp_activation,
+            "return_mask": self.return_mask,
         }

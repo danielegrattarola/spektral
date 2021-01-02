@@ -33,7 +33,7 @@ def degree_power(A, k):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         degrees = np.power(np.array(A.sum(1)), k).ravel()
-    degrees[np.isinf(degrees)] = 0.
+    degrees[np.isinf(degrees)] = 0.0
     if sp.issparse(A):
         D = sp.diags(degrees)
     else:
@@ -53,7 +53,7 @@ def normalized_adjacency(A, symmetric=True):
         normalized_D = degree_power(A, -0.5)
         return normalized_D.dot(A).dot(normalized_D)
     else:
-        normalized_D = degree_power(A, -1.)
+        normalized_D = degree_power(A, -1.0)
         return normalized_D.dot(A)
 
 
@@ -93,14 +93,14 @@ def rescale_laplacian(L, lmax=None):
     """
     if lmax is None:
         try:
-            lmax = sp.linalg.eigsh(L, 1, which='LM', return_eigenvectors=False)[0]
+            lmax = sp.linalg.eigsh(L, 1, which="LM", return_eigenvectors=False)[0]
         except ArpackNoConvergence:
             lmax = 2
     if sp.issparse(L):
         I = sp.eye(L.shape[-1], dtype=L.dtype)
     else:
         I = np.eye(L.shape[-1], dtype=L.dtype)
-    L_scaled = (2. / lmax) * L - I
+    L_scaled = (2.0 / lmax) * L - I
     return L_scaled
 
 
@@ -120,7 +120,7 @@ def gcn_filter(A, symmetric=True):
             out[i][np.diag_indices_from(out[i])] += 1
             out[i] = normalized_adjacency(out[i], symmetric=symmetric)
     else:
-        if hasattr(out, 'tocsr'):
+        if hasattr(out, "tocsr"):
             out = out.tocsr()
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
@@ -202,11 +202,12 @@ def add_self_loops(a, value=1):
     """
     a = a.copy()
     if len(a.shape) < 2:
-        raise ValueError('a must have at least rank 2')
+        raise ValueError("a must have at least rank 2")
     n = a.shape[-1]
     if n != a.shape[-2]:
-        raise ValueError('Innermost two dimensions must be equal. Got {}'
-                         .format(a.shape))
+        raise ValueError(
+            "Innermost two dimensions must be equal. Got {}".format(a.shape)
+        )
     if sp.issparse(a):
         a = a.tolil()
         a.setdiag(value)

@@ -22,7 +22,7 @@ from spektral.data import DisjointLoader
 from spektral.datasets import TUDataset
 from spektral.models import GeneralGNN
 
-physical_devices = tf.config.list_physical_devices('GPU')
+physical_devices = tf.config.list_physical_devices("GPU")
 if len(physical_devices) > 0:
     tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
@@ -32,7 +32,7 @@ learning_rate = 0.01
 epochs = 400
 
 # Read data
-data = TUDataset('PROTEINS')
+data = TUDataset("PROTEINS")
 
 # Train/test split
 np.random.shuffle(data)
@@ -44,7 +44,7 @@ loader_tr = DisjointLoader(data_tr, batch_size=batch_size, epochs=epochs)
 loader_te = DisjointLoader(data_te, batch_size=batch_size)
 
 # Create model
-model = GeneralGNN(data.n_labels, activation='softmax')
+model = GeneralGNN(data.n_labels, activation="softmax")
 optimizer = Adam(learning_rate)
 loss_fn = CategoricalCrossentropy()
 acc_fn = CategoricalAccuracy()
@@ -90,9 +90,12 @@ for batch in loader_tr:
         step = 0
         epoch += 1
         results_te = evaluate(loader_te)
-        print('Epoch {} - Train loss: {:.3f} - Train acc: {:.3f} - '
-              'Test loss: {:.3f} - Test acc: {:.3f}'
-              .format(epoch, *np.mean(results, 0), *results_te))
+        print(
+            "Epoch {} - Train loss: {:.3f} - Train acc: {:.3f} - "
+            "Test loss: {:.3f} - Test acc: {:.3f}".format(
+                epoch, *np.mean(results, 0), *results_te
+            )
+        )
 
 results_te = evaluate(loader_te)
-print('Final results - Loss: {:.3f} - Acc: {:.3f}'.format(*results_te))
+print("Final results - Loss: {:.3f} - Acc: {:.3f}".format(*results_te))

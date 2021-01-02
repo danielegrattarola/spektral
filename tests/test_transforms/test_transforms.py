@@ -1,8 +1,8 @@
 import numpy as np
 import scipy.sparse as sp
 
-from spektral.data import Graph
 from spektral import transforms as tr
+from spektral.data import Graph
 
 N = 10
 F = 3
@@ -76,6 +76,7 @@ def test_gcn_filter():
 
 def test_layer_preprocess():
     from spektral.layers import GCNConv
+
     t = tr.LayerPreprocess(GCNConv)
     assert callable(t)
     g = Graph(x=x, a=a, e=e, y=y_nl)

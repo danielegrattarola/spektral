@@ -28,7 +28,7 @@ In all data modes, our goal is to represent one or more graphs by grouping their
 |`Single`  |`[nodes, nodes]`|`[nodes, n_feat]`|`[edges, e_feat]`|
 |`Disjoint`|`[nodes, nodes]`|`[nodes, n_feat]`|`[edges, e_feat]`|
 |`Batch`   |`[batch, nodes, nodes]`|`[batch, nodes, nodes]`|`[batch, nodes, nodes, e_feat]`|
-|`Mixed`   |`[nodes, nodes]`|`[batch, nodes, n_feat]`| `n/a` |
+|`Mixed`   |`[nodes, nodes]`|`[batch, nodes, n_feat]`| `[batch, edges, e_feat]` |
 
 In the following sections we describe the four modes more into detail.
 In particular, we go over which [data `Loader`](/loaders/) to use in each case.
@@ -185,8 +185,9 @@ In mixed mode we have a single graph that acts as the support for different node
 
 In this case we have that: 
 
-- `A` is a matrix of shape `[node, node]`;
-- `X` is a tensor in batch mode, of shape `[batch, node, n_feat]`;
+- `A` is a matrix of shape `[nodes, nodes]`;
+- `X` is a tensor in batch mode, of shape `[batch, nodes, n_feat]`;
+- `E` has shape `[batch, edges, e_feat]` so that `E[i, j]` corresponds to the edge of the i-th graph associated with `A[j // nodes, j % nodes]`.
 
 Currently, there are no layers in Spektral that support mixed mode and edge attributes. 
 
@@ -199,7 +200,7 @@ An example of a mixed mode dataset is the MNIST random grid ([Defferrard et al.,
 MNIST(n_graphs=70000)
 ```
 
-Mixed-mode datasets have a special `a` attribute that stores the adjacency matrix, while the proper graphs that make up the dataset only have node features:
+Mixed-mode datasets have a special `a` attribute that stores the adjacency matrix, while the proper graphs that make up the dataset only have node/edge features:
 
 ```py
 >>>dataset.a
@@ -213,7 +214,19 @@ Graph(n_nodes=784, n_node_features=1, n_edge_features=None, n_labels=1)
 # None
 ```
 
-For this reason, a `PackedBatchLoader` will work perfectly for our mixed mode datasets (a `BatchLoader` will work perfectly, as well, but it will have slightly more Python overhead).
+We can use a `MixedLoader` to deal with sharing the adjacency matrix between the graphs in our dataset: 
+
+```py
+>>> from spektral.data import MixedLoader
+>>> loader = MixedLoader(dataset, batch_size=3)
+>>> inputs, target = loader.__next__()
+
+>>> inputs[0].shape
+(3, 784, 1)
+
+>>> inputs[1].shape  # Only one adjacency matrix
+(784, 784)
+```
 
 Mixed mode requires a bit more work than the other three modes. In particular, it is not possible to use `loader.load()` to train a model in this mode. 
 

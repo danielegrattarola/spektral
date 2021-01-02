@@ -3,35 +3,35 @@ import scipy.sparse as sp
 import tensorflow as tf
 from tensorflow.keras import Input, Model
 
-from spektral.layers import TopKPool, MinCutPool, DiffPool, SAGPool
+from spektral.layers import DiffPool, MinCutPool, SAGPool, TopKPool
+
 from .test_convolutional import _test_get_config
 
-tf.keras.backend.set_floatx('float64')
+tf.keras.backend.set_floatx("float64")
 
 SINGLE, BATCH, DISJOINT = 1, 2, 3  # Single, batch, disjoint
-LAYER_K_, MODES_K_, KWARGS_K_ = 'layer', 'modes', 'kwargs'
+LAYER_K_, MODES_K_, KWARGS_K_ = "layer", "modes", "kwargs"
 TESTS = [
     {
         LAYER_K_: TopKPool,
         MODES_K_: [SINGLE, DISJOINT],
-        KWARGS_K_: {'ratio': 0.5, 'return_mask': True, 'sparse': True}
+        KWARGS_K_: {"ratio": 0.5, "return_mask": True, "sparse": True},
     },
     {
         LAYER_K_: SAGPool,
         MODES_K_: [SINGLE, DISJOINT],
-        KWARGS_K_: {'ratio': 0.5, 'return_mask': True, 'sparse': True}
+        KWARGS_K_: {"ratio": 0.5, "return_mask": True, "sparse": True},
     },
     {
         LAYER_K_: MinCutPool,
         MODES_K_: [SINGLE, BATCH],
-        KWARGS_K_: {'k': 5, 'return_mask': True, 'sparse': True}
+        KWARGS_K_: {"k": 5, "return_mask": True, "sparse": True},
     },
     {
         LAYER_K_: DiffPool,
         MODES_K_: [SINGLE, BATCH],
-        KWARGS_K_: {'k': 5, 'return_mask': True, 'sparse': True}
+        KWARGS_K_: {"k": 5, "return_mask": True, "sparse": True},
     },
-
 ]
 
 batch_size = 3
@@ -56,7 +56,7 @@ def _check_number_of_nodes(N_pool_expected, N_pool_true):
 def _test_single_mode(layer, **kwargs):
     A = np.ones((N, N))
     X = np.random.normal(size=(N, F))
-    sparse = kwargs.pop('sparse', None) is not None
+    sparse = kwargs.pop("sparse", None) is not None
 
     A_in = Input(shape=(None,), sparse=sparse)
     X_in = Input(shape=(F,))
@@ -67,12 +67,12 @@ def _test_single_mode(layer, **kwargs):
     output = model([X, A])
     X_pool, A_pool, mask = output
 
-    if 'ratio' in kwargs.keys():
-        N_exp = kwargs['ratio'] * N
-    elif 'k' in kwargs.keys():
-        N_exp = kwargs['k']
+    if "ratio" in kwargs.keys():
+        N_exp = kwargs["ratio"] * N
+    elif "k" in kwargs.keys():
+        N_exp = kwargs["k"]
     else:
-        raise ValueError('Need k or ratio.')
+        raise ValueError("Need k or ratio.")
     N_pool_expected = int(np.ceil(N_exp))
     N_pool_true = A_pool.shape[-1]
 
@@ -98,12 +98,12 @@ def _test_batch_mode(layer, **kwargs):
     output = model([X, A])
     X_pool, A_pool, mask = output
 
-    if 'ratio' in kwargs.keys():
-        N_exp = kwargs['ratio'] * N
-    elif 'k' in kwargs.keys():
-        N_exp = kwargs['k']
+    if "ratio" in kwargs.keys():
+        N_exp = kwargs["ratio"] * N
+    elif "k" in kwargs.keys():
+        N_exp = kwargs["k"]
     else:
-        raise ValueError('Need k or ratio.')
+        raise ValueError("Need k or ratio.")
     N_pool_expected = int(np.ceil(N_exp))
     N_pool_true = A_pool.shape[-1]
 
@@ -117,11 +117,12 @@ def _test_batch_mode(layer, **kwargs):
 
 
 def _test_disjoint_mode(layer, **kwargs):
-    A = sp.block_diag([np.ones((N1, N1)), np.ones(
-        (N2, N2)), np.ones((N3, N3))]).todense()
+    A = sp.block_diag(
+        [np.ones((N1, N1)), np.ones((N2, N2)), np.ones((N3, N3))]
+    ).todense()
     X = np.random.normal(size=(N, F))
     I = np.array([0] * N1 + [1] * N2 + [2] * N3).astype(int)
-    sparse = kwargs.pop('sparse', None) is not None
+    sparse = kwargs.pop("sparse", None) is not None
 
     A_in = Input(shape=(None,), sparse=sparse)
     X_in = Input(shape=(F,))
@@ -133,9 +134,11 @@ def _test_disjoint_mode(layer, **kwargs):
     output = model([X, A, I])
     X_pool, A_pool, I_pool, mask = output
 
-    N_pool_expected = np.ceil(kwargs['ratio'] * N1) + \
-                      np.ceil(kwargs['ratio'] * N2) + \
-                      np.ceil(kwargs['ratio'] * N3)
+    N_pool_expected = (
+        np.ceil(kwargs["ratio"] * N1)
+        + np.ceil(kwargs["ratio"] * N2)
+        + np.ceil(kwargs["ratio"] * N3)
+    )
     N_pool_expected = int(N_pool_expected)
     N_pool_true = A_pool.shape[0]
 
@@ -154,12 +157,12 @@ def test_layers():
         for mode in test[MODES_K_]:
             if mode == SINGLE:
                 _test_single_mode(test[LAYER_K_], **test[KWARGS_K_])
-                if test[KWARGS_K_].pop('sparse', None):
+                if test[KWARGS_K_].pop("sparse", None):
                     _test_single_mode(test[LAYER_K_], **test[KWARGS_K_])
             elif mode == BATCH:
                 _test_batch_mode(test[LAYER_K_], **test[KWARGS_K_])
             elif mode == DISJOINT:
                 _test_disjoint_mode(test[LAYER_K_], **test[KWARGS_K_])
-                if test[KWARGS_K_].pop('sparse', None):
+                if test[KWARGS_K_].pop("sparse", None):
                     _test_disjoint_mode(test[LAYER_K_], **test[KWARGS_K_])
         _test_get_config(test[LAYER_K_], **test[KWARGS_K_])

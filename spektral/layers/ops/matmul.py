@@ -6,188 +6,169 @@ from . import modes as modes
 from . import ops as ops
 
 
-def dot(a, b, transpose_a=False, transpose_b=False):
+def dot(a, b):
     """
-    Dot product between `a` and `b`, with automatic handling of batch dimensions.
+    Computes a @ b, for a, b of the same rank (both 2 or both 3).
+
+    If the rank is 2, then the innermost dimension of `a` must match the
+    outermost dimension of `b`.
+    If the rank is 3, the first dimension of `a` and `b` must be equal and the
+    function computes a batch matmul.
+
     Supports both dense and sparse multiplication (including sparse-sparse).
-    The innermost dimension of `a` must match the outermost dimension of `b`,
-    unless there is a shared batch dimension.
-    Note that doing sparse-sparse multiplication of any rank and sparse-dense
-    multiplication with rank higher than 2 may result in slower computations.
+
     :param a: Tensor or SparseTensor with rank 2 or 3.
-    :param b: Tensor or SparseTensor with rank 2 or 3.
-    :param transpose_a: bool, transpose innermost two dimensions of a.
-    :param transpose_b: bool, transpose innermost two dimensions of b.
+    :param b: Tensor or SparseTensor with same rank as b.
     :return: Tensor or SparseTensor with rank 2 or 3.
     """
-    a_is_sparse_tensor = isinstance(a, tf.SparseTensor)
-    b_is_sparse_tensor = isinstance(b, tf.SparseTensor)
+    a_ndim = K.ndim(a)
+    b_ndim = K.ndim(b)
+    assert a_ndim == b_ndim, "Expected equal ranks, got {} and {}" "".format(
+        a_ndim, b_ndim
+    )
+    a_is_sparse = K.is_sparse(a)
+    b_is_sparse = K.is_sparse(b)
 
-    # Handle case where we can use faster sparse-dense matmul
-    if K.ndim(a) == 2 and K.ndim(b) == 2:
-        if transpose_a:
-            a = ops.transpose(a)
-        if transpose_b:
-            b = ops.transpose(b)
-        if a_is_sparse_tensor and not b_is_sparse_tensor:
+    # Handle cases: rank 2 sparse-dense, rank 2 dense-sparse
+    # In these cases we can use the faster sparse-dense matmul of tf.sparse
+    if a_ndim == 2:
+        if a_is_sparse and not b_is_sparse:
             return tf.sparse.sparse_dense_matmul(a, b)
-        elif not a_is_sparse_tensor and b_is_sparse_tensor:
+        if not a_is_sparse and b_is_sparse:
             return ops.transpose(
                 tf.sparse.sparse_dense_matmul(ops.transpose(b), ops.transpose(a))
             )
 
-    # Fallthrough to sp-sp and d-d implementations
-    if a_is_sparse_tensor:
+    # Handle cases: rank 2 sparse-sparse, rank 3 sparse-dense,
+    # rank 3 dense-sparse, rank 3 sparse-sparse
+    # In these cases we can use the tfsp.CSRSparseMatrix implementation (slower,
+    # but saves memory)
+    if a_is_sparse:
         a = tfsp.CSRSparseMatrix(a)
-    if b_is_sparse_tensor:
+    if b_is_sparse:
         b = tfsp.CSRSparseMatrix(b)
-    if a_is_sparse_tensor or b_is_sparse_tensor:
-        out = tfsp.matmul(a, b, transpose_a=transpose_a, transpose_b=transpose_b)
-        if hasattr(out, 'to_sparse_tensor'):
+    if a_is_sparse or b_is_sparse:
+        out = tfsp.matmul(a, b)
+        if hasattr(out, "to_sparse_tensor"):
             return out.to_sparse_tensor()
-    else:
-        out = tf.matmul(a, b, transpose_a=transpose_a, transpose_b=transpose_b)
+        else:
+            return out
 
-    return out
+    # Handle case: rank 2 dense-dense, rank 3 dense-dense
+    # Here we use the standard dense operation
+    return tf.matmul(a, b)
 
 
 def mixed_mode_dot(a, b):
     """
     Computes the equivalent of `tf.einsum('ij,bjk->bik', a, b)`, but
     works for both dense and sparse inputs.
+
     :param a: Tensor or SparseTensor with rank 2.
     :param b: Tensor or SparseTensor with rank 3.
     :return: Tensor or SparseTensor with rank 3.
     """
-    s_0_, s_1_, s_2_ = K.int_shape(b)
-    B_T = ops.transpose(b, (1, 2, 0))
-    B_T = ops.reshape(B_T, (s_1_, -1))
-    output = dot(a, B_T)
-    output = ops.reshape(output, (s_1_, s_2_, -1))
+    shp = K.int_shape(b)
+    b_t = ops.transpose(b, (1, 2, 0))
+    b_t = ops.reshape(b_t, (shp[1], -1))
+    output = dot(a, b_t)
+    output = ops.reshape(output, (shp[1], shp[2], -1))
     output = ops.transpose(output, (2, 0, 1))
 
     return output
 
 
-def filter_dot(fltr, features):
+def modal_dot(a, b, transpose_a=False, transpose_b=False):
     """
-    Computes the matrix multiplication between a graph filter and node features,
-    automatically handling data modes.
-    :param fltr: Tensor or SparseTensor of rank 2 or 3.
-    :param features: Tensor or SparseTensor of rank 2 or 3.
+    Computes the matrix multiplication of a and b, handling the data modes
+    automatically.
+
+    This is a wrapper to standard matmul operations, for a and b with rank 2
+    or 3, that:
+
+    - Supports automatic broadcasting of the "batch" dimension if the two inputs
+    have different ranks.
+    - Supports any combination of dense and sparse inputs.
+
+    This op is useful for multiplying matrices that represent batches of graphs
+    in the different modes, for which the adjacency matrices may or may not be
+    sparse and have different ranks from the node attributes.
+
+    Additionally, it can also support the case where we have many adjacency
+    matrices and only one graph signal (which is uncommon, but may still happen).
+
+    If you know a-priori the type and shape of the inputs, it may be faster to
+    use the built-in functions of TensorFlow directly instead.
+
+    Examples:
+
+        - `a` rank 2, `b` rank 2 -> `a @ b`
+        - `a` rank 3, `b` rank 3 -> `[a[i] @ b[i] for i in range(len(a))]`
+        - `a` rank 2, `b` rank 3 -> `[a @ b[i] for i in range(len(b))]`
+        - `a` rank 3, `b` rank 2 -> `[a[i] @ b for i in range(len(a))]`
+
+    :param a: Tensor or SparseTensor with rank 2 or 3;
+    :param b: Tensor or SparseTensor with rank 2 or 3;
+    :param transpose_a: transpose the innermost 2 dimensions of `a`;
+    :param transpose_b: transpose the innermost 2 dimensions of `b`;
     :return: Tensor or SparseTensor with rank = max(rank(a), rank(b)).
     """
-    mode = modes.autodetect_mode(fltr, features)
-    if mode == modes.SINGLE or mode == modes.BATCH:
-        return dot(fltr, features)
-    else:
-        return mixed_mode_dot(fltr, features)
+    a_ndim = K.ndim(a)
+    b_ndim = K.ndim(b)
+    assert a_ndim in (2, 3), "Expected a of rank 2 or 3, got {}".format(a_ndim)
+    assert b_ndim in (2, 3), "Expected b of rank 2 or 3, got {}".format(b_ndim)
 
+    if transpose_a:
+        perm = None if a_ndim == 2 else (0, 2, 1)
+        a = ops.transpose(a, perm)
+    if transpose_b:
+        perm = None if b_ndim == 2 else (0, 2, 1)
+        b = ops.transpose(b, perm)
 
-def matmul_A_B(a, b):
-    """
-    Computes A * B, dealing automatically with sparsity and data modes.
-    :param a: Tensor or SparseTensor with rank 2 or 3.
-    :param b: Tensor or SparseTensor with rank 2 or 3.
-    :return: Tensor or SparseTensor with rank = max(rank(a), rank(b)).
-    """
-    mode = modes.autodetect_mode(a, b)
-    if mode == modes.MIXED:
-        # Mixed mode (rank(a)=2, rank(b)=3)
-        output = mixed_mode_dot(a, b)
-    elif mode == modes.iMIXED:
-        # Inverted mixed (rank(a)=3, rank(b)=2)
+    if a_ndim == b_ndim:
+        # ...ij,...jk->...ik
+        return dot(a, b)
+    elif a_ndim == 2:
+        # ij,bjk->bik
+        return mixed_mode_dot(a, b)
+    else:  # a_ndim == 3
+        # bij,jk->bik
+        if not K.is_sparse(a) and not K.is_sparse(b):
+            # Immediately fallback to standard dense matmul, no need to reshape
+            return tf.matmul(a, b)
+
+        # If either input is sparse, we use dot(a, b)
         # This implementation is faster than using rank 3 sparse matmul with tfsp
-        s_1_a, s_2_a = tf.shape(a)[1], tf.shape(a)[2]
-        s_1_b = tf.shape(b)[1]
-        a_flat = ops.reshape(a, (-1, s_2_a))
+        a_shape = tf.shape(a)
+        b_shape = tf.shape(b)
+        a_flat = ops.reshape(a, (-1, a_shape[2]))
         output = dot(a_flat, b)
-        output = ops.reshape(output, (-1, s_1_a, s_1_b))
-    else:
-        # Single (rank(a)=2, rank(b)=2) and batch (rank(a)=3, rank(b)=3) mode
-        output = dot(a, b)
-
-    return output
+        return ops.reshape(output, (-1, a_shape[1], b_shape[1]))
 
 
-def matmul_AT_B(a, b):
+def matmul_at_b_a(a, b):
     """
-    Computes A.T * B, dealing automatically with sparsity and data modes.
+    Computes a.T @ b @ a, for a, b with rank 2 or 3.
+
+    Supports automatic broadcasting of the "batch" dimension if the two inputs
+    have different ranks.
+    Supports any combination of dense and sparse inputs.
+
     :param a: Tensor or SparseTensor with rank 2 or 3.
     :param b: Tensor or SparseTensor with rank 2 or 3.
     :return: Tensor or SparseTensor with rank = max(rank(a), rank(b)).
     """
-    mode = modes.autodetect_mode(a, b)
-    if mode == modes.SINGLE or mode == modes.MIXED:
-        # Single (rank(a)=2, rank(b)=2)
-        # Mixed (rank(a)=2, rank(b)=3)
-        a_t = ops.transpose(a)
-    elif mode == modes.iMIXED or mode == modes.BATCH:
-        # Inverted mixed (rank(a)=3, rank(b)=2)
-        # Batch (rank(a)=3, rank(b)=3)
-        a_t = ops.transpose(a, (0, 2, 1))
-    else:
-        raise ValueError('Expected ranks to be 2 or 3, got {} and {}'.format(
-            K.ndim(a), K.ndim(b)
-        ))
-
-    return matmul_A_B(a_t, b)
-
-
-def matmul_A_BT(a, b):
-    """
-    Computes A * B.T, dealing automatically with sparsity and data modes.
-    :param a: Tensor or SparseTensor with rank 2 or 3.
-    :param b: Tensor or SparseTensor with rank 2 or 3.
-    :return: Tensor or SparseTensor with rank = max(rank(a), rank(b)).
-    """
-    mode = modes.autodetect_mode(a, b)
-    if mode == modes.SINGLE or mode == modes.iMIXED:
-        # Single (rank(a)=2, rank(b)=2)
-        # Inverted mixed (rank(a)=3, rank(b)=2)
-        b_t = ops.transpose(b)
-    elif mode == modes.MIXED or mode == modes.BATCH:
-        # Mixed (rank(a)=2, rank(b)=3)
-        # Batch (rank(a)=3, rank(b)=3)
-        b_t = ops.transpose(b, (0, 2, 1))
-    else:
-        raise ValueError('Expected ranks to be 2 or 3, got {} and {}'.format(
-            K.ndim(a), K.ndim(b)
-        ))
-
-    return matmul_A_B(a, b_t)
-
-
-def matmul_AT_B_A(a, b):
-    """
-    Computes A.T * B * A, dealing automatically with sparsity and data modes.
-    :param a: Tensor or SparseTensor with rank 2 or 3.
-    :param b: Tensor or SparseTensor with rank 2 or 3.
-    :return: Tensor or SparseTensor with rank = max(rank(a), rank(b)).
-    """
-    at_b = matmul_AT_B(a, b)
-    at_b_a = matmul_A_B(at_b, a)
+    at_b = modal_dot(a, b, transpose_a=True)
+    at_b_a = modal_dot(at_b, a)
 
     return at_b_a
-
-
-def matmul_A_B_AT(a, b):
-    """
-    Computes A * B * A.T, dealing automatically with sparsity and data modes.
-    :param a: Tensor or SparseTensor with rank 2 or 3.
-    :param b: Tensor or SparseTensor with rank 2 or 3.
-    :return: Tensor or SparseTensor with rank = max(rank(a), rank(b)).
-    """
-    b_at = matmul_A_BT(a, b)
-    a_b_at = matmul_A_B(a, b_at)
-
-    return a_b_at
 
 
 def matrix_power(a, k):
     """
     If a is a square matrix, computes a^k. If a is a rank 3 Tensor of square
     matrices, computes the exponent of each inner matrix.
+
     :param a: Tensor or SparseTensor with rank 2 or 3. The innermost two
     dimensions must be the same.
     :param k: int, the exponent to which to raise the matrices.
@@ -195,6 +176,6 @@ def matrix_power(a, k):
     """
     x_k = a
     for _ in range(k - 1):
-        x_k = matmul_A_B(a, x_k)
+        x_k = modal_dot(a, x_k)
 
     return x_k
