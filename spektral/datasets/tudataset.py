@@ -48,8 +48,11 @@ class TUDataset(Dataset):
     - `clean`: if `True`, rload a version of the dataset with no isomorphic
                graphs.
     """
-    url = 'https://www.chrsmrrs.com/graphkerneldatasets'
-    url_clean = 'https://raw.githubusercontent.com/nd7141/graph_datasets/master/datasets'
+
+    url = "https://www.chrsmrrs.com/graphkerneldatasets"
+    url_clean = (
+        "https://raw.githubusercontent.com/nd7141/graph_datasets/master/datasets"
+    )
 
     def __init__(self, name, clean=False, **kwargs):
         self.name = name
@@ -181,7 +184,7 @@ class TUDataset(Dataset):
 
     @property
     def available_datasets(self):
-        url = 'https://chrsmrrs.github.io/datasets/docs/datasets/'
+        url = "https://chrsmrrs.github.io/datasets/docs/datasets/"
         try:
             tables = pd.read_html(url)
             names = []
@@ -190,7 +193,7 @@ class TUDataset(Dataset):
             return names
         except URLError:
             # No internet, don't panic
-            print('Could not read URL {}'.format(url))
+            print("Could not read URL {}".format(url))
             return []
 
 
