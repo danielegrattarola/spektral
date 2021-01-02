@@ -1,0 +1,13 @@
+-   repo: https://gitlab.com/PyCQA/flake8
+    rev: 3.7.9
+    hooks:
+    -   id: flake8
+        args: [--count, "--select=E9,F63,F7,F82", --show-source, --statistics]
+-   repo: https://github.com/timothycrosley/isort
+    rev: 5.6.4
+    hooks:
+      - id: isort
+-   repo: https://github.com/psf/black
+    rev: 20.8b1
+    hooks:
+      - id: black

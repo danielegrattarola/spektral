@@ -1,10 +1,10 @@
 import tensorflow as tf
 from tensorflow.keras import backend as K
 
-SINGLE = 1    # Single         (rank(a)=2, rank(b)=2)
-MIXED = 2     # Mixed          (rank(a)=2, rank(b)=3)
-iMIXED = 3    # Inverted mixed (rank(a)=3, rank(b)=2)
-BATCH = 4     # Batch          (rank(a)=3, rank(b)=3)
+SINGLE = 1  # Single         (rank(a)=2, rank(b)=2)
+MIXED = 2  # Mixed          (rank(a)=2, rank(b)=3)
+iMIXED = 3  # Inverted mixed (rank(a)=3, rank(b)=2)
+BATCH = 4  # Batch          (rank(a)=3, rank(b)=3)
 UNKNOWN = -1  # Unknown
 
 
@@ -45,6 +45,7 @@ def _vectorised_get_cum_graph_size(nodes, graph_sizes):
     :return: A list of shape (nodes) where each entry corresponds to the number of nodes contained in graphs
     with smaller segment ID for each node.
     """
+
     def get_cum_graph_size(node):
         cum_graph_sizes = tf.cumsum(graph_sizes, exclusive=True)
         indicator_if_smaller = tf.cast(node - cum_graph_sizes >= 0, tf.int32)
