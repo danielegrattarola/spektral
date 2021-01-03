@@ -85,10 +85,13 @@ PAGES = [
         ],
     },
     {
-        "page": "models.md",
-        "functions": [],
-        "methods": [],
-        "classes": [models.GeneralGNN],
+        'page': 'models.md',
+        'functions': [],
+        'methods': [],
+        'classes': [
+            models.GCN,
+            models.GeneralGNN
+        ]
     },
     # Data #####################################################################
     {"page": "data.md", "functions": [], "methods": [], "classes": [data.Graph]},
