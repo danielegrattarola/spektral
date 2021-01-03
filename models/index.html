@@ -85,6 +85,8 @@
                     </li>
                     <li class="toctree-l1 current"><a class="reference internal current" href="./">Models</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#gcn">GCN</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#generalgnn">GeneralGNN</a>
     </li>
     </ul>
@@ -153,7 +155,41 @@
               
                 <h2 id="models">Models</h2>
 <p>This module implements ready-to-use models from recent literature.</p>
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/models/general_gnn.py#L16">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/models/gcn.py#L5">[source]</a></span></p>
+<h4 id="gcn">GCN</h4>
+<pre><code class="python">spektral.models.gcn.GCN(n_labels, channels=16, activation='relu', output_activation='softmax', use_bias=False, dropout_rate=0.5, l2_reg=0.00025, n_input_channels=None)
+</code></pre>
+
+<p>This model, with its default hyperparameters, implements the architecture
+from the paper:</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1609.02907">Semi-Supervised Classification with Graph Convolutional Networks</a><br>
+Thomas N. Kipf and Max Welling</p>
+</blockquote>
+<p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>([batch], n_nodes, n_node_features)</code></li>
+<li>Weighted adjacency matrix of shape <code>([batch], n_nodes, n_nodes)</code></li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Softmax predictions with shape <code>([batch], n_nodes, n_labels)</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>n_labels</code>: number of channels in output;</li>
+<li><code>channels</code>: number of channels in first GCNConv layer;</li>
+<li><code>activation</code>: activation of the first GCNConv layer;</li>
+<li><code>output_activation</code>: activation of the second GCNConv layer;</li>
+<li><code>use_bias</code>: whether to add a learnable bias to the two GCNConv layers;</li>
+<li><code>dropout_rate</code>: <code>rate</code> used in <code>Dropout</code> layers;</li>
+<li><code>l2_reg</code>: l2 regularization strength;</li>
+<li><code>n_input_channels</code>: number of input channels, required for tf 2.1;</li>
+<li><code>**kwargs</code>: passed to <code>Model.__init__</code>.</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/models/general_gnn.py#L23">[source]</a></span></p>
 <h4 id="generalgnn">GeneralGNN</h4>
 <pre><code class="python">spektral.models.general_gnn.GeneralGNN(output, activation=None, hidden=256, message_passing=4, pre_process=2, post_process=2, connectivity='cat', batch_norm=True, dropout=0.0, aggregate='sum', hidden_activation='prelu', pool='sum')
 </code></pre>

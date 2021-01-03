@@ -162,7 +162,7 @@
             <div class="section">
               
                 <h2 id="loaders">Loaders</h2>
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L13">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L20">[source]</a></span></p>
 <h4 id="loader">Loader</h4>
 <pre><code class="python">spektral.data.loaders.Loader(dataset, batch_size=1, epochs=None, shuffle=True)
 </code></pre>
@@ -217,7 +217,7 @@ iterates indefinitely;</li>
 <li><code>shuffle</code>: whether to shuffle the data at the start of each epoch.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L151">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L163">[source]</a></span></p>
 <h4 id="singleloader">SingleLoader</h4>
 <pre><code class="python">spektral.data.loaders.SingleLoader(dataset, epochs=None, sample_weights=None)
 </code></pre>
@@ -250,7 +250,7 @@ SparseTensors);</li>
 <p><code>labels</code> is the same as <code>datsaset[0].y</code>.
 <code>sample_weights</code> is the same object passed to the constructor.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L216">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L231">[source]</a></span></p>
 <h4 id="disjointloader">DisjointLoader</h4>
 <pre><code class="python">spektral.data.loaders.DisjointLoader(dataset, node_level=False, batch_size=1, epochs=None, shuffle=True)
 </code></pre>
@@ -285,7 +285,7 @@ iterates indefinitely;</li>
 <p><code>labels</code> have shape <code>[batch, n_labels]</code> if <code>node_level=False</code> or
 <code>[n_nodes, n_labels]</code> otherwise.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L311">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L331">[source]</a></span></p>
 <h4 id="batchloader">BatchLoader</h4>
 <pre><code class="python">spektral.data.loaders.BatchLoader(dataset, batch_size=1, epochs=None, shuffle=True)
 </code></pre>
@@ -327,7 +327,7 @@ iterates indefinitely;</li>
 </ul>
 <p><code>labels</code> have shape <code>[batch, n_labels]</code>.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L391">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L412">[source]</a></span></p>
 <h4 id="packedbatchloader">PackedBatchLoader</h4>
 <pre><code class="python">spektral.data.loaders.PackedBatchLoader(dataset, batch_size=1, epochs=None, shuffle=True)
 </code></pre>
@@ -363,7 +363,7 @@ iterates indefinitely;</li>
 </ul>
 <p><code>labels</code> have shape <code>[batch, ..., n_labels]</code>.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L456">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L478">[source]</a></span></p>
 <h4 id="mixedloader">MixedLoader</h4>
 <pre><code class="python">spektral.data.loaders.MixedLoader(dataset, batch_size=1, epochs=None, shuffle=True)
 </code></pre>

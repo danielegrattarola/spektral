@@ -217,7 +217,7 @@ individual node (shape <code>(n_nodes, n_labels)</code>).</p>
 <li><code>y</code>: np.array, the node or graph labels (shape <code>(n_nodes, n_labels)</code> or <code>(n_labels, )</code>);</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/dataset.py#L12">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/dataset.py#L13">[source]</a></span></p>
 <h4 id="dataset">Dataset</h4>
 <pre><code class="python">spektral.data.dataset.Dataset(transforms=None)
 </code></pre>
@@ -435,7 +435,8 @@ size <code>batch_size</code>.</p>
 <p><code>batch_size</code>: number of samples in a batch;</p>
 </li>
 <li>
-<p><code>epochs</code>: number of times to iterate over the data;</p>
+<p><code>epochs</code>: number of times to iterate over the data (default None, iterates
+indefinitely);</p>
 </li>
 <li>
 <p><code>shuffle</code>: whether to shuffle the data at the beginning of each epoch</p>
