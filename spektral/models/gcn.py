@@ -1,4 +1,5 @@
 import tensorflow as tf
+
 from spektral.layers.convolutional import gcn_conv
 
 
