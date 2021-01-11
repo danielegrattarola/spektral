@@ -27,7 +27,7 @@ In all data modes, our goal is to represent one or more graphs by grouping their
 |:---------|:--|:--|:--|
 |`Single`  |`[nodes, nodes]`|`[nodes, n_feat]`|`[edges, e_feat]`|
 |`Disjoint`|`[nodes, nodes]`|`[nodes, n_feat]`|`[edges, e_feat]`|
-|`Batch`   |`[batch, nodes, nodes]`|`[batch, nodes, nodes]`|`[batch, nodes, nodes, e_feat]`|
+|`Batch`   |`[batch, nodes, nodes]`|`[batch, nodes, n_feat]`|`[batch, nodes, nodes, e_feat]`|
 |`Mixed`   |`[nodes, nodes]`|`[batch, nodes, n_feat]`| `[batch, edges, e_feat]` |
 
 In the following sections we describe the four modes more into detail.
