@@ -106,7 +106,7 @@ class GatedGraphConv(MessagePassing):
 
     def call(self, inputs):
         x, a, _ = self.get_inputs(inputs)
-        F = K.int_shape(x)[-1]
+        F = tf.shape(x)[-1]
 
         to_pad = self.channels - F
         ndims = len(tf.shape(x)) - 1
