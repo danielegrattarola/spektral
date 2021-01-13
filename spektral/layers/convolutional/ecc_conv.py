@@ -142,8 +142,8 @@ class ECCConv(Conv):
         x, a, e = inputs
 
         # Parameters
-        N = K.shape(x)[-2]
-        F = K.int_shape(x)[-1]
+        N = tf.shape(x)[-2]
+        F = tf.shape(x)[-1]
         F_ = self.channels
 
         # Filter network

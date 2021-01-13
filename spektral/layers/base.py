@@ -199,7 +199,7 @@ class MinkowskiProduct(Layer):
         self.built = True
 
     def call(self, inputs):
-        F = K.int_shape(inputs)[-1]
+        F = tf.shape(inputs)[-1]
         minkowski_prod_mat = np.eye(F)
         minkowski_prod_mat[-1, -1] = -1.0
         minkowski_prod_mat = K.constant(minkowski_prod_mat)
