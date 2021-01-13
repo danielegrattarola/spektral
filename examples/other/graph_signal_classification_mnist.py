@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import Model
-from tensorflow.keras.layers import Dense, Flatten
+from tensorflow.keras.layers import Dense
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.metrics import SparseCategoricalAccuracy
 from tensorflow.keras.optimizers import Adam
@@ -9,10 +9,8 @@ from tensorflow.keras.regularizers import l2
 
 from spektral.data import MixedLoader
 from spektral.datasets.mnist import MNIST
-from spektral.layers import GCNConv
+from spektral.layers import GCNConv, GlobalSumPool
 from spektral.layers.ops import sp_matrix_to_sp_tensor
-
-tf.config.experimental_run_functions_eagerly(True)
 
 # Parameters
 batch_size = 32  # Batch size
@@ -45,7 +43,7 @@ class Net(Model):
         super().__init__(**kwargs)
         self.conv1 = GCNConv(32, activation="elu", kernel_regularizer=l2(l2_reg))
         self.conv2 = GCNConv(32, activation="elu", kernel_regularizer=l2(l2_reg))
-        self.flatten = Flatten()
+        self.flatten = GlobalSumPool()
         self.fc1 = Dense(512, activation="relu")
         self.fc2 = Dense(10, activation="softmax")  # MNIST has 10 classes
 
