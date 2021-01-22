@@ -99,7 +99,7 @@ class EdgeConv(MessagePassing):
         self.mlp = Sequential(
             [
                 Dense(channels, self.mlp_activation, **layer_kwargs)
-                for channels in self.mlp_hidden
+                for channels in range(self.mlp_hidden)
             ]
             + [
                 Dense(

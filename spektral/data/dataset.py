@@ -210,7 +210,14 @@ class Dataset:
 
     @property
     def path(self):
-        return osp.join(DATASET_FOLDER, self.__class__.__name__)
+        try:
+            return self._path
+        except AttributeError:
+            return osp.join(DATASET_FOLDER, self.__class__.__name__)
+
+    @path.setter
+    def path(self, path):
+        self._path = path
 
     @property
     def n_graphs(self):
