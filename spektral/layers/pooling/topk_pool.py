@@ -114,9 +114,7 @@ class TopKPool(Pool):
         # Multiply X and y to make layer differentiable
         features = X * self.gating_op(y)
 
-        axis = (
-            0 if len(K.int_shape(A)) == 2 else 1
-        )  # Cannot use negative axis in tf.boolean_mask
+        axis = 0 if len(A.shape) == 2 else 1  # Cannot use negative axis
         # Reduce X
         X_pooled = tf.gather(features, indices, axis=axis)
 

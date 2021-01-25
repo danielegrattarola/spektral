@@ -109,7 +109,7 @@ class GatedGraphConv(MessagePassing):
         F = tf.shape(x)[-1]
 
         to_pad = self.channels - F
-        ndims = len(tf.shape(x)) - 1
+        ndims = len(x.shape) - 1
         output = tf.pad(x, [[0, 0]] * ndims + [[0, to_pad]])
         for i in range(self.n_layers):
             m = tf.matmul(output, self.kernel[i])
