@@ -74,10 +74,10 @@ class AGNNConv(MessagePassing):
         x_norm_j = self.get_j(x_norm)
         alpha = self.beta * tf.reduce_sum(x_norm_i * x_norm_j, axis=-1)
 
-        if len(tf.shape(alpha)) == 2:
+        if len(alpha.shape) == 2:
             alpha = tf.transpose(alpha)  # For mixed mode
         alpha = ops.unsorted_segment_softmax(alpha, self.index_i, self.n_nodes)
-        if len(tf.shape(alpha)) == 2:
+        if len(alpha.shape) == 2:
             alpha = tf.transpose(alpha)  # For mixed mode
         alpha = alpha[..., None]
 

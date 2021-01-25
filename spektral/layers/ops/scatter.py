@@ -3,10 +3,10 @@ import tensorflow as tf
 
 def mixed_mode_support(scatter_fn):
     def _wrapper_mm_support(updates, indices, N):
-        if len(tf.shape(updates)) == 3:
+        if len(updates.shape) == 3:
             updates = tf.transpose(updates, perm=(1, 0, 2))
         out = scatter_fn(updates, indices, N)
-        if len(tf.shape(out)) == 3:
+        if len(out.shape) == 3:
             out = tf.transpose(out, perm=(1, 0, 2))
         return out
 
