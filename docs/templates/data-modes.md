@@ -120,7 +120,7 @@ To create batches in disjoint mode, we can use a `DisjointLoader`:
 >>> loader = DisjointLoader(dataset, batch_size=3)
 ```
 
-Since Loaders are effectively generators, we can inspect the first batch that the loader will compute for us by calling `__next__()`:
+Since Loaders are effectively generators, we can inspect the first batch by calling `__next__()`:
 
 ```py
 >>> batch = loader.__next__()
@@ -188,8 +188,6 @@ In this case we have that:
 - `A` is a matrix of shape `[nodes, nodes]`;
 - `X` is a tensor in batch mode, of shape `[batch, nodes, n_feat]`;
 - `E` has shape `[batch, edges, e_feat]` so that `E[i, j]` corresponds to the edge of the i-th graph associated with `A[j // nodes, j % nodes]`.
-
-Currently, there are no layers in Spektral that support mixed mode and edge attributes. 
 
 An example of a mixed mode dataset is the MNIST random grid ([Defferrard et al., 2016](https://arxiv.org/abs/1606.09375)):
 
