@@ -21,7 +21,7 @@ import scipy.sparse as sp
 import tensorflow as tf
 from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras.losses import CategoricalCrossentropy
-from tensorflow.keras.metrics import CategoricalAccuracy
+from tensorflow.keras.metrics import categorical_accuracy
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 
@@ -121,7 +121,6 @@ output = Dense(n_out, activation="softmax")(X_3)
 model = Model(inputs=[X_in, A_in, I_in], outputs=output)
 opt = Adam(lr=learning_rate)
 loss_fn = CategoricalCrossentropy()
-acc_fn = CategoricalAccuracy()
 
 
 ################################################################################
@@ -133,20 +132,23 @@ def train_step(inputs, target):
         predictions = model(inputs, training=True)
         loss = loss_fn(target, predictions)
         loss += sum(model.losses)
-        acc = acc_fn(target, predictions)
     gradients = tape.gradient(loss, model.trainable_variables)
     opt.apply_gradients(zip(gradients, model.trainable_variables))
+    acc = tf.reduce_mean(categorical_accuracy(target, predictions))
     return loss, acc
 
 
-def evaluate(loader, ops_list):
+def evaluate(loader):
     output = []
     step = 0
     while step < loader.steps_per_epoch:
         step += 1
         inputs, target = loader.__next__()
         pred = model(inputs, training=False)
-        outs = [o(target, pred) for o in ops_list]
+        outs = (
+            loss_fn(target, pred),
+            tf.reduce_mean(categorical_accuracy(target, pred)),
+        )
         output.append(outs)
     return np.mean(output, 0)
 
@@ -169,7 +171,7 @@ for batch in loader_tr:
         epoch += 1
 
         # Compute validation loss and accuracy
-        val_loss, val_acc = evaluate(loader_va, [loss_fn, acc_fn])
+        val_loss, val_acc = evaluate(loader_va)
         print(
             "Ep. {} - Loss: {:.2f} - Acc: {:.2f} - Val loss: {:.2f} - Val acc: {:.2f}".format(
                 epoch, model_loss, model_acc, val_loss, val_acc
@@ -196,5 +198,5 @@ for batch in loader_tr:
 ################################################################################
 print("Testing model")
 model.set_weights(best_weights)  # Load best model
-test_loss, test_acc = evaluate(loader_te, [loss_fn, acc_fn])
+test_loss, test_acc = evaluate(loader_te)
 print("Done. Test loss: {:.4f}. Test acc: {:.2f}".format(test_loss, test_acc))

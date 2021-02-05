@@ -27,6 +27,8 @@ class GeneralGNN(Model):
     > [Design Space for Graph Neural Networks](https://arxiv.org/abs/2011.08843)<br>
     > Jiaxuan You, Rex Ying, Jure Leskovec
 
+    **Mode**: single, disjoint, mixed, batch.
+
     The default parameters of the model are selected according to the best
     results obtained in the paper, and should provide a good performance on
     many node-level and graph-level tasks, without modifications.

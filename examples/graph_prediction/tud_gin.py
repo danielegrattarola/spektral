@@ -8,7 +8,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Dense, Dropout
 from tensorflow.keras.losses import CategoricalCrossentropy
-from tensorflow.keras.metrics import CategoricalAccuracy
+from tensorflow.keras.metrics import categorical_accuracy
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 
@@ -75,7 +75,6 @@ class GIN0(Model):
 model = GIN0(channels, layers)
 opt = Adam(lr=learning_rate)
 loss_fn = CategoricalCrossentropy()
-acc_fn = CategoricalAccuracy()
 
 
 ################################################################################
@@ -89,7 +88,7 @@ def train_step(inputs, target):
         loss += sum(model.losses)
     gradients = tape.gradient(loss, model.trainable_variables)
     opt.apply_gradients(zip(gradients, model.trainable_variables))
-    acc = acc_fn(target, predictions)
+    acc = tf.reduce_mean(categorical_accuracy(target, predictions))
     return loss, acc
 
 
@@ -118,7 +117,7 @@ for batch in loader_te:
     inputs, target = batch
     predictions = model(inputs, training=False)
     model_lss += loss_fn(target, predictions)
-    model_acc += acc_fn(target, predictions)
+    model_acc += tf.reduce_mean(categorical_accuracy(target, predictions))
 model_lss /= loader_te.steps_per_epoch
 model_acc /= loader_te.steps_per_epoch
 print("Done. Test loss: {}. Test acc: {}".format(model_lss, model_acc))

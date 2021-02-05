@@ -7,7 +7,7 @@ paper), using faster training and test functions.
 import tensorflow as tf
 from tensorflow.keras.layers import Dropout, Input
 from tensorflow.keras.losses import CategoricalCrossentropy
-from tensorflow.keras.metrics import CategoricalAccuracy
+from tensorflow.keras.metrics import categorical_accuracy
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
@@ -56,7 +56,6 @@ x_2 = GATConv(
 model = Model(inputs=[x_in, a_in], outputs=x_2)
 optimizer = Adam(lr=5e-3)
 loss_fn = CategoricalCrossentropy()
-acc_fn = CategoricalAccuracy()
 
 
 # Training step
@@ -80,8 +79,7 @@ def evaluate():
         loss = loss_fn(y[mask], predictions[mask])
         loss += sum(model.losses)
         losses.append(loss)
-        acc_fn.reset_states()
-        acc = acc_fn(y[mask], predictions[mask])
+        acc = tf.reduce_mean(categorical_accuracy(y[mask], predictions[mask]))
         accuracies.append(acc)
     return losses, accuracies
 
