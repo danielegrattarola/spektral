@@ -6,7 +6,7 @@ In this page we will go over the main features of Spektral while creating a grap
 
 ## Graphs
 
-A graph is a mathematical object that represents relations between objects. We call the objects "nodes" and the relations "edges". 
+A graph is a mathematical object that represents relations between entities. We call the entities "nodes" and the relations "edges". 
 
 Both the nodes and the edges can have vector **features**.
 
@@ -47,14 +47,14 @@ or shuffle the data:
 >>> np.random.shuffle(dataset)
 ```
 
-or slice the dataset up into sub-datsets: 
+or slice the dataset into sub-datsets: 
 
 ```python
 >>> dataset[:100]
 TUDataset(n_graphs=100)
 ```
 
-Datasets also provide methods for applying **transforms** to each data: 
+Datasets also provide methods for applying **transforms** to each datum: 
 
 - `apply(transform)` - modifies the dataset in-place, by applying the `transform` to each graph;
 - `map(transform)` - returns a list obtained by applying the `transform` to each graph;
@@ -80,7 +80,7 @@ First, we compute the maximum degree of the dataset, so that we know the size of
 12
 ```
 
-Try to go over the lambda function to see what it does. Also, notice that we passed another function to the method with the `reduce` keyword. Can you guess why?
+Try to go over the lambda function to see what it does. Also, notice that we passed a reduction function to the method, using the `reduce` keyword. This will be run on the output list computed by the map.
 
 Now we are ready to augment our node features with the one-hot-encoded degree. Spektral has a lot of pre-implemented `transforms` that we can use: 
 
@@ -116,8 +116,7 @@ Have a look at the handy [`LayerPreprocess` transform](/transforms/#layerpreproc
 Creating GNNs is where Spektral really shines. Since Spektral is designed as an extension of Keras, you can plug any Spektral layer into a Keras `Model` without modifications.  
 We just need to use the functional API because GNN layers usually need two or more inputs (so no `Sequential` models for now). 
 
-For our first GNN, we will create a simple network that first does a bit of graph convolution, then sums all the nodes together (known as "global pooling"), and finally classifies the result with a dense softmax layer.  
-Oh, and we will also use dropout for regularization.
+For our first GNN, we will create a simple network that first does a bit of graph convolution, then sums all the nodes together (known as "global pooling"), and finally classifies the result with a dense softmax layer. We will also use dropout for regularization.
 
 Let's start by importing the necessary layers:
 
@@ -148,9 +147,9 @@ class MyFirstGNN(Model):
         return out
 ``` 
 
-And that's it.
+And that's it!
 
-Note how we mixed layers from Spektral and Keras interchangeably: it's all just computation with tensors underneath! 
+Note how we mixed layers from Spektral and Keras interchangeably: it's all just computation with tensors underneath.
 
 This also means that if you want to break free from `Graph` and `Dataset` and every other feature of Spektral, you can. 
 
@@ -179,7 +178,7 @@ We have to use a data `Loader`.
 Loaders iterate over a graph dataset to create mini-batches. They hide a lot of the complexity behind the process, so that you don't need to think about it. 
 You only need to go to [this page](/data-modes) and read up on **data modes**, so that you know which loader to use. 
 
-Each loader has a `load()` method that when called will return a data generator that Keras can process. 
+Each loader has a `load()` method that returns a data generator that Keras can process. 
 
 Since we're doing graph-level classification, we can use a `BatchLoader`. It's a bit slow and memory intensive (a `DisjointLoader` would have been better), but it lets us simplify the definition of `MyFirstGNN`. Again, go read about [data modes](/data-modes) after this tutorial.
 
