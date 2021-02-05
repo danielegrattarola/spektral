@@ -25,6 +25,7 @@ class Delaunay:
         )
         values = np.ones(edges.shape[0])
         graph.a = sp.csr_matrix((values, edges.T))
+        graph.a += graph.a.T
         graph.a.data = np.clip(graph.a.data, 0, 1)
 
         return graph

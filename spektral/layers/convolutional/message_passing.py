@@ -112,6 +112,7 @@ class MessagePassing(Layer):
         self.n_nodes = tf.shape(x)[-2]
         self.index_i = a.indices[:, 1]
         self.index_j = a.indices[:, 0]
+        # TODO: e should be transposed here
 
         # Message
         msg_kwargs = self.get_kwargs(x, a, e, self.msg_signature, kwargs)
@@ -162,6 +163,11 @@ class MessagePassing(Layer):
 
     @staticmethod
     def get_inputs(inputs):
+        """
+        Parses the inputs lists and returns a tuple (x, a, e) with node features,
+        adjacency matrix and edge features. In the inputs only contain x and a, then
+        e=None is returned.
+        """
         if len(inputs) == 3:
             x, a, e = inputs
             assert K.ndim(e) in (2, 3), "E must have rank 2 or 3"

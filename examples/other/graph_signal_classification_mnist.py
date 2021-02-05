@@ -3,7 +3,7 @@ import tensorflow as tf
 from tensorflow.keras import Model
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
-from tensorflow.keras.metrics import SparseCategoricalAccuracy
+from tensorflow.keras.metrics import sparse_categorical_accuracy
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
 
@@ -62,7 +62,6 @@ class Net(Model):
 model = Net()
 optimizer = Adam()
 loss_fn = SparseCategoricalCrossentropy()
-acc_fn = SparseCategoricalAccuracy()
 
 
 # Training function
@@ -71,7 +70,7 @@ def train_on_batch(inputs, target):
     with tf.GradientTape() as tape:
         predictions = model(inputs, training=True)
         loss = loss_fn(target, predictions) + sum(model.losses)
-        acc = acc_fn(target, predictions)
+        acc = tf.reduce_mean(sparse_categorical_accuracy(target, predictions))
 
     gradients = tape.gradient(loss, model.trainable_variables)
     optimizer.apply_gradients(zip(gradients, model.trainable_variables))
@@ -87,7 +86,7 @@ def evaluate(loader):
         inputs, target = batch
         predictions = model(inputs, training=False)
         loss = loss_fn(target, predictions)
-        acc = acc_fn(target, predictions)
+        acc = tf.reduce_mean(sparse_categorical_accuracy(target, predictions))
         results.append((loss, acc, len(target)))  # Keep track of batch size
         if step == loader.steps_per_epoch:
             results = np.array(results)
