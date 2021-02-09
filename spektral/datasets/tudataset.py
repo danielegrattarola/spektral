@@ -1,21 +1,17 @@
 import glob
 import os
 import shutil
-import zipfile
 from os import path as osp
 from urllib.error import URLError
 
 import numpy as np
 import pandas as pd
-import requests
 import scipy.sparse as sp
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from spektral.data import Dataset, Graph
 from spektral.datasets.utils import download_file
 from spektral.utils import io
-
-DATA_PATH = osp.expanduser("~/.spektral/datasets/")
 
 
 class TUDataset(Dataset):
