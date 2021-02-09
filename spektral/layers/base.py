@@ -149,7 +149,7 @@ class InnerProduct(Layer):
         else:
             return input_shape[:-1] + (input_shape[-2],)
 
-    def get_config(self, **kwargs):
+    def get_config(self):
         config = {
             "trainable_kernel": self.trainable_kernel,
             "activation": self.activation,
@@ -221,7 +221,7 @@ class MinkowskiProduct(Layer):
         else:
             return input_shape[:-1] + (input_shape[-2],)
 
-    def get_config(self, **kwargs):
+    def get_config(self):
         config = {"input_dim_1": self.input_dim_1, "activation": self.activation}
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))

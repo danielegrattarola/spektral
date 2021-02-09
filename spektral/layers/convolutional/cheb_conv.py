@@ -1,4 +1,4 @@
-from tensorflow.keras import backend as K
+from tensorflow.keras import backend as KB
 
 from spektral.layers import ops
 from spektral.layers.convolutional.conv import Conv
@@ -115,19 +115,19 @@ class ChebConv(Conv):
         x, a = inputs
 
         T_0 = x
-        output = K.dot(T_0, self.kernel[0])
+        output = KB.dot(T_0, self.kernel[0])
 
         if self.K > 1:
             T_1 = ops.modal_dot(a, x)
-            output += K.dot(T_1, self.kernel[1])
+            output += KB.dot(T_1, self.kernel[1])
 
         for k in range(2, self.K):
             T_2 = 2 * ops.modal_dot(a, T_1) - T_0
-            output += K.dot(T_2, self.kernel[k])
+            output += KB.dot(T_2, self.kernel[k])
             T_0, T_1 = T_1, T_2
 
         if self.use_bias:
-            output = K.bias_add(output, self.bias)
+            output = KB.bias_add(output, self.bias)
         output = self.activation(output)
 
         return output

@@ -100,7 +100,7 @@ class TAGConv(MessagePassing):
         edge_weight = a.values
 
         output = [x]
-        for k in range(self.K):
+        for _ in range(self.K):
             output.append(self.propagate(x, a, edge_weight=edge_weight))
         output = K.concatenate(output)
 

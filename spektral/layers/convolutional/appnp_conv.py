@@ -105,7 +105,7 @@ class APPNPConv(Conv):
             bias_constraint=self.bias_constraint,
         )
         mlp_layers = []
-        for i, channels in enumerate(self.mlp_hidden):
+        for channels in self.mlp_hidden:
             mlp_layers.extend(
                 [
                     Dropout(self.dropout_rate),
@@ -121,7 +121,7 @@ class APPNPConv(Conv):
 
         mlp_out = self.mlp(x)
         z = mlp_out
-        for k in range(self.propagations):
+        for _ in range(self.propagations):
             z = (1 - self.alpha) * ops.modal_dot(a, z) + self.alpha * mlp_out
         output = self.activation(z)
 

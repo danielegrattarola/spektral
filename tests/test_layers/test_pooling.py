@@ -4,7 +4,6 @@ import tensorflow as tf
 from tensorflow.keras import Input, Model
 
 from spektral.layers import DiffPool, MinCutPool, SAGPool, TopKPool
-
 from .test_convolutional import _test_get_config
 
 tf.keras.backend.set_floatx("float64")

@@ -154,7 +154,7 @@ def chebyshev_polynomial(X, k):
             X_ = np.copy(X)
         return 2 * X_.dot(T_k_minus_one) - T_k_minus_two
 
-    for i in range(2, k + 1):
+    for _ in range(2, k + 1):
         T_k.append(chebyshev_recurrence(T_k[-1], T_k[-2], X))
 
     return T_k

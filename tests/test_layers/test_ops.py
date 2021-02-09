@@ -13,7 +13,7 @@ tol = 5.0e-7
 def _assert_all_close(output, expected_output):
     try:
         assert np.allclose(output, expected_output, atol=tol)
-    except AssertionError:
+    except AssertionError as ae:
         mean_diff = np.mean(np.absolute(output - expected_output))
         max_diff = np.max(np.absolute(output - expected_output))
         if mean_diff <= tol:
@@ -21,7 +21,7 @@ def _assert_all_close(output, expected_output):
         else:
             raise AssertionError(
                 "Mean diff: {}, Max diff: {}".format(mean_diff, max_diff)
-            )
+            ) from ae
 
 
 def _convert_to_sparse_tensor(x):

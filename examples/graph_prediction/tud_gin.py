@@ -51,7 +51,7 @@ class GIN0(Model):
         super().__init__()
         self.conv1 = GINConv(channels, epsilon=0, mlp_hidden=[channels, channels])
         self.convs = []
-        for i in range(1, n_layers):
+        for _ in range(1, n_layers):
             self.convs.append(
                 GINConv(channels, epsilon=0, mlp_hidden=[channels, channels])
             )
@@ -60,7 +60,7 @@ class GIN0(Model):
         self.dropout = Dropout(0.5)
         self.dense2 = Dense(n_out, activation="softmax")
 
-    def call(self, inputs, **kwargs):
+    def call(self, inputs):
         x, a, i = inputs
         x = self.conv1([x, a])
         for conv in self.convs:

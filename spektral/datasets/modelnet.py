@@ -58,9 +58,9 @@ class ModelNet(Dataset):
 
         print("Loading data")
 
-        def load(fname):
+        def load(fname, class_i):
             graph = load_off(fname)
-            graph.y = one_hot(i, n_out)
+            graph.y = one_hot(class_i, n_out)
             return graph
 
         output = []
@@ -68,7 +68,7 @@ class ModelNet(Dataset):
             fnames = osp.join(self.true_path, c, dataset, "{}_*.off".format(c))
             fnames = glob(fnames)
             output_partial = Parallel(n_jobs=self.n_jobs)(
-                delayed(load)(fname) for fname in fnames
+                delayed(load)(fname, i) for fname in fnames
             )
             output.extend(output_partial)
 

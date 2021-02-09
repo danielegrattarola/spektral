@@ -190,13 +190,13 @@ PAGES = [
 ROOT = "https://graphneural.network/"
 
 
-def get_function_signature(function, method=True):
-    wrapped = getattr(function, "_original_function", None)
+def get_function_signature(fn, method=True):
+    wrapped = getattr(fn, "_original_function", None)
     if wrapped is None:
         try:
-            signature = inspect.getargspec(function)
+            signature = inspect.getargspec(fn)
         except ValueError:
-            signature = inspect.getfullargspec(function)
+            signature = inspect.getfullargspec(fn)
     else:
         signature = inspect.getargspec(wrapped)
     if signature.defaults is None:
@@ -215,7 +215,7 @@ def get_function_signature(function, method=True):
         args = args[: -len(defaults)]
     else:
         kwargs = []
-    st = "%s.%s(" % (clean_module_name(function.__module__), function.__name__)
+    st = "%s.%s(" % (clean_module_name(fn.__module__), fn.__name__)
 
     for a in args:
         st += str(a) + ", "

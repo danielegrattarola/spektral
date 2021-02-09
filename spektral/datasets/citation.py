@@ -98,11 +98,11 @@ class Citation(Dataset):
 
             indices = np.arange(y.shape[0])
             n_classes = y.shape[1]
-            idx_tr, idx_te, y_tr, y_te = train_test_split(
+            idx_tr, idx_te, _, y_te = train_test_split(
                 indices, y, train_size=20 * n_classes, stratify=y
             )
-            idx_va, idx_te, y_va, y_te = train_test_split(
-                idx_te, y_te, train_size=30 * n_classes, stratify=y_te
+            idx_va, idx_te = train_test_split(
+                idx_te, train_size=30 * n_classes, stratify=y_te
             )
 
         # Adjacency matrix

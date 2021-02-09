@@ -39,7 +39,7 @@ def test_sparse_dropout():
         tape.watch(values)
         st = tf.sparse.eye(5)
         st = tf.SparseTensor(st.indices, values, st.dense_shape)
-        st = SparseDropout(0.5)(st, training=True)
+        st = SparseDropout(rate)(st, training=True)
         loss = tf.sparse.reduce_sum(st)
     grad = tape.gradient(loss, values)
     assert grad is not None

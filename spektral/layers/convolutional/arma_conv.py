@@ -192,8 +192,8 @@ class ARMAConv(Conv):
         """
         x, x_skip, a = inputs
 
-        iter = 1 if self.share_weights and iteration >= 1 else iteration
-        kernel_1, kernel_2, bias = self.kernels[stack][iter]
+        itr = 1 if self.share_weights and iteration >= 1 else iteration
+        kernel_1, kernel_2, bias = self.kernels[stack][itr]
 
         output = K.dot(x, kernel_1)
         output = ops.modal_dot(a, output)

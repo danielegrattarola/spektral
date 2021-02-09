@@ -2,10 +2,8 @@ import json
 import os
 import os.path as osp
 import shutil
-import zipfile
 
 import numpy as np
-import requests
 import scipy.sparse as sp
 from networkx.readwrite import json_graph
 
@@ -151,7 +149,7 @@ def preprocess_data(path, name):
 
     id_map = json.load(open(prefix + "-id_map.json"))
     if list(id_map.keys())[0].isdigit():
-        conversion = lambda n: int(n)
+        conversion = int
     else:
         conversion = lambda n: n
     id_map = {conversion(k): int(v) for k, v in id_map.items()}
@@ -161,7 +159,7 @@ def preprocess_data(path, name):
     if isinstance(list(class_map.values())[0], list):
         lab_conversion = lambda n: n
     else:
-        lab_conversion = lambda n: int(n)
+        lab_conversion = int
     class_map = {conversion(k): lab_conversion(v) for k, v in class_map.items()}
 
     # Remove all nodes that do not have val/test annotations

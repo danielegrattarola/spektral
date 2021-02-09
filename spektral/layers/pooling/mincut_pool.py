@@ -110,7 +110,7 @@ class MinCutPool(Pool):
             bias_constraint=self.bias_constraint,
         )
         mlp_layers = []
-        for i, channels in enumerate(self.mlp_hidden):
+        for _, channels in enumerate(self.mlp_hidden):
             mlp_layers.append(Dense(channels, self.mlp_activation, **layer_kwargs))
         mlp_layers.append(Dense(self.k, "softmax", **layer_kwargs))
         self.mlp = Sequential(mlp_layers)

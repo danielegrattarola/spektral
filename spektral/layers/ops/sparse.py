@@ -122,7 +122,7 @@ def _square_size(dense_shape):
     size = dense_shape[0]
     for d in dense_shape[1:]:
         tf.debugging.assert_equal(size, d)
-    return d
+    return size
 
 
 def _indices_to_inverse_map(indices, size):

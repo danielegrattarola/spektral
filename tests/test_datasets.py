@@ -15,11 +15,11 @@ def test_citation():
 def test_graphsage():
     # Test only PPI because Travis otherwise runs into memory errors
     dataset = datasets.PPI()
-    sl = SingleLoader(dataset)
+    _ = SingleLoader(dataset)
 
 
 def test_mnist():
-    dataset = datasets.MNIST(k=8, noise_level=0.1)
+    _ = datasets.MNIST(k=8, noise_level=0.1)
 
 
 def test_qm7():

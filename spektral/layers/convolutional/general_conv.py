@@ -3,7 +3,6 @@ from tensorflow.keras import activations
 from tensorflow.keras.layers import BatchNormalization, Dropout, PReLU
 
 from spektral.layers.convolutional.message_passing import MessagePassing
-from spektral.layers.ops import dot
 
 
 class GeneralConv(MessagePassing):

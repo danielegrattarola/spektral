@@ -103,6 +103,20 @@ class GeneralGNN(Model):
         pool="sum",
     ):
         super().__init__()
+        self.config = {
+            "output": output,
+            "activation": activation,
+            "hidden": hidden,
+            "message_passing": message_passing,
+            "pre_process": pre_process,
+            "post_process": post_process,
+            "connectivity": connectivity,
+            "batch_norm": batch_norm,
+            "dropout": dropout,
+            "aggregate": aggregate,
+            "hidden_activation": hidden_activation,
+            "pool": pool,
+        }
 
         # Connectivity function
         if connectivity is None:
@@ -168,6 +182,10 @@ class GeneralGNN(Model):
 
         return out
 
+    def get_config(self):
+        base_config = super().get_config()
+        return {**base_config, **self.config}
+
 
 class MLP(Model):
     def __init__(
@@ -181,6 +199,15 @@ class MLP(Model):
         final_activation=None,
     ):
         super().__init__()
+        self.config = {
+            "output": output,
+            "hidden": hidden,
+            "layers": layers,
+            "batch_norm": batch_norm,
+            "dropout": dropout,
+            "activation": activation,
+            "final_activation": final_activation,
+        }
         self.batch_norm = batch_norm
         self.dropout_rate = dropout
 
@@ -198,3 +225,7 @@ class MLP(Model):
 
     def call(self, inputs):
         return self.mlp(inputs)
+
+    def get_config(self):
+        base_config = super().get_config()
+        return {**base_config, **self.config}

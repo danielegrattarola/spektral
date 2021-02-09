@@ -1,7 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras import backend as K
 
-import spektral.layers.ops.scatter
 from spektral.layers import ops
 from spektral.layers.convolutional.message_passing import MessagePassing
 

@@ -49,9 +49,6 @@ class GlobalPool(Layer):
             # Input shape is a list of shapes for X and I
             return input_shape[0]
 
-    def get_config(self):
-        return super().get_config()
-
 
 class GlobalSumPool(GlobalPool):
     """

@@ -27,7 +27,7 @@ class SGCN:
 
     def __call__(self, graph):
         out = graph.a
-        for i in range(self.K - 1):
+        for _ in range(self.K - 1):
             out = out.dot(out)
         out.sort_indices()
         graph.a = out
