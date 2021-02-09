@@ -374,7 +374,7 @@ class SortPool(Layer):
     """
 
     def __init__(self, k):
-        super(SortPool, self).__init__()
+        super().__init__()
         k = int(k)
         if k <= 0:
             raise ValueError("K must be a positive integer")

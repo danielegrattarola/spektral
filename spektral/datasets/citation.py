@@ -5,6 +5,7 @@ import networkx as nx
 import numpy as np
 import requests
 import scipy.sparse as sp
+from sklearn.model_selection import train_test_split
 
 from spektral.data import Dataset, Graph
 from spektral.datasets.utils import DATASET_FOLDER
@@ -94,8 +95,6 @@ class Citation(Dataset):
 
         if self.random_split:
             # Throw away public splits and compute random ones like Shchur et al.
-            from sklearn.model_selection import train_test_split
-
             indices = np.arange(y.shape[0])
             n_classes = y.shape[1]
             idx_tr, idx_te, _, y_te = train_test_split(
@@ -180,8 +179,8 @@ def _read_file(path, name, suffix):
     full_fname = os.path.join(path, "ind.{}.{}".format(name, suffix))
     if suffix == "test.index":
         return np.loadtxt(full_fname)
-    else:
-        return load_binary(full_fname)
+
+    return load_binary(full_fname)
 
 
 def _idx_to_mask(idx, l):

@@ -1,7 +1,7 @@
 from spektral.utils import gcn_filter
 
 
-class GCNFilter(object):
+class GCNFilter:
     r"""
         Normalizes the adjacency matrix as described by
         [Kipf & Welling (2017)](https://arxiv.org/abs/1609.02907):

@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class Constant(object):
+class Constant:
     """
     Concatenates a constant value to the node attributes.
 

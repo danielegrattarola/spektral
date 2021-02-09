@@ -151,7 +151,7 @@ class Loader:
         output = [list(elem) for elem in zip(*[g.numpy() for g in batch])]
         if return_dict:
             keys = [k + "_list" for k in self.dataset.signature.keys()]
-            return {k: v for k, v in zip(keys, output)}
+            return dict(zip(keys, output))
         else:
             return output
 
@@ -274,9 +274,7 @@ class DisjointLoader(Loader):
         self, dataset, node_level=False, batch_size=1, epochs=None, shuffle=True
     ):
         self.node_level = node_level
-        super(DisjointLoader, self).__init__(
-            dataset, batch_size=batch_size, epochs=epochs, shuffle=shuffle
-        )
+        super().__init__(dataset, batch_size=batch_size, epochs=epochs, shuffle=shuffle)
 
     def collate(self, batch):
         packed = self.pack(batch, return_dict=True)

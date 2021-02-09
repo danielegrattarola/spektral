@@ -39,7 +39,8 @@ class SparseDropout(Layer):
         self.seed = seed
         self.supports_masking = True
 
-    def _get_noise_shape(self, inputs):
+    @staticmethod
+    def _get_noise_shape(inputs):
         return tf.shape(inputs.values)
 
     def call(self, inputs, training=None):
@@ -146,8 +147,8 @@ class InnerProduct(Layer):
     def compute_output_shape(self, input_shape):
         if len(input_shape) == 2:
             return (None, None)
-        else:
-            return input_shape[:-1] + (input_shape[-2],)
+
+        return input_shape[:-1] + (input_shape[-2],)
 
     def get_config(self):
         config = {
@@ -190,7 +191,7 @@ class MinkowskiProduct(Layer):
 
     def __init__(self, input_dim_1=None, activation=None, **kwargs):
 
-        super(MinkowskiProduct, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.input_dim_1 = input_dim_1
         self.activation = activations.get(activation)
 
@@ -216,10 +217,8 @@ class MinkowskiProduct(Layer):
         if len(input_shape) == 2:
             if self.input_dim_1 is None:
                 return (None, None)
-            else:
-                return (self.input_dim_1, self.input_dim_1)
-        else:
-            return input_shape[:-1] + (input_shape[-2],)
+            return (self.input_dim_1, self.input_dim_1)
+        return input_shape[:-1] + (input_shape[-2],)
 
     def get_config(self):
         config = {"input_dim_1": self.input_dim_1, "activation": self.activation}
@@ -248,7 +247,7 @@ class Disjoint2Batch(Layer):
     """
 
     def __init__(self):
-        super(Disjoint2Batch, self).__init__()
+        super().__init__()
 
     def build(self, input_shape):
         assert len(input_shape) >= 2

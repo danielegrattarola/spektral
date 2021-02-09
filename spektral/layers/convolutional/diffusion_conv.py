@@ -38,7 +38,7 @@ class DiffuseFeatures(layers.Layer):
         kernel_constraint,
         **kwargs
     ):
-        super(DiffuseFeatures, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self.K = num_diffusion_steps
         self.kernel_initializer = kernel_initializer

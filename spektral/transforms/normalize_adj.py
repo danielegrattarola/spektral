@@ -1,7 +1,7 @@
 from spektral.utils import normalized_adjacency
 
 
-class NormalizeAdj(object):
+class NormalizeAdj:
     r"""
         Normalizes the adjacency matrix as:
     $$

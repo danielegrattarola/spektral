@@ -1,13 +1,11 @@
 import glob
 import os
 import shutil
-import zipfile
 from os import path as osp
 from urllib.error import URLError
 
 import numpy as np
 import pandas as pd
-import requests
 import scipy.sparse as sp
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
@@ -61,9 +59,7 @@ class TUDataset(Dataset):
 
     @property
     def path(self):
-        return osp.join(
-            super(TUDataset, self).path, self.name + ("_clean" if self.clean else "")
-        )
+        return osp.join(super().path, self.name + ("_clean" if self.clean else ""))
 
     def download(self):
         print(

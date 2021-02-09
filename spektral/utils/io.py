@@ -7,6 +7,8 @@ import numpy as np
 import pandas as pd
 import scipy.sparse as sp
 
+from spektral.data.graph import Graph
+
 
 def load_binary(filename):
     """
@@ -174,8 +176,6 @@ def load_off(filename):
     :param filename: path to the .off file.
     :return: a Graph
     """
-    from spektral.data.graph import Graph
-
     lines = open(filename, "r").read().lstrip("OF\n").splitlines()
     x, faces = _parse_off(lines)
     n = x.shape[0]

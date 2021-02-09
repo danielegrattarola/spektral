@@ -90,7 +90,7 @@ def test_single():
     data = TestDatasetSingle()
     n = data.n_nodes
     loader = SingleLoader(data, sample_weights=np.ones(n), epochs=1)
-    batches = [b for b in loader]
+    batches = list(loader)
     assert len(batches) == 1
 
     (x, a, e), y, sw = batches[0]
@@ -104,7 +104,7 @@ def test_single():
 def test_disjoint():
     data = TestDataset()
     loader = DisjointLoader(data, batch_size=batch_size, epochs=1, shuffle=False)
-    batches = [b for b in loader]
+    batches = list(loader)
 
     (x, a, e, i), y = batches[-1]
     n = sum(ns[-graphs_in_batch:])
@@ -121,7 +121,7 @@ def test_disjoint_node():
     loader = DisjointLoader(
         data, node_level=True, batch_size=batch_size, epochs=1, shuffle=False
     )
-    batches = [b for b in loader]
+    batches = list(loader)
 
     (x, a, e, i), y = batches[-1]
     n = sum(ns[-graphs_in_batch:])
@@ -136,7 +136,7 @@ def test_disjoint_node():
 def test_batch():
     data = TestDataset()
     loader = BatchLoader(data, batch_size=batch_size, epochs=1, shuffle=False)
-    batches = [b for b in loader]
+    batches = list(loader)
 
     (x, a, e), y = batches[-1]
     n = max(ns[-graphs_in_batch:])
@@ -150,7 +150,7 @@ def test_batch():
 def test_packed_batch():
     data = TestDataset()
     loader = PackedBatchLoader(data, batch_size=batch_size, epochs=1, shuffle=False)
-    batches = [b for b in loader]
+    batches = list(loader)
 
     (x, a, e), y = batches[-1]
     n = max(ns)
@@ -164,7 +164,7 @@ def test_packed_batch():
 def test_mixed():
     data = TestDatasetMixed()
     loader = MixedLoader(data, batch_size=batch_size, epochs=1, shuffle=False)
-    batches = [b for b in loader]
+    batches = list(loader)
 
     (x, a, e), y = batches[-1]
     n = data.n_nodes

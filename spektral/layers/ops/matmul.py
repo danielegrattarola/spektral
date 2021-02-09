@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow.keras import backend as K
 from tensorflow.python.ops.linalg.sparse import sparse as tfsp
 
-from . import ops as ops
+from . import ops
 
 
 def dot(a, b):

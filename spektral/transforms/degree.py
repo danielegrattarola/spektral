@@ -3,7 +3,7 @@ import numpy as np
 from spektral.utils import one_hot
 
 
-class Degree(object):
+class Degree:
     """
     Concatenates to each node attribute the one-hot degree of the corresponding
     node.
@@ -35,6 +35,6 @@ class Degree(object):
         return graph
 
 
-class MaxDegree(object):
+class MaxDegree:
     def __call__(self, graph):
         return graph.a.sum(1).max()

@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras import backend as K
 
-from . import ops as ops
+from . import ops
 
 
 def normalize_A(A):

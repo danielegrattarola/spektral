@@ -1,7 +1,7 @@
 from spektral.utils import label_to_one_hot, one_hot
 
 
-class OneHotLabels(object):
+class OneHotLabels:
     """
     One-hot encodes the graph labels along the innermost dimension (also if they
     are simple scalars).

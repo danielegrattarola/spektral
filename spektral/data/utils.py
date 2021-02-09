@@ -184,7 +184,7 @@ def batch_generator(data, batch_size=32, epochs=None, shuffle=True):
         data = [data]
     if len(data) < 1:
         raise ValueError("data cannot be empty")
-    if len(set([len(item) for item in data])) > 1:
+    if len({len(item) for item in data}) > 1:
         raise ValueError("All inputs must have the same __len__")
 
     if epochs is None or epochs == -1:
