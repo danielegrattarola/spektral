@@ -9,6 +9,7 @@ from spektral.data.utils import (
     to_disjoint,
     to_mixed,
     to_tf_signature,
+    get_spec,
 )
 from spektral.layers.ops import sp_matrix_to_sp_tensor
 
@@ -465,6 +466,7 @@ class PackedBatchLoader(BatchLoader):
         # Drop the Dataset container and work on packed tensors directly
         packed = self.pack(self.dataset, return_dict=True)
         y = np.array(packed.pop("y_list")) if "y" in dataset.signature else None
+        self.signature = dataset.signature
         self.dataset = to_batch(**packed)
         if y is not None:
             self.dataset += (y,)
@@ -480,6 +482,25 @@ class PackedBatchLoader(BatchLoader):
             return batch[0], batch[1]
         else:
             return batch[:-1], batch[-1]
+
+    def tf_signature(self):
+        """
+        Adjacency matrix has shape [batch, n_nodes, n_nodes]
+        Node features have shape [batch, n_nodes, n_node_features]
+        Edge features have shape [batch, n_nodes, n_nodes, n_edge_features]
+        Targets have shape [batch, ..., n_labels]
+        """
+        signature = self.signature
+        for k in signature:
+            signature[k]["shape"] = prepend_none(signature[k]["shape"])
+        if "a" in signature:
+            # Adjacency matrix in batch mode is dense
+            signature["a"]["spec"] = tf.TensorSpec
+        if "e" in signature:
+            # Edge attributes have an extra None dimension in batch mode
+            signature["e"]["shape"] = prepend_none(signature["e"]["shape"])
+
+        return to_tf_signature(signature)
 
     @property
     def steps_per_epoch(self):
@@ -570,5 +591,10 @@ class MixedLoader(Loader):
         for k in ["x", "e", "y"]:
             if k in signature:
                 signature[k]["shape"] = prepend_none(signature[k]["shape"])
+
+        signature["a"] = dict()
+        signature["a"]["spec"] = get_spec(self.dataset.a)
+        signature["a"]["shape"] = (None, None)
+        signature["a"]["dtype"] = tf.as_dtype(self.dataset.a.dtype)
 
         return to_tf_signature(signature)
