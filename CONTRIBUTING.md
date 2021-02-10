@@ -25,7 +25,7 @@ Bug fixes should be added to the `master` branch.
 
 ## Feature requests
 
-If you want to request a feature, [open an issue](https://github.com/danielegrattarola/spektral/issues) on GitHub and mark it as a feature request.
+If you want to request a feature, [open an issue](https://github.com/danielegrattarola/spektral/issues) or [a discussion](https://github.com/danielegrattarola/spektral/discussions) on GitHub and mark it as a feature request.
 
 1. Give a detailed description of the feature, including why it is important and why it fits in the scope of the project.
 Spektral is primarily a library for creating graph neural networks, so new features should gravitate around this subject.
@@ -38,16 +38,16 @@ The quickest way to see your feature implemented is to code it yourself and then
 ## Contributing a feature
 
 New features should be added to the `develop` branch.
-Contribution to the documentation go the `master` branch, instead.
+Contributions to the documentation go the `master` branch, instead.
 
 There are no hard rules for contributing to Spektral, but you should try to follow these guidelines.
 
 **General guidelines:**
 
-- Format your code according to PEP8;
+- Use Black and iSort for formatting code (see the section below about pre-commit hooks);
 - Make sure that the code you contribute is clearly identifiable in a PR (e.g., watch out for your IDE automatically reformatting files);
 - New features should support:
-    - Python >= 3.5
+    - Python >= 3.6
     - TensorFlow >= 2.1.0
     - Linux (at least Ubuntu >= 16.04) and MacOS >= 10.14
 - Write tests for the new feature and then run:
@@ -64,6 +64,7 @@ There are no hard rules for contributing to Spektral, but you should try to foll
 - Global pooling layers go in `layers/pooling/globalpool.py`;
 - Layers should extend `MessagePassing`, `Conv` or `Pool`.
 - Make sure that you understand [data modes](https://graphneural.network/data-modes/) and that you know the modes supported by your layer. Layers should support at least one of disjoint or batch mode;
+- Write documentation for your layer, including any references to scientific literature, supported modes, mathematical formulation, input, outputs and arguments. 
 
 **Guidelines for testing:**
 
@@ -72,12 +73,12 @@ There are no hard rules for contributing to Spektral, but you should try to foll
 
 **Guidelines for the documentation:**
 
-- See the documentation in the other layers for how to format docstrings (it's important that the format is the same so that the docs can be built automatically);
+- See the documentation in the other classes/functions for how to format docstrings (it's important that the format is the same so that the docs can be built automatically);
 - Docs are automatically generated using `docs/autogen.py`. Make sure to include any new layer as an entry in the `PAGES` dictionary. It is not necessary to add utils and other minor functions to `autogen.py` (although you should still write the docstrings).
 
 **Pre-commit**
 
-This package is configured for [pre-commit](https://pre-commit.com/) to ensure commits meet minimum criteria. To Install, use
+This package is configured for [pre-commit](https://pre-commit.com/) to ensure commits meet minimum criteria. To install, use
 
 ```bash
 pip install pre-commit
