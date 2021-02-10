@@ -104,7 +104,11 @@ def _test_get_config(layer, **kwargs):
     config_new.pop("name")
 
     # Remove 'name' if we have advanced activations (needed for GeneralConv)
-    if "activation" in config and "class_name" in config["activation"]:
+    if (
+            "activation" in config
+            and isinstance(config["activation"], dict)
+            and "class_name" in config["activation"]
+    ):
         config["activation"]["config"].pop("name")
         config_new["activation"]["config"].pop("name")
 

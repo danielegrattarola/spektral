@@ -58,9 +58,6 @@ class SparseDropout(Layer):
         output = smart_cond.smart_cond(training, dropped_inputs, lambda: inputs)
         return output
 
-    def compute_output_shape(self, input_shape):
-        return input_shape
-
     def get_config(self):
         config = {"rate": self.rate, "noise_shape": self.noise_shape, "seed": self.seed}
         base_config = super().get_config()
@@ -143,12 +140,6 @@ class InnerProduct(Layer):
             output = self.activation(output)
         return output
 
-    def compute_output_shape(self, input_shape):
-        if len(input_shape) == 2:
-            return (None, None)
-
-        return input_shape[:-1] + (input_shape[-2],)
-
     def get_config(self):
         config = {
             "trainable_kernel": self.trainable_kernel,
@@ -182,16 +173,12 @@ class MinkowskiProduct(Layer):
 
     - Tensor of shape `(n_nodes, n_nodes)`.
 
-    :param input_dim_1: first dimension of the input Tensor; set this if you
-    encounter issues with shapes in your model, in order to provide an explicit
-    output shape for your layer.
     :param activation: activation function;
     """
 
-    def __init__(self, input_dim_1=None, activation=None, **kwargs):
+    def __init__(self, activation=None, **kwargs):
 
         super().__init__(**kwargs)
-        self.input_dim_1 = input_dim_1
         self.activation = activations.get(activation)
 
     def build(self, input_shape):
@@ -212,15 +199,8 @@ class MinkowskiProduct(Layer):
 
         return output
 
-    def compute_output_shape(self, input_shape):
-        if len(input_shape) == 2:
-            if self.input_dim_1 is None:
-                return (None, None)
-            return (self.input_dim_1, self.input_dim_1)
-        return input_shape[:-1] + (input_shape[-2],)
-
     def get_config(self):
-        config = {"input_dim_1": self.input_dim_1, "activation": self.activation}
+        config = {"activation": self.activation}
         base_config = super().get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
@@ -245,8 +225,8 @@ class Disjoint2Batch(Layer):
     - Batched adjacency matrix of shape `(batch, N_max, N_max)`;
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def build(self, input_shape):
         assert len(input_shape) >= 2

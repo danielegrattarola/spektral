@@ -1,5 +1,6 @@
 import numpy as np
 
+from spektral import transforms
 from spektral.data.dataset import Dataset
 from spektral.data.graph import Graph
 
@@ -74,3 +75,14 @@ def test_dataset():
 
     # Test that shuffling doesn't crash
     np.random.shuffle(d)
+
+    # Test apply()
+    t = transforms.NormalizeSphere()
+    d.apply(t)
+
+    # Test filter
+    d.filter(lambda g: g.n_nodes >= 100)
+
+    # Test map
+    t = lambda g: g.n_nodes
+    d.map(t, reduce=max)

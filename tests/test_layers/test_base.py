@@ -3,6 +3,7 @@ import scipy.sparse as sp
 import tensorflow as tf
 
 from spektral import layers
+from tests.test_layers.convolutional.core import _test_get_config
 
 
 def test_disjoint_2_batch():
@@ -29,6 +30,8 @@ def test_disjoint_2_batch():
     assert np.allclose(result_A, expected_A)
     assert np.allclose(result_X, expected_X)
 
+    _test_get_config(layers.Disjoint2Batch)
+
 
 def test_sparse_dropout():
     """Ensure SparseDropout.sparse_dropout gradients don't throw issues."""
@@ -44,14 +47,25 @@ def test_sparse_dropout():
     grad = tape.gradient(loss, values)
     assert grad is not None
 
+    _test_get_config(layers.SparseDropout, rate=rate)
+
 
 def test_inner_products():
     x = np.random.rand(10, 2)
+
     layer = layers.InnerProduct(trainable_kernel=True)
     output = layer(x)
     assert output.shape == (10, 10)
 
+    layer = layers.InnerProduct(trainable_kernel=False)
+    output = layer(x)
+    assert output.shape == (10, 10)
+
+    _test_get_config(layers.InnerProduct, trainable_kernel=True)
+
     layer = layers.MinkowskiProduct()
     output = layer(x)
     assert output.shape == (10, 10)
+
+    _test_get_config(layers.MinkowskiProduct)
 
