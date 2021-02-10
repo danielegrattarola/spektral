@@ -58,11 +58,13 @@ def test_degree():
 def test_delaunay():
     t = tr.Delaunay()
     assert callable(t)
+    np.random.seed(0)
     x = np.random.rand(N, 2)
     g = Graph(x=x, a=a, e=e, y=y_nl)
     t(g)
     g = Graph(x=x, a=a.A, e=e, y=y_nl)
     t(g)
+
 
 
 def test_gcn_filter():

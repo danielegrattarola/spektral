@@ -112,7 +112,6 @@ class MessagePassing(Layer):
         self.n_nodes = tf.shape(x)[-2]
         self.index_i = a.indices[:, 1]
         self.index_j = a.indices[:, 0]
-        # TODO: e should be transposed here
 
         # Message
         msg_kwargs = self.get_kwargs(x, a, e, self.msg_signature, kwargs)

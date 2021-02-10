@@ -1,9 +1,5 @@
 [run]
-omit=
-    spektral/layers/base.py
-    spektral/utils*
-    spektral/brain.py
-    spektral/chem.py
+
 [report]
 exclude_lines =
     pragma: no cover

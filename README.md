@@ -1,4 +1,15 @@
 <img src="https://danielegrattarola.github.io/spektral/img/logo_dark.svg" style="max-width: 400px; width: 100%;"/>
+<br><br>
+<a href="https://pypi.org/project/spektral/">
+    <img alt="PyPi version" src="https://badge.fury.io/py/spektral.svg" style="width: auto !important" /></a>
+<a href="https://travis-ci.org/danielegrattarola/spektral">
+    <img alt="Build status" src="https://travis-ci.org/danielegrattarola/spektral.svg?branch=master" style="width: auto !important"/></a>
+<a href="https://github.com/danielegrattarola/spektral">
+    <img alt="Examples" src="https://github.com/danielegrattarola/spektral/workflows/Examples/badge.svg" style="width: auto !important"></a>
+<a href="https://github.com/danielegrattarola/spektral">
+    <img alt="Contributions welcome" src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat" style="width: auto !important" /></a>
+<a href="https://github.com/psf/black">
+    <img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg" style="width: auto !important"></a>
 
 # Welcome to Spektral
 Spektral is a Python library for graph deep learning, based on the Keras API and TensorFlow 2.

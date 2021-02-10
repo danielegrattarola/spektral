@@ -1,6 +1,7 @@
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import Input, Model
+from tests.test_layers.convolutional.core import _test_get_config
 
 from spektral.layers import (
     GlobalAttentionPool,
@@ -87,24 +88,28 @@ def test_global_sum_pool():
     _test_single_mode(GlobalSumPool)
     _test_batch_mode(GlobalSumPool)
     _test_disjoint_mode(GlobalSumPool)
+    _test_get_config(GlobalSumPool)
 
 
 def test_global_avg_pool():
     _test_single_mode(GlobalAvgPool)
     _test_batch_mode(GlobalAvgPool)
     _test_disjoint_mode(GlobalAvgPool)
+    _test_get_config(GlobalAvgPool)
 
 
 def test_global_max_pool():
     _test_single_mode(GlobalMaxPool)
     _test_batch_mode(GlobalMaxPool)
     _test_disjoint_mode(GlobalMaxPool)
+    _test_get_config(GlobalMaxPool)
 
 
 def test_global_node_attention_pool():
     _test_single_mode(GlobalAttnSumPool)
     _test_batch_mode(GlobalAttnSumPool)
     _test_disjoint_mode(GlobalAttnSumPool)
+    _test_get_config(GlobalAttnSumPool)
 
 
 def test_global_attention_pool():
@@ -113,6 +118,7 @@ def test_global_attention_pool():
     _test_single_mode(GlobalAttentionPool, channels=F_)
     _test_batch_mode(GlobalAttentionPool, channels=F_)
     _test_disjoint_mode(GlobalAttentionPool, channels=F_)
+    _test_get_config(GlobalAttentionPool, channels=F_)
 
 
 def test_sort_pool():
@@ -120,3 +126,12 @@ def test_sort_pool():
     _test_single_mode(SortPool, k=k, target_shape=(k, F))
     _test_batch_mode(SortPool, k=k, target_shape=(batch_size, k, F))
     _test_disjoint_mode(SortPool, k=k, target_shape=(batch_size, k, F))
+    _test_get_config(SortPool, k=k)
+
+
+def test_sort_pool_padded():
+    k = N + 2
+    _test_single_mode(SortPool, k=k, target_shape=(k, F))
+    _test_batch_mode(SortPool, k=k, target_shape=(batch_size, k, F))
+    _test_disjoint_mode(SortPool, k=k, target_shape=(batch_size, k, F))
+    _test_get_config(SortPool, k=k)

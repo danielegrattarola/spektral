@@ -87,9 +87,10 @@ class GCN(tf.keras.Model):
         )
 
     def call(self, inputs):
-        if len(inputs) != 2:
-            raise ValueError("Inputs should be (x, a), got {}".format(inputs))
-        x, a = inputs
+        if len(inputs) == 2:
+            x, a = inputs
+        else:
+            x, a, _ = inputs  # So that the model can be used with DisjointLoader
         if self.n_input_channels is None:
             self.n_input_channels = x.shape[-1]
         else:

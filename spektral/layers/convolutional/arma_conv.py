@@ -167,6 +167,7 @@ class ARMAConv(Conv):
             regularizer=self.kernel_regularizer,
             constraint=self.kernel_constraint,
         )
+        bias = None
         if self.use_bias:
             bias = self.add_weight(
                 shape=(channels,),
@@ -175,8 +176,6 @@ class ARMAConv(Conv):
                 regularizer=self.bias_regularizer,
                 constraint=self.bias_constraint,
             )
-        else:
-            bias = None
         return kernel_1, kernel_2, bias
 
     def gcs(self, inputs, stack, iteration):

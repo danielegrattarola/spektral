@@ -1,18 +1,19 @@
 import numpy as np
 
 from spektral.data.graph import Graph
+from scipy import sparse as sp
 
-N = 5
-F = 4
-S = 3
+n_nodes = 5
+n_node_features = 4
+n_edge_features = 3
 n_out = 2
 
 
 def _check_graph(x, a, e, y):
-    g = Graph()
-    g = Graph(x=x)
-    g = Graph(a=a)
-    g = Graph(x=x, a=a, e=e, y=y)
+    g = Graph() # Empty graph
+    g = Graph(x=x)  # Only node features
+    g = Graph(a=a)  # Only adjacency
+    g = Graph(x=x, a=a, e=e, y=y, extra=1)  # Complete graph with extra attribute
 
     # numpy
     g_np = g.numpy()
@@ -28,11 +29,18 @@ def _check_graph(x, a, e, y):
     # __repr__
     print(g)
 
+    # Properties
+    assert g.n_nodes == n_nodes
+    assert g.n_node_features == n_node_features
+    assert g.n_edge_features == n_edge_features
+    assert g.n_labels == n_out
+    assert g.n_edges == np.count_nonzero(a)
+
 
 def test_graph():
-    x = np.ones((N, F))
-    a = np.ones((N, N))
-    e = np.ones((N, N, S))
+    x = np.ones((n_nodes, n_node_features))
+    a = np.ones((n_nodes, n_nodes))
+    e = np.ones((n_nodes, n_nodes, n_edge_features))
     y = np.ones((n_out,))
 
     _check_graph(x, a, e, y)

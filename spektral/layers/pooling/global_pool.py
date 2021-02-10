@@ -373,8 +373,8 @@ class SortPool(Layer):
     - `k`: integer, number of nodes to keep;
     """
 
-    def __init__(self, k):
-        super().__init__()
+    def __init__(self, k, **kwargs):
+        super().__init__(**kwargs)
         k = int(k)
         if k <= 0:
             raise ValueError("K must be a positive integer")

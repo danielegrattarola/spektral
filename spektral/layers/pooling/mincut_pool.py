@@ -118,13 +118,7 @@ class MinCutPool(Pool):
         super().build(input_shape)
 
     def call(self, inputs):
-        if len(inputs) == 3:
-            X, A, I = inputs
-            if K.ndim(I) == 2:
-                I = I[:, 0]
-        else:
-            X, A = inputs
-            I = None
+        X, A = inputs
 
         # Check if the layer is operating in batch mode (X and A have rank 3)
         batch_mode = K.ndim(X) == 3
@@ -161,11 +155,6 @@ class MinCutPool(Pool):
         A_pooled = ops.normalize_A(A_pooled)
 
         output = [X_pooled, A_pooled]
-
-        if I is not None:
-            I_mean = tf.math.segment_mean(I, I)
-            I_pooled = ops.repeat(I_mean, tf.ones_like(I_mean) * self.k)
-            output.append(I_pooled)
 
         if self.return_mask:
             output.append(S)

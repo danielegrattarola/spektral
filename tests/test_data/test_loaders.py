@@ -170,6 +170,6 @@ def test_mixed():
     n = data.n_nodes
     assert x.shape == (graphs_in_batch, n, f)
     assert a.shape == (n, n)
-    assert e.shape == (graphs_in_batch, a.nnz, s)
+    assert e.shape == (graphs_in_batch, data.a.nnz, s)
     assert y.shape == (graphs_in_batch, 2)
     assert loader.steps_per_epoch == np.ceil(len(data) / batch_size)

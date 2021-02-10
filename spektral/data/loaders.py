@@ -218,9 +218,14 @@ class SingleLoader(Loader):
                 output[i] = sp_matrix_to_sp_tensor(output[i])
         output = tuple(output)
 
-        output = (output[:-1], output[-1])
-        if self.sample_weights is not None:
-            output += (self.sample_weights,)
+        if "y" in self.dataset.signature:
+            output = (output[:-1], output[-1])
+            if self.sample_weights is not None:
+                output += (self.sample_weights,)
+        else:
+            if self.sample_weights is not None:
+                output = (output, self.sample_weights,)
+
         return tuple(output)
 
     def load(self):
@@ -284,6 +289,8 @@ class DisjointLoader(Loader):
             y = np.vstack(y) if self.node_level else np.array(y)
 
         output = to_disjoint(**packed)
+
+        # Sparse matrices to SparseTensors
         output = list(output)
         for i in range(len(output)):
             if sp.issparse(output[i]):
@@ -378,6 +385,14 @@ class BatchLoader(Loader):
         y = np.array(packed.pop("y_list")) if "y" in self.dataset.signature else None
 
         output = to_batch(**packed)
+
+        # Sparse matrices to SparseTensors
+        output = list(output)
+        for i in range(len(output)):
+            if sp.issparse(output[i]):
+                output[i] = sp_matrix_to_sp_tensor(output[i])
+        output = tuple(output)
+
         if len(output) == 1:
             output = output[0]
 
@@ -528,6 +543,14 @@ class MixedLoader(Loader):
 
         packed["a"] = self.dataset.a
         output = to_mixed(**packed)
+
+        # Sparse matrices to SparseTensors
+        output = list(output)
+        for i in range(len(output)):
+            if sp.issparse(output[i]):
+                output[i] = sp_matrix_to_sp_tensor(output[i])
+        output = tuple(output)
+
         if len(output) == 1:
             output = output[0]
 

@@ -123,7 +123,6 @@ class InnerProduct(Layer):
         self.kernel_constraint = constraints.get(kernel_constraint)
 
     def build(self, input_shape):
-        assert len(input_shape) >= 2
         if self.trainable_kernel:
             features_dim = input_shape[-1]
             self.kernel = self.add_weight(

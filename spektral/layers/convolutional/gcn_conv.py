@@ -92,8 +92,6 @@ class GCNConv(Conv):
                 regularizer=self.bias_regularizer,
                 constraint=self.bias_constraint,
             )
-        else:
-            self.bias = None
         self.built = True
 
     def call(self, inputs):

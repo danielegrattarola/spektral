@@ -33,6 +33,7 @@ def deserialize_kwarg(key, attr):
         return constraints.get(attr)
     if key == "activation":
         return activations.get(attr)
+    return attr
 
 
 def serialize_kwarg(key, attr):

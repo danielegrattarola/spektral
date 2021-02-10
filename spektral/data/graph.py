@@ -97,7 +97,7 @@ class Graph:
         if sp.issparse(self.a):
             return self.a.nnz
         elif isinstance(self.a, np.ndarray):
-            return np.nonzero(self.a)
+            return np.count_nonzero(self.a)
         else:
             return None
 

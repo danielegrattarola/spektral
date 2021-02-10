@@ -111,13 +111,7 @@ class DiffPool(Pool):
         super().build(input_shape)
 
     def call(self, inputs):
-        if len(inputs) == 3:
-            X, A, I = inputs
-            if K.ndim(I) == 2:
-                I = I[:, 0]
-        else:
-            X, A = inputs
-            I = None
+        X, A = inputs
 
         N = K.shape(A)[-1]
         # Check if the layer is operating in mixed or batch mode
@@ -171,11 +165,6 @@ class DiffPool(Pool):
         A_pooled = ops.matmul_at_b_a(S, A)
 
         output = [X_pooled, A_pooled]
-
-        if I is not None:
-            I_mean = tf.math.segment_mean(I, I)
-            I_pooled = ops.repeat(I_mean, tf.ones_like(I_mean) * self.k)
-            output.append(I_pooled)
 
         if self.return_mask:
             output.append(S)

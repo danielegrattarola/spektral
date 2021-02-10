@@ -27,7 +27,7 @@ class GeneralGNN(Model):
     > [Design Space for Graph Neural Networks](https://arxiv.org/abs/2011.08843)<br>
     > Jiaxuan You, Rex Ying, Jure Leskovec
 
-    **Mode**: single, disjoint, mixed, batch.
+    **Mode**: single, disjoint, mixed.
 
     The default parameters of the model are selected according to the best
     results obtained in the paper, and should provide a good performance on
@@ -176,15 +176,14 @@ class GeneralGNN(Model):
                 out = z
         # Global pooling
         if self.pool is not None:
-            out = self.pool([out] + [i] if i is not None else [])
+            out = self.pool([out] + ([i] if i is not None else []))
         # Post-process
         out = self.post(out)
 
         return out
 
     def get_config(self):
-        base_config = super().get_config()
-        return {**base_config, **self.config}
+        return self.config
 
 
 class MLP(Model):
@@ -227,5 +226,4 @@ class MLP(Model):
         return self.mlp(inputs)
 
     def get_config(self):
-        base_config = super().get_config()
-        return {**base_config, **self.config}
+        return self.config
