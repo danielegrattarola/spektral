@@ -3,10 +3,10 @@ from tests.test_layers.pooling.core import MODES, run_layer
 
 config = {
     "layer": layers.TopKPool,
-    "modes": [MODES['SINGLE'], MODES['DISJOINT']],
+    "modes": [MODES["SINGLE"], MODES["DISJOINT"]],
     "kwargs": {"ratio": 0.5, "return_mask": True},
     "dense": True,
-    "sparse": True
+    "sparse": True,
 }
 
 

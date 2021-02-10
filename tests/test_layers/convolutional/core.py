@@ -105,19 +105,19 @@ def _test_get_config(layer, **kwargs):
 
     # Remove 'name' if we have advanced activations (needed for GeneralConv)
     if (
-            "activation" in config
-            and isinstance(config["activation"], dict)
-            and "class_name" in config["activation"]
+        "activation" in config
+        and isinstance(config["activation"], dict)
+        and "class_name" in config["activation"]
     ):
         config["activation"]["config"].pop("name")
         config_new["activation"]["config"].pop("name")
 
     assert config_new == config
 
+
 def _test_preprocess(layer):
     a_out = layer.preprocess(A)
     assert a_out.shape == A.shape
-
 
 
 def run_layer(config):
@@ -193,4 +193,3 @@ def run_layer(config):
                 )
     _test_get_config(config["layer"], **config["kwargs"])
     _test_preprocess(config["layer"])
-

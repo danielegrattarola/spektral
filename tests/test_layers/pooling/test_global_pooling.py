@@ -1,7 +1,6 @@
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import Input, Model
-from tests.test_layers.convolutional.core import _test_get_config
 
 from spektral.layers import (
     GlobalAttentionPool,
@@ -11,6 +10,7 @@ from spektral.layers import (
     GlobalSumPool,
     SortPool,
 )
+from tests.test_layers.convolutional.core import _test_get_config
 
 tf.keras.backend.set_floatx("float64")
 batch_size = 32

@@ -1,10 +1,8 @@
 import numpy as np
 import scipy.sparse as sp
 import tensorflow as tf
-from tensorflow.keras import Input, Model
-from spektral.data import Graph, Dataset, loaders
 
-from spektral.layers.ops import sp_matrix_to_sp_tensor
+from spektral.data import Dataset, Graph, loaders
 
 tf.keras.backend.set_floatx("float64")
 MODES = {"SINGLE": 0, "BATCH": 1, "MIXED": 2, "DISJOINT": 3}
@@ -17,7 +15,7 @@ n_edge_features = 3
 
 def _get_graph(n_nodes, n_features, n_edge_features=None, sparse=False):
     x = np.random.rand(n_nodes, n_features)
-    a = np.random.randint(0, 2, (n_nodes, n_nodes)).astype('f4')
+    a = np.random.randint(0, 2, (n_nodes, n_nodes)).astype("f4")
     e = (
         np.random.rand(np.count_nonzero(a), n_edge_features)
         if n_edge_features is not None

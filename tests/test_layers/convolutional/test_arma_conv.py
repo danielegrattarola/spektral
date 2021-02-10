@@ -1,4 +1,5 @@
-from core import run_layer, MODES
+from core import MODES, run_layer
+
 from spektral import layers
 
 config = {
@@ -10,7 +11,7 @@ config = {
         "order": 2,
         "iterations": 2,
         "share_weights": True,
-        "use_bias": True
+        "use_bias": True,
     },
     "dense": True,
     "sparse": True,

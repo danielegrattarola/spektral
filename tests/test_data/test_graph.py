@@ -1,7 +1,6 @@
 import numpy as np
 
 from spektral.data.graph import Graph
-from scipy import sparse as sp
 
 n_nodes = 5
 n_node_features = 4
@@ -10,7 +9,7 @@ n_out = 2
 
 
 def _check_graph(x, a, e, y):
-    g = Graph() # Empty graph
+    g = Graph()  # Empty graph
     g = Graph(x=x)  # Only node features
     g = Graph(a=a)  # Only adjacency
     g = Graph(x=x, a=a, e=e, y=y, extra=1)  # Complete graph with extra attribute

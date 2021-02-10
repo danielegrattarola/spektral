@@ -1,13 +1,14 @@
-from spektral.utils import logging
-from spektral.models import GCN
 import shutil
+
+from spektral.models import GCN
+from spektral.utils import logging
 
 
 def test_logging_functions():
-    log_dir = logging.init_logging(name='test')
+    log_dir = logging.init_logging(name="test")
     logging.log("test")
-    logging.tic(message='test')
-    logging.toc(message='test')
+    logging.tic(message="test")
+    logging.toc(message="test")
 
     model = GCN(1)
     model.build([(10, 2), (10, 10)])

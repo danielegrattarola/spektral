@@ -68,4 +68,3 @@ def test_inner_products():
     assert output.shape == (10, 10)
 
     _test_get_config(layers.MinkowskiProduct)
-

@@ -66,7 +66,6 @@ def test_delaunay():
     t(g)
 
 
-
 def test_gcn_filter():
     t = tr.GCNFilter()
     assert callable(t)

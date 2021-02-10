@@ -9,9 +9,9 @@ from tests.test_layers.convolutional.core import _test_get_config
 tf.keras.backend.set_floatx("float64")
 
 MODES = {
-    'SINGLE': 0,
-    'BATCH': 1,
-    'DISJOINT': 2,
+    "SINGLE": 0,
+    "BATCH": 1,
+    "DISJOINT": 2,
 }
 
 batch_size = 3

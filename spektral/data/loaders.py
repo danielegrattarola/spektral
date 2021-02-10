@@ -4,12 +4,12 @@ from scipy import sparse as sp
 
 from spektral.data.utils import (
     batch_generator,
+    get_spec,
     prepend_none,
     to_batch,
     to_disjoint,
     to_mixed,
     to_tf_signature,
-    get_spec,
 )
 from spektral.layers.ops import sp_matrix_to_sp_tensor
 
@@ -225,7 +225,10 @@ class SingleLoader(Loader):
                 output += (self.sample_weights,)
         else:
             if self.sample_weights is not None:
-                output = (output, self.sample_weights,)
+                output = (
+                    output,
+                    self.sample_weights,
+                )
 
         return tuple(output)
 

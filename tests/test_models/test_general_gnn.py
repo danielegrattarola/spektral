@@ -1,5 +1,5 @@
-from tests.test_models.core import run_model, MODES
 from spektral import models
+from tests.test_models.core import MODES, run_model
 
 config = {
     "model": models.GeneralGNN,

@@ -1,4 +1,5 @@
-from core import run_layer, MODES
+from core import MODES, run_layer
+
 from spektral import layers
 
 config = {
@@ -12,5 +13,5 @@ config = {
 
 def test_layer():
     run_layer(config)
-    config['kwargs']["activation"] = "relu"
+    config["kwargs"]["activation"] = "relu"
     run_layer(config)

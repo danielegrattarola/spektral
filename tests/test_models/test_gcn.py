@@ -1,9 +1,9 @@
-from tests.test_models.core import run_model, MODES
 from spektral import models
+from tests.test_models.core import MODES, run_model
 
 config = {
     "model": models.GCN,
-    "modes": [MODES["SINGLE"], MODES["DISJOINT"], MODES["MIXED"], MODES['BATCH']],
+    "modes": [MODES["SINGLE"], MODES["DISJOINT"], MODES["MIXED"], MODES["BATCH"]],
     "kwargs": {"n_labels": 32},
     "edges": False,
     "dense": True,

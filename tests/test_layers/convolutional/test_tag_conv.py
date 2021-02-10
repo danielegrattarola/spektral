@@ -1,4 +1,5 @@
-from core import run_layer, MODES
+from core import MODES, run_layer
+
 from spektral import layers
 
 config = {
