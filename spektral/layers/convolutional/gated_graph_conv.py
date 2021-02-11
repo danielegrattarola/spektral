@@ -100,6 +100,7 @@ class GatedGraphConv(MessagePassing):
             kernel_constraint=self.kernel_constraint,
             bias_constraint=self.bias_constraint,
             use_bias=self.use_bias,
+            dtype=self.dtype,
         )
         self.built = True
 

@@ -155,7 +155,7 @@ class GATConv(Conv):
                 name="bias",
             )
 
-        self.dropout = Dropout(self.dropout_rate)
+        self.dropout = Dropout(self.dropout_rate, dtype=self.dtype)
         self.built = True
 
     def call(self, inputs):

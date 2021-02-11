@@ -1,3 +1,7 @@
+import warnings
+from functools import wraps
+
+import tensorflow as tf
 from tensorflow.keras.layers import Layer
 
 from spektral.utils.keras import (
@@ -38,6 +42,7 @@ class Conv(Layer):
                 attr = deserialize_kwarg(key, attr)
                 self.kwargs_keys.append(key)
                 setattr(self, key, attr)
+        self.call = check_dtypes_decorator(self.call)
 
     def build(self, input_shape):
         self.built = True
@@ -59,3 +64,37 @@ class Conv(Layer):
     @staticmethod
     def preprocess(a):
         return a
+
+
+def check_dtypes_decorator(call):
+    @wraps(call)
+    def _inner_check_dtypes(inputs, **kwargs):
+        inputs = check_dtypes(inputs)
+        return call(inputs, **kwargs)
+
+    return _inner_check_dtypes
+
+
+def check_dtypes(inputs):
+    if len(inputs) == 2:
+        x, a = inputs
+        e = None
+    elif len(inputs) == 3:
+        x, a, e = inputs
+    else:
+        return inputs
+
+    if a.dtype in (tf.int32, tf.int64) and x.dtype in (
+        tf.float16,
+        tf.float32,
+        tf.float64,
+    ):
+        warnings.warn(
+            f"The adjacency matrix of dtype {a.dtype} is incompatible with the dtype "
+            f"of the node features {x.dtype} and has been automatically cast to "
+            f"{x.dtype}."
+        )
+        a = tf.cast(a, x.dtype)
+
+    output = [_ for _ in [x, a, e] if _ is not None]
+    return output

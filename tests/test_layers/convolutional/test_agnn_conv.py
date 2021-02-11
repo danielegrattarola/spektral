@@ -8,6 +8,7 @@ config = {
     "kwargs": {"channels": 7, "trainable": True},
     "dense": False,
     "sparse": True,
+    "edges": False,
 }
 
 

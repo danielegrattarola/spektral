@@ -12,9 +12,11 @@ config = {
         "iterations": 2,
         "share_weights": True,
         "use_bias": True,
+        "kernel_initializer": "zeros",
     },
     "dense": True,
     "sparse": True,
+    "edges": False,
 }
 
 

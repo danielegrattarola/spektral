@@ -2,12 +2,18 @@ from tensorflow.keras import activations, constraints, initializers, regularizer
 
 LAYER_KWARGS = {"activation", "use_bias"}
 KERAS_KWARGS = {
-    "activity_regularizer",
-    "autocast",
+    "trainable",
+    "name",
+    "dtype",
+    "dynamic",
+    "input_dim",
+    "input_shape",
     "batch_input_shape",
     "batch_size",
-    "input_shape",
     "weights",
+    "activity_regularizer",
+    "autocast",
+    "implementation",
 }
 
 

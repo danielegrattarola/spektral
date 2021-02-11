@@ -10,9 +10,11 @@ config = {
         "attn_heads": 2,
         "concat_heads": False,
         "activation": "relu",
+        "attn_kernel_initializer": "zeros",
     },
     "dense": True,
     "sparse": True,
+    "edges": False,
 }
 
 

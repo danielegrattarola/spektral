@@ -112,9 +112,12 @@ class ECCConv(Conv):
                         bias_regularizer=self.bias_regularizer,
                         kernel_constraint=self.kernel_constraint,
                         bias_constraint=self.bias_constraint,
+                        dtype=self.dtype,
                     )
                 )
-        self.kernel_network_layers.append(Dense(F_ * F, name="FGN_out"))
+        self.kernel_network_layers.append(
+            Dense(F_ * F, dtype=self.dtype, name="FGN_out")
+        )
 
         if self.root:
             self.root_kernel = self.add_weight(

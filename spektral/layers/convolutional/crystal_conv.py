@@ -90,6 +90,7 @@ class CrystalConv(MessagePassing):
             bias_regularizer=self.bias_regularizer,
             kernel_constraint=self.kernel_constraint,
             bias_constraint=self.bias_constraint,
+            dtype=self.dtype,
         )
         self.dense_f = Dense(self.channels, activation="sigmoid", **layer_kwargs)
         self.dense_s = Dense(self.channels, activation=self.activation, **layer_kwargs)

@@ -94,6 +94,7 @@ class EdgeConv(MessagePassing):
             bias_regularizer=self.bias_regularizer,
             kernel_constraint=self.kernel_constraint,
             bias_constraint=self.bias_constraint,
+            dtype=self.dtype,
         )
 
         self.mlp = Sequential(

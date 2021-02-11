@@ -8,6 +8,7 @@ config = {
     "kwargs": {"K": 3, "channels": 8, "activation": "relu"},
     "dense": True,
     "sparse": True,
+    "edges": False,
 }
 
 

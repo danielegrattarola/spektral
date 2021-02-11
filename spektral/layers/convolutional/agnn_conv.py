@@ -56,7 +56,7 @@ class AGNNConv(MessagePassing):
         if self.trainable:
             self.beta = self.add_weight(shape=(1,), initializer="ones", name="beta")
         else:
-            self.beta = K.constant(1.0)
+            self.beta = tf.cast(1.0, self.dtype)
         self.built = True
 
     def call(self, inputs, **kwargs):

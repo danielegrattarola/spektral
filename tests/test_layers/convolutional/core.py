@@ -1,3 +1,5 @@
+import itertools
+
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import Input, Model
@@ -120,6 +122,49 @@ def _test_preprocess(layer):
     assert a_out.shape == A.shape
 
 
+def _get_input_from_dtypes(dtypes, sparse=False):
+    assert len(dtypes) >= 2
+    x = np.ones((3, 1), dtype=dtypes[0])
+    a = np.ones((3, 3), dtype=dtypes[1])
+    if sparse:
+        a = sp_matrix_to_sp_tensor(a)
+    output = [x, a]
+    if len(dtypes) > 2:
+        e = np.ones((3 * 3, 1), dtype=dtypes[2])
+        output.append(e)
+    return output
+
+
+def _test_dtype_compatibility(layer, sparse=False, edges=False, **kwargs):
+    total = positive = 0
+    dtypes_all = ["int32", "int64", "float16", "float32", "float64"]
+    for dtypes in itertools.product(*([dtypes_all] * (3 if edges else 2))):
+        total += 1
+        layer_instance = layer(**kwargs, dtype=dtypes[0])
+        inputs = _get_input_from_dtypes(dtypes, sparse=sparse)
+        try:
+            layer_instance(inputs)
+            print(
+                "sparse" if sparse else "dense",
+                "".join([f"{dtype:10s}" for dtype in dtypes]),
+                "OK",
+            )
+            positive += 1
+        except Exception as e:
+            print(
+                "sparse" if sparse else "dense",
+                "".join([f"{dtype:10s}" for dtype in dtypes]),
+                "FAIL",
+                # e
+            )
+            # raise e
+            pass
+    print(f"RATIO: {positive / total}")
+    with open("dtype_ratio.txt", "a") as f:
+        f.write(f"{layer.__name__:20s} {positive / total:.2f}\n")
+    assert positive / total >= 0.2
+
+
 def run_layer(config):
     """
     Each `config` is a dictionary with the form:
@@ -163,14 +208,14 @@ def run_layer(config):
                     config["layer"],
                     sparse=False,
                     edges=config.get("edges", False),
-                    **config["kwargs"]
+                    **config["kwargs"],
                 )
             if config["sparse"]:
                 _test_single_mode(
                     config["layer"],
                     sparse=True,
                     edges=config.get("edges", False),
-                    **config["kwargs"]
+                    **config["kwargs"],
                 )
         elif mode == MODES["BATCH"]:
             _test_batch_mode(
@@ -182,14 +227,34 @@ def run_layer(config):
                     config["layer"],
                     sparse=False,
                     edges=config.get("edges", False),
-                    **config["kwargs"]
+                    **config["kwargs"],
                 )
             if config["sparse"]:
                 _test_mixed_mode(
                     config["layer"],
                     sparse=True,
                     edges=config.get("edges", False),
-                    **config["kwargs"]
+                    **config["kwargs"],
                 )
     _test_get_config(config["layer"], **config["kwargs"])
     _test_preprocess(config["layer"])
+
+    for k, v in config["kwargs"].items():
+        if k.endswith("_initializer"):
+            config["kwargs"][k] = "zeros"
+    config["kwargs"]["kernel_initializer"] = "zeros"
+
+    if config["dense"]:
+        _test_dtype_compatibility(
+            config["layer"],
+            sparse=False,
+            edges=config.get("edges", False),
+            **config["kwargs"],
+        )
+    if config["sparse"]:
+        _test_dtype_compatibility(
+            config["layer"],
+            sparse=True,
+            edges=config.get("edges", False),
+            **config["kwargs"],
+        )

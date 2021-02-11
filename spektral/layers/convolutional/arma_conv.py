@@ -124,6 +124,8 @@ class ARMAConv(Conv):
                     # No need to continue because all weights will be shared
                     break
             self.kernels.append(kernel_stack)
+
+        self.dropout = Dropout(self.dropout_rate, dtype=self.dtype)
         self.built = True
 
     def call(self, inputs):
@@ -198,7 +200,7 @@ class ARMAConv(Conv):
         output = ops.modal_dot(a, output)
 
         skip = K.dot(x_skip, kernel_2)
-        skip = Dropout(self.dropout_rate)(skip)
+        skip = self.dropout(skip)
         output += skip
 
         if self.use_bias:

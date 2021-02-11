@@ -8,6 +8,7 @@ config = {
     "kwargs": {"channels": 8, "activation": "tanh", "num_diffusion_steps": 5},
     "dense": True,
     "sparse": False,
+    "edges": False,
 }
 
 

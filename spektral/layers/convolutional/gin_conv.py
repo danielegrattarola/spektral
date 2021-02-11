@@ -1,5 +1,5 @@
+import tensorflow as tf
 from tensorflow.keras import activations
-from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.models import Sequential
 
@@ -121,13 +121,14 @@ class GINConv(MessagePassing):
             self.eps = self.add_weight(shape=(1,), initializer="zeros", name="eps")
         else:
             # If epsilon is given, keep it constant
-            self.eps = K.constant(self.epsilon)
+            self.eps = tf.cast(self.epsilon, self.dtype)
+        self.one = tf.cast(1, self.dtype)
 
         self.built = True
 
     def call(self, inputs, **kwargs):
         x, a, _ = self.get_inputs(inputs)
-        output = self.mlp((1.0 + self.eps) * x + self.propagate(x, a))
+        output = self.mlp((self.one + self.eps) * x + self.propagate(x, a))
 
         return output
 

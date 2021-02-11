@@ -103,6 +103,7 @@ class APPNPConv(Conv):
             bias_regularizer=self.bias_regularizer,
             kernel_constraint=self.kernel_constraint,
             bias_constraint=self.bias_constraint,
+            dtype=self.dtype,
         )
         mlp_layers = []
         for channels in self.mlp_hidden:
