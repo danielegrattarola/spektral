@@ -163,7 +163,9 @@ def preprocess_data(path, name):
     class_map = {conversion(k): lab_conversion(v) for k, v in class_map.items()}
 
     # Remove all nodes that do not have val/test annotations
-    [G.remove_node(node) for node in G.nodes() if node not in id_map]
+    nodes_to_remove = [node for node in G.nodes() if node not in id_map]
+    for node in nodes_to_remove:
+        G.remove_node(node)
 
     # Adjacency matrix
     edges = [
