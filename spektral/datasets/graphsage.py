@@ -162,16 +162,18 @@ def preprocess_data(path, name):
         lab_conversion = int
     class_map = {conversion(k): lab_conversion(v) for k, v in class_map.items()}
 
-    # Remove all nodes that do not have val/test annotations
-    nodes_to_remove = [node for node in G.nodes() if node not in id_map]
-    for node in nodes_to_remove:
-        G.remove_node(node)
+    # In Reddit, since edges in G_data are (int, int) and node ids are strings,
+    # Networkx weirdly doubles the number of nodes by creating duplicates with integer
+    # ids.
+    # We create a reverse lookup set to make sure that edges exist when creating the
+    # adjacency matrix.
+    inverse_ids_lookup = set(id_map.values())
 
     # Adjacency matrix
     edges = [
-        (id_map[edge[0]], id_map[edge[1]])
+        edge
         for edge in G.edges()
-        if edge[0] in id_map and edge[1] in id_map
+        if edge[0] in inverse_ids_lookup and edge[1] in inverse_ids_lookup
     ]
     edges = np.array(edges, dtype=np.int32)
     adj = sp.csr_matrix(
