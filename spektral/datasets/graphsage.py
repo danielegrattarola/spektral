@@ -180,7 +180,8 @@ def preprocess_data(path, name):
         (np.ones((edges.shape[0]), dtype=np.float32), (edges[:, 0], edges[:, 1])),
         shape=(n, n),
     )
-    adj = adj.maximum(adj.transpose())
+    adj += adj.T
+    adj.data = np.clip(adj.data, 0, 1)
 
     # Process labels
     if isinstance(list(class_map.values())[0], list):
@@ -196,10 +197,12 @@ def preprocess_data(path, name):
 
     # Get train/val/test indexes
     idx_va = np.array(
-        [id_map[k] for k in id_map if G.nodes[k]["val"]], dtype=np.int32
+        [id_map[k] for k in id_map if k in G.nodes and G.nodes[k]["val"]],
+        dtype=np.int32,
     )
     idx_te = np.array(
-        [id_map[k] for k in id_map if G.nodes[k]["test"]], dtype=np.int32
+        [id_map[k] for k in id_map if k in G.nodes and G.nodes[k]["test"]],
+        dtype=np.int32,
     )
     mask_tr = np.ones(n, dtype=np.bool)
     mask_va = np.zeros(n, dtype=np.bool)
