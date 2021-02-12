@@ -196,10 +196,10 @@ def preprocess_data(path, name):
 
     # Get train/val/test indexes
     idx_va = np.array(
-        [id_map[n] for n in G.nodes() if G.nodes[n]["val"]], dtype=np.int32
+        [id_map[k] for k in id_map if G.nodes[k]["val"]], dtype=np.int32
     )
     idx_te = np.array(
-        [id_map[n] for n in G.nodes() if G.nodes[n]["test"]], dtype=np.int32
+        [id_map[k] for k in id_map if G.nodes[k]["test"]], dtype=np.int32
     )
     mask_tr = np.ones(n, dtype=np.bool)
     mask_va = np.zeros(n, dtype=np.bool)
