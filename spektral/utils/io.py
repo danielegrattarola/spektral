@@ -152,7 +152,7 @@ def _parse_off(lines):
     n_verts, n_faces, _ = map(int, lines[0].split(" "))
 
     # Read vertices
-    verts = np.array([l.split(" ") for l in lines[1 : n_verts + 1]]).astype(float)
+    verts = np.array([l.strip().split(" ") for l in lines[1 : n_verts + 1]]).astype(float)
 
     # Read faces
     faces = lines[n_verts + 1 : n_verts + 1 + n_faces]
