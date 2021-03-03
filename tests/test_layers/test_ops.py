@@ -86,6 +86,7 @@ def _check_op_sparse(op, numpy_inputs, convert_to_sparse, **kwargs):
 
 
 def test_matmul_ops_rank_2():
+    np.random.seed(0)
     a = np.random.randn(N, N)
     b = np.random.randn(N, N)
     convert_to_sparse = [[True, False], [False, True], [True, True]]
@@ -105,6 +106,7 @@ def test_matmul_ops_rank_2():
 
 
 def test_matmul_ops_rank_2_3():
+    np.random.seed(0)
     a = np.random.randn(N, N)
     b = np.random.randn(batch_size, N, N)
     convert_to_sparse = [[True, False], [False, True], [True, True]]
@@ -137,6 +139,7 @@ def test_matmul_ops_rank_2_3():
 
 
 def test_matmul_ops_rank_3_2():
+    np.random.seed(0)
     a = np.random.randn(batch_size, N, N)
     b = np.random.randn(N, N)
     convert_to_sparse = [[True, False], [False, True], [True, True]]
@@ -169,6 +172,7 @@ def test_matmul_ops_rank_3_2():
 
 
 def test_matmul_ops_rank_3():
+    np.random.seed(0)
     a = np.random.randn(batch_size, N, N)
     b = np.random.randn(batch_size, N, N)
     convert_to_sparse = [[True, False], [False, True], [True, True]]
@@ -215,6 +219,7 @@ def test_graph_ops():
 
 
 def test_base_ops():
+    np.random.seed(0)
     convert_to_sparse = [[True]]
 
     # Transpose
@@ -275,6 +280,7 @@ def test_modes_ops():
 
 
 def test_scatter_ops():
+    np.random.seed(0)
     from spektral.layers.ops.scatter import OP_DICT
 
     indices = np.array([0, 1, 1, 2, 2, 2, 4, 4, 4, 4])

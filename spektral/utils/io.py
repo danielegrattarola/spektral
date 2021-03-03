@@ -187,7 +187,7 @@ def load_off(filename):
     adj = adj.T.tocsr()
     adj.data = np.clip(adj.data, 0, 1)
 
-    return Graph(x=x, adj=adj)
+    return Graph(x=x, a=adj)
 
 
 # Reference for implementation:
