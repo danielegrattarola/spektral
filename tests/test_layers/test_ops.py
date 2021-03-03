@@ -1,6 +1,6 @@
 import numpy as np
-import tensorflow as tf
 import scipy.sparse as sp
+import tensorflow as tf
 
 from spektral.layers import ops
 from spektral.utils import convolution
