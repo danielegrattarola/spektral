@@ -2,6 +2,7 @@ import copy
 import warnings
 
 import numpy as np
+from scipy import linalg
 from scipy import sparse as sp
 from scipy.sparse.linalg import ArpackNoConvergence
 
@@ -93,7 +94,11 @@ def rescale_laplacian(L, lmax=None):
     """
     if lmax is None:
         try:
-            lmax = sp.linalg.eigsh(L, 1, which="LM", return_eigenvectors=False)[0]
+            if sp.issparse(L):
+                lmax = sp.linalg.eigsh(L, 1, which="LM", return_eigenvectors=False)[0]
+            else:
+                n = L.shape[-1]
+                lmax = linalg.eigh(L, eigvals_only=True, eigvals=[n-2, n-1])[-1]
         except ArpackNoConvergence:
             lmax = 2
     if sp.issparse(L):
