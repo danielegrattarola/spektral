@@ -51,6 +51,11 @@ class TUDataset(Dataset):
     )
 
     def __init__(self, name, clean=False, **kwargs):
+        if name not in self.available_datasets():
+            raise ValueError(
+                "Unknown dataset {}. See {}.available_datasets() for a complete list of"
+                "available datasets.".format(name, self.__class__.__name__)
+            )
         self.name = name
         self.clean = clean
         super().__init__(**kwargs)
@@ -176,8 +181,8 @@ class TUDataset(Dataset):
             for x, a, e, y in zip(x_list, a_list, e_list, labels)
         ]
 
-    @property
-    def available_datasets(self):
+    @staticmethod
+    def available_datasets():
         url = "https://chrsmrrs.github.io/datasets/docs/datasets/"
         try:
             tables = pd.read_html(url)

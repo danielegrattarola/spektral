@@ -40,9 +40,10 @@ class ModelNet(Dataset):
     }
 
     def __init__(self, name, test=False, n_jobs=-1, **kwargs):
-        if name not in self.available_datasets:
+        if name not in self.available_datasets():
             raise ValueError(
-                "Unknown dataset {}. Possible: {}".format(name, self.available_datasets)
+                "Unknown dataset {}. See {}.available_datasets() for a complete list of"
+                "available datasets.".format(name, self.__class__.__name__)
             )
         self.name = name
         self.test = test
@@ -80,6 +81,6 @@ class ModelNet(Dataset):
         download_file(url, self.path, "ModelNet" + self.name + ".zip")
         shutil.rmtree(osp.join(self.path, "__MACOSX"), ignore_errors=True)
 
-    @property
-    def available_datasets(self):
+    @staticmethod
+    def available_datasets():
         return ["10", "40"]

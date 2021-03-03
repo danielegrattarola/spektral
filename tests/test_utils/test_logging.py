@@ -5,7 +5,7 @@ from spektral.utils import logging
 
 
 def test_logging_functions():
-    log_dir = logging.init_logging(name="test")
+    log_dir = logging.init_logging()
     logging.log("test")
     logging.tic(message="test")
     logging.toc(message="test")

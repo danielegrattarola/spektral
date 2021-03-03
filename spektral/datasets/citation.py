@@ -46,12 +46,12 @@ class Citation(Dataset):
         if hasattr(dtype, "as_numpy_dtype"):
             # support tf.dtypes
             dtype = dtype.as_numpy_dtype
-        self.name = name.lower()
-        if self.name not in self.available_datasets:
+        if name.lower() not in self.available_datasets():
             raise ValueError(
-                "Unknown dataset {}. See Citation.available_datasets "
-                "for a list of available datasets."
+                "Unknown dataset {}. See {}.available_datasets() for a complete list of"
+                "available datasets.".format(name, self.__class__.__name__)
             )
+        self.name = name.lower()
         self.random_split = random_split
         self.normalize_x = normalize_x
         self.mask_tr = self.mask_va = self.mask_te = None
@@ -137,8 +137,8 @@ class Citation(Dataset):
             with open(os.path.join(self.path, f_name), "wb") as out_file:
                 out_file.write(req.content)
 
-    @property
-    def available_datasets(self):
+    @staticmethod
+    def available_datasets():
         return ["cora", "citeseer", "pubmed"]
 
 

@@ -56,3 +56,5 @@ def test_tud():
 
     bl = BatchLoader(dataset, batch_size=batch_size)
     bl.__next__()
+
+    datasets.TUDataset.available_datasets

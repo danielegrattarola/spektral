@@ -53,11 +53,10 @@ class GraphSage(Dataset):
     url = "http://snap.stanford.edu/graphsage/{}.zip"
 
     def __init__(self, name, **kwargs):
-        if name.lower() not in self.available_datasets:
+        if name.lower() not in self.available_datasets():
             raise ValueError(
-                "Unknown dataset: {}. Possible: {}".format(
-                    name, self.available_datasets
-                )
+                "Unknown dataset {}. See {}.available_datasets() for a complete list of"
+                "available datasets.".format(name, self.__class__.__name__)
             )
         self.name = name.lower()
         self.mask_tr = self.mask_va = self.mask_te = None
@@ -112,8 +111,8 @@ class GraphSage(Dataset):
             mask_te=mask_te,
         )
 
-    @property
-    def available_datasets(self):
+    @staticmethod
+    def available_datasets():
         return ["ppi", "reddit"]
 
 
