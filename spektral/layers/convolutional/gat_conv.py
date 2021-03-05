@@ -170,8 +170,9 @@ class GATConv(Conv):
             output, attn_coef = self._call_dense(x, a)
 
         if self.concat_heads:
-            shape = output.shape[:-2] + [self.attn_heads * self.channels]
-            shape = [d if d is not None else -1 for d in shape]
+            shape = tf.concat(
+                (tf.shape(output)[:-2], [self.attn_heads * self.channels]), axis=0
+            )
             output = tf.reshape(output, shape)
         else:
             output = tf.reduce_mean(output, axis=-2)
