@@ -1,3 +1,4 @@
+import os
 import os.path as osp
 import shutil
 from glob import glob
@@ -48,11 +49,14 @@ class ModelNet(Dataset):
         self.name = name
         self.test = test
         self.n_jobs = n_jobs
-        self.true_path = osp.join(self.path, "ModelNet" + self.name)
         super().__init__(**kwargs)
 
+    @property
+    def path(self):
+        return osp.join(super().path, self.name)
+
     def read(self):
-        folders = glob(osp.join(self.true_path, "*", ""))
+        folders = glob(osp.join(self.path, "*", ""))
         dataset = "test" if self.test else "train"
         classes = [f.split("/")[-2] for f in folders]
         n_out = len(classes)
@@ -66,7 +70,7 @@ class ModelNet(Dataset):
 
         output = []
         for i, c in enumerate(tqdm(classes)):
-            fnames = osp.join(self.true_path, c, dataset, "{}_*.off".format(c))
+            fnames = osp.join(self.path, c, dataset, "{}_*.off".format(c))
             fnames = glob(fnames)
             output_partial = Parallel(n_jobs=self.n_jobs)(
                 delayed(load)(fname, i) for fname in fnames
@@ -79,6 +83,13 @@ class ModelNet(Dataset):
         print("Downloading ModelNet{} dataset.".format(self.name))
         url = self.url[self.name]
         download_file(url, self.path, "ModelNet" + self.name + ".zip")
+
+        # Datasets are zipped in a folder: unpack them
+        parent = self.path
+        subfolder = osp.join(self.path, "ModelNet" + self.name)
+        for filename in os.listdir(subfolder):
+            shutil.move(osp.join(subfolder, filename), osp.join(parent, filename))
+        os.rmdir(subfolder)
         shutil.rmtree(osp.join(self.path, "__MACOSX"), ignore_errors=True)
 
     @staticmethod
