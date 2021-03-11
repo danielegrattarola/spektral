@@ -281,7 +281,7 @@ Graph(n_nodes=10, n_node_features=4, n_edge_features=None, n_labels=2)
 &gt;&gt;&gt; loader = DisjointLoader(dataset, batch_size=3)
 </code></pre>
 
-<p>Since Loaders are effectively generators, we can inspect the first batch that the loader will compute for us by calling <code>__next__()</code>:</p>
+<p>Since Loaders are effectively generators, we can inspect the first batch by calling <code>__next__()</code>:</p>
 <pre><code class="py">&gt;&gt;&gt; batch = loader.__next__()
 &gt;&gt;&gt; inputs, target = batch
 &gt;&gt;&gt; x, a, i = inputs
@@ -332,7 +332,6 @@ Also note that the batch was padded so that all graphs have 42 nodes, which is t
 <li><code>X</code> is a tensor in batch mode, of shape <code>[batch, nodes, n_feat]</code>;</li>
 <li><code>E</code> has shape <code>[batch, edges, e_feat]</code> so that <code>E[i, j]</code> corresponds to the edge of the i-th graph associated with <code>A[j // nodes, j % nodes]</code>.</li>
 </ul>
-<p>Currently, there are no layers in Spektral that support mixed mode and edge attributes. </p>
 <p>An example of a mixed mode dataset is the MNIST random grid (<a href="https://arxiv.org/abs/1606.09375">Defferrard et al., 2016</a>):</p>
 <pre><code class="py">&gt;&gt;&gt; from spektral.datasets import MNIST
 &gt;&gt;&gt; dataset = MNIST()

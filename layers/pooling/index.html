@@ -191,30 +191,35 @@ Rex Ying et al.</p>
 <p>This layer computes a soft clustering <script type="math/tex">\S</script> of the input graphs using a GNN,
 and reduces graphs as follows:
 <script type="math/tex; mode=display">
-\S = \textrm{GNN}(\A, \X); \\
-\A' = \S^\top \A \S; \X' = \S^\top \X;
+\begin{align}
+\S &= \textrm{GNN}_{embed}(\A, \X); \\
+\Z &= \textrm{GNN}_{pool}(\A, \X); \\
+\A' &= \S^\top \A \S; \\
+\X' &= \S^\top \Z
+\end{align}
 </script>
-</p>
-<p>where GNN consists of one GraphConv layer with softmax activation.
-Two auxiliary loss terms are also added to the model: the <em>link prediction
+where:
+<script type="math/tex; mode=display">
+\textrm{GNN}_{\square}(\A, \X) = \D^{-1/2} \A \D^{-1/2} \X \W_{\square}.
+</script>
+The number of output channels of <script type="math/tex">\textrm{GNN}_{embed}</script> is controlled by 
+the <code>channels</code> parameter.</p>
+<p>Two auxiliary loss terms are also added to the model: the <em>link prediction
 loss</em>
 <script type="math/tex; mode=display">
-\big\| \A - \S\S^\top \big\|_F
+L_{LP} = \big\| \A - \S\S^\top \big\|_F
 </script>
 and the <em>entropy loss</em>
 <script type="math/tex; mode=display">
-- \frac{1}{N} \sum\limits_{i = 1}^{N} \S \log (\S).
+L_{E} - \frac{1}{N} \sum\limits_{i = 1}^{N} \S \log (\S).
 </script>
 </p>
-<p>The layer also applies a 1-layer GCN to the input features, and returns
-the updated graph signal (the number of output channels is controlled by
-the <code>channels</code> parameter).
-The layer can be used without a supervised loss, to compute node clustering
+<p>The layer can be used without a supervised loss, to compute node clustering
 simply by minimizing the two auxiliary losses.</p>
 <p><strong>Input</strong></p>
 <ul>
 <li>Node features of shape <code>([batch], n_nodes, n_node_features)</code>;</li>
-<li>Binary adjacency matrix of shape <code>([batch], n_nodes, n_nodes)</code>;</li>
+<li>Adjacency matrix of shape <code>([batch], n_nodes, n_nodes)</code>;</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
@@ -224,7 +229,7 @@ simply by minimizing the two auxiliary losses.</p>
 </ul>
 <p><strong>Arguments</strong></p>
 <ul>
-<li><code>k</code>: number of nodes to keep;</li>
+<li><code>k</code>: number of output nodes;</li>
 <li><code>channels</code>: number of output channels (if None, the number of output
 channels is assumed to be the same as the input);</li>
 <li><code>return_mask</code>: boolean, whether to return the cluster assignment matrix;</li>
@@ -247,17 +252,20 @@ Filippo Maria Bianchi et al.</p>
 <p>This layer computes a soft clustering <script type="math/tex">\S</script> of the input graphs using a MLP,
 and reduces graphs as follows:
 <script type="math/tex; mode=display">
-\S = \textrm{MLP}(\X); \\
-\A' = \S^\top \A \S; \X' = \S^\top \X;
+\begin{align}
+\S &= \textrm{MLP}(\X); \\
+\A' &= \S^\top \A \S; \\ 
+\X' &= \S^\top \X
+\end{align}
 </script>
-where MLP is a multi-layer perceptron with softmax output.
-Two auxiliary loss terms are also added to the model: the <em>minCUT loss</em>
+where MLP is a multi-layer perceptron with softmax output.</p>
+<p>Two auxiliary loss terms are also added to the model: the <em>minCUT loss</em>
 <script type="math/tex; mode=display">
-- \frac{ \mathrm{Tr}(\S^\top \A \S) }{ \mathrm{Tr}(\S^\top \D \S) }
+L_c = - \frac{ \mathrm{Tr}(\S^\top \A \S) }{ \mathrm{Tr}(\S^\top \D \S) }
 </script>
 and the <em>orthogonality loss</em>
 <script type="math/tex; mode=display">
-\left\|
+L_o = \left\|
 \frac{\S^\top \S}{\| \S^\top \S \|_F}
 - \frac{\I_K}{\sqrt{K}}
 \right\|_F.
@@ -278,7 +286,7 @@ simply by minimizing the two auxiliary losses.</p>
 </ul>
 <p><strong>Arguments</strong></p>
 <ul>
-<li><code>k</code>: number of nodes to keep;</li>
+<li><code>k</code>: number of output nodes;</li>
 <li><code>mlp_hidden</code>: list of integers, number of hidden units for each hidden
 layer in the MLP used to compute cluster assignments (if None, the MLP has
 only the output layer);</li>
@@ -298,7 +306,7 @@ only the output layer);</li>
 <pre><code class="python">spektral.layers.SAGPool(ratio, return_mask=False, sigmoid_gating=False, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
 </code></pre>
 
-<p>A self-attention graph pooling layer (SAG) from the paper</p>
+<p>A self-attention graph pooling layer from the paper</p>
 <blockquote>
 <p><a href="https://arxiv.org/abs/1904.08082">Self-Attention Graph Pooling</a><br>
 Junhyun Lee et al.</p>
@@ -311,17 +319,15 @@ Junhyun Lee et al.</p>
 \X' = (\X \odot \textrm{tanh}(\y))_\i; \;\;\;\;
 \A' = \A_{\i, \i}
 </script>
+where <script type="math/tex">\textrm{rank}(\y, K)</script> returns the indices of the top K values of
+<script type="math/tex">\y</script> and 
+<script type="math/tex; mode=display">
+\textrm{GNN}(\A, \X) = \A \X \W.
+</script>
 </p>
-<p>where <script type="math/tex"> \textrm{rank}(\y, K) </script> returns the indices of the top K values of
-<script type="math/tex">\y</script>, and <script type="math/tex">\textrm{GNN}</script> consists of one GraphConv layer with no
-activation. <script type="math/tex">K</script> is defined for each graph as a fraction of the number of
-nodes.</p>
-<p>This layer temporarily makes the adjacency matrix dense in order to compute
-<script type="math/tex">\A'</script>.
-If memory is not an issue, considerable speedups can be achieved by using
-dense graphs directly.
-Converting a graph from sparse to dense and back to sparse is an expensive
-operation.</p>
+<p>
+<script type="math/tex">K</script> is defined for each graph as a fraction of the number of nodes, 
+controlled by the <code>ratio</code> argument.</p>
 <p><strong>Input</strong></p>
 <ul>
 <li>Node features of shape <code>(n_nodes, n_node_features)</code>;</li>
@@ -369,11 +375,12 @@ Cătălina Cangea et al.</p>
 \X' = (\X \odot \textrm{tanh}(\y))_\i; \;\;\;\;
 \A' = \A_{\i, \i}
 </script>
-</p>
-<p>where <script type="math/tex"> \textrm{rank}(\y, K) </script> returns the indices of the top K values of
-<script type="math/tex">\y</script>, and <script type="math/tex">\p</script> is a learnable parameter vector of size <script type="math/tex">F</script>. <script type="math/tex">K</script> is
-defined for each graph as a fraction of the number of nodes.
-Note that the the gating operation <script type="math/tex">\textrm{tanh}(\y)</script> (Cangea et al.)
+where <script type="math/tex">\textrm{rank}(\y, K)</script> returns the indices of the top K values of
+<script type="math/tex">\y</script>, and <script type="math/tex">\p</script> is a learnable parameter vector of size <script type="math/tex">F</script>. </p>
+<p>
+<script type="math/tex">K</script> is defined for each graph as a fraction of the number of nodes, 
+controlled by the <code>ratio</code> argument.</p>
+<p>Note that the the gating operation <script type="math/tex">\textrm{tanh}(\y)</script> (Cangea et al.)
 can be replaced with a sigmoid (Gao &amp; Ji).</p>
 <p><strong>Input</strong></p>
 <ul>
@@ -400,7 +407,7 @@ tanh;</li>
 </ul>
 <hr />
 <h3 id="global-pooling-layers">Global pooling layers</h3>
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L85">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L82">[source]</a></span></p>
 <h4 id="globalavgpool">GlobalAvgPool</h4>
 <pre><code class="python">spektral.layers.GlobalAvgPool()
 </code></pre>
@@ -421,7 +428,7 @@ be <code>(1, n_node_features)</code>).</li>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L114">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L111">[source]</a></span></p>
 <h4 id="globalmaxpool">GlobalMaxPool</h4>
 <pre><code class="python">spektral.layers.GlobalMaxPool()
 </code></pre>
@@ -442,7 +449,7 @@ be <code>(1, n_node_features)</code>).</li>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L56">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L53">[source]</a></span></p>
 <h4 id="globalsumpool">GlobalSumPool</h4>
 <pre><code class="python">spektral.layers.GlobalSumPool()
 </code></pre>
@@ -463,7 +470,7 @@ be <code>(1, n_node_features)</code>).</li>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L143">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L140">[source]</a></span></p>
 <h4 id="globalattentionpool">GlobalAttentionPool</h4>
 <pre><code class="python">spektral.layers.GlobalAttentionPool(channels, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -499,7 +506,7 @@ shape will be <code>(1, channels)</code>).</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vectors.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L257">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L254">[source]</a></span></p>
 <h4 id="globalattnsumpool">GlobalAttnSumPool</h4>
 <pre><code class="python">spektral.layers.GlobalAttnSumPool(attn_kernel_initializer='glorot_uniform', attn_kernel_regularizer=None, attn_kernel_constraint=None)
 </code></pre>
@@ -533,7 +540,7 @@ matrix;</li>
 matrix;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L354">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L351">[source]</a></span></p>
 <h4 id="sortpool">SortPool</h4>
 <pre><code class="python">spektral.layers.SortPool(k)
 </code></pre>

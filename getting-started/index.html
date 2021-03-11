@@ -171,7 +171,7 @@
 <p>Spektral is designed according to the guiding principles of Keras to make things extremely simple for beginners while maintaining flexibility for experts.  </p>
 <p>In this page we will go over the main features of Spektral while creating a graph neural network for graph classification. </p>
 <h3 id="graphs">Graphs</h3>
-<p>A graph is a mathematical object that represents relations between objects. We call the objects "nodes" and the relations "edges". </p>
+<p>A graph is a mathematical object that represents relations between entities. We call the entities "nodes" and the relations "edges". </p>
 <p>Both the nodes and the edges can have vector <strong>features</strong>.</p>
 <p>In Spektral, graphs are represented with instances of <code>spektral.data.Graph</code> which can contain:</p>
 <ul>
@@ -201,12 +201,12 @@ Graph(n_nodes=42, n_node_features=4, n_edge_features=None, y=[1. 0.])
 <pre><code class="python">&gt;&gt;&gt; np.random.shuffle(dataset)
 </code></pre>
 
-<p>or slice the dataset up into sub-datsets: </p>
+<p>or slice the dataset into sub-datsets: </p>
 <pre><code class="python">&gt;&gt;&gt; dataset[:100]
 TUDataset(n_graphs=100)
 </code></pre>
 
-<p>Datasets also provide methods for applying <strong>transforms</strong> to each data: </p>
+<p>Datasets also provide methods for applying <strong>transforms</strong> to each datum: </p>
 <ul>
 <li><code>apply(transform)</code> - modifies the dataset in-place, by applying the <code>transform</code> to each graph;</li>
 <li><code>map(transform)</code> - returns a list obtained by applying the <code>transform</code> to each graph;</li>
@@ -227,7 +227,7 @@ TUDataset(n_graphs=1111)  # removed 2 graphs
 12
 </code></pre>
 
-<p>Try to go over the lambda function to see what it does. Also, notice that we passed another function to the method with the <code>reduce</code> keyword. Can you guess why?</p>
+<p>Try to go over the lambda function to see what it does. Also, notice that we passed a reduction function to the method, using the <code>reduce</code> keyword. This will be run on the output list computed by the map.</p>
 <p>Now we are ready to augment our node features with the one-hot-encoded degree. Spektral has a lot of pre-implemented <code>transforms</code> that we can use: </p>
 <pre><code class="python">&gt;&gt;&gt; from spektral.transforms import Degree
 
@@ -251,8 +251,7 @@ Have a look at the handy <a href="/transforms/#layerpreprocess"><code>LayerPrepr
 <h3 id="creating-a-gnn">Creating a GNN</h3>
 <p>Creating GNNs is where Spektral really shines. Since Spektral is designed as an extension of Keras, you can plug any Spektral layer into a Keras <code>Model</code> without modifications.<br />
 We just need to use the functional API because GNN layers usually need two or more inputs (so no <code>Sequential</code> models for now). </p>
-<p>For our first GNN, we will create a simple network that first does a bit of graph convolution, then sums all the nodes together (known as "global pooling"), and finally classifies the result with a dense softmax layer.<br />
-Oh, and we will also use dropout for regularization.</p>
+<p>For our first GNN, we will create a simple network that first does a bit of graph convolution, then sums all the nodes together (known as "global pooling"), and finally classifies the result with a dense softmax layer. We will also use dropout for regularization.</p>
 <p>Let's start by importing the necessary layers:</p>
 <pre><code class="python">from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Dense, Dropout
@@ -278,8 +277,8 @@ from spektral.layers import GCNConv, GlobalSumPool
         return out
 </code></pre>
 
-<p>And that's it.</p>
-<p>Note how we mixed layers from Spektral and Keras interchangeably: it's all just computation with tensors underneath! </p>
+<p>And that's it!</p>
+<p>Note how we mixed layers from Spektral and Keras interchangeably: it's all just computation with tensors underneath.</p>
 <p>This also means that if you want to break free from <code>Graph</code> and <code>Dataset</code> and every other feature of Spektral, you can. </p>
 <p><strong>Note:</strong> If you don't want to subclass <code>Model</code> to implement your GNN, you can also use the classical declarative style. You just need to pay attention to the <code>Input</code> and leave "node" dimensions unspecified (so <code>None</code> instead of <code>n_nodes</code>).</p>
 <h3 id="training-the-gnn">Training the GNN</h3>
@@ -295,7 +294,7 @@ model.compile('adam', 'categorical_crossentropy')
 <h4 id="loaders">Loaders</h4>
 <p>Loaders iterate over a graph dataset to create mini-batches. They hide a lot of the complexity behind the process, so that you don't need to think about it. 
 You only need to go to <a href="/data-modes">this page</a> and read up on <strong>data modes</strong>, so that you know which loader to use. </p>
-<p>Each loader has a <code>load()</code> method that when called will return a data generator that Keras can process. </p>
+<p>Each loader has a <code>load()</code> method that returns a data generator that Keras can process. </p>
 <p>Since we're doing graph-level classification, we can use a <code>BatchLoader</code>. It's a bit slow and memory intensive (a <code>DisjointLoader</code> would have been better), but it lets us simplify the definition of <code>MyFirstGNN</code>. Again, go read about <a href="/data-modes">data modes</a> after this tutorial.</p>
 <p>Let's create a data loader:</p>
 <pre><code class="python">from spektral.data import BatchLoader
