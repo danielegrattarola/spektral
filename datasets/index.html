@@ -353,8 +353,10 @@ each node:</p>
 <li>node labels, if available, one-hot encoded.</li>
 </ul>
 <p>Some datasets might not have node features at all. In this case, attempting
-to use the dataset with a Loader will result in a crash. In this case,
-you should set the features manually by iterating over the <code>graph</code> list.</p>
+to use the dataset with a Loader will result in a crash. You can create
+node features using some of the transforms available in <code>spektral.transforms</code>
+or you can define your own features by accessing the individual samples in 
+the <code>graph</code> attribute of the dataset (which is a list of <code>Graph</code> objects).</p>
 <p>Edge features are computed by concatenating the following features for
 each node:</p>
 <ul>
