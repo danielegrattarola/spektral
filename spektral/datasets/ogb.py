@@ -37,7 +37,7 @@ def _elem_to_numpy(elem):
         edge_index=np.array((row, col)).T,
         edge_weight=np.ones_like(row),
         edge_features=e,
-        shape=(n, n)
+        shape=(n, n),
     )
     if e is None:
         a = a_e
