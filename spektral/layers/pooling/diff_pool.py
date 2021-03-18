@@ -19,31 +19,37 @@ class DiffPool(Pool):
     This layer computes a soft clustering \(\S\) of the input graphs using a GNN,
     and reduces graphs as follows:
     $$
-        \S = \textrm{GNN}(\A, \X); \\
-        \A' = \S^\top \A \S; \X' = \S^\top \X;
+        \begin{align}
+            \S &= \textrm{GNN}_{embed}(\A, \X); \\
+            \Z &= \textrm{GNN}_{pool}(\A, \X); \\
+            \A' &= \S^\top \A \S; \\
+            \X' &= \S^\top \Z
+        \end{align}
     $$
+    where:
+    $$
+        \textrm{GNN}_{\square}(\A, \X) = \D^{-1/2} \A \D^{-1/2} \X \W_{\square}.
+    $$
+    The number of output channels of \(\textrm{GNN}_{embed}\) is controlled by 
+    the `channels` parameter.
 
-    where GNN consists of one GraphConv layer with softmax activation.
     Two auxiliary loss terms are also added to the model: the _link prediction
     loss_
     $$
-        \big\| \A - \S\S^\top \big\|_F
+        L_{LP} = \big\| \A - \S\S^\top \big\|_F
     $$
     and the _entropy loss_
     $$
-        - \frac{1}{N} \sum\limits_{i = 1}^{N} \S \log (\S).
+        L_{E} - \frac{1}{N} \sum\limits_{i = 1}^{N} \S \log (\S).
     $$
 
-    The layer also applies a 1-layer GCN to the input features, and returns
-    the updated graph signal (the number of output channels is controlled by
-    the `channels` parameter).
     The layer can be used without a supervised loss, to compute node clustering
     simply by minimizing the two auxiliary losses.
 
     **Input**
 
     - Node features of shape `([batch], n_nodes, n_node_features)`;
-    - Binary adjacency matrix of shape `([batch], n_nodes, n_nodes)`;
+    - Adjacency matrix of shape `([batch], n_nodes, n_nodes)`;
 
     **Output**
 
@@ -53,7 +59,7 @@ class DiffPool(Pool):
 
     **Arguments**
 
-    - `k`: number of nodes to keep;
+    - `k`: number of output nodes;
     - `channels`: number of output channels (if None, the number of output
     channels is assumed to be the same as the input);
     - `return_mask`: boolean, whether to return the cluster assignment matrix;

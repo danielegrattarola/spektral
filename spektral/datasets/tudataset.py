@@ -17,7 +17,7 @@ from spektral.utils import io
 class TUDataset(Dataset):
     """
     The Benchmark Data Sets for Graph Kernels from TU Dortmund
-    ([link](https://ls11-www.cs.tu-dortmund.de/staff/morris/graphkerneldatasets)).
+    ([link](https://chrsmrrs.github.io/datasets/docs/datasets/)).
 
     Node features are computed by concatenating the following features for
     each node:
@@ -26,8 +26,10 @@ class TUDataset(Dataset):
     - node labels, if available, one-hot encoded.
 
     Some datasets might not have node features at all. In this case, attempting
-    to use the dataset with a Loader will result in a crash. In this case,
-    you should set the features manually by iterating over the `graph` list.
+    to use the dataset with a Loader will result in a crash. You can create
+    node features using some of the transforms available in `spektral.transforms`
+    or you can define your own features by accessing the individual samples in 
+    the `graph` attribute of the dataset (which is a list of `Graph` objects).
 
     Edge features are computed by concatenating the following features for
     each node:
@@ -35,8 +37,12 @@ class TUDataset(Dataset):
     - edge attributes, if available;
     - edge labels, if available, one-hot encoded.
 
-    Graph labels are provided for each dataset. See the dataset's README in
-    ~/.spektral/datasets/TUD/`name`/ for details about each dataset.
+    Graph labels are provided for each dataset. 
+
+    Specific details about each individual dataset can be found in
+    `~/.spektral/datasets/TUDataset/<dataset name>/README.md`, after the dataset
+    has been downloaded locally (datasets are downloaded automatically upon 
+    calling `TUDataset('<dataset name>')` the first time).
 
     **Arguments**
 

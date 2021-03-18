@@ -5,7 +5,7 @@ from spektral.layers.pooling.topk_pool import TopKPool, ops
 
 class SAGPool(TopKPool):
     r"""
-    A self-attention graph pooling layer (SAG) from the paper
+    A self-attention graph pooling layer from the paper
 
     > [Self-Attention Graph Pooling](https://arxiv.org/abs/1904.08082)<br>
     > Junhyun Lee et al.
@@ -19,18 +19,14 @@ class SAGPool(TopKPool):
         \X' = (\X \odot \textrm{tanh}(\y))_\i; \;\;\;\;
         \A' = \A_{\i, \i}
     $$
-
-    where \( \textrm{rank}(\y, K) \) returns the indices of the top K values of
-    \(\y\), and \(\textrm{GNN}\) consists of one GraphConv layer with no
-    activation. \(K\) is defined for each graph as a fraction of the number of
-    nodes.
-
-    This layer temporarily makes the adjacency matrix dense in order to compute
-    \(\A'\).
-    If memory is not an issue, considerable speedups can be achieved by using
-    dense graphs directly.
-    Converting a graph from sparse to dense and back to sparse is an expensive
-    operation.
+    where \(\textrm{rank}(\y, K)\) returns the indices of the top K values of
+    \(\y\) and 
+    $$
+        \textrm{GNN}(\A, \X) = \A \X \W.
+    $$
+    
+    \(K\) is defined for each graph as a fraction of the number of nodes, 
+    controlled by the `ratio` argument.
 
     **Input**
 

@@ -19,17 +19,21 @@ class MinCutPool(Pool):
     This layer computes a soft clustering \(\S\) of the input graphs using a MLP,
     and reduces graphs as follows:
     $$
-        \S = \textrm{MLP}(\X); \\
-        \A' = \S^\top \A \S; \X' = \S^\top \X;
+    \begin{align}
+        \S &= \textrm{MLP}(\X); \\
+        \A' &= \S^\top \A \S; \\ 
+        \X' &= \S^\top \X
+    \end{align}
     $$
     where MLP is a multi-layer perceptron with softmax output.
+
     Two auxiliary loss terms are also added to the model: the _minCUT loss_
     $$
-        - \frac{ \mathrm{Tr}(\S^\top \A \S) }{ \mathrm{Tr}(\S^\top \D \S) }
+        L_c = - \frac{ \mathrm{Tr}(\S^\top \A \S) }{ \mathrm{Tr}(\S^\top \D \S) }
     $$
     and the _orthogonality loss_
     $$
-        \left\|
+        L_o = \left\|
             \frac{\S^\top \S}{\| \S^\top \S \|_F}
             - \frac{\I_K}{\sqrt{K}}
         \right\|_F.
@@ -51,7 +55,7 @@ class MinCutPool(Pool):
 
     **Arguments**
 
-    - `k`: number of nodes to keep;
+    - `k`: number of output nodes;
     - `mlp_hidden`: list of integers, number of hidden units for each hidden
     layer in the MLP used to compute cluster assignments (if None, the MLP has
     only the output layer);
