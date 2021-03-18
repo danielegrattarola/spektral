@@ -27,11 +27,11 @@ class TopKPool(Pool):
         \A' = \A_{\i, \i}
     $$
     where \(\textrm{rank}(\y, K)\) returns the indices of the top K values of
-    \(\y\), and \(\p\) is a learnable parameter vector of size \(F\). 
+    \(\y\), and \(\p\) is a learnable parameter vector of size \(F\).
 
-    \(K\) is defined for each graph as a fraction of the number of nodes, 
+    \(K\) is defined for each graph as a fraction of the number of nodes,
     controlled by the `ratio` argument.
-    
+
     Note that the the gating operation \(\textrm{tanh}(\y)\) (Cangea et al.)
     can be replaced with a sigmoid (Gao & Ji).
 

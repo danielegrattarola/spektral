@@ -155,6 +155,7 @@ class Loader:
             return dict(zip(keys, output))
         else:
             return output
+
     @property
     def steps_per_epoch(self):
         return int(np.ceil(len(self.dataset) / self.batch_size))

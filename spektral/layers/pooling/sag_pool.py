@@ -20,12 +20,12 @@ class SAGPool(TopKPool):
         \A' = \A_{\i, \i}
     $$
     where \(\textrm{rank}(\y, K)\) returns the indices of the top K values of
-    \(\y\) and 
+    \(\y\) and
     $$
         \textrm{GNN}(\A, \X) = \A \X \W.
     $$
-    
-    \(K\) is defined for each graph as a fraction of the number of nodes, 
+
+    \(K\) is defined for each graph as a fraction of the number of nodes,
     controlled by the `ratio` argument.
 
     **Input**
