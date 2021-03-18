@@ -169,9 +169,12 @@ class TUDataset(Dataset):
         # order
         a_e_list = [
             sparse.edge_index_to_matrix(
-                edge_index=el, edge_weight=np.ones(el.shape[0]), edge_features=e
+                edge_index=el,
+                edge_weight=np.ones(el.shape[0]),
+                edge_features=e,
+                shape=(n, n),
             )
-            for el, e in zip(el_list, e_list)
+            for el, e, n in zip(el_list, e_list, n_nodes)
         ]
         if e_available:
             a_list, e_list = list(zip(*a_e_list))

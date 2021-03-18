@@ -27,9 +27,9 @@ def reorder(edge_index, edge_weight=None, edge_features=None):
     return tuple(output)
 
 
-def edge_index_to_matrix(edge_index, edge_weight, edge_features=None):
+def edge_index_to_matrix(edge_index, edge_weight, edge_features=None, shape=None):
     reordered = reorder(edge_index, edge_weight, edge_features)
-    a = sp.csr_matrix((reordered[1], reordered[0].T))
+    a = sp.csr_matrix((reordered[1], reordered[0].T), shape=shape)
 
     if edge_features is not None:
         return a, reordered[2]

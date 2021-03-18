@@ -33,10 +33,15 @@ def _elem_to_numpy(elem):
     x = graph["node_feat"]
     row, col = graph["edge_index"]
     e = graph["edge_feat"]
-    a, e = sparse.edge_index_to_matrix(
+    a_e = sparse.edge_index_to_matrix(
         edge_index=np.array((row, col)).T,
         edge_weight=np.ones_like(row),
         edge_features=e,
+        shape=(n, n)
     )
+    if e is None:
+        a = a_e
+    else:
+        a, e = a_e
 
     return x, a, e, label
