@@ -2,6 +2,7 @@ import numpy as np
 import scipy.sparse as sp
 
 from spektral.data import Dataset, Graph
+from spektral.utils import sparse
 
 
 class OGB(Dataset):
@@ -31,7 +32,11 @@ def _elem_to_numpy(elem):
     n = graph["num_nodes"]
     x = graph["node_feat"]
     row, col = graph["edge_index"]
-    a = sp.csr_matrix((np.ones_like(row), (row, col)), shape=(n, n)).tocsr()
     e = graph["edge_feat"]
+    a, e = sparse.edge_index_to_matrix(
+        edge_index=np.array((row, col)).T,
+        edge_weight=np.ones_like(row),
+        edge_features=e
+    )
 
     return x, a, e, label

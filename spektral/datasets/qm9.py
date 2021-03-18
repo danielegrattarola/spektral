@@ -2,13 +2,13 @@ import os
 import os.path as osp
 
 import numpy as np
-import scipy.sparse as sp
 from joblib import Parallel, delayed
 from tensorflow.keras.utils import get_file
 from tqdm import tqdm
 
 from spektral.data import Dataset, Graph
 from spektral.utils import label_to_one_hot
+from spektral.utils import sparse
 from spektral.utils.io import load_csv, load_sdf
 
 ATOM_TYPES = [1, 6, 7, 8, 9]
@@ -98,13 +98,17 @@ def atom_to_feature(atom):
 
 
 def mol_to_adj(mol):
-    row, col, edge_attr = [], [], []
+    row, col, edge_features = [], [], []
     for bond in mol["bonds"]:
         start, end = bond["start_atom"], bond["end_atom"]
         row += [start, end]
         col += [end, start]
-        edge_attr += [bond["type"]] * 2
+        edge_features += [bond["type"]] * 2
 
-    a = sp.csr_matrix((np.ones_like(row), (row, col)))
-    edge_attr = np.array([label_to_one_hot(e, BOND_TYPES) for e in edge_attr])
-    return a, edge_attr
+    a, e = sparse.edge_index_to_matrix(
+        edge_index=np.array((row, col)).T,
+        edge_weight=np.ones_like(row),
+        edge_features=label_to_one_hot(edge_features, BOND_TYPES)
+    )
+
+    return a, e

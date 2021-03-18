@@ -6,6 +6,7 @@ from scipy.io import loadmat
 from tensorflow.keras.utils import get_file
 
 from spektral.data import Dataset, Graph
+from spektral.utils import sparse
 
 
 class QM7(Dataset):
@@ -47,7 +48,8 @@ class QM7(Dataset):
         output = []
         for i in range(len(coulomb_matrices)):
             row, col, data = sp.find(coulomb_matrices[i])
-            a = sp.csr_matrix((np.ones_like(data), (row, col)))
+            edge_index = np.array([row, col]).T
+            a, e = sparse.edge_index_to_matrix(edge_index, np.ones_like(data), data)
             e = data[:, None]
             y = labels[i]
             output.append(Graph(a=a, e=e, y=y))

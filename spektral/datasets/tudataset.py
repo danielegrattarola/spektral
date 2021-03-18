@@ -11,7 +11,7 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from spektral.data import Dataset, Graph
 from spektral.datasets.utils import download_file
-from spektral.utils import io
+from spektral.utils import io, sparse
 
 
 class TUDataset(Dataset):
@@ -28,7 +28,7 @@ class TUDataset(Dataset):
     Some datasets might not have node features at all. In this case, attempting
     to use the dataset with a Loader will result in a crash. You can create
     node features using some of the transforms available in `spektral.transforms`
-    or you can define your own features by accessing the individual samples in 
+    or you can define your own features by accessing the individual samples in
     the `graph` attribute of the dataset (which is a list of `Graph` objects).
 
     Edge features are computed by concatenating the following features for
@@ -37,11 +37,11 @@ class TUDataset(Dataset):
     - edge attributes, if available;
     - edge labels, if available, one-hot encoded.
 
-    Graph labels are provided for each dataset. 
+    Graph labels are provided for each dataset.
 
     Specific details about each individual dataset can be found in
     `~/.spektral/datasets/TUDataset/<dataset name>/README.md`, after the dataset
-    has been downloaded locally (datasets are downloaded automatically upon 
+    has been downloaded locally (datasets are downloaded automatically upon
     calling `TUDataset('<dataset name>')` the first time).
 
     **Arguments**
@@ -100,7 +100,7 @@ class TUDataset(Dataset):
         n_nodes = np.bincount(node_batch_index)
         n_nodes_cum = np.concatenate(([0], np.cumsum(n_nodes)[:-1]))
 
-        # Adjacency matrix
+        # Read edge lists
         edges = io.load_txt(fname_template.format("A"), delimiter=",").astype(int) - 1
         # Remove duplicates and self-loops from edges
         _, mask = np.unique(edges, axis=0, return_index=True)
@@ -110,15 +110,7 @@ class TUDataset(Dataset):
         edge_batch_idx = node_batch_index[edges[:, 0]]
         n_edges = np.bincount(edge_batch_idx)
         n_edges_cum = np.cumsum(n_edges[:-1])
-        edge_lists = np.split(edges - n_nodes_cum[edge_batch_idx, None], n_edges_cum)
-        # Create sparse adjacency matrices
-        a_list = [
-            sp.csr_matrix(
-                (np.ones_like(el[:, 0]), (el[:, 0], el[:, 1])),
-                shape=(n_nodes[i], n_nodes[i]),
-            )
-            for i, el in enumerate(edge_lists)
-        ]
+        el_list = np.split(edges - n_nodes_cum[edge_batch_idx, None], n_edges_cum)
 
         # Node features
         x_list = []
@@ -166,10 +158,25 @@ class TUDataset(Dataset):
             )
             e_list.append(e_labs)
         if len(e_list) > 0:
+            e_available = True
             e_list = np.concatenate(e_list, -1)
             e_list = np.split(e_list, n_edges_cum)
         else:
+            e_available = False
             e_list = [None] * len(n_nodes)
+
+        # Create sparse adjacency matrices and re-sort edge attributes in lexicographic
+        # order
+        a_e_list = [
+            sparse.edge_index_to_matrix(
+                edge_index=el, edge_weight=np.ones(el.shape[0]), edge_features=e
+            )
+            for el, e in zip(el_list, e_list)
+        ]
+        if e_available:
+            a_list, e_list = list(zip(*a_e_list))
+        else:
+            a_list = a_e_list
 
         # Labels
         if "graph_attributes" in available:

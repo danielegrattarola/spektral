@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 import scipy.sparse as sp
 
@@ -57,6 +59,32 @@ class Graph:
     """
 
     def __init__(self, x=None, a=None, e=None, y=None, **kwargs):
+        if x is not None:
+            if not isinstance(x, np.ndarray):
+                raise ValueError(f"Unsupported type {type(x)} for x")
+            if len(x.shape) == 1:
+                x = x[:, None]
+                warnings.warn(f"x was automatically reshaped to {x.shape}")
+            if len(x.shape) != 2:
+                raise ValueError(
+                    f"x must have shape (n_nodes, n_node_features), got "
+                    f"rank {len(x.shape)}"
+                )
+        if a is not None:
+            if not (isinstance(a, np.ndarray) or sp.isspmatrix(a)):
+                raise ValueError(f"Unsupported type {type(a)} for a")
+            if len(a.shape) != 2:
+                raise ValueError(
+                    f"a must have shape (n_nodes, n_nodes), got rank {len(a.shape)}"
+                )
+        if e is not None:
+            if not isinstance(e, np.ndarray):
+                raise ValueError(f"Unsupported type {type(e)} for e")
+            if len(e.shape) not in (2, 3):
+                raise ValueError(
+                    f"e must have shape (n_edges, n_edge_features) or "
+                    f"(n_nodes, n_nodes, n_edge_features), got rank {len(e.shape)}"
+                )
         self.x = x
         self.a = a
         self.e = e
@@ -68,6 +96,9 @@ class Graph:
 
     def numpy(self):
         return tuple(ret for ret in [self.x, self.a, self.e, self.y] if ret is not None)
+
+    def get(self, *keys):
+        return tuple(self[key] for key in keys if self[key] is not None)
 
     def __setitem__(self, key, value):
         setattr(self, key, value)

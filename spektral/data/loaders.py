@@ -155,13 +155,13 @@ class Loader:
             return dict(zip(keys, output))
         else:
             return output
-
     @property
     def steps_per_epoch(self):
         return int(np.ceil(len(self.dataset) / self.batch_size))
 
 
 class SingleLoader(Loader):
+
     """
     A Loader for
     [single mode](https://graphneural.network/data-modes/#single-mode).
@@ -193,7 +193,7 @@ class SingleLoader(Loader):
     SparseTensors);
     - `e`: same as `dataset[0].e`;
 
-    `labels` is the same as `datsaset[0].y`.
+    `labels` is the same as `dataset[0].y`.
     `sample_weights` is the same object passed to the constructor.
 
 
@@ -290,7 +290,14 @@ class DisjointLoader(Loader):
         y = None
         if "y" in self.dataset.signature:
             y = packed.pop("y_list")
-            y = np.vstack(y) if self.node_level else np.array(y)
+            if self.node_level:
+                if len(np.shape(y[0])) == 1:
+                    y = [y_[:, None] for y_ in y]
+                y = np.vstack(y)
+            else:
+                if len(np.shape(y[0])) == 0:
+                    y = [np.array([y_]) for y_ in y]
+                y = np.array(y)
 
         output = to_disjoint(**packed)
 
