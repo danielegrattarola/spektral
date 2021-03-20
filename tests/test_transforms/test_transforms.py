@@ -75,6 +75,17 @@ def test_gcn_filter():
     t(g)
 
 
+def test_laplacian_pe():
+    k = 3
+    t = tr.LaplacianPE(k)
+    assert callable(t)
+    g = Graph(x=x, a=a, e=e, y=y_gl)
+    t(g)
+    g = Graph(x=None, a=a, e=e, y=y_gl)
+    g_ = t(g)
+    assert g_.x.shape[-1] == k
+
+
 def test_layer_preprocess():
     from spektral.layers import GCNConv
 
