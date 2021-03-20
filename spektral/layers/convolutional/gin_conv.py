@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras import activations
-from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import BatchNormalization, Dense
 from tensorflow.keras.models import Sequential
 
 from spektral.layers.convolutional.message_passing import MessagePassing
@@ -44,6 +44,7 @@ class GINConv(MessagePassing):
     - `mlp_hidden`: list of integers, number of hidden units for each hidden
     layer in the MLP (if None, the MLP has only the output layer);
     - `mlp_activation`: activation for the MLP layers;
+    - `mlp_batchnorm`: apply batch normalization after every hidden layer of the MLP;
     - `activation`: activation function;
     - `use_bias`: bool, add a bias vector to the output;
     - `kernel_initializer`: initializer for the weights;
@@ -61,6 +62,7 @@ class GINConv(MessagePassing):
         epsilon=None,
         mlp_hidden=None,
         mlp_activation="relu",
+        mlp_batchnorm=True,
         aggregate="sum",
         activation=None,
         use_bias=True,
@@ -90,6 +92,7 @@ class GINConv(MessagePassing):
         self.epsilon = epsilon
         self.mlp_hidden = mlp_hidden if mlp_hidden else []
         self.mlp_activation = activations.get(mlp_activation)
+        self.mlp_batchnorm = mlp_batchnorm
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
@@ -102,19 +105,15 @@ class GINConv(MessagePassing):
             bias_constraint=self.bias_constraint,
         )
 
-        self.mlp = Sequential(
-            [
-                Dense(channels, self.mlp_activation, **layer_kwargs)
-                for channels in self.mlp_hidden
-            ]
-            + [
-                Dense(
-                    self.channels,
-                    self.activation,
-                    use_bias=self.use_bias,
-                    **layer_kwargs
-                )
-            ]
+        self.mlp = Sequential()
+        for channels in self.mlp_hidden:
+            self.mlp.add(Dense(channels, self.mlp_activation, **layer_kwargs))
+            if self.mlp_batchnorm:
+                self.mlp.add(BatchNormalization())
+        self.mlp.add(
+            Dense(
+                self.channels, self.activation, use_bias=self.use_bias, **layer_kwargs
+            )
         )
 
         if self.epsilon is None:
@@ -139,4 +138,5 @@ class GINConv(MessagePassing):
             "epsilon": self.epsilon,
             "mlp_hidden": self.mlp_hidden,
             "mlp_activation": self.mlp_activation,
+            "mlp_batchnorm": self.mlp_batchnorm,
         }
