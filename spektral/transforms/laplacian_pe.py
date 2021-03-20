@@ -1,5 +1,5 @@
-from scipy.sparse.linalg import eigsh
 import numpy as np
+from scipy.sparse.linalg import eigsh
 
 from spektral.utils import normalized_laplacian
 
@@ -12,6 +12,7 @@ class LaplacianPE:
     Each node will be extended with its corresponding entries in the first k
     eigenvectors.
     """
+
     def __init__(self, k):
         assert k > 0, "k must be greater than 0"
         self.k = k
