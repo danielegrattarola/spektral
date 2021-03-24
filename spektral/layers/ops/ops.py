@@ -84,6 +84,7 @@ def indices_to_mask(indices, shape, dtype=tf.bool):
     This can be used as an inverse to tf.where.
     :param indices: [nnz, k] or [nnz] Tensor indices of True values.
     :param shape: [k] or [] (scalar) Tensor shape/size of output.
+    :param dtype: dtype of the output.
     :return: Tensor of given shape and dtype.
     """
     indices = tf.convert_to_tensor(indices, dtype_hint=tf.int64)
