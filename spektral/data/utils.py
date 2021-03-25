@@ -156,7 +156,7 @@ def to_mixed(x_list=None, a=None, e_list=None):
     # Node features
     x_out = None
     if x_list is not None:
-        x_out = np.array(x_list)
+        x_out = np.array(x_list, ndmin=2)
 
     # Edge attributes
     e_out = None
