@@ -3,6 +3,7 @@ import networkx as nx
 import numpy as np
 import tensorflow as tf
 from scipy.sparse import csr_matrix
+
 from spektral.layers.ops import dot, sp_matrix_to_sp_tensor
 
 
