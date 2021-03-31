@@ -1,9 +1,9 @@
-import tensorflow as tf
-import networkx as nx
 import matplotlib.pyplot as plt
+import networkx as nx
 import numpy as np
-from spektral.layers.ops import dot, sp_matrix_to_sp_tensor
+import tensorflow as tf
 from scipy.sparse import csr_matrix
+from spektral.layers.ops import dot, sp_matrix_to_sp_tensor
 
 
 def k_hop_sparse_subgraph(a, node_idx, k, transformer=None):
