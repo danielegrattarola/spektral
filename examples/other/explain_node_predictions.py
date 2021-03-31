@@ -1,23 +1,22 @@
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.callbacks import EarlyStopping
-from tensorflow.keras.losses import CategoricalCrossentropy
-from tensorflow.keras.optimizers import Adam
-
 from spektral.data.loaders import SingleLoader
 from spektral.datasets.citation import Citation
 from spektral.layers import GCNConv
+from spektral.models import GNNExplainer
 from spektral.models.gcn import GCN
 from spektral.transforms import AdjToSpTensor, LayerPreprocess
-from spektral.models import GNNExplainer
-
+from spektral.utils import gcn_filter
+from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.losses import CategoricalCrossentropy
+from tensorflow.keras.optimizers import Adam
 
 ############ Model setup ###################
 
 
 learning_rate = 1e-2
 seed = 0
-epochs = 200
+epochs = 50
 patience = 10
 data = "cora"
 
