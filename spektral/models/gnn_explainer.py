@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import tensorflow as tf
@@ -356,7 +355,6 @@ class GNNExplainer:
         # take the largest component
         giant = max(nx.algorithms.components.connected_components(G), key=len)
 
-        plt.figure(figsize=(8, 8))
         pos = nx.layout.spring_layout(G, k=0.04)
         nx.draw_networkx_nodes(G, pos=pos, node_size=30, nodelist=giant)
         nx.draw_networkx_edges(G, pos=pos, edge_color="grey", alpha=0.8)
@@ -365,5 +363,5 @@ class GNNExplainer:
         )
 
         print("Top features: ", top_ftrs.numpy())
-        plt.show()
+
         return G
