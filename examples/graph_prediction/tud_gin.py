@@ -17,7 +17,7 @@ from spektral.datasets import TUDataset
 from spektral.layers import GINConv, GlobalAvgPool
 
 ################################################################################
-# PARAMETERS
+# Config
 ################################################################################
 learning_rate = 1e-3  # Learning rate
 channels = 128  # Hidden units
@@ -26,7 +26,7 @@ epochs = 10  # Number of training epochs
 batch_size = 32  # Batch size
 
 ################################################################################
-# LOAD DATA
+# Load data
 ################################################################################
 dataset = TUDataset("PROTEINS", clean=True)
 
@@ -43,8 +43,9 @@ dataset_tr, dataset_te = dataset[idx_tr], dataset[idx_te]
 loader_tr = DisjointLoader(dataset_tr, batch_size=batch_size, epochs=epochs)
 loader_te = DisjointLoader(dataset_te, batch_size=batch_size, epochs=1)
 
+
 ################################################################################
-# BUILD MODEL
+# Build model
 ################################################################################
 class GIN0(Model):
     def __init__(self, channels, n_layers):
@@ -73,51 +74,45 @@ class GIN0(Model):
 
 # Build model
 model = GIN0(channels, layers)
-opt = Adam(lr=learning_rate)
+optimizer = Adam(learning_rate)
 loss_fn = CategoricalCrossentropy()
 
 
 ################################################################################
-# FIT MODEL
+# Fit model
 ################################################################################
 @tf.function(input_signature=loader_tr.tf_signature(), experimental_relax_shapes=True)
 def train_step(inputs, target):
     with tf.GradientTape() as tape:
         predictions = model(inputs, training=True)
-        loss = loss_fn(target, predictions)
-        loss += sum(model.losses)
+        loss = loss_fn(target, predictions) + sum(model.losses)
     gradients = tape.gradient(loss, model.trainable_variables)
-    opt.apply_gradients(zip(gradients, model.trainable_variables))
+    optimizer.apply_gradients(zip(gradients, model.trainable_variables))
     acc = tf.reduce_mean(categorical_accuracy(target, predictions))
     return loss, acc
 
 
-print("Fitting model")
-current_batch = 0
-model_lss = model_acc = 0
+epoch = step = 0
+results = []
 for batch in loader_tr:
-    lss, acc = train_step(*batch)
-
-    model_lss += lss.numpy()
-    model_acc += acc.numpy()
-    current_batch += 1
-    if current_batch == loader_tr.steps_per_epoch:
-        model_lss /= loader_tr.steps_per_epoch
-        model_acc /= loader_tr.steps_per_epoch
-        print("Loss: {}. Acc: {}".format(model_lss, model_acc))
-        model_lss = model_acc = 0
-        current_batch = 0
+    step += 1
+    loss, acc = train_step(*batch)
+    results.append((loss, acc))
+    if step == loader_tr.steps_per_epoch:
+        step = 0
+        epoch += 1
+        print("Ep. {} - Loss: {}. Acc: {}".format(epoch, *np.mean(results, 0)))
+        results = []
 
 ################################################################################
-# EVALUATE MODEL
+# Evaluate model
 ################################################################################
-print("Testing model")
-model_lss = model_acc = 0
+results = []
 for batch in loader_te:
     inputs, target = batch
     predictions = model(inputs, training=False)
-    model_lss += loss_fn(target, predictions)
-    model_acc += tf.reduce_mean(categorical_accuracy(target, predictions))
-model_lss /= loader_te.steps_per_epoch
-model_acc /= loader_te.steps_per_epoch
-print("Done. Test loss: {}. Test acc: {}".format(model_lss, model_acc))
+    results.append((
+        loss_fn(target, predictions),
+        tf.reduce_mean(categorical_accuracy(target, predictions))
+    ))
+print("Done. Test loss: {}. Test acc: {}".format(*np.mean(results, 0)))

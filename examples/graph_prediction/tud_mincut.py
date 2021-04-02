@@ -16,14 +16,14 @@ from spektral.datasets import TUDataset
 from spektral.layers import GCNConv, GlobalSumPool, GraphMasking, MinCutPool
 
 ################################################################################
-# PARAMETERS
+# Config
 ################################################################################
 learning_rate = 1e-3  # Learning rate
 epochs = 10  # Number of training epochs
 batch_size = 32  # Batch size
 
 ################################################################################
-# LOAD DATA
+# Load data
 ################################################################################
 dataset = TUDataset("PROTEINS", clean=True)
 
@@ -47,7 +47,7 @@ loader_te = BatchLoader(dataset_te, batch_size=batch_size, mask=True)
 
 
 ################################################################################
-# BUILD MODEL
+# Build model
 ################################################################################
 class Net(Model):
     def __init__(self):
@@ -71,13 +71,12 @@ class Net(Model):
         return output
 
 
-# Build model
 model = Net()
 opt = Adam(lr=learning_rate)
 model.compile(optimizer=opt, loss="categorical_crossentropy", metrics=["acc"])
 
 ################################################################################
-# FIT MODEL
+# Fit model
 ################################################################################
 model.fit(
     loader_tr.load(),
@@ -89,7 +88,7 @@ model.fit(
 )
 
 ################################################################################
-# EVALUATE MODEL
+# Evaluate model
 ################################################################################
 print("Testing model")
 loss, acc = model.evaluate(loader_te.load(), steps=loader_te.steps_per_epoch)

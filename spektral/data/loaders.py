@@ -64,7 +64,7 @@ class Loader:
             predictions = model(inputs, training=True)
             loss = loss_fn(target, predictions) + sum(model.losses)
         gradients = tape.gradient(loss, model.trainable_variables)
-        opt.apply_gradients(zip(gradients, model.trainable_variables))
+        optimizer.apply_gradients(zip(gradients, model.trainable_variables))
     ```
 
     We can then train our model in a for loop as follows:

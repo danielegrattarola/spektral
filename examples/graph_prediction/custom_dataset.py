@@ -19,7 +19,7 @@ the corresponding target will be [1, 0].
 import numpy as np
 import scipy.sparse as sp
 import tensorflow as tf
-from tensorflow.keras.layers import Dense, Input
+from tensorflow.keras.layers import Dense
 from tensorflow.keras.losses import CategoricalCrossentropy
 from tensorflow.keras.metrics import categorical_accuracy
 from tensorflow.keras.models import Model
@@ -31,7 +31,7 @@ from spektral.layers.pooling import TopKPool
 from spektral.transforms.normalize_adj import NormalizeAdj
 
 ################################################################################
-# PARAMETERS
+# Config
 ################################################################################
 learning_rate = 1e-2  # Learning rate
 epochs = 400  # Number of training epochs
@@ -40,7 +40,7 @@ batch_size = 32  # Batch size
 
 
 ################################################################################
-# LOAD DATA
+# Load data
 ################################################################################
 class MyDataset(Dataset):
     """
@@ -84,56 +84,64 @@ class MyDataset(Dataset):
         return [make_graph() for _ in range(self.n_samples)]
 
 
-dataset = MyDataset(1000, transforms=NormalizeAdj())
-
-# Parameters
-F = dataset.n_node_features  # Dimension of node features
-n_out = dataset.n_labels  # Dimension of the target
+data = MyDataset(1000, transforms=NormalizeAdj())
 
 # Train/valid/test split
-idxs = np.random.permutation(len(dataset))
-split_va, split_te = int(0.8 * len(dataset)), int(0.9 * len(dataset))
+idxs = np.random.permutation(len(data))
+split_va, split_te = int(0.8 * len(data)), int(0.9 * len(data))
 idx_tr, idx_va, idx_te = np.split(idxs, [split_va, split_te])
-dataset_tr = dataset[idx_tr]
-dataset_va = dataset[idx_va]
-dataset_te = dataset[idx_te]
+data_tr = data[idx_tr]
+data_va = data[idx_va]
+data_te = data[idx_te]
 
-loader_tr = DisjointLoader(dataset_tr, batch_size=batch_size, epochs=epochs)
-loader_va = DisjointLoader(dataset_va, batch_size=batch_size)
-loader_te = DisjointLoader(dataset_te, batch_size=batch_size)
+# Data loaders
+loader_tr = DisjointLoader(data_tr, batch_size=batch_size, epochs=epochs)
+loader_va = DisjointLoader(data_va, batch_size=batch_size)
+loader_te = DisjointLoader(data_te, batch_size=batch_size)
+
 
 ################################################################################
-# BUILD (unnecessarily big) MODEL
-################################################################################
-X_in = Input(shape=(F,), name="X_in")
-A_in = Input(shape=(None,), sparse=True)
-I_in = Input(shape=(), name="segment_ids_in", dtype=tf.int32)
-
-X_1 = GCSConv(32, activation="relu")([X_in, A_in])
-X_1, A_1, I_1 = TopKPool(ratio=0.5)([X_1, A_in, I_in])
-X_2 = GCSConv(32, activation="relu")([X_1, A_1])
-X_2, A_2, I_2 = TopKPool(ratio=0.5)([X_2, A_1, I_1])
-X_3 = GCSConv(32, activation="relu")([X_2, A_2])
-X_3 = GlobalAvgPool()([X_3, I_2])
-output = Dense(n_out, activation="softmax")(X_3)
-
 # Build model
-model = Model(inputs=[X_in, A_in, I_in], outputs=output)
-opt = Adam(lr=learning_rate)
+################################################################################
+class Net(Model):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = GCSConv(32, activation="relu")
+        self.pool1 = TopKPool(ratio=0.5)
+        self.conv2 = GCSConv(32, activation="relu")
+        self.pool2 = TopKPool(ratio=0.5)
+        self.conv3 = GCSConv(32, activation="relu")
+        self.global_pool = GlobalAvgPool()
+        self.dense = Dense(data.n_labels, activation="softmax")
+
+    def call(self, inputs):
+        x, a, i = inputs
+        x = self.conv1([x, a])
+        x1, a1, i1 = self.pool1([x, a, i])
+        x1 = self.conv2([x1, a1])
+        x2, a2, i2 = self.pool1([x1, a1, i1])
+        x2 = self.conv3([x2, a2])
+        output = self.global_pool([x2, i2])
+        output = self.dense(output)
+
+        return output
+
+
+model = Net()
+optimizer = Adam(lr=learning_rate)
 loss_fn = CategoricalCrossentropy()
 
 
 ################################################################################
-# FIT MODEL
+# Fit model
 ################################################################################
 @tf.function(input_signature=loader_tr.tf_signature(), experimental_relax_shapes=True)
 def train_step(inputs, target):
     with tf.GradientTape() as tape:
         predictions = model(inputs, training=True)
-        loss = loss_fn(target, predictions)
-        loss += sum(model.losses)
+        loss = loss_fn(target, predictions) + sum(model.losses)
     gradients = tape.gradient(loss, model.trainable_variables)
-    opt.apply_gradients(zip(gradients, model.trainable_variables))
+    optimizer.apply_gradients(zip(gradients, model.trainable_variables))
     acc = tf.reduce_mean(categorical_accuracy(target, predictions))
     return loss, acc
 
@@ -148,33 +156,32 @@ def evaluate(loader):
         outs = (
             loss_fn(target, pred),
             tf.reduce_mean(categorical_accuracy(target, pred)),
+            len(target)  # Keep track of batch size
         )
         output.append(outs)
-    return np.mean(output, 0)
+        if step == loader.steps_per_epoch:
+            output = np.array(output)
+            return np.average(output[:, :-1], 0, weights=output[:, -1])
 
 
-print("Fitting model")
-current_batch = epoch = model_loss = model_acc = 0
+epoch = step = 0
 best_val_loss = np.inf
 best_weights = None
 patience = es_patience
-
+results = []
 for batch in loader_tr:
-    outs = train_step(*batch)
-
-    model_loss += outs[0]
-    model_acc += outs[1]
-    current_batch += 1
-    if current_batch == loader_tr.steps_per_epoch:
-        model_loss /= loader_tr.steps_per_epoch
-        model_acc /= loader_tr.steps_per_epoch
+    step += 1
+    loss, acc = train_step(*batch)
+    results.append((loss, acc))
+    if step == loader_tr.steps_per_epoch:
+        step = 0
         epoch += 1
 
         # Compute validation loss and accuracy
         val_loss, val_acc = evaluate(loader_va)
         print(
-            "Ep. {} - Loss: {:.2f} - Acc: {:.2f} - Val loss: {:.2f} - Val acc: {:.2f}".format(
-                epoch, model_loss, model_acc, val_loss, val_acc
+            "Ep. {} - Loss: {:.3f} - Acc: {:.3f} - Val loss: {:.3f} - Val acc: {:.3f}".format(
+                epoch, *np.mean(results, 0), val_loss, val_acc
             )
         )
 
@@ -189,14 +196,11 @@ for batch in loader_tr:
             if patience == 0:
                 print("Early stopping (best val_loss: {})".format(best_val_loss))
                 break
-        model_loss = 0
-        model_acc = 0
-        current_batch = 0
+        results = []
 
 ################################################################################
-# EVALUATE MODEL
+# Evaluate model
 ################################################################################
-print("Testing model")
 model.set_weights(best_weights)  # Load best model
 test_loss, test_acc = evaluate(loader_te)
 print("Done. Test loss: {:.4f}. Test acc: {:.2f}".format(test_loss, test_acc))

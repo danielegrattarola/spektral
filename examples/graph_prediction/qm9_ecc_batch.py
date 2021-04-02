@@ -10,17 +10,17 @@ from tensorflow.keras.optimizers import Adam
 
 from spektral.data import BatchLoader
 from spektral.datasets import QM9
-from spektral.layers import ECCConv, GlobalSumPool
+from spektral.layers import ECCConv, GlobalSumPool, GraphMasking
 
 ################################################################################
-# PARAMETERS
+# Config
 ################################################################################
 learning_rate = 1e-3  # Learning rate
 epochs = 10  # Number of training epochs
 batch_size = 32  # Batch size
 
 ################################################################################
-# LOAD DATA
+# Load data
 ################################################################################
 dataset = QM9(amount=1000)  # Set amount=None to train on whole dataset
 
@@ -35,34 +35,43 @@ split = int(0.9 * len(dataset))
 idx_tr, idx_te = np.split(idxs, [split])
 dataset_tr, dataset_te = dataset[idx_tr], dataset[idx_te]
 
-################################################################################
-# BUILD MODEL
-################################################################################
-X_in = Input(shape=(None, F))
-A_in = Input(shape=(None, None))
-E_in = Input(shape=(None, None, S))
 
-X_1 = ECCConv(32, activation="relu")([X_in, A_in, E_in])
-X_2 = ECCConv(32, activation="relu")([X_1, A_in, E_in])
-X_3 = GlobalSumPool()(X_2)
-output = Dense(n_out)(X_3)
-
+################################################################################
 # Build model
-model = Model(inputs=[X_in, A_in, E_in], outputs=output)
-optimizer = Adam(lr=learning_rate)
+################################################################################
+class Net(Model):
+    def __init__(self):
+        super().__init__()
+        self.masking = GraphMasking()
+        self.conv1 = ECCConv(32, activation="relu")
+        self.conv2 = ECCConv(32, activation="relu")
+        self.global_pool = GlobalSumPool()
+        self.dense = Dense(n_out)
+
+    def call(self, inputs):
+        x, a, e = inputs
+        x = self.masking(x)
+        x = self.conv1([x, a, e])
+        x = self.conv2([x, a, e])
+        output = self.global_pool(x)
+        output = self.dense(output)
+
+        return output
+
+model = Net()
+optimizer = Adam(learning_rate)
 model.compile(optimizer=optimizer, loss="mse")
-model.summary()
 
 ################################################################################
-# FIT MODEL
+# Fit model
 ################################################################################
-loader_tr = BatchLoader(dataset_tr, batch_size=batch_size)
+loader_tr = BatchLoader(dataset_tr, batch_size=batch_size, mask=True)
 model.fit(loader_tr.load(), steps_per_epoch=loader_tr.steps_per_epoch, epochs=epochs)
 
 ################################################################################
-# EVALUATE MODEL
+# Evaluate model
 ################################################################################
 print("Testing model")
-loader_te = BatchLoader(dataset_te, batch_size=batch_size)
-model_loss = model.evaluate(loader_te.load(), steps=loader_te.steps_per_epoch)
-print("Done. Test loss: {}".format(model_loss))
+loader_te = BatchLoader(dataset_te, batch_size=batch_size, mask=True)
+loss = model.evaluate(loader_te.load(), steps=loader_te.steps_per_epoch)
+print("Done. Test loss: {}".format(loss))

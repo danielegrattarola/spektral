@@ -19,14 +19,14 @@ from spektral.datasets import OGB
 from spektral.layers import ECCConv, GlobalSumPool
 
 ################################################################################
-# PARAMETERS
+# Config
 ################################################################################
 learning_rate = 1e-3  # Learning rate
 epochs = 10  # Number of training epochs
 batch_size = 32  # Batch size
 
 ################################################################################
-# LOAD DATA
+# Load data
 ################################################################################
 dataset_name = "ogbg-molhiv"
 ogb_dataset = GraphPropPredDataset(name=dataset_name)
@@ -48,7 +48,7 @@ loader_tr = DisjointLoader(dataset_tr, batch_size=batch_size, epochs=epochs)
 loader_te = DisjointLoader(dataset_te, batch_size=batch_size, epochs=1)
 
 ################################################################################
-# BUILD MODEL
+# Build model
 ################################################################################
 X_in = Input(shape=(F,))
 A_in = Input(shape=(None,), sparse=True)
@@ -60,51 +60,35 @@ X_2 = ECCConv(32, activation="relu")([X_1, A_in, E_in])
 X_3 = GlobalSumPool()([X_2, I_in])
 output = Dense(n_out, activation="sigmoid")(X_3)
 
-# Build model
 model = Model(inputs=[X_in, A_in, E_in, I_in], outputs=output)
-opt = Adam(lr=learning_rate)
+optimizer = Adam(learning_rate)
 loss_fn = BinaryCrossentropy()
 
 
 ################################################################################
-# FIT MODEL
+# Fit model
 ################################################################################
-@tf.function(
-    input_signature=(
-        (
-            tf.TensorSpec((None, F), dtype=tf.float64),
-            tf.SparseTensorSpec((None, None), dtype=tf.int64),
-            tf.TensorSpec((None, S), dtype=tf.float64),
-            tf.TensorSpec((None,), dtype=tf.int64),
-        ),
-        tf.TensorSpec((None, n_out), dtype=tf.float64),
-    ),
-    experimental_relax_shapes=True,
-)
+@tf.function(input_signature=loader_tr.tf_signature(), experimental_relax_shapes=True)
 def train_step(inputs, target):
     with tf.GradientTape() as tape:
         predictions = model(inputs, training=True)
-        loss = loss_fn(target, predictions)
-        loss += sum(model.losses)
+        loss = loss_fn(target, predictions) + sum(model.losses)
     gradients = tape.gradient(loss, model.trainable_variables)
-    opt.apply_gradients(zip(gradients, model.trainable_variables))
+    optimizer.apply_gradients(zip(gradients, model.trainable_variables))
     return loss
 
 
-print("Fitting model")
-current_batch = 0
-model_loss = 0
+step = loss = 0
 for batch in loader_tr:
-    outs = train_step(*batch)
-    model_loss += outs
-    current_batch += 1
-    if current_batch == loader_tr.steps_per_epoch:
-        print("Loss: {}".format(model_loss / loader_tr.steps_per_epoch))
-        model_loss = 0
-        current_batch = 0
+    step += 1
+    loss += train_step(*batch)
+    if step == loader_tr.steps_per_epoch:
+        step = 0
+        print("Loss: {}".format(loss / loader_tr.steps_per_epoch))
+        loss = 0
 
 ################################################################################
-# EVALUATE MODEL
+# Evaluate model
 ################################################################################
 print("Testing model")
 evaluator = Evaluator(name=dataset_name)
