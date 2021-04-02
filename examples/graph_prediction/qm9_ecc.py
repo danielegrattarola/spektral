@@ -60,6 +60,7 @@ class Net(Model):
 
         return output
 
+
 model = Net()
 optimizer = Adam(learning_rate)
 loss_fn = MeanSquaredError()

@@ -79,7 +79,7 @@ def evaluate(loader):
         outs = (
             loss_fn(target, pred),
             tf.reduce_mean(categorical_accuracy(target, pred)),
-            len(target)  # Keep track of batch size
+            len(target),  # Keep track of batch size
         )
         output.append(outs)
         if step == loader.steps_per_epoch:

@@ -1,5 +1,4 @@
 import numpy as np
-import scipy.sparse as sp
 
 from spektral.data import Dataset, Graph
 from spektral.utils import sparse

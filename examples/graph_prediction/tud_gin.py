@@ -111,8 +111,10 @@ results = []
 for batch in loader_te:
     inputs, target = batch
     predictions = model(inputs, training=False)
-    results.append((
-        loss_fn(target, predictions),
-        tf.reduce_mean(categorical_accuracy(target, predictions))
-    ))
+    results.append(
+        (
+            loss_fn(target, predictions),
+            tf.reduce_mean(categorical_accuracy(target, predictions)),
+        )
+    )
 print("Done. Test loss: {}. Test acc: {}".format(*np.mean(results, 0)))

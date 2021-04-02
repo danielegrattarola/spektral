@@ -4,7 +4,7 @@ QM9 database, using a GNN based on edge-conditioned convolutions in batch mode.
 """
 
 import numpy as np
-from tensorflow.keras.layers import Dense, Input
+from tensorflow.keras.layers import Dense
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 
@@ -57,6 +57,7 @@ class Net(Model):
         output = self.dense(output)
 
         return output
+
 
 model = Net()
 optimizer = Adam(learning_rate)
