@@ -9,14 +9,12 @@ from spektral.data import DisjointLoader
 from spektral.datasets import TUDataset
 from spektral.models import GeneralGNN, GNNExplainer
 
-######### Model setup ##################
-
-# Best config
+# Config
+learning_rate = 1e-2
 batch_size = 32
-learning_rate = 0.01
-epochs = 400
+epochs = 100
 
-# Read data
+# Load data
 data = TUDataset("PROTEINS")
 
 # Train/test split
@@ -24,7 +22,7 @@ np.random.shuffle(data)
 split = int(0.8 * len(data))
 data_tr, data_te = data[:split], data[split:]
 
-# Data loader
+# Data loaders
 loader_tr = DisjointLoader(data_tr, batch_size=batch_size, epochs=epochs)
 loader_te = DisjointLoader(data_te, batch_size=batch_size)
 
@@ -63,8 +61,7 @@ def evaluate(loader):
             return np.average(results[:, :-1], 0, weights=results[:, -1])
 
 
-# Training loop
-num_epochs = 100
+# Train model
 epoch = step = 0
 results = []
 for batch in loader_tr:
@@ -81,27 +78,17 @@ for batch in loader_tr:
                 epoch, *np.mean(results, 0), *results_te
             )
         )
-    if epoch == num_epochs:
-        break
 
-
-############# Explainer ###############
-
-# load a batch of data
+# Set up explainer
 (x, a, i), y = next(iter(loader_te))
-
-
-# select one graph from the batch
 last_idx = len(np.where(i == 0)[0])
 x_exp = x[:last_idx]
 a_exp = tf.sparse.slice(a, start=[0, 0], size=[last_idx, last_idx])
-
-# init the explainer
 explainer = GNNExplainer(
     model, mode="graph", x=x_exp, a=a_exp, verbose=False, epochs=300
 )
 
-# get in output the trained masks
+# Explain prediction for one graph
 adj_mask, feat_mask = explainer.explain_node(
     edge_size_reg=0.000001,
     edge_entropy_reg=0.5,
@@ -110,6 +97,6 @@ adj_mask, feat_mask = explainer.explain_node(
     feat_entropy_reg=0.1,
 )
 
-# plot the results
+# Plot the result
 G = explainer.plot_subgraph(adj_mask, feat_mask)
 plt.show()

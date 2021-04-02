@@ -13,15 +13,12 @@ from spektral.models.gcn import GCN
 from spektral.transforms import AdjToSpTensor, LayerPreprocess
 from spektral.utils import gcn_filter
 
-############ Model setup ###################
-
-
+# Config
 learning_rate = 1e-2
 seed = 0
 epochs = 50
 patience = 10
 data = "cora"
-
 tf.random.set_seed(seed=seed)  # make weight initialization reproducible
 
 # Load data
@@ -62,16 +59,8 @@ model.fit(
     callbacks=[EarlyStopping(patience=patience, restore_best_weights=True)],
 )
 
-
-######### Explainer ################
-
-
-# select the feature matrix and the laplacian matrix
+# Set up explainer
 x_exp, a_exp = dataset[0].x, dataset[0].a
-
-
-# since it is used a laplacian matrix also a
-# transformer should be passed
 explainer = GNNExplainer(
     model,
     mode="node",
@@ -83,10 +72,8 @@ explainer = GNNExplainer(
     epochs=300,
 )
 
-# pick the node to explain
+# Explain prediction for one node
 node_idx = 1000
-
-# get the trained masks
 adj_mask, feat_mask = explainer.explain_node(
     node_idx=node_idx,
     edge_size_reg=0.000001,
@@ -96,7 +83,6 @@ adj_mask, feat_mask = explainer.explain_node(
     feat_entropy_reg=0.1,
 )
 
-# plot the result
+# Plot the result
 G = explainer.plot_subgraph(adj_mask, feat_mask)
-
 plt.show()
