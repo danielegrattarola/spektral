@@ -121,7 +121,7 @@ class MinCutPool(Pool):
 
         super().build(input_shape)
 
-    def call(self, inputs):
+    def call(self, inputs, mask=None):
         X, A = inputs
 
         # Check if the layer is operating in batch mode (X and A have rank 3)
@@ -129,6 +129,8 @@ class MinCutPool(Pool):
 
         # Compute cluster assignment matrix
         S = self.mlp(X)
+        if mask is not None:
+            S *= mask[0]
 
         # MinCut regularization
         A_pooled = ops.matmul_at_b_a(S, A)

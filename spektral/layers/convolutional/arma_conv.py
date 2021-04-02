@@ -128,7 +128,7 @@ class ARMAConv(Conv):
         self.dropout = Dropout(self.dropout_rate, dtype=self.dtype)
         self.built = True
 
-    def call(self, inputs):
+    def call(self, inputs, mask=None):
         x, a = inputs
 
         output = []
@@ -139,6 +139,9 @@ class ARMAConv(Conv):
             output.append(output_k)
         output = K.stack(output, axis=-1)
         output = K.mean(output, axis=-1)
+
+        if mask is not None:
+            output *= mask[0]
         output = self.activation(output)
 
         return output

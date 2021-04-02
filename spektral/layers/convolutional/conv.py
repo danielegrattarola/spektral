@@ -35,6 +35,7 @@ class Conv(Layer):
 
     def __init__(self, **kwargs):
         super().__init__(**{k: v for k, v in kwargs.items() if is_keras_kwarg(k)})
+        self.supports_masking = True
         self.kwargs_keys = []
         for key in kwargs:
             if is_layer_kwarg(key):

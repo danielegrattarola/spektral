@@ -137,7 +137,7 @@ class ECCConv(Conv):
             )
         self.built = True
 
-    def call(self, inputs):
+    def call(self, inputs, mask=None):
         x, a, e = inputs
 
         # Parameters
@@ -179,8 +179,9 @@ class ECCConv(Conv):
             output += K.dot(x, self.root_kernel)
         if self.use_bias:
             output = K.bias_add(output, self.bias)
-        if self.activation is not None:
-            output = self.activation(output)
+        if mask is not None:
+            output *= mask[0]
+        output = self.activation(output)
 
         return output
 

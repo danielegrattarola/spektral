@@ -64,7 +64,7 @@ def to_disjoint(x_list=None, a_list=None, e_list=None):
     return tuple(out for out in [x_out, a_out, e_out, i_out] if out is not None)
 
 
-def to_batch(x_list=None, a_list=None, e_list=None):
+def to_batch(x_list=None, a_list=None, e_list=None, mask=False):
     """
     Converts lists of node features, adjacency matrices and edge features to
     [batch mode](https://graphneural.network/data-modes/#batch-mode),
@@ -90,6 +90,11 @@ def to_batch(x_list=None, a_list=None, e_list=None):
     `(n_nodes, n_nodes)`;
     :param e_list: a list of np.arrays of shape
     `(n_nodes, n_nodes, n_edge_features)` or `(n_edges, n_edge_features)`;
+    :param mask: bool, if True, node attributes will be extended with a binary mask that
+    indicates valid nodes (the last feature of each node will be 1 if the node is valid
+    and 0 otherwise). Use this flag in conjunction with layers.base.GraphMasking to
+    start the propagation of masks in a model.
+
     :return: only if the corresponding list is given as input:
 
         -  `x`: np.array of shape `(batch, n_max, n_node_features)`;
@@ -104,6 +109,8 @@ def to_batch(x_list=None, a_list=None, e_list=None):
     # Node features
     x_out = None
     if x_list is not None:
+        if mask:
+            x_list = [np.concatenate((x, np.ones((x.shape[0], 1))), -1) for x in x_list]
         x_out = pad_jagged_array(x_list, (n_max, -1))
 
     # Adjacency matrix

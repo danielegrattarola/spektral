@@ -116,7 +116,7 @@ class DiffPool(Pool):
 
         super().build(input_shape)
 
-    def call(self, inputs):
+    def call(self, inputs, mask=None):
         X, A = inputs
 
         N = K.shape(A)[-1]
@@ -143,6 +143,8 @@ class DiffPool(Pool):
         S = K.dot(X, self.kernel_pool)
         S = ops.modal_dot(fltr, S)
         S = activations.softmax(S, axis=-1)  # softmax applied row-wise
+        if mask is not None:
+            S *= mask[0]
 
         # Link prediction loss
         S_gram = ops.modal_dot(S, S, transpose_b=True)

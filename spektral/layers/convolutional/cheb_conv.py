@@ -109,7 +109,7 @@ class ChebConv(Conv):
             )
         self.built = True
 
-    def call(self, inputs):
+    def call(self, inputs, mask=None):
         x, a = inputs
 
         T_0 = x
@@ -126,6 +126,8 @@ class ChebConv(Conv):
 
         if self.use_bias:
             output = KB.bias_add(output, self.bias)
+        if mask is not None:
+            output *= mask[0]
         output = self.activation(output)
 
         return output

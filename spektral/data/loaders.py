@@ -374,6 +374,10 @@ class BatchLoader(Loader):
     **Arguments**
 
     - `dataset`: a graph Dataset;
+    - `mask`: if True, node attributes will be extended with a binary mask that
+    indicates valid nodes (the last feature of each node will be 1 if the node is valid
+    and 0 otherwise). Use this flag in conjunction with layers.base.GraphMasking to
+    start the propagation of masks in a model.
     - `batch_size`: size of the mini-batches;
     - `epochs`: number of epochs to iterate over the dataset. By default (`None`)
     iterates indefinitely;
@@ -392,11 +396,15 @@ class BatchLoader(Loader):
     `labels` have shape `[batch, n_labels]`.
     """
 
+    def __init__(self, dataset, mask=False, batch_size=1, epochs=None, shuffle=True):
+        self.mask = mask
+        super().__init__(dataset, batch_size=batch_size, epochs=epochs, shuffle=shuffle)
+
     def collate(self, batch):
         packed = self.pack(batch, return_dict=True)
         y = np.array(packed.pop("y_list")) if "y" in self.dataset.signature else None
 
-        output = to_batch(**packed)
+        output = to_batch(**packed, mask=self.mask)
 
         # Sparse matrices to SparseTensors
         output = list(output)
@@ -471,14 +479,16 @@ class PackedBatchLoader(BatchLoader):
     `labels` have shape `[batch, ..., n_labels]`.
     """
 
-    def __init__(self, dataset, batch_size=1, epochs=None, shuffle=True):
-        super().__init__(dataset, batch_size=batch_size, epochs=epochs, shuffle=shuffle)
+    def __init__(self, dataset, mask=False, batch_size=1, epochs=None, shuffle=True):
+        super().__init__(
+            dataset, mask=mask, batch_size=batch_size, epochs=epochs, shuffle=shuffle
+        )
 
         # Drop the Dataset container and work on packed tensors directly
         packed = self.pack(self.dataset, return_dict=True)
         y = np.array(packed.pop("y_list")) if "y" in dataset.signature else None
         self.signature = dataset.signature
-        self.dataset = to_batch(**packed)
+        self.dataset = to_batch(**packed, mask=mask)
         if y is not None:
             self.dataset += (y,)
 

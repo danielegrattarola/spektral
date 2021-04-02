@@ -162,12 +162,15 @@ class DiffusionConv(Conv):
 
         return tf.concat(diffused_features, -1)
 
-    def call(self, inputs):
+    def call(self, inputs, mask=None):
         x, a = inputs
-        h = self.apply_filters(x, a)
-        h = self.activation(h)
+        output = self.apply_filters(x, a)
 
-        return h
+        if mask is not None:
+            output *= mask[0]
+        output = self.activation(output)
+
+        return output
 
     @property
     def config(self):

@@ -99,7 +99,7 @@ class GCSConv(Conv):
             )
         self.built = True
 
-    def call(self, inputs):
+    def call(self, inputs, mask=None):
         x, a = inputs
 
         output = K.dot(x, self.kernel_1)
@@ -109,8 +109,10 @@ class GCSConv(Conv):
 
         if self.use_bias:
             output = K.bias_add(output, self.bias)
-        if self.activation is not None:
-            output = self.activation(output)
+        if mask is not None:
+            output *= mask[0]
+        output = self.activation(output)
+
         return output
 
     @property

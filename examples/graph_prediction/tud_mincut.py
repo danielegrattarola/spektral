@@ -7,13 +7,13 @@ Expect unstable training due to the small-ish size of the dataset.
 
 import numpy as np
 from tensorflow.keras.callbacks import EarlyStopping
-from tensorflow.keras.layers import Dense, Input
+from tensorflow.keras.layers import Dense
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 
 from spektral.data import BatchLoader
 from spektral.datasets import TUDataset
-from spektral.layers import GCNConv, GlobalSumPool, MinCutPool
+from spektral.layers import GCNConv, GlobalSumPool, GraphMasking, MinCutPool
 
 ################################################################################
 # PARAMETERS
@@ -41,27 +41,40 @@ dataset_tr = dataset[idx_tr]
 dataset_va = dataset[idx_va]
 dataset_te = dataset[idx_te]
 
-loader_tr = BatchLoader(dataset_tr, batch_size=batch_size)
-loader_va = BatchLoader(dataset_va, batch_size=batch_size)
-loader_te = BatchLoader(dataset_te, batch_size=batch_size)
+loader_tr = BatchLoader(dataset_tr, batch_size=batch_size, mask=True)
+loader_va = BatchLoader(dataset_va, batch_size=batch_size, mask=True)
+loader_te = BatchLoader(dataset_te, batch_size=batch_size, mask=True)
+
 
 ################################################################################
 # BUILD MODEL
 ################################################################################
-X_in = Input(shape=(None, F))
-A_in = Input(shape=(None, None))
+class Net(Model):
+    def __init__(self):
+        super().__init__()
+        self.mask = GraphMasking()
+        self.conv1 = GCNConv(32, activation="relu")
+        self.pool = MinCutPool(N // 2)
+        self.conv2 = GCNConv(32, activation="relu")
+        self.global_pool = GlobalSumPool()
+        self.dense1 = Dense(n_out)
 
-X_1 = GCNConv(32, activation="relu")([X_in, A_in])
-X_1, A_1 = MinCutPool(N // 2)([X_1, A_in])
-X_2 = GCNConv(32, activation="relu")([X_1, A_1])
-X_3 = GlobalSumPool()(X_2)
-output = Dense(n_out)(X_3)
+    def call(self, inputs):
+        x, a = inputs
+        x = self.mask(x)
+        x = self.conv1([x, a])
+        x_pool, a_pool = self.pool([x, a])
+        x_pool = self.conv2([x_pool, a_pool])
+        output = self.global_pool(x_pool)
+        output = self.dense1(output)
+
+        return output
+
 
 # Build model
-model = Model(inputs=[X_in, A_in], outputs=output)
+model = Net()
 opt = Adam(lr=learning_rate)
 model.compile(optimizer=opt, loss="categorical_crossentropy", metrics=["acc"])
-model.summary()
 
 ################################################################################
 # FIT MODEL

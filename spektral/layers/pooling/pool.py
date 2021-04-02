@@ -25,6 +25,7 @@ class Pool(Layer):
 
     def __init__(self, **kwargs):
         super().__init__(**{k: v for k, v in kwargs.items() if is_keras_kwarg(k)})
+        self.supports_masking = True
         self.kwargs_keys = []
         for key in kwargs:
             if is_layer_kwarg(key):
@@ -45,6 +46,10 @@ class Pool(Layer):
         for key in self.kwargs_keys:
             keras_config[key] = serialize_kwarg(key, getattr(self, key))
         return {**base_config, **keras_config, **self.config}
+
+    def compute_mask(self, inputs, mask=None):
+        if mask is not None:
+            return None
 
     @property
     def config(self):

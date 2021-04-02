@@ -9,72 +9,79 @@ from tensorflow.python.framework import smart_cond
 from spektral.layers import ops
 
 
-class SparseDropout(Layer):
-    """Applies Dropout to the input.
+class Disjoint2Batch(Layer):
+    r"""Utility layer that converts data from disjoint mode to batch mode by
+    zero-padding the node features and adjacency matrices.
 
-    Dropout consists in randomly setting
-    a fraction `rate` of input units to 0 at each update during training time,
-    which helps prevent overfitting.
+    **Mode**: disjoint.
 
-    Arguments:
-    rate: Float between 0 and 1. Fraction of the input units to drop.
-    noise_shape: 1D integer tensor representing the shape of the
-      binary dropout mask that will be multiplied with the input.
-      For instance, if your inputs have shape
-      `(batch_size, timesteps, features)` and
-      you want the dropout mask to be the same for all timesteps,
-      you can use `noise_shape=(batch_size, 1, features)`.
-    seed: A Python integer to use as random seed.
+    **This layer expects a sparse adjacency matrix.**
 
-    Call arguments:
-    inputs: Input tensor (of any rank).
-    training: Python boolean indicating whether the layer should behave in
-      training mode (adding dropout) or in inference mode (doing nothing).
+    **Input**
+
+    - Node features of shape `(n_nodes, n_node_features)`;
+    - Binary adjacency matrix of shape `(n_nodes, n_nodes)`;
+    - Graph IDs of shape `(n_nodes, )`;
+
+    **Output**
+
+    - Batched node features of shape `(batch, N_max, n_node_features)`;
+    - Batched adjacency matrix of shape `(batch, N_max, N_max)`;
     """
 
-    def __init__(self, rate, noise_shape=None, seed=None, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.rate = rate
-        self.noise_shape = noise_shape
-        self.seed = seed
-        self.supports_masking = True
 
-    @staticmethod
-    def _get_noise_shape(inputs):
-        return tf.shape(inputs.values)
+    def build(self, input_shape):
+        assert len(input_shape) >= 2
+        self.built = True
 
-    def call(self, inputs, training=None):
-        if training is None:
-            training = K.learning_phase()
+    def call(self, inputs, **kwargs):
+        X, A, I = inputs
 
-        def dropped_inputs():
-            return self.sparse_dropout(
-                inputs,
-                noise_shape=self._get_noise_shape(inputs),
-                seed=self.seed,
-                rate=self.rate,
-            )
+        batch_X = ops.disjoint_signal_to_batch(X, I)
+        batch_A = ops.disjoint_adjacency_to_batch(A, I)
 
-        output = smart_cond.smart_cond(training, dropped_inputs, lambda: inputs)
-        return output
+        # Ensure that the channel dimension is known
+        batch_X.set_shape((None, None, X.shape[-1]))
+        batch_A.set_shape((None, None, None))
 
-    def get_config(self):
-        config = {"rate": self.rate, "noise_shape": self.noise_shape, "seed": self.seed}
-        base_config = super().get_config()
-        return dict(list(base_config.items()) + list(config.items()))
+        return batch_X, batch_A
 
-    @staticmethod
-    def sparse_dropout(x, rate, noise_shape=None, seed=None):
-        random_tensor = tf.random.uniform(noise_shape, seed=seed, dtype=x.dtype)
-        keep_prob = 1 - rate
-        scale = 1 / keep_prob
-        keep_mask = random_tensor >= rate
-        output = tf.sparse.retain(x, keep_mask)
-        # output = output * scale  # gradient issues with automatic broadcasting
-        output = output * tf.reshape(
-            tf.convert_to_tensor(scale, dtype=output.dtype), (1,) * output.shape.ndims
-        )
-        return output
+
+class GraphMasking(Layer):
+    """
+    A layer that starts the propagation of masks in a model.
+
+    This layer assumes that the node features given as input have been extended with a
+    binary mask that indicates which nodes are valid in each graph.
+    The layer is useful when using a `data.BatchLoader` with `mask=True` or in general
+    when zero-padding graphs so that all batches have the same size. The binary mask
+    indicates with a 1 those nodes that should be taken into account by the model.
+
+    The layer will remove the rightmost feature from the nodes and start a mask
+    propagation to all subsequent layers:
+
+    ```python
+    print(x.shape)  # shape (batch, n_nodes, n_node_features + 1)
+    mask = x[..., -1:]  # shape (batch, n_nodes, 1)
+    x_new = x[..., :-1] # shape (batch, n_nodes, n_node_features)
+    ```
+
+    """
+
+    def compute_mask(self, inputs, mask=None):
+        x = inputs[0] if isinstance(inputs, list) else inputs
+        return x[..., -1:]
+
+    def call(self, inputs, **kwargs):
+        # Remove mask from features
+        if isinstance(inputs, list):
+            inputs[0] = inputs[0][..., :-1]
+        else:
+            inputs = inputs[..., :-1]
+
+        return inputs
 
 
 class InnerProduct(Layer):
@@ -205,41 +212,69 @@ class MinkowskiProduct(Layer):
         return dict(list(base_config.items()) + list(config.items()))
 
 
-class Disjoint2Batch(Layer):
-    r"""Utility layer that converts data from disjoint mode to batch mode by
-    zero-padding the node features and adjacency matrices.
+class SparseDropout(Layer):
+    """Applies Dropout to the input.
 
-    **Mode**: disjoint.
+    Dropout consists in randomly setting
+    a fraction `rate` of input units to 0 at each update during training time,
+    which helps prevent overfitting.
 
-    **This layer expects a sparse adjacency matrix.**
+    Arguments:
+    rate: Float between 0 and 1. Fraction of the input units to drop.
+    noise_shape: 1D integer tensor representing the shape of the
+      binary dropout mask that will be multiplied with the input.
+      For instance, if your inputs have shape
+      `(batch_size, timesteps, features)` and
+      you want the dropout mask to be the same for all timesteps,
+      you can use `noise_shape=(batch_size, 1, features)`.
+    seed: A Python integer to use as random seed.
 
-    **Input**
-
-    - Node features of shape `(n_nodes, n_node_features)`;
-    - Binary adjacency matrix of shape `(n_nodes, n_nodes)`;
-    - Graph IDs of shape `(n_nodes, )`;
-
-    **Output**
-
-    - Batched node features of shape `(batch, N_max, n_node_features)`;
-    - Batched adjacency matrix of shape `(batch, N_max, N_max)`;
+    Call arguments:
+    inputs: Input tensor (of any rank).
+    training: Python boolean indicating whether the layer should behave in
+      training mode (adding dropout) or in inference mode (doing nothing).
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, rate, noise_shape=None, seed=None, **kwargs):
         super().__init__(**kwargs)
+        self.rate = rate
+        self.noise_shape = noise_shape
+        self.seed = seed
+        self.supports_masking = True
 
-    def build(self, input_shape):
-        assert len(input_shape) >= 2
-        self.built = True
+    @staticmethod
+    def _get_noise_shape(inputs):
+        return tf.shape(inputs.values)
 
-    def call(self, inputs, **kwargs):
-        X, A, I = inputs
+    def call(self, inputs, training=None):
+        if training is None:
+            training = K.learning_phase()
 
-        batch_X = ops.disjoint_signal_to_batch(X, I)
-        batch_A = ops.disjoint_adjacency_to_batch(A, I)
+        def dropped_inputs():
+            return self.sparse_dropout(
+                inputs,
+                noise_shape=self._get_noise_shape(inputs),
+                seed=self.seed,
+                rate=self.rate,
+            )
 
-        # Ensure that the channel dimension is known
-        batch_X.set_shape((None, None, X.shape[-1]))
-        batch_A.set_shape((None, None, None))
+        output = smart_cond.smart_cond(training, dropped_inputs, lambda: inputs)
+        return output
 
-        return batch_X, batch_A
+    def get_config(self):
+        config = {"rate": self.rate, "noise_shape": self.noise_shape, "seed": self.seed}
+        base_config = super().get_config()
+        return dict(list(base_config.items()) + list(config.items()))
+
+    @staticmethod
+    def sparse_dropout(x, rate, noise_shape=None, seed=None):
+        random_tensor = tf.random.uniform(noise_shape, seed=seed, dtype=x.dtype)
+        keep_prob = 1 - rate
+        scale = 1 / keep_prob
+        keep_mask = random_tensor >= rate
+        output = tf.sparse.retain(x, keep_mask)
+        # output = output * scale  # gradient issues with automatic broadcasting
+        output = output * tf.reshape(
+            tf.convert_to_tensor(scale, dtype=output.dtype), (1,) * output.shape.ndims
+        )
+        return output
