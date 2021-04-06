@@ -84,7 +84,9 @@ for batch in loader_tr:
 last_idx = len(np.where(i == 0)[0])
 x_exp = x[:last_idx]
 a_exp = tf.sparse.slice(a, start=[0, 0], size=[last_idx, last_idx])
-explainer = GNNExplainer(model, mode="graph", verbose=False, epochs=300)
+explainer = GNNExplainer(
+    model, mode="graph", verbose=False, epochs=300
+)
 
 # Explain prediction for one graph
 adj_mask, feat_mask = explainer.explain_node(
