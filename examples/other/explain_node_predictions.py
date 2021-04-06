@@ -65,8 +65,6 @@ explainer = GNNExplainer(
     model,
     mode="node",
     num_conv_layers=2,
-    x=x_exp,
-    a=a_exp,
     adj_transf=gcn_filter,
     verbose=False,
     epochs=300,
@@ -75,8 +73,10 @@ explainer = GNNExplainer(
 # Explain prediction for one node
 node_idx = 1000
 adj_mask, feat_mask = explainer.explain_node(
+    x=x_exp,
+    a=a_exp,
     node_idx=node_idx,
-    edge_size_reg=0.000001,
+    edge_size_reg=0.0001,
     edge_entropy_reg=0.5,
     laplacian_reg=1,
     feat_size_reg=0.0001,
