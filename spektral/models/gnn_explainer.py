@@ -72,7 +72,7 @@ class GNNExplainer:
         self.laplacian_reg = laplacian_reg
 
         x = tf.cast(x, tf.float32)
-        
+
         # get the computational graph
         if self.mode == "node":
             self.comp_graph = k_hop_sparse_subgraph(
@@ -84,15 +84,11 @@ class GNNExplainer:
 
         # predictions needed to compute the explainer's loss
         if self.mode == "node":
-            self.y_pred = tf.argmax(
-                self.model([x, a], training=False), axis=1
-            )
+            self.y_pred = tf.argmax(self.model([x, a], training=False), axis=1)
 
         elif self.mode == "graph":
             self.i = tf.zeros(x.shape[0], dtype=tf.int32)
-            self.y_pred = tf.argmax(
-                self.model([x, a, self.i], training=False), axis=1
-            )
+            self.y_pred = tf.argmax(self.model([x, a, self.i], training=False), axis=1)
 
         # init the optimizer for the training
         self.opt = tf.keras.optimizers.Adam(0.01)
