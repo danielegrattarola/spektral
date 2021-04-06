@@ -29,6 +29,8 @@ class GNNExplainer:
     def __init__(
         self,
         model,
+        x,
+        a,
         num_conv_layers=None,
         adj_transf=None,
         mode="node",
@@ -37,15 +39,15 @@ class GNNExplainer:
     ):
         self.model = model
         self.num_conv_layers = num_conv_layers
+        self.a = a
         self.adj_transf = adj_transf
+        self.x = x
         self.mode = mode
         self.verbose = verbose
         self.epochs = epochs
 
     def explain_node(
         self,
-        x,
-        a,
         node_idx=None,
         edge_size_reg=0.0005,
         feat_size_reg=0.1,
@@ -71,24 +73,26 @@ class GNNExplainer:
         self.feat_entropy_reg = feat_entropy_reg
         self.laplacian_reg = laplacian_reg
 
-        x = tf.cast(x, tf.float32)
-
         # get the computational graph
         if self.mode == "node":
             self.comp_graph = k_hop_sparse_subgraph(
-                a, self.node_idx, self.num_conv_layers, self.adj_transf
+                self.a, self.node_idx, self.num_conv_layers, self.adj_transf
             )
 
         elif self.mode == "graph":
-            self.comp_graph = tf.cast(a, tf.float32)
+            self.comp_graph = tf.cast(self.a, tf.float32)
 
         # predictions needed to compute the explainer's loss
         if self.mode == "node":
-            self.y_pred = tf.argmax(self.model([x, a], training=False), axis=1)
+            self.y_pred = tf.argmax(
+                self.model([self.x, self.a], training=False), axis=1
+            )
 
         elif self.mode == "graph":
-            self.i = tf.zeros(x.shape[0], dtype=tf.int32)
-            self.y_pred = tf.argmax(self.model([x, a, self.i], training=False), axis=1)
+            self.i = tf.zeros(self.x.shape[0], dtype=tf.int32)
+            self.y_pred = tf.argmax(
+                self.model([self.x, self.a, self.i], training=False), axis=1
+            )
 
         # init the optimizer for the training
         self.opt = tf.keras.optimizers.Adam(0.01)
@@ -104,7 +108,7 @@ class GNNExplainer:
         # init the trainable adj mask
         adj_mask = tf.Variable(
             tf.random.normal(
-                self.comp_graph.values.shape, stddev=(2 / x.shape[0]) ** 0.5
+                self.comp_graph.values.shape, stddev=(2 / self.x.shape[0]) ** 0.5
             ),
             dtype=tf.float32,
             trainable=True,
@@ -112,21 +116,21 @@ class GNNExplainer:
 
         # init the trainable feature mask
         feat_mask = tf.Variable(
-            tf.random.normal((1, x.shape[1]), stddev=0.1),
+            tf.random.normal((1, self.x.shape[1]), stddev=0.1),
             dtype=tf.float32,
             trainable=True,
         )
 
         # training loop
         for i in range(self.epochs):
-            losses = self._train_step(x, adj_mask, feat_mask)
+            losses = self._train_step(adj_mask, feat_mask)
             print(
                 {key: val.numpy() for key, val in losses.items()}
             ) if self.verbose else None
         return adj_mask, feat_mask
 
     @tf.function
-    def _train_step(self, x, adj_mask, feat_mask):
+    def _train_step(self, adj_mask, feat_mask):
         with tf.GradientTape() as tape:
             # compute the masked adj matrix
             masked_adj = tf.sparse.map_values(
@@ -134,7 +138,7 @@ class GNNExplainer:
             )
 
             # compute the masked feature matrix
-            masked_input = x * tf.nn.sigmoid(feat_mask)
+            masked_input = self.x * tf.nn.sigmoid(feat_mask)
 
             if self.mode == "node":
                 pred = self.model([masked_input, masked_adj], training=False)[
