@@ -431,6 +431,10 @@ class BatchLoader(Loader):
         signature = self.dataset.signature
         for k in signature:
             signature[k]["shape"] = prepend_none(signature[k]["shape"])
+        if "x" in signature:
+            signature["x"]["shape"] = signature["x"]["shape"][:-1] + (
+                signature["x"]["shape"][-1] + 1,
+            )
         if "a" in signature:
             # Adjacency matrix in batch mode is dense
             signature["a"]["spec"] = tf.TensorSpec
@@ -514,6 +518,10 @@ class PackedBatchLoader(BatchLoader):
         signature = self.signature
         for k in signature:
             signature[k]["shape"] = prepend_none(signature[k]["shape"])
+        if "x" in signature:
+            signature["x"]["shape"] = signature["x"]["shape"][:-1] + (
+                signature["x"]["shape"][-1] + 1,
+            )
         if "a" in signature:
             # Adjacency matrix in batch mode is dense
             signature["a"]["spec"] = tf.TensorSpec
