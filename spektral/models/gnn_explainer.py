@@ -23,17 +23,22 @@ class GNNExplainer:
     - `model`: tf.keras.Model to explain;
     - `n_hops`: number of hops from which the GNN aggregates info. If `None`, then the
     number is inferred from the Conv and MessagePassing layers in the model.
+    - `preprocess`: a preprocessing function to transform the adjacency matrix before
+    giving it as input to the GNN; this is usually the same `preprocess` function of the
+    Conv or MessagePassing layers used in the GNN (e.g., `GCNConv.preprocess`).
     - `graph_level`: if True, the GNN is assumed to be for graph-level prediction and
     the explanation is computed for the whole graph (and not just a node).
-    - `verbose`: `True` to print loss values during the training, else `False`;
-    - `epochs`: number of epochs to train the explainer;
-    - `edge_size_reg`: controls the edge size of the subgraph that contributes to
-        the prediction;
-    - `feat_size_reg`: controls the number of features that contribute to the
-    prediction;
-    - `edge_entropy_reg`: controls the discretization of the adjacency mask;
-    - `feat_entropy_reg`: controls the discretization of the feature mask;
-    - `laplacian_reg`: controls the laplacian loss;
+    - `verbose`: if True, print info during training;
+    - `learning_rate`: learning rate when training the model;
+    - `a_size_coef`: coefficient to control the number of edges of the subgraph that
+    contributes to the prediction;
+    - `x_size_coef`: coefficient to control the number of features of the subgraph
+    that contributes to the prediction;
+    - `a_entropy_coef`: coefficient to control the discretization of the adjacency
+    mask;
+    - `x_entropy_coef`: coefficient to control the discretization of the features
+    mask;
+    - `laplacian_coef`: coefficient to control the graph Laplacian loss;
     """
 
     def __init__(
@@ -44,11 +49,11 @@ class GNNExplainer:
         graph_level=False,
         verbose=False,
         learning_rate=0.01,
-        edge_size_reg=0.0005,
-        feat_size_reg=0.1,
-        edge_entropy_reg=0.1,
-        feat_entropy_reg=0.1,
-        laplacian_reg=0.0,
+        a_size_coef=0.0005,
+        x_size_coef=0.1,
+        a_entropy_coef=0.1,
+        x_entropy_coef=0.1,
+        laplacian_coef=0.0,
     ):
         self.model = model
 
@@ -67,18 +72,24 @@ class GNNExplainer:
         self.verbose = verbose
 
         self.learning_rate = learning_rate
-        self.edge_size_reg = edge_size_reg
-        self.feat_size_reg = feat_size_reg
-        self.edge_entropy_reg = edge_entropy_reg
-        self.feat_entropy_reg = feat_entropy_reg
-        self.laplacian_reg = laplacian_reg
+        self.a_size_coef = a_size_coef
+        self.x_size_coef = x_size_coef
+        self.a_entropy_coef = a_entropy_coef
+        self.x_entropy_coef = x_entropy_coef
+        self.laplacian_coef = laplacian_coef
 
     def explain_node(self, x, a, node_idx=None, epochs=100):
         """
-        Method used to start the training.
-        **Arguments**
-        - `x`: feature matrix of shape `(n_nodes, n_node_features)`;
-        - `a`: sparse adjacency matrix `(n_nodes, n_nodes)`;
+        Train the GNNExplainer to explain the given graph.
+
+        :param x: feature matrix of shape `(n_nodes, n_node_features)`;
+        :param a: sparse adjacency matrix of shape `(n_nodes, n_nodes)`;
+        :param node_idx: index of the node to explain. If `self.graph_level=True`, this
+        is ignored;
+        :param epochs: number of epochs to train for.
+        :return:
+        - `a_mask`: mask for the adjacency matrix;
+        - `x_mask`: mask for the node features.
         """
         x = tf.cast(x, tf.float32)
         if node_idx is None:
@@ -124,12 +135,12 @@ class GNNExplainer:
         return a_mask, x_mask
 
     @tf.function
-    def _train_step(self, x, adj_mask, feat_mask, node_idx):
+    def _train_step(self, x, a_mask, x_mask, node_idx):
         with tf.GradientTape() as tape:
             masked_a = tf.sparse.map_values(
-                tf.multiply, self.comp_graph, tf.nn.sigmoid(adj_mask)
+                tf.multiply, self.comp_graph, tf.nn.sigmoid(a_mask)
             )
-            masked_x = x * tf.nn.sigmoid(feat_mask)
+            masked_x = x * tf.nn.sigmoid(x_mask)
 
             if self.graph_level:
                 pred = self.model([masked_x, masked_a, self.i], training=False)[
@@ -140,64 +151,72 @@ class GNNExplainer:
                     node_idx, self.node_pred
                 ]
 
-            loss, losses = self._explain_loss_fn(pred, adj_mask, feat_mask)
-        grad = tape.gradient(loss, [adj_mask, feat_mask])
-        self.opt.apply_gradients(zip(grad, [adj_mask, feat_mask]))
+            loss, losses = self._explain_loss_fn(pred, a_mask, x_mask)
+        grad = tape.gradient(loss, [a_mask, x_mask])
+        self.opt.apply_gradients(zip(grad, [a_mask, x_mask]))
         return losses
 
-    def _explain_loss_fn(self, y_pred, adj_mask, feat_mask):
-        mask = tf.nn.sigmoid(adj_mask)
+    def _explain_loss_fn(self, y_pred, a_mask, x_mask):
+        mask = tf.nn.sigmoid(a_mask)
 
-        # prediction and entropy loss
+        # Prediction loss
         pred_loss = -tf.math.log(y_pred + 1e-15)
-        edge_size_loss = self.edge_size_reg * tf.reduce_sum(mask)
+
+        # Loss for A
+        a_size_loss = self.a_size_coef * tf.reduce_sum(mask)
         entropy = -mask * tf.math.log(mask + 1e-15) - (1 - mask) * tf.math.log(
             1 - mask + 1e-15
         )
-        edge_entropy_loss = self.edge_entropy_reg * tf.reduce_mean(entropy)
+        a_entropy_loss = self.a_entropy_coef * tf.reduce_mean(entropy)
 
-        # smoothness of signal loss
+        # Graph Laplacian loss
         if self.graph_level:
             smoothness_loss = 0
         else:
-            masked_adj = tf.sparse.map_values(tf.multiply, self.comp_graph, mask)
-            d = tf.linalg.diag(tf.sparse.reduce_sum(masked_adj, axis=0))
-            masked_adj = tf.sparse.map_values(tf.multiply, masked_adj, -1)
+            masked_a = tf.sparse.map_values(tf.multiply, self.comp_graph, mask)
+            d = tf.linalg.diag(tf.sparse.reduce_sum(masked_a, axis=0))
+            masked_a = tf.sparse.map_values(tf.multiply, masked_a, -1)
 
-            laplacian = tf.sparse.add(d, masked_adj)
+            laplacian = tf.sparse.add(d, masked_a)
             laplacian = tf.cast(laplacian, tf.float32)
             quad_form = (
                 tf.reshape(self.y_pred, (1, -1))
                 @ laplacian
                 @ tf.reshape(self.y_pred, (-1, 1))
             )
-            smoothness_loss = self.laplacian_reg * quad_form
+            smoothness_loss = self.laplacian_coef * quad_form
 
         # Feature loss
-        mask = tf.nn.sigmoid(feat_mask)
-        feat_size_loss = self.feat_size_reg * tf.reduce_sum(mask)
+        mask = tf.nn.sigmoid(x_mask)
+        x_size_loss = self.x_size_coef * tf.reduce_sum(mask)
         entropy = -mask * tf.math.log(mask + 1e-15) - (1 - mask) * tf.math.log(
             1 - mask + 1e-15
         )
-        feat_entropy_loss = self.feat_entropy_reg * tf.reduce_mean(entropy)
+        x_entropy_loss = self.x_entropy_coef * tf.reduce_mean(entropy)
 
-        loss = pred_loss + edge_size_loss + edge_entropy_loss + smoothness_loss
-        loss += feat_size_loss + feat_entropy_loss
+        loss = (
+            pred_loss
+            + a_size_loss
+            + a_entropy_loss
+            + smoothness_loss
+            + x_size_loss
+            + x_entropy_loss
+        )
 
         losses = {
             "pred_loss": pred_loss,
-            "edge_size_loss": edge_size_loss,
-            "ent_edge_loss": edge_entropy_loss,
-            "smooth_loss": smoothness_loss,
-            "feat_size_loss": feat_size_loss,
-            "ent_feat_loss": feat_entropy_loss,
+            "a_size_loss": a_size_loss,
+            "a_entropy_loss": a_entropy_loss,
+            "smoothness_loss": smoothness_loss,
+            "x_size_loss": x_size_loss,
+            "x_entropy_loss": x_entropy_loss,
         }
         return loss, losses
 
-    def _explainer_cleaning(self, adj_mask, feat_mask, node_idx, adj_tr, top_feat, k):
+    def _explainer_cleaning(self, a_mask, x_mask, node_idx, a_thresh):
         # Get the masks
-        selected_adj_mask = tf.nn.sigmoid(adj_mask)
-        selected_feat_mask = tf.nn.sigmoid(feat_mask)
+        selected_adj_mask = tf.nn.sigmoid(a_mask)
+        selected_feat_mask = tf.nn.sigmoid(x_mask)
 
         # convert into a binary matrix
         if self.preprocess is not None:
@@ -216,9 +235,9 @@ class GNNExplainer:
             tf.sparse.add(selected_subgraph, tf.sparse.transpose(selected_subgraph)) / 2
         )
 
-        # remove the edges which value is < adj_tr
+        # remove the edges which value is < a_thresh
         selected_adj_mask = tf.where(
-            selected_subgraph.values >= adj_tr, selected_subgraph.values, 0
+            selected_subgraph.values >= a_thresh, selected_subgraph.values, 0
         )
         selected_subgraph = tf.sparse.map_values(
             tf.multiply, self.comp_graph, selected_adj_mask
@@ -226,28 +245,35 @@ class GNNExplainer:
 
         if not self.graph_level:
             # get the final denoised subgraph centerd in the interested node
-            selected_subgraph = k_hop_sparse_subgraph(selected_subgraph, node_idx, k)
+            selected_subgraph = k_hop_sparse_subgraph(
+                selected_subgraph, node_idx, self.n_hops
+            )
 
         # the the top_feat relevant feature ids
         selected_features = tf.argsort(
             tf.nn.sigmoid(selected_feat_mask), direction="DESCENDING"
-        )[0][:top_feat]
+        )[0]
 
         return selected_subgraph, selected_features
 
     def plot_subgraph(
-        self, adj_mask, feat_mask, node_idx=None, adj_tr=0.1, top_feat=10, k=2
+        self, a_mask, x_mask, node_idx=None, a_thresh=0.1, return_features=False
     ):
         """
-        Method used to clean the important subgraph and features and make the plots.
+        Plot the subgraph computed by the GNNExplainer.
+
         **Arguments**
-        - `adj_tr`: threshold needed to remove low importance nodes;
-        - `top_feat`: number of features to return sorted by importance;
-        - `k`: order of neighbors of the subgraph around `node_idx` to ;
+        :param a_mask: the mask for the adjacency matrix computed by `explain_node`;
+        :param x_mask: the mask for the node features computed by `explain_node`;
+        :param node_idx: the same node index that was given to `explain_node`;
+        :param a_thresh: threshold to remove low-importance edges;
+        :param return_features: if True, return indices to sort the nodes by their
+        importance.
+        :return: The subgraph computed by GNNExplainer in Networkx format. If
+        `return_features=True`, also returns an indices to sort the nodes by their
+        importance.
         """
-        adj_mtx, top_ftrs = self._explainer_cleaning(
-            adj_mask, feat_mask, node_idx, adj_tr, top_feat, k
-        )
+        adj_mtx, top_ftrs = self._explainer_cleaning(a_mask, x_mask, node_idx, a_thresh)
 
         edge_list = adj_mtx.indices.numpy()
         weights = adj_mtx.values
@@ -267,9 +293,10 @@ class GNNExplainer:
             G, pos=pos, font_color="black", font_size=10, verticalalignment="bottom"
         )
 
-        print("Top features: ", top_ftrs.numpy())
-
-        return G
+        if return_features:
+            return G, top_ftrs
+        else:
+            return G
 
 
 def k_hop_sparse_subgraph(a, node_idx, k, transformer=None):
