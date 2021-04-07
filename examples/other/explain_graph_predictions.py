@@ -80,22 +80,14 @@ for batch in loader_tr:
         )
 
 # Set up explainer
-(x, a, i), y = next(iter(loader_te))
-last_idx = len(np.where(i == 0)[0])
-x_exp = x[:last_idx]
-a_exp = tf.sparse.slice(a, start=[0, 0], size=[last_idx, last_idx])
-explainer = GNNExplainer(model, mode="graph", verbose=False, epochs=300)
+(x, a, i), y = next(loader_te)
+cut_idx = (i == 0).sum()
+x_exp = x[:cut_idx]
+a_exp = tf.sparse.slice(a, start=[0, 0], size=[cut_idx, cut_idx])
+explainer = GNNExplainer(model, graph_level=True, verbose=True)
 
 # Explain prediction for one graph
-adj_mask, feat_mask = explainer.explain_node(
-    x=x_exp,
-    a=a_exp,
-    edge_size_reg=0.000001,
-    edge_entropy_reg=0.5,
-    laplacian_reg=1,
-    feat_size_reg=0.0001,
-    feat_entropy_reg=0.1,
-)
+adj_mask, feat_mask = explainer.explain_node(x=x_exp, a=a_exp)
 
 # Plot the result
 G = explainer.plot_subgraph(adj_mask, feat_mask)

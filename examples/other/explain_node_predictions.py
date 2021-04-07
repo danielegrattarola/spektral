@@ -61,28 +61,12 @@ model.fit(
 
 # Set up explainer
 x_exp, a_exp = dataset[0].x, dataset[0].a
-explainer = GNNExplainer(
-    model,
-    mode="node",
-    num_conv_layers=2,
-    adj_transf=gcn_filter,
-    verbose=False,
-    epochs=300,
-)
+explainer = GNNExplainer(model, preprocess=gcn_filter, verbose=True)
 
 # Explain prediction for one node
 node_idx = 1000
-adj_mask, feat_mask = explainer.explain_node(
-    x=x_exp,
-    a=a_exp,
-    node_idx=node_idx,
-    edge_size_reg=0.0001,
-    edge_entropy_reg=0.5,
-    laplacian_reg=1,
-    feat_size_reg=0.0001,
-    feat_entropy_reg=0.1,
-)
+adj_mask, feat_mask = explainer.explain_node(x=x_exp, a=a_exp, node_idx=node_idx)
 
 # Plot the result
-G = explainer.plot_subgraph(adj_mask, feat_mask)
+G = explainer.plot_subgraph(adj_mask, feat_mask, node_idx)
 plt.show()
