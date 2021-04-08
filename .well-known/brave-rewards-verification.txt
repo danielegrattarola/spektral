@@ -1,0 +1,4 @@
+This is a Brave Rewards publisher verification file.
+
+Domain: graphneural.network
+Token: 2b52f704cc451c551085ef42e5a56affeada694b21f12178fb8331036b5ab7b1
