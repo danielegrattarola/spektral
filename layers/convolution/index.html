@@ -931,7 +931,7 @@ dimension changed to <code>channels</code>.</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gin_conv.py#L9">[source]</a></span></p>
 <h4 id="ginconv">GINConv</h4>
-<pre><code class="python">spektral.layers.GINConv(channels, epsilon=None, mlp_hidden=None, mlp_activation='relu', aggregate='sum', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<pre><code class="python">spektral.layers.GINConv(channels, epsilon=None, mlp_hidden=None, mlp_activation='relu', mlp_batchnorm=True, aggregate='sum', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 
 <p>A Graph Isomorphism Network (GIN) from the paper</p>
@@ -967,6 +967,7 @@ If given as a value, the parameter will stay fixed.</li>
 <li><code>mlp_hidden</code>: list of integers, number of hidden units for each hidden
 layer in the MLP (if None, the MLP has only the output layer);</li>
 <li><code>mlp_activation</code>: activation for the MLP layers;</li>
+<li><code>mlp_batchnorm</code>: apply batch normalization after every hidden layer of the MLP;</li>
 <li><code>activation</code>: activation function;</li>
 <li><code>use_bias</code>: bool, add a bias vector to the output;</li>
 <li><code>kernel_initializer</code>: initializer for the weights;</li>
