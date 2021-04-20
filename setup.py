@@ -11,7 +11,7 @@ setup(
         "joblib",
         "lxml",
         "networkx",
-        "numpy",
+        "numpy<1.20",
         "pandas",
         "requests",
         "scikit-learn",

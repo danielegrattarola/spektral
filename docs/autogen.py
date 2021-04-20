@@ -88,7 +88,7 @@ PAGES = [
         "page": "models.md",
         "functions": [],
         "methods": [],
-        "classes": [models.GCN, models.GeneralGNN],
+        "classes": [models.GCN, models.GeneralGNN, models.GNNExplainer],
     },
     # Data #####################################################################
     {"page": "data.md", "functions": [], "methods": [], "classes": [data.Graph]},

@@ -1,0 +1,27 @@
+name: Style check
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.6
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.6
+    - name: Lint Python code
+      run: |
+        pip install flake8
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+    - name: Black formatting
+      run: |
+        pip install black
+        black --diff --check .
+    - name: Ensure import sorted
+      run: |
+        pip install isort
+        isort -rc --diff --check-only .
