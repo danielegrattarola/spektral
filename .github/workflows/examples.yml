@@ -15,7 +15,7 @@ jobs:
         python-version: 3.6
     - name: Install dependencies
       run: |
-        pip install ogb
+        pip install ogb matplotlib
     - name: Install Spektral
       run: |
         pip install .
