@@ -25,6 +25,6 @@ jobs:
         python -m pip install .
     - name: Test with pytest and coverage
       run: |
-        pytest
+        python -m coverage run --source=. -m pytest
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
