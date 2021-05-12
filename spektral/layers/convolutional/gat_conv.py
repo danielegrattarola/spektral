@@ -59,6 +59,7 @@ class GATConv(Conv):
     - `dropout_rate`: internal dropout rate for attention coefficients;
     - `return_attn_coef`: if True, return the attention coefficients for
     the given input (one n_nodes x n_nodes matrix for each head).
+    - `add_self_loops`: if True, add self loops to the adjacency matrix.
     - `activation`: activation function;
     - `use_bias`: bool, add a bias vector to the output;
     - `kernel_initializer`: initializer for the weights;
@@ -81,6 +82,7 @@ class GATConv(Conv):
         concat_heads=True,
         dropout_rate=0.5,
         return_attn_coef=False,
+        add_self_loops=True,
         activation=None,
         use_bias=True,
         kernel_initializer="glorot_uniform",
@@ -112,6 +114,7 @@ class GATConv(Conv):
         self.concat_heads = concat_heads
         self.dropout_rate = dropout_rate
         self.return_attn_coef = return_attn_coef
+        self.add_self_loops = add_self_loops
         self.attn_kernel_initializer = initializers.get(attn_kernel_initializer)
         self.attn_kernel_regularizer = regularizers.get(attn_kernel_regularizer)
         self.attn_kernel_constraint = constraints.get(attn_kernel_constraint)
@@ -197,7 +200,8 @@ class GATConv(Conv):
         # Prepare message-passing
         indices = a.indices
         N = tf.shape(x, out_type=indices.dtype)[-2]
-        indices = ops.add_self_loops_indices(indices, N)
+        if self.add_self_loops:
+            indices = ops.add_self_loops_indices(indices, N)
         targets, sources = indices[:, 1], indices[:, 0]
 
         # Update node features
@@ -224,7 +228,8 @@ class GATConv(Conv):
 
     def _call_dense(self, x, a):
         shape = tf.shape(a)[:-1]
-        a = tf.linalg.set_diag(a, tf.ones(shape, a.dtype))
+        if self.add_self_loops:
+            a = tf.linalg.set_diag(a, tf.ones(shape, a.dtype))
         x = tf.einsum("...NI , IHO -> ...NHO", x, self.kernel)
         attn_for_self = tf.einsum("...NHI , IHO -> ...NHO", x, self.attn_kernel_self)
         attn_for_neighs = tf.einsum(
