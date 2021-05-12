@@ -224,7 +224,6 @@ class GATConv(Conv):
 
     def _call_dense(self, x, a):
         shape = tf.shape(a)[:-1]
-        a = tf.linalg.set_diag(a, tf.zeros(shape, a.dtype))
         a = tf.linalg.set_diag(a, tf.ones(shape, a.dtype))
         x = tf.einsum("...NI , IHO -> ...NHO", x, self.kernel)
         attn_for_self = tf.einsum("...NHI , IHO -> ...NHO", x, self.attn_kernel_self)
