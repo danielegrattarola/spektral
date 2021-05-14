@@ -1,29 +1,21 @@
-import warnings
+from collections.abc import Iterable
 
 import tensorflow as tf
-from tensorflow.keras import backend as K
+from spektral.layers.convolutional.message_passing import MessagePassing
 from tensorflow.keras.layers import Dense, Multiply, PReLU, ReLU
 from tensorflow.python.ops import gen_sparse_ops
 
-from spektral.layers import ops
-from spektral.layers.convolutional.conv import Conv
-from spektral.layers.convolutional.message_passing import MessagePassing
-from spektral.layers.ops import modes
 
-from collections.abc import Iterable
-
-
-class XENetConv(MessagePassing):
+class XENetSparseConv(MessagePassing):
     r"""
-      An XENet convolutional layer (ECC) from the paper
+    A XENet convolutional layer from the paper
 
       > [XENet: Using a new graph convolution to accelerate the timeline for protein design on quantum computers](https://www.biorxiv.org/content/10.1101/2021.05.05.442729v1)<br>
       > Jack B. Maguire, Daniele Grattarola, Eugene Klyshko, Vikram Khipple Mulligan, Hans Melo
 
-    **Mode**: single, disjoint, batch, mixed.
+    **Mode**: single, disjoint, mixed.
 
-    **In single, disjoint, and mixed mode, this layer expects a sparse adjacency
-    matrix.**
+    **This layer expects a sparse adjacency matrix.**
 
     This layer computes for each node \(i\):
     $$
@@ -36,19 +28,17 @@ class XENetConv(MessagePassing):
 
     **Input**
 
-    - Node features of shape `([batch], n_nodes, n_node_features)`;
-    - Binary adjacency matrices of shape `([batch], n_nodes, n_nodes)`;
-    - Edge features. In single mode, shape `(num_edges, n_edge_features)`; in
-    batch mode, shape `(batch, n_nodes, n_nodes, n_edge_features)`.
+    - Node features of shape `(n_nodes, n_node_features)`;
+    - Binary adjacency matrix of shape `(n_nodes, n_nodes)`.
 
-      **Output**
+    **Output**
 
     - Node features with the same shape of the input, but the last dimension
     changed to `node_channels`.
     - Edge features with the same shape of the input, but the last dimension
     changed to `edge_channels`.
 
-      **Arguments**
+    **Arguments**
 
     - `stack_channels`: integer or list of integers, number of channels for the hidden layers;
     - `node_channels`: integer, number of output channels for the nodes;
@@ -86,7 +76,7 @@ class XENetConv(MessagePassing):
         **kwargs
     ):
         super().__init__(
-            activation=activation,
+            aggregate=aggregate,
             use_bias=use_bias,
             kernel_initializer=kernel_initializer,
             bias_initializer=bias_initializer,
@@ -146,8 +136,7 @@ class XENetConv(MessagePassing):
 
         self.built = True
 
-        
-    def call(self, inputs):
+    def call(self, inputs, **kwargs):
         x, a, e = self.get_inputs(inputs)
         x_out, e_out = self.propagate(x, a, e)
 
@@ -207,7 +196,7 @@ class XENetConv(MessagePassing):
         x_new, stack_ij = embeddings
 
         return self.node_model(x_new), self.edge_model(stack_ij)
-    
+
     @property
     def config(self):
         return {
@@ -218,3 +207,4 @@ class XENetConv(MessagePassing):
             "node_activation": self.node_activation,
             "edge_activation": self.edge_activation,
         }
+
