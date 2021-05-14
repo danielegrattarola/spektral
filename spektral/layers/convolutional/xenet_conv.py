@@ -142,11 +142,6 @@ class XENetSparseConv(MessagePassing):
         x, a, e = self.get_inputs(inputs)
         x_out, e_out = self.propagate(x, a, e)
 
-        print( "stack_models[0]", self.stack_models[0].weights[0].shape )
-        print( "node_model", self.node_model.weights[0].shape )
-        print( "edge_model", self.edge_model.weights[0].shape )
-        print( "stack_model_acts[-1]", self.stack_model_acts[-1].weights[0].shape ) 
-        
         return x_out, e_out
 
     def message(self, x, e=None):
@@ -370,7 +365,6 @@ class XENetDenseConv(Conv):
         e_transpose = tf.transpose(e, perm=[0, 2, 1, 3])
         
         stack = tf.concat([xi, xj, e, e_transpose], axis=-1)
-        print( "stack", stack.shape )
         
         for i in range( 0, len( self.stack_models ) ):
             stack = self.stack_models[ i ]( stack )
@@ -381,7 +375,6 @@ class XENetDenseConv(Conv):
 
         #zero-out elements that aren't edges in the adjacency matrix
         stack = Multiply()([stack,e_mask])
-        print( "stack", stack.shape )
         
         if self.attention:
             att1 = self.incoming_att_sigmoid( stack )
@@ -395,23 +388,12 @@ class XENetDenseConv(Conv):
             outgoing_e = tf.keras.backend.sum( stack, axis=-3, keepdims=False)
             
         final_stack = Concatenate(axis=-1)([x, incoming_e, outgoing_e])
-        print( "final_stack", final_stack.shape )
         
         x = self.node_model(final_stack)
-        print( "node", x.shape )
-
-        print( "stack", stack.shape )
         e = self.edge_model( stack )
-        print( "edge", e.shape )
         
         #zero-out elements that aren't edges in the adjacency matrix
-        e = Multiply()([e,e_mask])
-
-        print( "stack_models[0]", self.stack_models[0].weights[0].shape )
-        print( "node_model", self.node_model.weights[0].shape )
-        print( "edge_model", self.edge_model.weights[0].shape )
-        print( "stack_model_acts[-1]", self.stack_model_acts[-1].weights[0].shape ) 
-        
+        e = Multiply()([e,e_mask])        
         return x, e
 
     @property

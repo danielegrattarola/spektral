@@ -43,12 +43,6 @@ def test_sparse_model_sizes():
         model.compile(optimizer="adam", loss="mean_squared_error")
         print(model.count_params())
         assert model.count_params() == expected_size
-
-    X, E = XENetSparseConv(1, 10, 20, False)([X_in, A_in, E_in])
-    assert_n_params([X_in, A_in, E_in], [X, E], 126)
-        
-    X, E = XENetSparseConv([4], 10, 20, False)([X_in, A_in, E_in])
-    assert_n_params([X_in, A_in, E_in], [X, E], 294)
         
     X, E = XENetSparseConv([5], 10, 20, False)([X_in, A_in, E_in])
     assert_n_params([X_in, A_in, E_in], [X, E], 350)
@@ -92,14 +86,7 @@ def test_dense_model_sizes():
         model = Model(inputs=inp, outputs=out)
         model.compile(optimizer='adam', loss='mean_squared_error')
         print(model.count_params())
-        model.summary()
         assert(model.count_params() == expected_size)
-
-    X, E = XENetDenseConv(1, 10, 20, False)([X_in, A_in, E_in])
-    assert_n_params([X_in, A_in, E_in], [X, E], 126)        
-        
-    X, E = XENetDenseConv([4], 10, 20, False)([X_in, A_in, E_in])
-    assert_n_params([X_in, A_in, E_in], [X, E], 294)        
     
     X, E = XENetDenseConv([5], 10, 20, False)([X_in, A_in, E_in])
     assert_n_params([X_in, A_in, E_in], [X, E], 350)
