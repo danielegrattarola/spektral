@@ -7,6 +7,7 @@ from tensorflow.python.ops import gen_sparse_ops
 from spektral.layers.convolutional.message_passing import MessagePassing
 from spektral.layers.convolutional.conv import Conv
 
+
 class XENetSparseConv(MessagePassing):
     r"""
     A XENet convolutional layer from the paper
@@ -97,7 +98,7 @@ class XENetSparseConv(MessagePassing):
         self.edge_activation = edge_activation
 
     def build(self, input_shape):
-        assert len(input_shape) == 3 # X, A, E, right?
+        assert len(input_shape) == 3  # X, A, E, right?
         layer_kwargs = dict(
             kernel_initializer=self.kernel_initializer,
             bias_initializer=self.bias_initializer,
@@ -120,7 +121,10 @@ class XENetSparseConv(MessagePassing):
                 else:
                     self.stack_model_acts.append(PReLU())
         else:
-            self.stack_models.append(Dense(self.stack_channels, **layer_kwargs))
+            self.stack_models.append(
+                Dense(
+                    self.stack_channels,
+                    **layer_kwargs))
             self.stack_model_acts.append(PReLU())
 
         self.node_model = Dense(
@@ -211,8 +215,6 @@ class XENetSparseConv(MessagePassing):
         }
 
 
-
-
 class XENetDenseConv(Conv):
     r"""
     A XENet convolutional layer from the paper
@@ -300,11 +302,10 @@ class XENetDenseConv(Conv):
         self.edge_channels = edge_channels
         self.attention = attention
         self.node_activation = node_activation
-        self.edge_activation = edge_activation    
+        self.edge_activation = edge_activation
 
-        
     def build(self, input_shape):
-        assert len(input_shape) == 3 # X, A, E, right?        
+        assert len(input_shape) == 3  # X, A, E, right?
         layer_kwargs = dict(
             kernel_initializer=self.kernel_initializer,
             bias_initializer=self.bias_initializer,
@@ -314,7 +315,7 @@ class XENetDenseConv(Conv):
             bias_constraint=self.bias_constraint,
             dtype=self.dtype,
         )
-        channels = input_shape[0][-1] # last dim of X
+        channels = input_shape[0][-1]  # last dim of X
 
         self.stack_models = []
         self.stack_model_acts = []
@@ -327,10 +328,13 @@ class XENetDenseConv(Conv):
                 if count != len(self.stack_channels) - 1:
                     self.stack_model_acts.append(ReLU())
                 else:
-                    self.stack_model_acts.append(PReLU(shared_axes=[1,2]))
+                    self.stack_model_acts.append(PReLU(shared_axes=[1, 2]))
         else:
-            self.stack_models.append(Dense(self.stack_channels, **layer_kwargs))
-            self.stack_model_acts.append(PReLU(shared_axes=[1,2]))
+            self.stack_models.append(
+                Dense(
+                    self.stack_channels,
+                    **layer_kwargs))
+            self.stack_model_acts.append(PReLU(shared_axes=[1, 2]))
 
         self.node_model = Dense(
             self.node_channels, activation=self.node_activation, **layer_kwargs
@@ -344,9 +348,9 @@ class XENetDenseConv(Conv):
             self.incoming_att_multiply = Multiply()
             self.outgoing_att_sigmoid = Dense(1, activation="sigmoid")
             self.outgoing_att_multiply = Multiply()
-        
+
         self.built = True
-        
+
     def call(self, inputs):
         x, a, e = inputs
 
@@ -363,37 +367,39 @@ class XENetDenseConv(Conv):
         xj = tf.repeat(xj, x.shape[1], axis=1)
 
         e_transpose = tf.transpose(e, perm=[0, 2, 1, 3])
-        
+
         stack = tf.concat([xi, xj, e, e_transpose], axis=-1)
-        
-        for i in range( 0, len( self.stack_models ) ):
-            stack = self.stack_models[ i ]( stack )
-            stack = self.stack_model_acts[ i ]( stack )
-            
+
+        for i in range(0, len(self.stack_models)):
+            stack = self.stack_models[i](stack)
+            stack = self.stack_model_acts[i](stack)
+
         e_mask_shape = (a.shape[1], a.shape[2], 1)
         e_mask = Reshape(e_mask_shape, input_shape=a.shape)(a)
 
-        #zero-out elements that aren't edges in the adjacency matrix
-        stack = Multiply()([stack,e_mask])
-        
+        # zero-out elements that aren't edges in the adjacency matrix
+        stack = Multiply()([stack, e_mask])
+
         if self.attention:
-            att1 = self.incoming_att_sigmoid( stack )
-            incoming_e = self.incoming_att_multiply( [stack,att1] )
-            incoming_e = tf.keras.backend.sum(incoming_e, axis=-2, keepdims=False)
-            att2 = self.outgoing_att_sigmoid( stack )
-            outgoing_e = self.outgoing_att_multiply( [stack,att2] )
-            outgoing_e = tf.keras.backend.sum(outgoing_e, axis=-3, keepdims=False)
+            att1 = self.incoming_att_sigmoid(stack)
+            incoming_e = self.incoming_att_multiply([stack, att1])
+            incoming_e = tf.keras.backend.sum(
+                incoming_e, axis=-2, keepdims=False)
+            att2 = self.outgoing_att_sigmoid(stack)
+            outgoing_e = self.outgoing_att_multiply([stack, att2])
+            outgoing_e = tf.keras.backend.sum(
+                outgoing_e, axis=-3, keepdims=False)
         else:
-            incoming_e = tf.keras.backend.sum( stack, axis=-2, keepdims=False)
-            outgoing_e = tf.keras.backend.sum( stack, axis=-3, keepdims=False)
-            
+            incoming_e = tf.keras.backend.sum(stack, axis=-2, keepdims=False)
+            outgoing_e = tf.keras.backend.sum(stack, axis=-3, keepdims=False)
+
         final_stack = Concatenate(axis=-1)([x, incoming_e, outgoing_e])
-        
+
         x = self.node_model(final_stack)
-        e = self.edge_model( stack )
-        
-        #zero-out elements that aren't edges in the adjacency matrix
-        e = Multiply()([e,e_mask])        
+        e = self.edge_model(stack)
+
+        # zero-out elements that aren't edges in the adjacency matrix
+        e = Multiply()([e, e_mask])
         return x, e
 
     @property
