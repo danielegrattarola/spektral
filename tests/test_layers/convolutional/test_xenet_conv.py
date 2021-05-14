@@ -6,7 +6,8 @@ from spektral.layers import XENetDenseConv, XENetSparseConv
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 
-# Not using these tests because they assume certain behaviors that we don't follow
+# Not using these tests because they assume certain behaviors that we
+# don't follow
 '''
 dense_config = {
     "layer": layers.XENetDenseConv,
@@ -27,6 +28,7 @@ sparse_config = {
 }
 '''
 
+
 def test_sparse_model_sizes():
     """
     This is a sanity check to make sure we have the same number of operations that we intend to have
@@ -43,7 +45,7 @@ def test_sparse_model_sizes():
         model.compile(optimizer="adam", loss="mean_squared_error")
         print(model.count_params())
         assert model.count_params() == expected_size
-        
+
     X, E = XENetSparseConv([5], 10, 20, False)([X_in, A_in, E_in])
     assert_n_params([X_in, A_in, E_in], [X, E], 350)
     # int vs list: 5 vs [5]
@@ -74,6 +76,7 @@ def test_sparse_model_sizes():
     # p                     =    5    # Prelu
     # total = t+x+e+p       = 1292
 
+
 def test_dense_model_sizes():
     N = 5
     F = 4
@@ -87,7 +90,7 @@ def test_dense_model_sizes():
         model.compile(optimizer='adam', loss='mean_squared_error')
         print(model.count_params())
         assert(model.count_params() == expected_size)
-    
+
     X, E = XENetDenseConv([5], 10, 20, False)([X_in, A_in, E_in])
     assert_n_params([X_in, A_in, E_in], [X, E], 350)
     # int vs list: 5 vs [5]
@@ -120,11 +123,11 @@ def test_dense_model_sizes():
 
 
 def test_layer():
-    #run_layer(dense_config)
-    #run_layer(sparse_config)    
+    # run_layer(dense_config)
+    # run_layer(sparse_config)
     test_sparse_model_sizes()
     test_dense_model_sizes()
 
+
 if __name__ == '__main__':
     test_layer()
-    
