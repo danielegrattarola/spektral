@@ -13,7 +13,7 @@ from spektral.layers.ops import modes
 from collections.abc import Iterable
 
 
-class XENetConv(Conv):
+class XENetConv(MessagePassing):
     r"""
       An XENet convolutional layer (ECC) from the paper
 
