@@ -387,7 +387,7 @@ class XENetDenseConv(Conv):
             incoming_e = tf.keras.backend.sum( stack, axis=-2, keepdims=False)
             outgoing_e = tf.keras.backend.sum( stack, axis=-3, keepdims=False)
             
-        final_stack = Concatenate(axis=-1)([x, incoming_e, outcoming_e])
+        final_stack = Concatenate(axis=-1)([x, incoming_e, outgoing_e])
 
         x = self.node_model(final_stack)
         e = self.edge_model(stack)
