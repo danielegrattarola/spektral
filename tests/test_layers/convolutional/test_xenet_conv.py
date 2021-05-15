@@ -138,12 +138,6 @@ def test_dense_model_sizes():
     # total = t+x+e+p       = 1292
 
 
-def test_layer():
-    # run_layer(dense_config)
-    # run_layer(sparse_config)
+if __name__ == "__main__":
     test_sparse_model_sizes()
     test_dense_model_sizes()
-
-
-if __name__ == "__main__":
-    test_layer()
