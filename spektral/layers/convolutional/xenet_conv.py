@@ -1,11 +1,19 @@
 from collections.abc import Iterable
 
 import tensorflow as tf
-from tensorflow.keras.layers import Dense, Multiply, PReLU, ReLU, Concatenate, MaxPooling1D, Reshape
+from tensorflow.keras.layers import (
+    Concatenate,
+    Dense,
+    MaxPooling1D,
+    Multiply,
+    PReLU,
+    ReLU,
+    Reshape,
+)
 from tensorflow.python.ops import gen_sparse_ops
 
-from spektral.layers.convolutional.message_passing import MessagePassing
 from spektral.layers.convolutional.conv import Conv
+from spektral.layers.convolutional.message_passing import MessagePassing
 
 
 class XENetSparseConv(MessagePassing):
@@ -121,10 +129,7 @@ class XENetSparseConv(MessagePassing):
                 else:
                     self.stack_model_acts.append(PReLU())
         else:
-            self.stack_models.append(
-                Dense(
-                    self.stack_channels,
-                    **layer_kwargs))
+            self.stack_models.append(Dense(self.stack_channels, **layer_kwargs))
             self.stack_model_acts.append(PReLU())
 
         self.node_model = Dense(
@@ -330,10 +335,7 @@ class XENetDenseConv(Conv):
                 else:
                     self.stack_model_acts.append(PReLU(shared_axes=[1, 2]))
         else:
-            self.stack_models.append(
-                Dense(
-                    self.stack_channels,
-                    **layer_kwargs))
+            self.stack_models.append(Dense(self.stack_channels, **layer_kwargs))
             self.stack_model_acts.append(PReLU(shared_axes=[1, 2]))
 
         self.node_model = Dense(
@@ -383,12 +385,10 @@ class XENetDenseConv(Conv):
         if self.attention:
             att1 = self.incoming_att_sigmoid(stack)
             incoming_e = self.incoming_att_multiply([stack, att1])
-            incoming_e = tf.keras.backend.sum(
-                incoming_e, axis=-2, keepdims=False)
+            incoming_e = tf.keras.backend.sum(incoming_e, axis=-2, keepdims=False)
             att2 = self.outgoing_att_sigmoid(stack)
             outgoing_e = self.outgoing_att_multiply([stack, att2])
-            outgoing_e = tf.keras.backend.sum(
-                outgoing_e, axis=-3, keepdims=False)
+            outgoing_e = tf.keras.backend.sum(outgoing_e, axis=-3, keepdims=False)
         else:
             incoming_e = tf.keras.backend.sum(stack, axis=-2, keepdims=False)
             outgoing_e = tf.keras.backend.sum(stack, axis=-3, keepdims=False)
