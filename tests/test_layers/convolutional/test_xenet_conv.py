@@ -1,16 +1,15 @@
+import numpy as np
 from core import MODES, run_layer
-
-from spektral import layers
-
-from spektral.layers import XENetDenseConv, XENetSparseConv
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 
-import numpy as np
+from spektral import layers
+from spektral.layers import XENetDenseConv, XENetSparseConv
+from spektral.layers.ops import sp_matrix_to_sp_tensor
 
 # Not using these tests because they assume certain behaviors that we
 # don't follow
-'''
+"""
 dense_config = {
     "layer": layers.XENetDenseConv,
     "modes": [MODES["BATCH"],],
@@ -28,7 +27,7 @@ sparse_config = {
     "sparse": True,
     "edges": True,
 }
-'''
+"""
 
 
 def test_sparse_model_sizes():
@@ -39,14 +38,21 @@ def test_sparse_model_sizes():
     F = 4
     S = 3
     X_in = Input(shape=(F,), name="X_in")
-    A_in = Input(shape=(None, ), name="A_in", sparse=True)
-    E_in = Input(shape=(S, ), name="E_in")
+    A_in = Input(shape=(None,), name="A_in", sparse=True)
+    E_in = Input(shape=(S,), name="E_in")
+
+    x = np.ones(shape=(N, F))
+    a = np.ones(shape=(N, N))
+    a = sp_matrix_to_sp_tensor(a)
+    e = np.ones(shape=(N * N, S))
 
     def assert_n_params(inp, out, expected_size):
         model = Model(inputs=inp, outputs=out)
         model.compile(optimizer="adam", loss="mean_squared_error")
         print(model.count_params())
         assert model.count_params() == expected_size
+        # for test coverage:
+        model([x, a, e])
 
     X, E = XENetSparseConv([5], 10, 20, False)([X_in, A_in, E_in])
     assert_n_params([X_in, A_in, E_in], [X, E], 350)
@@ -83,23 +89,23 @@ def test_dense_model_sizes():
     N = 5
     F = 4
     S = 3
-    X_in = Input(shape=(N, F), name='X_in')
-    A_in = Input(shape=(N, N), sparse=False, name='A_in')
-    E_in = Input(shape=(N, N, S), name='E_in')
+    X_in = Input(shape=(N, F), name="X_in")
+    A_in = Input(shape=(N, N), sparse=False, name="A_in")
+    E_in = Input(shape=(N, N, S), name="E_in")
 
-    x = np.ones( shape=(1,N,F) )
-    a = np.ones( shape=(1,N,N) )
-    e = np.ones( shape=(1,N,N,S) )
+    x = np.ones(shape=(1, N, F))
+    a = np.ones(shape=(1, N, N))
+    e = np.ones(shape=(1, N, N, S))
     a[0][1][2] = 0
     a[0][2][1] = 0
-    
+
     def assert_n_params(inp, out, expected_size):
         model = Model(inputs=inp, outputs=out)
-        model.compile(optimizer='adam', loss='mean_squared_error')
+        model.compile(optimizer="adam", loss="mean_squared_error")
         print(model.count_params())
-        assert(model.count_params() == expected_size)
-        #for test coverage:
-        model.predict([x,a,e])
+        assert model.count_params() == expected_size
+        # for test coverage:
+        model.predict([x, a, e])
 
     X, E = XENetDenseConv([5], 10, 20, False)([X_in, A_in, E_in])
     assert_n_params([X_in, A_in, E_in], [X, E], 350)
@@ -139,5 +145,5 @@ def test_layer():
     test_dense_model_sizes()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_layer()
