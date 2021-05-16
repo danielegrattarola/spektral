@@ -350,6 +350,12 @@ class DisjointLoader(Loader):
         signature["i"]["shape"] = (None,)
         signature["i"]["dtype"] = tf.as_dtype(tf.int64)
 
+        graph = self.dataset.graphs[0]  # This is always non-empty
+        signature["w"] = dict()
+        signature["w"]["spec"] = tf.TensorSpec
+        signature["w"]["shape"] = (None,)
+        signature["w"]["dtype"] = tf.as_dtype(graph.a.dtype)  # weights type matches the adj. matrix (where they are stored)
+
         return to_tf_signature(signature)
 
 

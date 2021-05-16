@@ -244,5 +244,10 @@ def to_tf_signature(signature):
         dtype = signature["y"]["dtype"]
         spec = signature["y"]["spec"]
         output = (output, spec(shape, dtype))
+    if "w" in signature:
+        shape = signature["w"]["shape"]
+        dtype = signature["w"]["dtype"]
+        spec = signature["w"]["spec"]
+        output = output + (spec(shape, dtype),)
 
     return output
