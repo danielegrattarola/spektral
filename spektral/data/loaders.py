@@ -249,6 +249,8 @@ class DisjointLoader(Loader):
     indices that map each node to its corresponding graph in the batch.
 
     The adjacency matrix os returned as a SparseTensor, regardless of the input.
+    The values in the leading diagonal are interpreted as sample weights, but ignored
+    if they are all equal.
 
     If `node_level=False`, the labels are interpreted as graph-level labels and
     are stacked along an additional dimension.
@@ -288,6 +290,13 @@ class DisjointLoader(Loader):
 
     def collate(self, batch):
         packed = self.pack(batch, return_dict=True)
+
+        # Sample weights can be stored in the leading diagonals of the adjacency matrices
+        sample_weights = np.concatenate([a.diagonal() for a in packed['a_list']])
+        # In case the leading diagonal is completely zero, convert them to 1's to avoid pathologies
+        if np.isclose(sample_weights.std(), 0.):
+            sample_weights = np.ones(len(sample_weights))
+
         y = None
         if "y" in self.dataset.signature:
             y = packed.pop("y_list")
@@ -312,7 +321,7 @@ class DisjointLoader(Loader):
         if y is None:
             return output
         else:
-            return output, y
+            return output, y, sample_weights
 
     def load(self):
         if not tf_loader_available:
