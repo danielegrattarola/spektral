@@ -108,13 +108,14 @@ def test_disjoint():
     loader = DisjointLoader(data, batch_size=batch_size, epochs=1, shuffle=False)
     batches = list(loader)
 
-    (x, a, e, i), y = batches[-1]
+    (x, a, e, i), y, w = batches[-1]
     n = sum(ns[-graphs_in_batch:])
     assert x.shape == (n, f)
     assert a.shape == (n, n)
     assert len(e.shape) == 2 and e.shape[1] == s  # Avoid counting edges
     assert i.shape == (n,)
     assert y.shape == (graphs_in_batch, 2)
+    assert w.shape == (n,)
     assert loader.steps_per_epoch == np.ceil(len(data) / batch_size)
     signature = loader.tf_signature()
     assert len(signature[0]) == 4
@@ -127,13 +128,14 @@ def test_disjoint_node():
     )
     batches = list(loader)
 
-    (x, a, e, i), y = batches[-1]
+    (x, a, e, i), y, w = batches[-1]
     n = sum(ns[-graphs_in_batch:])
     assert x.shape == (n, f)
     assert a.shape == (n, n)
     assert len(e.shape) == 2 and e.shape[1] == s  # Avoid counting edges
     assert i.shape == (n,)
     assert y.shape == (n, 2)
+    assert w.shape == (n,)
     assert loader.steps_per_epoch == np.ceil(len(data) / batch_size)
 
     signature = loader.tf_signature()
