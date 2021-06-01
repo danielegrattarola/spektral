@@ -9,13 +9,6 @@ import sys
 
 from spektral import data, datasets, layers, models, transforms, utils
 
-try:
-    reload(sys)
-    sys.setdefaultencoding("utf8")
-except NameError:
-    pass
-
-
 EXCLUDE = {}
 
 # For each class to document, it is possible to:
@@ -48,6 +41,7 @@ PAGES = [
             layers.GINConv,
             layers.GraphSageConv,
             layers.TAGConv,
+            layers.XENetConv,
         ],
     },
     {
