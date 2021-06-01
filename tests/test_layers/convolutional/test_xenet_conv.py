@@ -4,7 +4,7 @@ from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 
 from spektral import layers
-from spektral.layers import XENetDenseConv, XENetSparseConv
+from spektral.layers import XENetConv, XENetDenseConv
 from spektral.layers.ops import sp_matrix_to_sp_tensor
 
 # Not using these tests because they assume certain behaviors that we
@@ -20,7 +20,7 @@ dense_config = {
 }
 
 sparse_config = {
-    "layer": layers.XENetSparseConv,
+    "layer": layers.XENetConv,
     "modes": [MODES["SINGLE"], MODES["MIXED"]],
     "kwargs": {"kernel_network": [8], "stack_channels": [2, 4], "node_channels": 64, "edge_channels": 16, "channels": 64 },
     "dense": True,
@@ -54,10 +54,10 @@ def test_sparse_model_sizes():
         # for test coverage:
         model([x, a, e])
 
-    X, E = XENetSparseConv([5], 10, 20, False)([X_in, A_in, E_in])
+    X, E = XENetConv([5], 10, 20, False)([X_in, A_in, E_in])
     assert_n_params([X_in, A_in, E_in], [X, E], 350)
     # int vs list: 5 vs [5]
-    X, E = XENetSparseConv(5, 10, 20, False)([X_in, A_in, E_in])
+    X, E = XENetConv(5, 10, 20, False)([X_in, A_in, E_in])
     assert_n_params([X_in, A_in, E_in], [X, E], 350)
     # t = (4+4+3+3+1)*5 =  75    # Stack Conv
     # x = (4+5+5+1)*10  = 150    # Node reduce
@@ -65,7 +65,7 @@ def test_sparse_model_sizes():
     # p                 =   5    # Prelu
     # total = t+x+e+p   = 350
 
-    X, E = XENetSparseConv(5, 10, 20, True)([X_in, A_in, E_in])
+    X, E = XENetConv(5, 10, 20, True)([X_in, A_in, E_in])
     assert_n_params([X_in, A_in, E_in], [X, E], 362)
     # t = (4+4+3+3+1)*5 =  75
     # a = (5+1)*1   *2  =  12    # Attention
@@ -74,7 +74,7 @@ def test_sparse_model_sizes():
     # p                 =   5    # Prelu
     # total = t+x+e+p   = 362
 
-    X, E = XENetSparseConv([50, 5], 10, 20, True)([X_in, A_in, E_in])
+    X, E = XENetConv([50, 5], 10, 20, True)([X_in, A_in, E_in])
     assert_n_params([X_in, A_in, E_in], [X, E], 1292)
     # t1 = (4+4+3+3+1)*50   =  750
     # t2 = (50+1)*5         =  255

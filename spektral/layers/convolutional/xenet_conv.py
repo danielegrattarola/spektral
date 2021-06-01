@@ -1,22 +1,14 @@
 from collections.abc import Iterable
 
 import tensorflow as tf
-from tensorflow.keras.layers import (
-    Concatenate,
-    Dense,
-    MaxPooling1D,
-    Multiply,
-    PReLU,
-    ReLU,
-    Reshape,
-)
+from tensorflow.keras.layers import Concatenate, Dense, Multiply, PReLU, ReLU, Reshape
 from tensorflow.python.ops import gen_sparse_ops
 
 from spektral.layers.convolutional.conv import Conv
 from spektral.layers.convolutional.message_passing import MessagePassing
 
 
-class XENetSparseConv(MessagePassing):
+class XENetConv(MessagePassing):
     r"""
     A XENet convolutional layer from the paper
 
@@ -26,6 +18,8 @@ class XENetSparseConv(MessagePassing):
     **Mode**: single, disjoint, mixed.
 
     **This layer expects a sparse adjacency matrix.**
+
+    For a version of this layer that supports batch mode, see `spektral.layers.XENetDenseConv`.
 
     This layer computes for each node \(i\):
     $$
