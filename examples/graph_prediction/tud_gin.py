@@ -1,7 +1,6 @@
 """
 This example shows how to perform graph classification with a simple Graph
 Isomorphism Network.
-This is an example of TensorFlow 2's imperative style for model declaration.
 """
 
 import numpy as np

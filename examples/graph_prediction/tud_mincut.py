@@ -1,10 +1,3 @@
-"""
-This example shows how to perform molecule regression with the
-[Open Graph Benchmark](https://ogb.stanford.edu) `mol-esol` dataset, using a
-simple GCN with MinCutPool in batch mode.
-Expect unstable training due to the small-ish size of the dataset.
-"""
-
 import numpy as np
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.layers import Dense
