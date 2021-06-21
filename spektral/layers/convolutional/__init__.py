@@ -15,3 +15,4 @@ from .gin_conv import GINConv
 from .graphsage_conv import GraphSageConv
 from .message_passing import MessagePassing
 from .tag_conv import TAGConv
+from .xenet_conv import XENetConv, XENetDenseConv
