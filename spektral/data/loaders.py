@@ -391,7 +391,7 @@ class BatchLoader(Loader):
 
     - `x`: node attributes of shape `[batch, n_max, n_node_features]`;
     - `a`: adjacency matrices of shape `[batch, n_max, n_max]`;
-    - `e`: edge attributes of shape `[batch, n_edges, n_edge_features]`.
+    - `e`: edge attributes of shape `[batch, n_max, n_max, n_edge_features]`.
 
     `labels` have shape `[batch, n_labels]`.
     """
@@ -478,7 +478,7 @@ class PackedBatchLoader(BatchLoader):
 
     - `x`: node attributes of shape `[batch, n_max, n_node_features]`;
     - `a`: adjacency matrices of shape `[batch, n_max, n_max]`;
-    - `e`: edge attributes of shape `[batch, n_max, n_edge_features]`.
+    - `e`: edge attributes of shape `[batch, n_max, n_max, n_edge_features]`.
 
     `labels` have shape `[batch, ..., n_labels]`.
     """
