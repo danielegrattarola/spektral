@@ -5,13 +5,15 @@ import zipfile
 import requests
 from tqdm import tqdm
 
+_dataset_folder = "~/.spektral/datasets"
 _config_path = osp.expanduser("~/.spektral/config.json")
 if osp.isfile(_config_path):
     import json
 
     with open(_config_path) as fh:
         _config = json.load(fh)
-DATASET_FOLDER = osp.expanduser(_config.get("dataset_folder", "~/.spektral/datasets"))
+        _dataset_folder = _config.get("dataset_folder", _dataset_folder)
+DATASET_FOLDER = osp.expanduser(_dataset_folder)
 
 
 def download_file(url, datadir, fname, progress=True, extract=True):
