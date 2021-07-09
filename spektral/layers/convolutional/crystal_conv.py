@@ -22,7 +22,7 @@ class CrystalConv(MessagePassing):
         \W^{(f)} + \b^{(f)} \right) \odot \g \left( \z_{ij} \W^{(s)} + \b^{(s)}
         \right)
     $$
-    where \(\z_{ij} = \X_i \| \X_j \| \E_{ij} \), \(\sigma\) is a sigmoid
+    where \(\z_{ij} = \x_i \| \x_j \| \e_{ji} \), \(\sigma\) is a sigmoid
     activation, and \(g\) is the activation function (defined by the `activation`
     argument).
 
