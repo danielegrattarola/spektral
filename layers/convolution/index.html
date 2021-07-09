@@ -113,6 +113,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#tagconv">TAGConv</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#xenetconv">XENetConv</a>
+    </li>
     </ul>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../pooling/">Pooling layers</a>
@@ -506,7 +508,7 @@ Tian Xie and Jeffrey C. Grossman</p>
 \W^{(f)} + \b^{(f)} \right) \odot \g \left( \z_{ij} \W^{(s)} + \b^{(s)}
 \right)
 </script>
-where <script type="math/tex">\z_{ij} = \X_i \| \X_j \| \E_{ij} </script>, <script type="math/tex">\sigma</script> is a sigmoid
+where <script type="math/tex">\z_{ij} = \x_i \| \x_j \| \e_{ji} </script>, <script type="math/tex">\sigma</script> is a sigmoid
 activation, and <script type="math/tex">g</script> is the activation function (defined by the <code>activation</code>
 argument).</p>
 <p><strong>Input</strong></p>
@@ -674,7 +676,7 @@ layer in the MLP (if None, the MLP has only the output layer);</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gat_conv.py#L11">[source]</a></span></p>
 <h4 id="gatconv">GATConv</h4>
-<pre><code class="python">spektral.layers.GATConv(channels, attn_heads=1, concat_heads=True, dropout_rate=0.5, return_attn_coef=False, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', attn_kernel_initializer='glorot_uniform', kernel_regularizer=None, bias_regularizer=None, attn_kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None, attn_kernel_constraint=None)
+<pre><code class="python">spektral.layers.GATConv(channels, attn_heads=1, concat_heads=True, dropout_rate=0.5, return_attn_coef=False, add_self_loops=True, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', attn_kernel_initializer='glorot_uniform', kernel_regularizer=None, bias_regularizer=None, attn_kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None, attn_kernel_constraint=None)
 </code></pre>
 
 <p>A Graph Attention layer (GAT) from the paper</p>
@@ -723,6 +725,7 @@ heads instead of averaging;</li>
 <li><code>dropout_rate</code>: internal dropout rate for attention coefficients;</li>
 <li><code>return_attn_coef</code>: if True, return the attention coefficients for
 the given input (one n_nodes x n_nodes matrix for each head).</li>
+<li><code>add_self_loops</code>: if True, add self loops to the adjacency matrix.</li>
 <li><code>activation</code>: activation function;</li>
 <li><code>use_bias</code>: bool, add a bias vector to the output;</li>
 <li><code>kernel_initializer</code>: initializer for the weights;</li>
@@ -1058,6 +1061,59 @@ changed to <code>channels</code>.</li>
 <li><code>K</code>: the order of the layer (i.e., the layer will consider a K-hop
 neighbourhood for each node);</li>
 <li><code>activation</code>: activation function;</li>
+<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
+<li><code>bias_initializer</code>: initializer for the bias vector;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
+<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
+<li><code>activity_regularizer</code>: regularization applied to the output;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
+<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/xenet_conv.py#L11">[source]</a></span></p>
+<h4 id="xenetconv">XENetConv</h4>
+<pre><code class="python">spektral.layers.XENetConv(stack_channels, node_channels, edge_channels, attention=True, node_activation=None, edge_activation=None, aggregate='sum', use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+</code></pre>
+
+<p>A XENet convolutional layer from the paper</p>
+<blockquote>
+<p><a href="https://www.biorxiv.org/content/10.1101/2021.05.05.442729v1">XENet: Using a new graph convolution to accelerate the timeline for protein design on quantum computers</a><br>
+Jack B. Maguire, Daniele Grattarola, Eugene Klyshko, Vikram Khipple Mulligan, Hans Melo</p>
+</blockquote>
+<p><strong>Mode</strong>: single, disjoint, mixed.</p>
+<p><strong>This layer expects a sparse adjacency matrix.</strong></p>
+<p>For a version of this layer that supports batch mode, see <code>spektral.layers.XENetDenseConv</code>.</p>
+<p>This layer computes for each node <script type="math/tex">i</script>:
+<script type="math/tex; mode=display">
+\s_{ij} = \text{PReLU} \left( (\x_{i} \| \x_{j} \| \e_{ij} \| \e_{ji}) \W^{(s)} + \b^{(s)} \right) \\
+\s^{(\text{out})}_{i} = \sum\limits_{j \in \mathcal{N}(i)} \s_{ij} \\
+\s^{(\text{in})}_{i} = \sum\limits_{j \in \mathcal{N}(i)} \s_{ji} \\
+\x_{i}' = \sigma\left( (\x_{i} \| \s^{(\text{out})}_{i} \| \s^{(\text{in})}_{i}) \W^{(n)} + \b^{(n)} \right) \\
+\e_{ij}' = \sigma\left( \s_{ij} \W^{(e)} + \b^{(e)} \right)
+</script>
+</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>([batch], n_nodes, n_node_features)</code>;</li>
+<li>Binary adjacency matrices of shape <code>([batch], n_nodes, n_nodes)</code>;</li>
+<li>Edge features of shape <code>(num_edges, n_edge_features)</code>;</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Node features with the same shape of the input, but the last dimension
+changed to <code>node_channels</code>.</li>
+<li>Edge features with the same shape of the input, but the last dimension
+changed to <code>edge_channels</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>stack_channels</code>: integer or list of integers, number of channels for the hidden layers;</li>
+<li><code>node_channels</code>: integer, number of output channels for the nodes;</li>
+<li><code>edge_channels</code>: integer, number of output channels for the edges;</li>
+<li><code>attention</code>: whether to use attention when aggregating the stacks;</li>
+<li><code>node_activation</code>: activation function for nodes;</li>
+<li><code>edge_activation</code>: activation function for edges;</li>
 <li><code>use_bias</code>: bool, add a bias vector to the output;</li>
 <li><code>kernel_initializer</code>: initializer for the weights;</li>
 <li><code>bias_initializer</code>: initializer for the bias vector;</li>

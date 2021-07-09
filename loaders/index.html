@@ -200,7 +200,7 @@ def train_step(inputs, target):
         predictions = model(inputs, training=True)
         loss = loss_fn(target, predictions) + sum(model.losses)
     gradients = tape.gradient(loss, model.trainable_variables)
-    opt.apply_gradients(zip(gradients, model.trainable_variables))
+    optimizer.apply_gradients(zip(gradients, model.trainable_variables))
 </code></pre>
 
 <p>We can then train our model in a for loop as follows:</p>
@@ -287,7 +287,7 @@ iterates indefinitely;</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L347">[source]</a></span></p>
 <h4 id="batchloader">BatchLoader</h4>
-<pre><code class="python">spektral.data.loaders.BatchLoader(dataset, batch_size=1, epochs=None, shuffle=True)
+<pre><code class="python">spektral.data.loaders.BatchLoader(dataset, mask=False, batch_size=1, epochs=None, shuffle=True)
 </code></pre>
 
 <p>A Loader for
@@ -312,6 +312,10 @@ zero-padded because they are assumed to have no "node" dimensions).</p>
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>dataset</code>: a graph Dataset;</li>
+<li><code>mask</code>: if True, node attributes will be extended with a binary mask that
+indicates valid nodes (the last feature of each node will be 1 if the node is valid
+and 0 otherwise). Use this flag in conjunction with layers.base.GraphMasking to
+start the propagation of masks in a model.</li>
 <li><code>batch_size</code>: size of the mini-batches;</li>
 <li><code>epochs</code>: number of epochs to iterate over the dataset. By default (<code>None</code>)
 iterates indefinitely;</li>
@@ -323,13 +327,13 @@ iterates indefinitely;</li>
 <ul>
 <li><code>x</code>: node attributes of shape <code>[batch, n_max, n_node_features]</code>;</li>
 <li><code>a</code>: adjacency matrices of shape <code>[batch, n_max, n_max]</code>;</li>
-<li><code>e</code>: edge attributes of shape <code>[batch, n_edges, n_edge_features]</code>.</li>
+<li><code>e</code>: edge attributes of shape <code>[batch, n_max, n_max, n_edge_features]</code>.</li>
 </ul>
 <p><code>labels</code> have shape <code>[batch, n_labels]</code>.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L436">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L448">[source]</a></span></p>
 <h4 id="packedbatchloader">PackedBatchLoader</h4>
-<pre><code class="python">spektral.data.loaders.PackedBatchLoader(dataset, batch_size=1, epochs=None, shuffle=True)
+<pre><code class="python">spektral.data.loaders.PackedBatchLoader(dataset, mask=False, batch_size=1, epochs=None, shuffle=True)
 </code></pre>
 
 <p>A <code>BatchLoader</code> that zero-pads the graphs before iterating over the dataset.
@@ -359,11 +363,11 @@ iterates indefinitely;</li>
 <ul>
 <li><code>x</code>: node attributes of shape <code>[batch, n_max, n_node_features]</code>;</li>
 <li><code>a</code>: adjacency matrices of shape <code>[batch, n_max, n_max]</code>;</li>
-<li><code>e</code>: edge attributes of shape <code>[batch, n_max, n_edge_features]</code>.</li>
+<li><code>e</code>: edge attributes of shape <code>[batch, n_max, n_max, n_edge_features]</code>.</li>
 </ul>
 <p><code>labels</code> have shape <code>[batch, ..., n_labels]</code>.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L522">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L540">[source]</a></span></p>
 <h4 id="mixedloader">MixedLoader</h4>
 <pre><code class="python">spektral.data.loaders.MixedLoader(dataset, batch_size=1, epochs=None, shuffle=True)
 </code></pre>

@@ -89,6 +89,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#generalgnn">GeneralGNN</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#gnnexplainer">GNNExplainer</a>
+    </li>
     </ul>
                     </li>
                 </ul>
@@ -256,6 +258,40 @@ pooling is applied (e.g., for node-level learning). Supported pooling methods:
 'sum', 'avg', 'max', 'attn', 'attn_sum', 'sort'
 (see <code>spektral.layers.pooling.global_pool</code>).</li>
 </ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/models/gnn_explainer.py#L11">[source]</a></span></p>
+<h4 id="gnnexplainer">GNNExplainer</h4>
+<pre><code class="python">spektral.models.gnn_explainer.GNNExplainer(model, n_hops=None, preprocess=None, graph_level=False, verbose=False, learning_rate=0.01, a_size_coef=0.0005, x_size_coef=0.1, a_entropy_coef=0.1, x_entropy_coef=0.1, laplacian_coef=0.0)
+</code></pre>
+
+<p>The GNNExplainer model from the paper:</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1903.03894">GNNExplainer: Generating Explanations for Graph Neural Networks</a><br>
+Rex Ying, Dylan Bourgeois, Jiaxuan You, Marinka Zitnik and Jure Leskovec.</p>
+</blockquote>
+<p>The model can be used to explain the predictions for a single node or for an entire
+graph. In both cases, it returns the subgraph that mostly contributes to the
+prediction.</p>
+<p><strong>Arguments</strong>
+- <code>model</code>: tf.keras.Model to explain;
+- <code>n_hops</code>: number of hops from which the GNN aggregates info. If <code>None</code>, then the
+number is inferred from the Conv and MessagePassing layers in the model.
+- <code>preprocess</code>: a preprocessing function to transform the adjacency matrix before
+giving it as input to the GNN; this is usually the same <code>preprocess</code> function of the
+Conv or MessagePassing layers used in the GNN (e.g., <code>GCNConv.preprocess</code>).
+- <code>graph_level</code>: if True, the GNN is assumed to be for graph-level prediction and
+the explanation is computed for the whole graph (and not just a node).
+- <code>verbose</code>: if True, print info during training;
+- <code>learning_rate</code>: learning rate when training the model;
+- <code>a_size_coef</code>: coefficient to control the number of edges of the subgraph that
+contributes to the prediction;
+- <code>x_size_coef</code>: coefficient to control the number of features of the subgraph
+that contributes to the prediction;
+- <code>a_entropy_coef</code>: coefficient to control the discretization of the adjacency
+mask;
+- <code>x_entropy_coef</code>: coefficient to control the discretization of the features
+mask;
+- <code>laplacian_coef</code>: coefficient to control the graph Laplacian loss;</p>
               
             </div>
           </div>

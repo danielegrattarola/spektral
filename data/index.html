@@ -345,7 +345,7 @@ from the disjoint union.</p>
 </ul>
 <hr />
 <h4 id="to_batch">to_batch</h4>
-<pre><code class="python">spektral.data.utils.to_batch(x_list=None, a_list=None, e_list=None)
+<pre><code class="python">spektral.data.utils.to_batch(x_list=None, a_list=None, e_list=None, mask=False)
 </code></pre>
 
 <p>Converts lists of node features, adjacency matrices and edge features to
@@ -374,6 +374,12 @@ np.arrays.</p>
 <li>
 <p><code>e_list</code>: a list of np.arrays of shape
 <code>(n_nodes, n_nodes, n_edge_features)</code> or <code>(n_edges, n_edge_features)</code>;</p>
+</li>
+<li>
+<p><code>mask</code>: bool, if True, node attributes will be extended with a binary mask that
+indicates valid nodes (the last feature of each node will be 1 if the node is valid
+and 0 otherwise). Use this flag in conjunction with layers.base.GraphMasking to
+start the propagation of masks in a model.</p>
 </li>
 </ul>
 <p><strong>Return</strong><br />

@@ -170,6 +170,14 @@
             <div class="section">
               
                 <h2 id="datasets">Datasets</h2>
+<p>This module provides benchmark datasets for graph-level and node-level prediction. 
+Datasets are automatically downloaded and savevd locally on the first usage. 
+You can configure the path in which the data are stored by creating a <code>~/.spektral/config.json</code> file with the following content:</p>
+<pre><code class="json">{
+  &quot;dataset_folder&quot;: &quot;/path/to/dataset/folder&quot;
+}
+</code></pre>
+
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/citation.py#L15">[source]</a></span></p>
 <h4 id="citation">Citation</h4>
 <pre><code class="python">spektral.datasets.citation.Citation(name, random_split=False, normalize_x=False, dtype=&lt;class 'numpy.float32'&gt;)
@@ -286,7 +294,7 @@ controls which split is loaded.</p>
 available cores)</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/ogb.py#L8">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/ogb.py#L7">[source]</a></span></p>
 <h4 id="ogb">OGB</h4>
 <pre><code class="python">spektral.datasets.ogb.OGB(dataset)
 </code></pre>
