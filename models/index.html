@@ -272,26 +272,28 @@ Rex Ying, Dylan Bourgeois, Jiaxuan You, Marinka Zitnik and Jure Leskovec.</p>
 <p>The model can be used to explain the predictions for a single node or for an entire
 graph. In both cases, it returns the subgraph that mostly contributes to the
 prediction.</p>
-<p><strong>Arguments</strong>
-- <code>model</code>: tf.keras.Model to explain;
-- <code>n_hops</code>: number of hops from which the GNN aggregates info. If <code>None</code>, then the
-number is inferred from the Conv and MessagePassing layers in the model.
-- <code>preprocess</code>: a preprocessing function to transform the adjacency matrix before
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>model</code>: tf.keras.Model to explain;</li>
+<li><code>n_hops</code>: number of hops from which the GNN aggregates info. If <code>None</code>, then the
+number is inferred from the Conv and MessagePassing layers in the model.</li>
+<li><code>preprocess</code>: a preprocessing function to transform the adjacency matrix before
 giving it as input to the GNN; this is usually the same <code>preprocess</code> function of the
-Conv or MessagePassing layers used in the GNN (e.g., <code>GCNConv.preprocess</code>).
-- <code>graph_level</code>: if True, the GNN is assumed to be for graph-level prediction and
-the explanation is computed for the whole graph (and not just a node).
-- <code>verbose</code>: if True, print info during training;
-- <code>learning_rate</code>: learning rate when training the model;
-- <code>a_size_coef</code>: coefficient to control the number of edges of the subgraph that
-contributes to the prediction;
-- <code>x_size_coef</code>: coefficient to control the number of features of the subgraph
-that contributes to the prediction;
-- <code>a_entropy_coef</code>: coefficient to control the discretization of the adjacency
-mask;
-- <code>x_entropy_coef</code>: coefficient to control the discretization of the features
-mask;
-- <code>laplacian_coef</code>: coefficient to control the graph Laplacian loss;</p>
+Conv or MessagePassing layers used in the GNN (e.g., <code>GCNConv.preprocess</code>).</li>
+<li><code>graph_level</code>: if True, the GNN is assumed to be for graph-level prediction and
+the explanation is computed for the whole graph (and not just a node).</li>
+<li><code>verbose</code>: if True, print info during training;</li>
+<li><code>learning_rate</code>: learning rate when training the model;</li>
+<li><code>a_size_coef</code>: coefficient to control the number of edges of the subgraph that
+contributes to the prediction;</li>
+<li><code>x_size_coef</code>: coefficient to control the number of features of the subgraph
+that contributes to the prediction;</li>
+<li><code>a_entropy_coef</code>: coefficient to control the discretization of the adjacency
+mask;</li>
+<li><code>x_entropy_coef</code>: coefficient to control the discretization of the features
+mask;</li>
+<li><code>laplacian_coef</code>: coefficient to control the graph Laplacian loss;</li>
+</ul>
               
             </div>
           </div>
