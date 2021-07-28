@@ -23,7 +23,7 @@ from spektral.layers import ChebConv
 from spektral.transforms import AdjToSpTensor, LayerPreprocess
 
 # Load data
-dataset = Citation("cora", transforms=[LayerPreprocess(ChebConv), AdjToSpTensor()])
+dataset = Citation("cora", transforms=[LayerPreprocess(ChebConv)])
 
 
 # We convert the binary masks to sample weights so that we can compute the

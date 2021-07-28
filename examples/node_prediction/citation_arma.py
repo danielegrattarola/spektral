@@ -17,7 +17,7 @@ from spektral.layers import ARMAConv
 from spektral.transforms import AdjToSpTensor, LayerPreprocess
 
 # Load data
-dataset = Citation("cora", transforms=[LayerPreprocess(ARMAConv), AdjToSpTensor()])
+dataset = Citation("cora", transforms=[LayerPreprocess(ARMAConv)])
 mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
 
 # Parameters

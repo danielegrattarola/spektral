@@ -21,9 +21,7 @@ from spektral.transforms import AdjToSpTensor, LayerPreprocess
 set_seed(0)
 
 # Load data
-dataset = Citation(
-    "cora", normalize_x=True, transforms=[LayerPreprocess(GATConv), AdjToSpTensor()]
-)
+dataset = Citation("cora", normalize_x=True, transforms=[LayerPreprocess(GATConv)])
 
 
 def mask_to_weights(mask):

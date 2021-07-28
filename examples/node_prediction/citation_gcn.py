@@ -25,9 +25,7 @@ data = "cora"
 tf.random.set_seed(seed=seed)  # make weight initialization reproducible
 
 # Load data
-dataset = Citation(
-    data, normalize_x=True, transforms=[LayerPreprocess(GCNConv), AdjToSpTensor()]
-)
+dataset = Citation(data, normalize_x=True, transforms=[LayerPreprocess(GCNConv)])
 
 
 # We convert the binary masks to sample weights so that we can compute the

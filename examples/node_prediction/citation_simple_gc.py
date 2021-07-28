@@ -36,9 +36,7 @@ class SGCN:
 
 # Load data
 K = 2  # Propagation steps for SGCN
-dataset = Citation(
-    "cora", transforms=[LayerPreprocess(GCNConv), SGCN(K), AdjToSpTensor()]
-)
+dataset = Citation("cora", transforms=[LayerPreprocess(GCNConv), SGCN(K)])
 mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
 
 # Parameters
