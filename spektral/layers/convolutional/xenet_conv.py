@@ -19,7 +19,8 @@ class XENetConv(MessagePassing):
 
     **This layer expects a sparse adjacency matrix.**
 
-    For a version of this layer that supports batch mode, see `spektral.layers.XENetDenseConv`.
+    For a version of this layer that supports batch mode, you can use
+    `spektral.layers.XENetDenseConv` as a drop-in replacement.
 
     This layer computes for each node \(i\):
     $$

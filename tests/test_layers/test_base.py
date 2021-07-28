@@ -6,6 +6,8 @@ from spektral import layers
 from spektral.utils.sparse import sp_matrix_to_sp_tensor
 from tests.test_layers.convolutional.core import _test_get_config
 
+tol = 1e-6
+
 
 def test_disjoint_2_batch():
     X = np.array([[1, 0], [0, 1], [1, 1], [0, 0], [1, 2]])
@@ -26,8 +28,8 @@ def test_disjoint_2_batch():
     )
 
     result_X, result_A = layers.Disjoint2Batch()((X, A, I))
-    assert np.allclose(result_A, expected_A)
-    assert np.allclose(result_X, expected_X)
+    assert np.allclose(result_A, expected_A, atol=tol)
+    assert np.allclose(result_X, expected_X, atol=tol)
 
     _test_get_config(layers.Disjoint2Batch)
 
