@@ -231,6 +231,9 @@ class SingleLoader(Loader):
         if self.sample_weights is not None:
             output += (self.sample_weights,)
 
+        if len(output) == 1:
+            output = output[0]  # Again, in case there are no targets and no SW
+
         return output
 
     def load(self):
