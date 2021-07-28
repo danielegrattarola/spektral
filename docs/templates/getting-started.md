@@ -2,7 +2,7 @@
 
 Spektral is designed according to the guiding principles of Keras to make things extremely simple for beginners while maintaining flexibility for experts.  
 
-In this page we will go over the main features of Spektral while creating a graph neural network for graph classification. 
+In this tutorial, we will go over the main features of Spektral while creating a graph neural network for graph classification. 
 
 ## Graphs
 
@@ -10,14 +10,109 @@ A graph is a mathematical object that represents relations between entities. We 
 
 Both the nodes and the edges can have vector **features**.
 
-In Spektral, graphs are represented with instances of `spektral.data.Graph` which can contain:
+In Spektral, graphs are represented with instances of `spektral.data.Graph`.
+A graph can have four main attributes: 
 
-- `a`: the **adjacency matrix** - usually a `scipy.sparse` matrix of shape `(n_nodes, n_nodes)`. 
-- `x`: the **node features** - represented by a `np.array` of shape `(n_nodes, n_node_features)`.
-- `e`: the **edge features** - usually represented in a sparse edge list format, with a `np.array` of shape `(n_edges, n_edge_features)`.
-- `y`: the **labels** - can represent anything, from graph labels to node labels, or even something else. 
+- `a`: the **adjacency matrix**
+- `x`: the **node features**
+- `e`: the **edge features**
+- `y`: the **labels**
 
 A graph can have all of these attributes or none of them. Since Graphs are just plain Python objects, you can also add extra attributes if you want. For instance, see `graph.n_nodes`, `graph.n_node_features`, etc.
+
+### Adjacency matrix (`graph.a`)
+
+Each entry `a[i, j]` of the adjacency matrix is non-zero if there exists an edge going from node `j` to node `i`, and zero otherwise. 
+
+We can represent `a` as a dense `np.array` or as a Scipy sparse matrix of shape `[n_nodes, n_nodes]`.
+Using an `np.array` to represent the adjacency matrix can be expensive, since we need to store a lot of 0s in memory, so sparse matrices are usually preferable.
+
+With sparse matrices, we only need to store the non-zero entries of `a`. In practice, we can implement a sparse matrix by only storing the indices and values of the non-zero entries in a list, and assuming that if a pair of indices is missing from the list then its corresponding value will be 0.  
+This is called the _COOrdinate format_ and it is the format used by TensorFlow to represent sparse tensors.
+
+For example, the adjacency matrix of a weighted ring graph with 4 nodes:
+
+```
+[[0, 1, 0, 2],
+ [3, 0, 4, 0],
+ [0, 5, 0, 6],
+ [7, 0, 8, 0]]
+```
+
+can be represented in COOrdinate format as follows: 
+
+```python
+R, C, V
+0, 1, 1
+0, 3, 2
+1, 0, 3
+1, 2, 4
+2, 1, 5
+2, 3, 6
+3, 0, 7
+3, 2, 8
+```
+
+where `R` indicates the "row" indices, `C` the columns, and `V` the non-zero values `a[i, j]`. For example, in the second line, we see that there is an edge that goes **from node 3 to node 0** with weight 2.
+
+We also see that, in this case, all edges have a corresponding edge that goes in the opposite direction. For the sake of this example, all edges have been assigned a different weight. In practice, however, edge `i, j` will often have the same weight as edge `j, i` and the adjacency matrix will be symmetric.
+
+Many convolutional and pooling layers in Spektral use this sparse representation of matrices to do their computation, and sometimes you will see in the documentation a comment saying that **"This layer expects a sparse adjacency matrix."**
+
+### Node features (`graph.x`)
+
+When working with graph neural networks, we usually associate a vector of features with each node of a graph. This is no different from how every pixel in an image has an `[R, G, B, A]` vector associated with it. 
+
+Since we have `n_nodes` nodes and each node has a feature vector of size `n_node_features`, we can stack all features in a matrix `x` of shape `[n_nodes, n_node_features]`.
+
+In Spektral, `x` is always represented with a dense `np.array` (since in this case we don't run the risk of storing many useless zeros -- at least not often).
+
+### Edge features (`graph.e`)
+
+Similar to node features, we can also have features associated with edges. These are usually different from the _edge weights_ that we saw for the adjacency matrix, and often represent the kind of relation between two nodes (e.g., acquaintances, friends, or partners).
+
+When representing edge features, we run into the same problems that we have for the adjacency matrix. 
+
+If we store them in a dense `np.array`, then the array will have shape `[n_nodes, n_nodes, n_edge_features]` and most of its entries will be zeros. Unfortunately, order-3 tensors cannot be represented as Scipy sparse matrices, so we need to be smart about it. 
+
+Similar to how we stored the adjacency matrix as a list of entries `r, c, v`, here we can use the COOrdinate format to represent our edge features. 
+Assume that, in the example above, each edge has `n_edge_features=3` features. We could do something like: 
+
+```python
+R, C, V
+0, 1, [ef_1, ef_2, ef_3]
+0, 3, [ef_1, ef_2, ef_3]
+1, 0, [ef_1, ef_2, ef_3]
+1, 2, [ef_1, ef_2, ef_3]
+2, 1, [ef_1, ef_2, ef_3]
+2, 3, [ef_1, ef_2, ef_3]
+3, 0, [ef_1, ef_2, ef_3]
+3, 2, [ef_1, ef_2, ef_3]
+```
+
+Since we already have the information of `R` and `C` in the adjacency matrix, we only need to store the `V` column as a matrix `e` of shape `[n_edges, n_edge_features]`. In this case, `n_edges` indicates the number of non-zero entries in the adjacency matrix. 
+
+Note that, since we have separated the edge features from the edge indices of the adjacency matrix, the order in which we store the edge features is very important. We must not break the correspondence between the edges in `a` and the edges in `e`.
+
+**In Spektral, we always assume that edges are sorted in the row-major ordering (we first sort by row, then by column, like in the example above). This is not important when building the adjacency matrix, but it is important when building `e`.**
+
+You can use `spektral.utils.sparse.reorder` to sort a matrix of edge features in the correct row-major order given by an _edge index_ (i.e., the matrix obtained by stacking the `R` and `C` columns).
+
+### Labels (`graph.y`)
+
+Finally, in many machine learning tasks we want to predict a label given an input. 
+When working with GNNs, labels can be of two types: 
+
+1. **Graph labels** represent some global properties of an entire graph;
+2. **Node labels** represent some properties of each individual node in a graph;
+
+Spektral supports both kinds. 
+
+Labels are dense `np.array`s or scalars, stored in the `y` attribute of a `Graph` object.    
+Graph-level labels can be either scalars or 1-dimensional arrays of shape `[n_labels, ]`.   
+Node-level labels can be 1-dimensional arrays of shape `[n_nodes, ]` (representing a scalar label for each node), or 2-dimensional arrays of shape `[n_nodes, n_labels]`.
+
+This difference is relevant only when using a [`DisjointLoader`](/loaders/#disjointloader) ([read more here](/data-modes/#disjoint-mode)).
 
 ## Datasets
 
@@ -167,7 +262,7 @@ model.compile('adam', 'categorical_crossentropy')
 
 and we're almost there!
 
-However, here's where graphs get in our way. Unlike regular data, like images or sequences, graphs cannot be stretched or cut or reshaped so that we can fit them into tensors of pre-defined shape. If a graph has 10 nodes and another one has 4, we have to keep them that way. 
+However, here's where graphs get in our way. Unlike regular data, like images or sequences, graphs cannot be stretched, cut, or reshaped so that we can fit them into tensors of pre-defined shapes. If a graph has 10 nodes and another one has 4, we have to keep them that way. 
 
 This means that iterating over a dataset in mini-batches is not trivial and we cannot simply use the `model.fit()` method of Keras as-is. 
 
@@ -175,7 +270,7 @@ We have to use a data `Loader`.
 
 ### Loaders
 
-Loaders iterate over a graph dataset to create mini-batches. They hide a lot of the complexity behind the process, so that you don't need to think about it. 
+Loaders iterate over a graph dataset to create mini-batches. They hide a lot of the complexity behind the process so that you don't need to think about it. 
 You only need to go to [this page](/data-modes) and read up on **data modes**, so that you know which loader to use. 
 
 Each loader has a `load()` method that returns a data generator that Keras can process. 

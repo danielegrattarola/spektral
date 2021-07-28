@@ -23,25 +23,29 @@ In Spektral, there are four of them:
 
 In all data modes, our goal is to represent one or more graphs by grouping their respective `x`, `a` and `e` matrices into single tensors `X`, `A`, and `E`. The shapes of these tensors in the different data modes are summarized in the table below. 
 
-|Mode      | `A.shape` | `X.shape` | `E.shape` |
-|:---------|:--|:--|:--|
-|`Single`  |`[nodes, nodes]`|`[nodes, n_feat]`|`[edges, e_feat]`|
-|`Disjoint`|`[nodes, nodes]`|`[nodes, n_feat]`|`[edges, e_feat]`|
-|`Batch`   |`[batch, nodes, nodes]`|`[batch, nodes, n_feat]`|`[batch, nodes, nodes, e_feat]`|
-|`Mixed`   |`[nodes, nodes]`|`[batch, nodes, n_feat]`| `[batch, edges, e_feat]` |
+|Mode    | `A.shape` | `X.shape` | `E.shape` |
+|:-------|:--|:--|:--|
+|Single  |`[nodes, nodes]`|`[nodes, n_feat]`|`[edges, e_feat]`|
+|Disjoint|`[nodes, nodes]`|`[nodes, n_feat]`|`[edges, e_feat]`|
+|Batch   |`[batch, nodes, nodes]`|`[batch, nodes, n_feat]`|`[batch, nodes, nodes, e_feat]`|
+|Mixed   |`[nodes, nodes]`|`[batch, nodes, n_feat]`| `[batch, edges, e_feat]` |
+
+In the table above, `batch` is the batch size, `nodes` is the number of nodes, `edges` is the number of edges, `n_feat` and `e_feat` are the number of node and edge features respectively.
+
+Make sure to read the [Getting Started](/getting-started/) tutorial to understand what these matrices represent for a generic graph.
 
 In the following sections we describe the four modes more into detail.
 In particular, we go over which [data `Loader`](/loaders/) to use in each case.
 
 ## Single mode
 
-<img src="https://danielegrattarola.github.io/spektral/img/single_mode.svg" style="max-width: 400px; width: 100%;"/>
+<img src="/img/single_mode.svg" style="max-width: 400px; width: 100%;"/>
 
 In single mode we have only one graph in which: 
 
 - `A` is a matrix of shape `[nodes, nodes]`;
 - `X` is a matrix of shape `[nodes, n_feat]`;
-- `E` has shape `[edges, e_feat]` so that `E[i]` corresponds to the edge in `A[i // nodes, i % nodes]`.
+- `E` has shape `[edges, e_feat]` with one row for each non-zero entry of `A`, sorted in row-major ordering (see the [Getting Started](/getting-started/) tutorial).
 
 A very common benchmark dataset in single mode is the Cora citation network. 
 We can load it with:
@@ -77,7 +81,7 @@ When training a GNN in single mode, we can use a `SingleLoader` that will extrac
 
 ## Disjoint mode
 
-<img src="https://danielegrattarola.github.io/spektral/img/disjoint_mode.svg" style="max-width: 400px; width: 100%;"/>
+<img src="/img/disjoint_mode.svg" style="max-width: 400px; width: 100%;"/>
 
 In disjoint mode we represent a set of graphs as a single graph, their "disjoint union", where:
 
@@ -85,11 +89,12 @@ In disjoint mode we represent a set of graphs as a single graph, their "disjoint
 - `X` is obtained by stacking the node attributes `x_i`;
 - `E` is also obtained by stacking the edges `e_i`.
 
-The shapes of the three matrices are the same as single mode, but `nodes` is the number of all the nodes in the set of graphs. 
+The shapes of the three matrices are the same as single mode, but `nodes` is the cumulative number of all the nodes in the set of graphs. 
+Similarly, the edge features are represented in sparse COOrdinate format and row-major ordering relative to each graph (see the [Getting Started](/getting-started/) tutorial), and `edges` indicates the cumulative number of edges of the disjoint union.
 
 To keep track of the different graphs in the disjoint union, we use an additional array of zero-based indices `I` that identify which nodes belong to which graph. 
 For instance: if node 8 belongs to the third graph, we will have `I[8] == 2`. <br>
-In the example above, color blue represents 0, green is 1, and orange is 2
+In the example above, color blue represents 0, green is 1, and orange is 2.
 
 In convolutional layers, disjoint mode is indistinguishable from single mode because it is not possible to exchange messages between the disjoint components of the graph, so `I` is not needed to compute the output.  
 Pooling layers, on the other hand, require `I` to know which nodes can be pooled together.
@@ -142,19 +147,18 @@ Note that, since we don't have edge attributes in our dataset, the loader did no
 
 ## Batch mode
 
-<img src="https://danielegrattarola.github.io/spektral/img/batch_mode.svg" style="max-width: 400px; width: 100%;"/>
+<img src="/img/batch_mode.svg" style="max-width: 400px; width: 100%;"/>
 
 In batch mode, graphs are zero-padded so that they fit into tensors of shape `[batch, N, ...]`. 
 Due to the general lack of support for sparse higher-order tensors both in Scipy and TensorFlow, `X`, `A`, and `E` will be dense tensors:
 
 - `A` has shape `[batch, nodes, nodes]`;
 - `X` has shape `[batch, nodes, n_feat]`;
-- `E` has shape `[batch, nodes, nodes, e_feat]` (the attributes of non-existing edges are all zeros).
+- `E` has shape `[batch, nodes, nodes, e_feat]` (note that this is now the dense/`np.array` format, in which the attributes of non-existing edges are all zeros).
 
 If the graphs have a variable number of nodes, `nodes` will be the size of the biggest graph in the batch.
 
 If you don't want to zero-pad the graphs or work with dense inputs, it is better to use [disjoint mode](#disjoint-mode) instead.
-
 However, note that some pooling layers like `DiffPool` and `MinCutPool` will only work in batch mode. 
 
 Let's re-use the dataset from the example above. We can use a `BatchLoader` as follows: 
@@ -179,7 +183,7 @@ The `BatchLoader` zero-pads each batch independently of the others, so that we d
 
 ## Mixed mode
 
-<img src="https://danielegrattarola.github.io/spektral/img/mixed_mode.svg" style="max-width: 400px; width: 100%;"/>
+<img src="/img/mixed_mode.svg" style="max-width: 400px; width: 100%;"/>
 
 In mixed mode we have a single graph that acts as the support for different node attributes (also sometimes called "graph signals").
 
@@ -187,7 +191,9 @@ In this case we have that:
 
 - `A` is a matrix of shape `[nodes, nodes]`;
 - `X` is a tensor in batch mode, of shape `[batch, nodes, n_feat]`;
-- `E` has shape `[batch, edges, e_feat]` so that `E[i, j]` corresponds to the edge of the i-th graph associated with `A[j // nodes, j % nodes]`.
+- `E` has shape `[batch, edges, e_feat]`, where again we are representing each edge feature matrix `E[b]`, for `b` = `0`, ..., `batch - 1`, in sparse format.
+
+Note that, since `nodes` and `edges` are the same for all graphs, we have stacked each `x_i` and `e_i` in higher-order tensors, similar to batch mode. 
 
 An example of a mixed mode dataset is the MNIST random grid ([Defferrard et al., 2016](https://arxiv.org/abs/1606.09375)):
 

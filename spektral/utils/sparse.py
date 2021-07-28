@@ -5,14 +5,16 @@ from scipy import sparse as sp
 
 def reorder(edge_index, edge_weight=None, edge_features=None):
     """
-    Reorders `edge_index`, `edge_weight`, and `edge_features` in row-major order.
-    :param edge_index: np.array, indices to sort in row-major order.
+    Reorders `edge_index`, `edge_weight`, and `edge_features` according to the row-major
+    ordering of `edge_index`.
+    :param edge_index: np.array of shape `[n_edges, 2]` (representing rows and columns
+    of the adjacency matrix), indices to sort in row-major order.
     :param edge_weight: np.array or None, edge weight to sort according to the new
     order of the indices.
     :param edge_features: np.array or None, edge features to sort according to the new
     order of the indices.
     :return:
-        - edge_index: np.array, edge_index sorted in lexicographic order.
+        - edge_index: np.array, edge_index sorted in row-major order.
         - edge_weight: If edge_weight is not None, edge_weight sorted according to the
         new order of the indices. Otherwise, None.
         - edge_features: If edge_features is not None, edge_features sorted according to
