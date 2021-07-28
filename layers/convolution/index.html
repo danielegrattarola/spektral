@@ -1083,7 +1083,8 @@ Jack B. Maguire, Daniele Grattarola, Eugene Klyshko, Vikram Khipple Mulligan, Ha
 </blockquote>
 <p><strong>Mode</strong>: single, disjoint, mixed.</p>
 <p><strong>This layer expects a sparse adjacency matrix.</strong></p>
-<p>For a version of this layer that supports batch mode, see <code>spektral.layers.XENetDenseConv</code>.</p>
+<p>For a version of this layer that supports batch mode, you can use
+<code>spektral.layers.XENetDenseConv</code> as a drop-in replacement.</p>
 <p>This layer computes for each node <script type="math/tex">i</script>:
 <script type="math/tex; mode=display">
 \s_{ij} = \text{PReLU} \left( (\x_{i} \| \x_{j} \| \e_{ij} \| \e_{ji}) \W^{(s)} + \b^{(s)} \right) \\
