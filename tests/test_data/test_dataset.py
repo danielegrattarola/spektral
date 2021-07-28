@@ -70,6 +70,11 @@ def test_dataset():
     # __len__
     assert d.__len__() == n_graphs
 
+    # __add__
+    d2 = TestDataset()
+    assert len(d + d2) == len(d) + len(d2)
+    assert len(d + d2) == len(d2 + d)  # Test no side effects by repeated calling
+
     # __repr__
     print(d)
 

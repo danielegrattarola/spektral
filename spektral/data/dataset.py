@@ -202,6 +202,12 @@ class Dataset:
                 for i, k in enumerate(key):
                     self.graphs[k] = value[i]
 
+    def __add__(self, other):
+        self_new = copy.copy(self)
+        self_new.graphs = self.graphs + other.graphs
+
+        return self_new
+
     def __len__(self):
         return len(self.graphs)
 
