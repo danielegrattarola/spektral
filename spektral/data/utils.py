@@ -3,6 +3,7 @@ import tensorflow as tf
 from scipy import sparse as sp
 
 from spektral.utils import pad_jagged_array
+from spektral.utils.sparse import sp_matrix_to_sp_tensor
 
 
 def to_disjoint(x_list=None, a_list=None, e_list=None):
@@ -253,3 +254,36 @@ def to_tf_signature(signature):
         output = (output, spec(shape, dtype))
 
     return output
+
+
+def sp_matrices_to_sp_tensors(inputs):
+    inputs = list(inputs)
+    for i in range(len(inputs)):
+        if sp.issparse(inputs[i]):
+            inputs[i] = sp_matrix_to_sp_tensor(inputs[i])
+    return tuple(inputs)
+
+
+def collate_labels_disjoint(y_list, node_level=False):
+    """
+    Collates the given list of labels for disjoint mode.
+
+    If `node_level=False`, the labels can be scalars or must have shape `[n_labels, ]`.
+    If `node_level=True`, the labels must have shape `[n_nodes, ]` (i.e., a scalar label
+    for each node) or `[n_nodes, n_labels]`.
+
+    :param y_list: a list of np.arrays or scalars.
+    :param node_level: bool, whether to pack the labels as node-level or graph-level.
+    :return:
+        - If `node_level=False`: a np.array of shape `[len(y_list), n_labels]`.
+        - If `node_level=True`: a np.array of shape `[n_nodes_total, n_labels]`, where
+        `n_nodes_total = sum(y.shape[0] for y in y_list)`.
+    """
+    if node_level:
+        if len(np.shape(y_list[0])) == 1:
+            y_list = [y_[:, None] for y_ in y_list]
+        return np.vstack(y_list)
+    else:
+        if len(np.shape(y_list[0])) == 0:
+            y_list = [np.array([y_]) for y_ in y_list]
+        return np.array(y_list)

@@ -4,6 +4,7 @@ import tensorflow as tf
 
 from spektral.layers import ops
 from spektral.utils import convolution
+from spektral.utils.sparse import sp_batch_to_sp_tensor, sp_matrix_to_sp_tensor
 
 batch_size = 10
 N = 3
@@ -26,11 +27,11 @@ def _assert_all_close(output, expected_output):
 
 def _convert_to_sparse_tensor(x):
     if x.ndim == 2:
-        return ops.sp_matrix_to_sp_tensor(x)
+        return sp_matrix_to_sp_tensor(x)
     elif x.ndim == 3:
         s1_, s2_, s3_ = x.shape
         return ops.reshape(
-            ops.sp_matrix_to_sp_tensor(x.reshape(s1_ * s2_, s3_)), (s1_, s2_, s3_)
+            sp_matrix_to_sp_tensor(x.reshape(s1_ * s2_, s3_)), (s1_, s2_, s3_)
         )
 
 
@@ -260,7 +261,7 @@ def test_modes_ops():
     A_row = [0, 1, 2, 3, 4]
     A_col = [1, 0, 1, 4, 3]
     A_sparse = sp.csr_matrix((A_data, (A_row, A_col)), shape=(5, 5))
-    A_sparse_tensor = ops.sp_matrix_to_sp_tensor(A_sparse)
+    A_sparse_tensor = sp_matrix_to_sp_tensor(A_sparse)
 
     # Disjoint signal to batch
     expected_result = np.array(
@@ -425,5 +426,5 @@ def test_gather_sparse_square():
 
 def test_sp_batch_to_sp_tensor():
     a_batch = [sp.random(N, N) for _ in range(batch_size)]
-    a_out = ops.sp_batch_to_sp_tensor(a_batch)
+    a_out = sp_batch_to_sp_tensor(a_batch)
     assert a_out.shape == (batch_size, N, N)

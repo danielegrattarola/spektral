@@ -20,9 +20,9 @@ from tqdm import tqdm
 
 from spektral.datasets.citation import Cora
 from spektral.layers.convolutional import GCSConv
-from spektral.layers.ops import sp_matrix_to_sp_tensor
 from spektral.layers.pooling import MinCutPool
 from spektral.utils.convolution import normalized_adjacency
+from spektral.utils.sparse import sp_matrix_to_sp_tensor
 
 
 @tf.function

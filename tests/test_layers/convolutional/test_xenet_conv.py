@@ -1,11 +1,9 @@
 import numpy as np
-from core import MODES, run_layer
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 
-from spektral import layers
 from spektral.layers import XENetConv, XENetDenseConv
-from spektral.layers.ops import sp_matrix_to_sp_tensor
+from spektral.utils.sparse import sp_matrix_to_sp_tensor
 
 # Not using these tests because they assume certain behaviors that we
 # don't follow

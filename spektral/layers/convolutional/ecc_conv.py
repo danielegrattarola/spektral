@@ -163,7 +163,7 @@ class ECCConv(Conv):
                     "Casting dense adjacency matrix to SparseTensor."
                     "This can be an expensive operation. "
                 )
-                a = ops.dense_to_sparse(a)
+                a = tf.sparse.from_dense(a)
 
             target_shape = (-1, F, F_)
             if mode == modes.MIXED:

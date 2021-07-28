@@ -5,7 +5,6 @@ import inspect
 import os
 import re
 import shutil
-import sys
 
 from spektral import data, datasets, layers, models, transforms, utils
 

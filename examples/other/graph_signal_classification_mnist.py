@@ -10,7 +10,7 @@ from tensorflow.keras.regularizers import l2
 from spektral.data import MixedLoader
 from spektral.datasets.mnist import MNIST
 from spektral.layers import GCNConv, GlobalSumPool
-from spektral.layers.ops import sp_matrix_to_sp_tensor
+from spektral.utils.sparse import sp_matrix_to_sp_tensor
 
 # Parameters
 batch_size = 32  # Batch size

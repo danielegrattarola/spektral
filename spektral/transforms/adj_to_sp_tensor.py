@@ -1,4 +1,4 @@
-from spektral.layers.ops import sp_matrix_to_sp_tensor
+from spektral.utils.sparse import sp_matrix_to_sp_tensor
 
 
 class AdjToSpTensor:

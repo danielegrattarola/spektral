@@ -3,7 +3,7 @@ import scipy.sparse as sp
 import tensorflow as tf
 from tensorflow.keras import Input, Model
 
-from spektral.layers.ops import sp_matrix_to_sp_tensor
+from spektral.utils.sparse import sp_matrix_to_sp_tensor
 from tests.test_layers.convolutional.core import _test_get_config
 
 tf.keras.backend.set_floatx("float64")

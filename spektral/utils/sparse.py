@@ -1,11 +1,12 @@
 import numpy as np
-import scipy.sparse as sp
+import tensorflow as tf
+from scipy import sparse as sp
 
 
 def reorder(edge_index, edge_weight=None, edge_features=None):
     """
-    Sorts index in lexicographic order and reorders data accordingly.
-    :param edge_index: np.array, indices to sort in lexicographic order.
+    Reorders `edge_index`, `edge_weight`, and `edge_features` in row-major order.
+    :param edge_index: np.array, indices to sort in row-major order.
     :param edge_weight: np.array or None, edge weight to sort according to the new
     order of the indices.
     :param edge_features: np.array or None, edge features to sort according to the new
@@ -35,3 +36,40 @@ def edge_index_to_matrix(edge_index, edge_weight, edge_features=None, shape=None
         return a, reordered[2]
     else:
         return a
+
+
+def sp_matrix_to_sp_tensor(x):
+    """
+    Converts a Scipy sparse matrix to a SparseTensor.
+    :param x: a Scipy sparse matrix.
+    :return: a SparseTensor.
+    """
+    if len(x.shape) != 2:
+        raise ValueError("x must have rank 2")
+    row, col, values = sp.find(x)
+    out = tf.SparseTensor(
+        indices=np.array([row, col]).T, values=values, dense_shape=x.shape
+    )
+    return tf.sparse.reorder(out)
+
+
+def sp_batch_to_sp_tensor(a_list):
+    """
+    Converts a list of Scipy sparse matrices to a rank 3 SparseTensor.
+    :param a_list: list of Scipy sparse matrices with the same shape.
+    :return: SparseTensor of rank 3.
+    """
+    tensor_data = []
+    for i, a in enumerate(a_list):
+        row, col, values = sp.find(a)
+        batch = np.ones_like(col) * i
+        tensor_data.append((values, batch, row, col))
+    tensor_data = list(map(np.concatenate, zip(*tensor_data)))
+
+    out = tf.SparseTensor(
+        indices=np.array(tensor_data[1:]).T,
+        values=tensor_data[0],
+        dense_shape=(len(a_list),) + a_list[0].shape,
+    )
+
+    return out
