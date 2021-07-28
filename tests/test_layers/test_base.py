@@ -3,6 +3,7 @@ import scipy.sparse as sp
 import tensorflow as tf
 
 from spektral import layers
+from spektral.utils.sparse import sp_matrix_to_sp_tensor
 from tests.test_layers.convolutional.core import _test_get_config
 
 
@@ -12,9 +13,7 @@ def test_disjoint_2_batch():
     A_data = [1, 1, 1, 1, 1]
     A_row = [0, 1, 2, 3, 4]
     A_col = [1, 0, 1, 4, 3]
-    A = layers.ops.sp_matrix_to_sp_tensor(
-        sp.csr_matrix((A_data, (A_row, A_col)), shape=(5, 5))
-    )
+    A = sp_matrix_to_sp_tensor(sp.csr_matrix((A_data, (A_row, A_col)), shape=(5, 5)))
 
     expected_X = np.array(
         [[[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]], [[0.0, 0.0], [1.0, 2.0], [0.0, 0.0]]]

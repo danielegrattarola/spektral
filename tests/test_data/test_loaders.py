@@ -96,7 +96,7 @@ def test_single():
     (x, a, e), y, sw = batches[0]
     assert x.shape == (n, f)
     assert a.shape == (n, n)
-    assert len(e.shape) == 3 and e.shape[-1] == s  # Avoid counting edges
+    assert len(e.shape) == 2 and e.shape[-1] == s and e.shape[0] == a.values.shape[0]
     assert y.shape == (n, 2)
     assert loader.steps_per_epoch == 1
     signature = loader.tf_signature()

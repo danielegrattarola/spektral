@@ -14,7 +14,7 @@ from spektral.data.loaders import SingleLoader
 from spektral.datasets.citation import Citation
 from spektral.layers import GCNConv
 from spektral.models.gcn import GCN
-from spektral.transforms import AdjToSpTensor, LayerPreprocess
+from spektral.transforms import LayerPreprocess
 
 learning_rate = 1e-2
 seed = 0
@@ -25,9 +25,7 @@ data = "cora"
 tf.random.set_seed(seed=seed)  # make weight initialization reproducible
 
 # Load data
-dataset = Citation(
-    data, normalize_x=True, transforms=[LayerPreprocess(GCNConv), AdjToSpTensor()]
-)
+dataset = Citation(data, normalize_x=True, transforms=[LayerPreprocess(GCNConv)])
 
 
 # We convert the binary masks to sample weights so that we can compute the

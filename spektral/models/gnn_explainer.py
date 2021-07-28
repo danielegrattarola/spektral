@@ -5,7 +5,8 @@ from scipy.sparse import csr_matrix
 
 from spektral.layers import MessagePassing
 from spektral.layers.convolutional.conv import Conv
-from spektral.layers.ops import dot, sp_matrix_to_sp_tensor
+from spektral.layers.ops import dot
+from spektral.utils.sparse import sp_matrix_to_sp_tensor
 
 
 class GNNExplainer:
@@ -20,6 +21,7 @@ class GNNExplainer:
     prediction.
 
     **Arguments**
+
     - `model`: tf.keras.Model to explain;
     - `n_hops`: number of hops from which the GNN aggregates info. If `None`, then the
     number is inferred from the Conv and MessagePassing layers in the model.

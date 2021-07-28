@@ -1,21 +1,21 @@
 import numpy as np
 import tensorflow as tf
-from scipy import sparse as sp
 
 from spektral.data.utils import (
     batch_generator,
+    collate_labels_disjoint,
     get_spec,
     prepend_none,
+    sp_matrices_to_sp_tensors,
     to_batch,
     to_disjoint,
     to_mixed,
     to_tf_signature,
 )
-from spektral.layers.ops import sp_matrix_to_sp_tensor
 
 version = tf.__version__.split(".")
 major, minor = int(version[0]), int(version[1])
-tf_loader_available = major > 1 and minor > 3
+tf_loader_available = major >= 2 and minor >= 4
 
 
 class Loader:
@@ -24,11 +24,11 @@ class Loader:
     Dataset and yield batches of graphs to feed your Keras Models.
 
     This is achieved by having a generator object that produces lists of Graphs,
-    which are then collated together and returned as Tensor-like objects.
+    which are then collated together and returned as Tensors.
 
     The core of a Loader is the `collate(batch)` method.
-    This takes as input a list of Graphs and returns a list of Tensors or
-    SparseTensors.
+    This takes as input a list of `Graph` objects and returns a list of Tensors,
+    np.arrays, or SparseTensors.
 
     For instance, if all graphs have the same number of nodes and size of the
     attributes, a simple collation function can be:
@@ -40,8 +40,8 @@ class Loader:
         return x, a
     ```
 
-    The `load()` method of a Loader returns an object that can be given as
-    input to `Model.fit()`.
+    The `load()` method of a Loader returns an object that can be passed to a Keras
+    model when using the `fit`, `predict` and `evaluate` functions.
     You can use it as follows:
 
     ```python
@@ -49,25 +49,26 @@ class Loader:
     ```
 
     The `steps_per_epoch` property represents the number of batches that are in
-    an epoch, and is a required keyword when calling `model.fit()` with a Loader.
+    an epoch, and is a required keyword when calling `fit`, `predict` or `evaluate`
+    with a Loader.
 
-    If you want to write your own training function, you can use the
-    `tf_signature()` method to specify the signature of your batches using the
-    tf.TypeSpec system, in order to avoid unnecessary re-tracings.
+    If you are using a custom training function, you can specify the input signature
+    of your batches with the tf.TypeSpec system to avoid unnecessary re-tracings.
+    The signature is computed automatically by calling `loader.tf_signature()`.
 
-    For example, a simple training function can be written as:
+    For example, a simple training step can be written as:
 
     ```python
-    @tf.function(input_signature=loader.tf_signature())
+    @tf.function(input_signature=loader.tf_signature())  # Specify signature here
     def train_step(inputs, target):
         with tf.GradientTape() as tape:
             predictions = model(inputs, training=True)
-            loss = loss_fn(target, predictions) + sum(model.losses)
+            loss = loss_fn(target, predictions)
         gradients = tape.gradient(loss, model.trainable_variables)
         optimizer.apply_gradients(zip(gradients, model.trainable_variables))
     ```
 
-    We can then train our model in a for loop as follows:
+    We can then train our model in a loop as follows:
 
     ```python
     for batch in loader:
@@ -76,11 +77,11 @@ class Loader:
 
     **Arguments**
 
-    - `dataset`: a graph Dataset;
+    - `dataset`: a `spektral.data.Dataset` object;
     - `batch_size`: size of the mini-batches;
     - `epochs`: number of epochs to iterate over the dataset. By default (`None`)
     iterates indefinitely;
-    - `shuffle`: whether to shuffle the data at the start of each epoch.
+    - `shuffle`: whether to shuffle the dataset at the start of each epoch.
     """
 
     def __init__(self, dataset, batch_size=1, epochs=None, shuffle=True):
@@ -98,6 +99,9 @@ class Loader:
         return self.collate(nxt)
 
     def generator(self):
+        """
+        Returns lists (batches) of `Graph` objects.
+        """
         return batch_generator(
             self.dataset,
             batch_size=self.batch_size,
@@ -106,66 +110,64 @@ class Loader:
         )
 
     def collate(self, batch):
+        """
+        Converts a list of graph objects to Tensors or np.arrays representing the batch.
+        :param batch: a list of `Graph` objects.
+        """
         raise NotImplementedError
 
     def load(self):
+        """
+        Returns an object that can be passed to a Keras model when using the `fit`,
+        `predict` and `evaluate` functions.
+        By default, returns the Loader itself, which is a generator.
+        """
         return self
 
     def tf_signature(self):
         """
-        Adjacency matrix has shape [n_nodes, n_nodes]
-        Node features have shape [n_nodes, n_node_features]
-        Edge features have shape [n_edges, n_node_features]
-        Targets have shape [..., n_labels]
+        Returns the signature of the collated batches using the tf.TypeSpec system.
+        By default, the signature is that of the dataset (`dataset.signature`):
+
+            - Adjacency matrix has shape `[n_nodes, n_nodes]`
+            - Node features have shape `[n_nodes, n_node_features]`
+            - Edge features have shape `[n_edges, n_node_features]`
+            - Targets have shape `[..., n_labels]`
         """
         signature = self.dataset.signature
         return to_tf_signature(signature)
 
-    def pack(self, batch, return_dict=False):
+    def pack(self, batch):
         """
-        Given a batch of graphs, groups their attributes into separate lists.
+        Given a batch of graphs, groups their attributes into separate lists and packs
+        them in a dictionary.
 
         For instance, if a batch has three graphs g1, g2 and g3 with node
         features (x1, x2, x3) and adjacency matrices (a1, a2, a3), this method
-        will return:
+        will return a dictionary:
 
-        ```
-        a_list = [a1, a2, a3]
-        x_list = [x1, x2, x3]
-        ```
-
-        If `return_dict=True`, the lists are wrapped in a dictionary:
-
-        ```
-        {'a_list': [a1, a2, a3],
-         'x_list': [x1, x2, x3]}
+        ```python
+        >>> {'a_list': [a1, a2, a3], 'x_list': [x1, x2, x3]}
         ```
 
-         this is useful for passing the packed batch to `data.utils.to_batch()`
-         and `data.utils.to_disjoint()` without knowing a-priori what are the
-         attributes of the graphs.
-
-        :param batch: a list of Graphs
-        :param return_dict: whether to return the lists as element of a dictionary.
-        :return: the batch packed into lists, by attribute type.
+        :param batch: a list of `Graph` objects.
         """
         output = [list(elem) for elem in zip(*[g.numpy() for g in batch])]
-        if return_dict:
-            keys = [k + "_list" for k in self.dataset.signature.keys()]
-            return dict(zip(keys, output))
-        else:
-            return output
+        keys = [k + "_list" for k in self.dataset.signature.keys()]
+        return dict(zip(keys, output))
 
     @property
     def steps_per_epoch(self):
+        """
+        :return: the number of batches of size `self.batch_size` in the dataset (i.e.,
+        how many batches are in an epoch).
+        """
         return int(np.ceil(len(self.dataset) / self.batch_size))
 
 
 class SingleLoader(Loader):
-
     """
-    A Loader for
-    [single mode](https://graphneural.network/data-modes/#single-mode).
+    A Loader for [single mode](https://graphneural.network/data-modes/#single-mode).
 
     This loader produces Tensors representing a single graph. As such, it can
     only be used with Datasets of length 1 and the `batch_size` cannot be set.
@@ -175,7 +177,7 @@ class SingleLoader(Loader):
 
     **Arguments**
 
-    - `dataset`: a graph Dataset;
+    - `dataset`: a `spektral.data.Dataset` object with only one graph;
     - `epochs`: number of epochs to iterate over the dataset. By default (`None`)
     iterates indefinitely;
     - `shuffle`: whether to shuffle the data at the start of each epoch;
@@ -210,28 +212,29 @@ class SingleLoader(Loader):
         super().__init__(dataset, batch_size=1, epochs=epochs, shuffle=False)
 
     def collate(self, batch):
-        graph = batch[0]
-        output = graph.numpy()
+        packed = self.pack(batch)
 
-        # Sparse matrices to SparseTensors
-        output = list(output)
-        for i in range(len(output)):
-            if sp.issparse(output[i]):
-                output[i] = sp_matrix_to_sp_tensor(output[i])
-        output = tuple(output)
+        y = packed.pop("y_list", None)
+        if y is not None:
+            y = collate_labels_disjoint(y, node_level=True)
 
-        if "y" in self.dataset.signature:
-            output = (output[:-1], output[-1])
-            if self.sample_weights is not None:
-                output += (self.sample_weights,)
-        else:
-            if self.sample_weights is not None:
-                output = (
-                    output,
-                    self.sample_weights,
-                )
+        output = to_disjoint(**packed)
+        output = output[:-1]  # Discard batch index
+        output = sp_matrices_to_sp_tensors(output)
 
-        return tuple(output)
+        if len(output) == 1:
+            output = output[0]
+
+        output = (output,)
+        if y is not None:
+            output += (y,)
+        if self.sample_weights is not None:
+            output += (self.sample_weights,)
+
+        if len(output) == 1:
+            output = output[0]  # Again, in case there are no targets and no SW
+
+        return output
 
     def load(self):
         output = self.collate(self.dataset)
@@ -240,8 +243,7 @@ class SingleLoader(Loader):
 
 class DisjointLoader(Loader):
     """
-    A Loader for
-    [disjoint mode](https://graphneural.network/data-modes/#disjoint-mode).
+    A Loader for [disjoint mode](https://graphneural.network/data-modes/#disjoint-mode).
 
     This loader represents a batch of graphs via their disjoint union.
 
@@ -287,27 +289,17 @@ class DisjointLoader(Loader):
         super().__init__(dataset, batch_size=batch_size, epochs=epochs, shuffle=shuffle)
 
     def collate(self, batch):
-        packed = self.pack(batch, return_dict=True)
-        y = None
-        if "y" in self.dataset.signature:
-            y = packed.pop("y_list")
-            if self.node_level:
-                if len(np.shape(y[0])) == 1:
-                    y = [y_[:, None] for y_ in y]
-                y = np.vstack(y)
-            else:
-                if len(np.shape(y[0])) == 0:
-                    y = [np.array([y_]) for y_ in y]
-                y = np.array(y)
+        packed = self.pack(batch)
+
+        y = packed.pop("y_list", None)
+        if y is not None:
+            y = collate_labels_disjoint(y, node_level=self.node_level)
 
         output = to_disjoint(**packed)
+        output = sp_matrices_to_sp_tensors(output)
 
-        # Sparse matrices to SparseTensors
-        output = list(output)
-        for i in range(len(output)):
-            if sp.issparse(output[i]):
-                output[i] = sp_matrix_to_sp_tensor(output[i])
-        output = tuple(output)
+        if len(output) == 1:
+            output = output[0]
 
         if y is None:
             return output
@@ -346,8 +338,7 @@ class DisjointLoader(Loader):
 
 class BatchLoader(Loader):
     """
-    A Loader for
-    [batch mode](https://graphneural.network/data-modes/#batch-mode).
+    A Loader for [batch mode](https://graphneural.network/data-modes/#batch-mode).
 
     This loader returns batches of graphs stacked along an extra dimension,
     with all "node" dimensions padded to be equal among all graphs.
@@ -401,17 +392,14 @@ class BatchLoader(Loader):
         super().__init__(dataset, batch_size=batch_size, epochs=epochs, shuffle=shuffle)
 
     def collate(self, batch):
-        packed = self.pack(batch, return_dict=True)
-        y = np.array(packed.pop("y_list")) if "y" in self.dataset.signature else None
+        packed = self.pack(batch)
+
+        y = packed.pop("y_list", None)
+        if y is not None:
+            y = np.array(y)
 
         output = to_batch(**packed, mask=self.mask)
-
-        # Sparse matrices to SparseTensors
-        output = list(output)
-        for i in range(len(output)):
-            if sp.issparse(output[i]):
-                output[i] = sp_matrix_to_sp_tensor(output[i])
-        output = tuple(output)
+        output = sp_matrices_to_sp_tensors(output)
 
         if len(output) == 1:
             output = output[0]
@@ -489,8 +477,12 @@ class PackedBatchLoader(BatchLoader):
         )
 
         # Drop the Dataset container and work on packed tensors directly
-        packed = self.pack(self.dataset, return_dict=True)
-        y = np.array(packed.pop("y_list")) if "y" in dataset.signature else None
+        packed = self.pack(self.dataset)
+
+        y = packed.pop("y_list", None)
+        if y is not None:
+            y = np.array(y)
+
         self.signature = dataset.signature
         self.dataset = to_batch(**packed, mask=mask)
         if y is not None:
@@ -539,8 +531,7 @@ class PackedBatchLoader(BatchLoader):
 
 class MixedLoader(Loader):
     """
-    A Loader for
-    [mixed mode](https://graphneural.network/data-modes/#mixed-mode).
+    A Loader for [mixed mode](https://graphneural.network/data-modes/#mixed-mode).
 
     This loader returns batches where the node and edge attributes are stacked
     along an extra dimension, but the adjacency matrix is shared by all graphs.
@@ -588,18 +579,15 @@ class MixedLoader(Loader):
         super().__init__(dataset, batch_size=batch_size, epochs=epochs, shuffle=shuffle)
 
     def collate(self, batch):
-        packed = self.pack(batch, return_dict=True)
-        y = np.array(packed.pop("y_list")) if "y" in self.dataset.signature else None
-
+        packed = self.pack(batch)
         packed["a"] = self.dataset.a
-        output = to_mixed(**packed)
 
-        # Sparse matrices to SparseTensors
-        output = list(output)
-        for i in range(len(output)):
-            if sp.issparse(output[i]):
-                output[i] = sp_matrix_to_sp_tensor(output[i])
-        output = tuple(output)
+        y = packed.pop("y_list", None)
+        if y is not None:
+            y = np.array(y)
+
+        output = to_mixed(**packed)
+        output = sp_matrices_to_sp_tensors(output)
 
         if len(output) == 1:
             output = output[0]

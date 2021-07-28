@@ -6,7 +6,6 @@ from urllib.error import URLError
 
 import numpy as np
 import pandas as pd
-import scipy.sparse as sp
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from spektral.data import Dataset, Graph

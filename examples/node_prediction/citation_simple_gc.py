@@ -18,7 +18,7 @@ from tensorflow.keras.regularizers import l2
 from spektral.data.loaders import SingleLoader
 from spektral.datasets.citation import Citation
 from spektral.layers import GCNConv
-from spektral.transforms import AdjToSpTensor, LayerPreprocess
+from spektral.transforms import LayerPreprocess
 
 
 class SGCN:
@@ -36,9 +36,7 @@ class SGCN:
 
 # Load data
 K = 2  # Propagation steps for SGCN
-dataset = Citation(
-    "cora", transforms=[LayerPreprocess(GCNConv), SGCN(K), AdjToSpTensor()]
-)
+dataset = Citation("cora", transforms=[LayerPreprocess(GCNConv), SGCN(K)])
 mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
 
 # Parameters

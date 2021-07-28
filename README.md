@@ -43,8 +43,8 @@ If you want to cite Spektral in your work, refer to our paper:
 > Daniele Grattarola and Cesare Alippi
 
 ## Installation
-Spektral is compatible with Python 3.5+, and is tested on Ubuntu 16.04+ and MacOS. 
-Other Linux distros should work as well, but Windows is not supported for now. 
+Spektral is compatible with Python 3.6 and above, and is tested on the latest versions of Ubuntu, MacOS, and Windows. 
+Other Linux distros should work as well. 
 
 The simplest way to install Spektral is from PyPi: 
 
