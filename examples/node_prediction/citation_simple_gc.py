@@ -18,7 +18,7 @@ from tensorflow.keras.regularizers import l2
 from spektral.data.loaders import SingleLoader
 from spektral.datasets.citation import Citation
 from spektral.layers import GCNConv
-from spektral.transforms import AdjToSpTensor, LayerPreprocess
+from spektral.transforms import LayerPreprocess
 
 
 class SGCN:

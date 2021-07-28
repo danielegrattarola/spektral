@@ -20,7 +20,7 @@ from tensorflow.keras.regularizers import l2
 from spektral.data.loaders import SingleLoader
 from spektral.datasets.citation import Citation
 from spektral.layers import ChebConv
-from spektral.transforms import AdjToSpTensor, LayerPreprocess
+from spektral.transforms import LayerPreprocess
 
 # Load data
 dataset = Citation("cora", transforms=[LayerPreprocess(ChebConv)])

@@ -14,7 +14,7 @@ from spektral.data.loaders import SingleLoader
 from spektral.datasets.citation import Citation
 from spektral.layers import GCNConv
 from spektral.models.gcn import GCN
-from spektral.transforms import AdjToSpTensor, LayerPreprocess
+from spektral.transforms import LayerPreprocess
 
 learning_rate = 1e-2
 seed = 0
