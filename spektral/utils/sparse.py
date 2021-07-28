@@ -41,6 +41,9 @@ def edge_index_to_matrix(edge_index, edge_weight, edge_features=None, shape=None
 def sp_matrix_to_sp_tensor(x):
     """
     Converts a Scipy sparse matrix to a SparseTensor.
+    The indices of the output are reordered in the canonical row-major ordering, and
+    duplicate entries are summed together (which is the default behaviour of Scipy).
+
     :param x: a Scipy sparse matrix.
     :return: a SparseTensor.
     """
