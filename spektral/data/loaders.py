@@ -212,23 +212,26 @@ class SingleLoader(Loader):
         super().__init__(dataset, batch_size=1, epochs=epochs, shuffle=False)
 
     def collate(self, batch):
-        graph = batch[0]  # In single mode we expect only 1 graph in the dataset
+        packed = self.pack(batch)
 
-        output = graph.numpy()
+        y = packed.pop("y_list", None)
+        if y is not None:
+            y = collate_labels_disjoint(y, node_level=True)
+
+        output = to_disjoint(**packed)
+        output = output[:-1]  # Discard batch index
         output = sp_matrices_to_sp_tensors(output)
 
-        if "y" in self.dataset.signature:
-            output = (output[:-1], output[-1])
-            if self.sample_weights is not None:
-                output += (self.sample_weights,)
-        else:
-            if self.sample_weights is not None:
-                output = (
-                    output,
-                    self.sample_weights,
-                )
+        if len(output) == 1:
+            output = output[0]
 
-        return tuple(output)
+        output = (output,)
+        if y is not None:
+            output += (y,)
+        if self.sample_weights is not None:
+            output += (self.sample_weights,)
+
+        return output
 
     def load(self):
         output = self.collate(self.dataset)
