@@ -227,22 +227,21 @@ class GNNExplainer:
                 self.comp_graph.indices, comp_graph_values, self.comp_graph.shape
             )
 
-        # get the final masked adj matrix
+        # remove the edges which value is < a_thresh
+        selected_adj_mask = tf.where(
+            selected_adj_mask >= a_thresh, selected_adj_mask, 0
+        )
+
         selected_subgraph = tf.sparse.map_values(
             tf.multiply, self.comp_graph, selected_adj_mask
         )
+
+        is_nonzero = tf.not_equal(selected_subgraph.values, 0)
+        selected_subgraph = tf.sparse.retain(selected_subgraph, is_nonzero)
 
         # impose the symmetry of the adj matrix
         selected_subgraph = (
             tf.sparse.add(selected_subgraph, tf.sparse.transpose(selected_subgraph)) / 2
-        )
-
-        # remove the edges which value is < a_thresh
-        selected_adj_mask = tf.where(
-            selected_subgraph.values >= a_thresh, selected_subgraph.values, 0
-        )
-        selected_subgraph = tf.sparse.map_values(
-            tf.multiply, self.comp_graph, selected_adj_mask
         )
 
         if not self.graph_level:
