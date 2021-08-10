@@ -354,14 +354,16 @@ class XENetDenseConv(Conv):
         assert len(x.shape) == 3
         assert len(e.shape) == 4
 
-        xi_shape = [-1, x.shape[1], 1, x.shape[2]]
-        xj_shape = [-1, 1, x.shape[1], x.shape[2]]
+        N = tf.shape(x)[1]
+        
+        xi_shape = [-1, N, 1, x.shape[2]]
+        xj_shape = [-1, 1, N, x.shape[2]]
 
         xi = tf.reshape(x, xi_shape)  # b n 1 f
         xj = tf.reshape(x, xj_shape)  # b 1 n f
 
-        xi = tf.repeat(xi, x.shape[1], axis=2)
-        xj = tf.repeat(xj, x.shape[1], axis=1)
+        xi = tf.repeat(xi, N, axis=2)
+        xj = tf.repeat(xj, N, axis=1)
 
         e_transpose = tf.transpose(e, perm=[0, 2, 1, 3])
 
@@ -371,8 +373,8 @@ class XENetDenseConv(Conv):
             stack = self.stack_models[i](stack)
             stack = self.stack_model_acts[i](stack)
 
-        e_mask_shape = (a.shape[1], a.shape[2], 1)
-        e_mask = Reshape(e_mask_shape, input_shape=a.shape)(a)
+        e_mask_shape = [-1, tf.shape(a)[1], tf.shape(a)[2], 1]
+        e_mask = tf.reshape( a, e_mask_shape )
 
         # zero-out elements that aren't edges in the adjacency matrix
         stack = Multiply()([stack, e_mask])
