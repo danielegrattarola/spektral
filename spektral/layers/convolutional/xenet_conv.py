@@ -355,7 +355,7 @@ class XENetDenseConv(Conv):
         assert len(e.shape) == 4
 
         N = tf.shape(x)[1]
-        
+
         xi_shape = [-1, N, 1, x.shape[2]]
         xj_shape = [-1, 1, N, x.shape[2]]
 
@@ -374,7 +374,7 @@ class XENetDenseConv(Conv):
             stack = self.stack_model_acts[i](stack)
 
         e_mask_shape = [-1, tf.shape(a)[1], tf.shape(a)[2], 1]
-        e_mask = tf.reshape( a, e_mask_shape )
+        e_mask = tf.reshape(a, e_mask_shape)
 
         # zero-out elements that aren't edges in the adjacency matrix
         stack = Multiply()([stack, e_mask])

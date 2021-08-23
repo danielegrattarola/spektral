@@ -135,6 +135,7 @@ def test_dense_model_sizes():
     # p                     =    5    # Prelu
     # total = t+x+e+p       = 1292
 
+
 def test_dense_model_unknown_size():
     N = None
     F = 4
