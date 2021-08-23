@@ -8,7 +8,7 @@ from spektral.utils.sparse import sp_batch_to_sp_tensor, sp_matrix_to_sp_tensor
 
 batch_size = 10
 N = 3
-tol = 5.0e-7
+tol = 1e-6
 
 
 def _assert_all_close(output, expected_output):
@@ -270,7 +270,7 @@ def test_modes_ops():
     result = ops.disjoint_signal_to_batch(X, I).numpy()
 
     assert expected_result.shape == result.shape
-    assert np.allclose(expected_result, result)
+    assert np.allclose(expected_result, result, atol=tol)
 
     # Disjoint adjacency to batch
     expected_result = np.array(
@@ -283,7 +283,7 @@ def test_modes_ops():
     result = ops.disjoint_adjacency_to_batch(A_sparse_tensor, I).numpy()
 
     assert expected_result.shape == result.shape
-    assert np.allclose(expected_result, result)
+    assert np.allclose(expected_result, result, atol=tol)
 
 
 def test_scatter_ops():
@@ -344,7 +344,7 @@ def test_scatter_ops():
         out_mixed = scatter_fn(messages_random, indices, n_nodes)
         for i in range(batch_size):
             assert np.allclose(
-                out_mixed[i], scatter_fn(messages_random[i], indices, n_nodes)
+                out_mixed[i], scatter_fn(messages_random[i], indices, n_nodes), atol=tol
             )
 
 

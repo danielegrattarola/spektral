@@ -136,6 +136,61 @@ def test_dense_model_sizes():
     # total = t+x+e+p       = 1292
 
 
+def test_dense_model_unknown_size():
+    N = None
+    F = 4
+    S = 3
+    X_in = Input(shape=(N, F), name="X_in")
+    A_in = Input(shape=(N, N), sparse=False, name="A_in")
+    E_in = Input(shape=(N, N, S), name="E_in")
+
+    N = 5
+    x = np.ones(shape=(1, N, F))
+    a = np.ones(shape=(1, N, N))
+    e = np.ones(shape=(1, N, N, S))
+    a[0][1][2] = 0
+    a[0][2][1] = 0
+
+    def assert_n_params(inp, out, expected_size):
+        model = Model(inputs=inp, outputs=out)
+        model.compile(optimizer="adam", loss="mean_squared_error")
+        print(model.count_params())
+        assert model.count_params() == expected_size
+        # for test coverage:
+        model.predict([x, a, e])
+
+    X, E = XENetDenseConv([5], 10, 20, False)([X_in, A_in, E_in])
+    assert_n_params([X_in, A_in, E_in], [X, E], 350)
+    # int vs list: 5 vs [5]
+    X, E = XENetDenseConv(5, 10, 20, False)([X_in, A_in, E_in])
+    assert_n_params([X_in, A_in, E_in], [X, E], 350)
+    # t = (4+4+3+3+1)*5 =  75    # Stack Conv
+    # x = (4+5+5+1)*10  = 150    # Node reduce
+    # e = (5+1)*20      = 120    # Edge reduce
+    # p                 =   5    # Prelu
+    # total = t+x+e+p   = 350
+
+    X, E = XENetDenseConv(5, 10, 20, True)([X_in, A_in, E_in])
+    assert_n_params([X_in, A_in, E_in], [X, E], 362)
+    # t = (4+4+3+3+1)*5 =  75
+    # a = (5+1)*1   *2  =  12    # Attention
+    # x = (4+5+5+1)*10  = 150
+    # e = (5+1)*20      = 120
+    # p                 =   5    # Prelu
+    # total = t+x+e+p   = 362
+
+    X, E = XENetDenseConv([50, 5], 10, 20, True)([X_in, A_in, E_in])
+    assert_n_params([X_in, A_in, E_in], [X, E], 1292)
+    # t1 = (4+4+3+3+1)*50   =  750
+    # t2 = (50+1)*5         =  255
+    # a = (5+1)*1   *2      =   12    # Attention
+    # x = (4+5+5+1)*10      =  150
+    # e = (5+1)*20          =  120
+    # p                     =    5    # Prelu
+    # total = t+x+e+p       = 1292
+
+
 if __name__ == "__main__":
     test_sparse_model_sizes()
     test_dense_model_sizes()
+    test_dense_model_unknown_size()

@@ -1,8 +1,8 @@
 # Datasets
 
 This module provides benchmark datasets for graph-level and node-level prediction. 
-Datasets are automatically downloaded and savevd locally on the first usage. 
-You can configure the path in which the data are stored by creating a `~/.spektral/config.json` file with the following content:
+Datasets are automatically downloaded and saved locally on first usage. 
+You can configure the path where the data are stored by creating a `~/.spektral/config.json` file with the following content:
 
 ```json
 {
