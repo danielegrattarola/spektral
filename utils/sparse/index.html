@@ -9,7 +9,7 @@
   <meta name="author" content="Daniele Grattarola">
   <link rel="canonical" href="https://graphneural.network/utils/sparse/">
   <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>Sparse - Spektral</title>
+  <title>Convolution - Spektral</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
   <link rel="stylesheet" href="../../css/theme.css" />
@@ -19,7 +19,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Sparse";
+    var mkdocs_page_name = "Convolution";
     var mkdocs_page_input_path = "utils/sparse.md";
     var mkdocs_page_url = "/utils/sparse/";
   </script>
@@ -98,8 +98,16 @@
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">Utils</span></p>
-                <ul>
+                <ul class="current">
                     <li class="toctree-l1"><a class="reference internal" href="../convolution/">Convolution</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Convolution</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#reorder">reorder</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#sp_matrix_to_sp_tensor">sp_matrix_to_sp_tensor</a>
+    </li>
+    </ul>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../misc/">Miscellaneous</a>
                     </li>
@@ -131,8 +139,12 @@
     <li><a href="../..">Docs</a> &raquo;</li>
     
       
+        
+          <li>Utils &raquo;</li>
+        
+      
     
-    <li>Sparse</li>
+    <li>Convolution</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -192,6 +204,15 @@ duplicate entries are summed together (which is the default behaviour of Scipy).
           </div>
           <footer>
   
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../misc/" class="btn btn-neutral float-right" title="Miscellaneous">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../convolution/" class="btn btn-neutral" title="Convolution"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
 
   <hr/>
 
@@ -216,6 +237,10 @@ duplicate entries are summed together (which is the default behaviour of Scipy).
           <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
+        <span><a href="../convolution/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../misc/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
