@@ -281,12 +281,13 @@ iterates indefinitely;</li>
 <ul>
 <li><code>x</code>: node attributes of shape <code>[n_nodes, n_node_features]</code>;</li>
 <li><code>a</code>: adjacency matrices of shape <code>[n_nodes, n_nodes]</code>;</li>
-<li><code>e</code>: edge attributes of shape <code>[n_edges, n_edge_features]</code>.</li>
+<li><code>e</code>: edge attributes of shape <code>[n_edges, n_edge_features]</code>;</li>
+<li><code>i</code>: batch index of shape <code>[n_nodes]</code>.</li>
 </ul>
 <p><code>labels</code> have shape <code>[batch, n_labels]</code> if <code>node_level=False</code> or
 <code>[n_nodes, n_labels]</code> otherwise.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L339">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L340">[source]</a></span></p>
 <h4 id="batchloader">BatchLoader</h4>
 <pre><code class="python">spektral.data.loaders.BatchLoader(dataset, mask=False, batch_size=1, epochs=None, shuffle=True)
 </code></pre>
@@ -331,7 +332,7 @@ iterates indefinitely;</li>
 </ul>
 <p><code>labels</code> have shape <code>[batch, n_labels]</code>.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L436">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L437">[source]</a></span></p>
 <h4 id="packedbatchloader">PackedBatchLoader</h4>
 <pre><code class="python">spektral.data.loaders.PackedBatchLoader(dataset, mask=False, batch_size=1, epochs=None, shuffle=True)
 </code></pre>
@@ -367,7 +368,7 @@ iterates indefinitely;</li>
 </ul>
 <p><code>labels</code> have shape <code>[batch, ..., n_labels]</code>.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L532">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L533">[source]</a></span></p>
 <h4 id="mixedloader">MixedLoader</h4>
 <pre><code class="python">spektral.data.loaders.MixedLoader(dataset, batch_size=1, epochs=None, shuffle=True)
 </code></pre>
