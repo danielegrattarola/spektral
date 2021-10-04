@@ -104,7 +104,6 @@ class MinCutPool(Pool):
         self.return_mask = return_mask
 
     def build(self, input_shape):
-        assert isinstance(input_shape, list)
         layer_kwargs = dict(
             kernel_initializer=self.kernel_initializer,
             bias_initializer=self.bias_initializer,
