@@ -240,7 +240,8 @@ class GATConv(Conv):
         attn_coef = attn_for_self + attn_for_neighs
         attn_coef = tf.nn.leaky_relu(attn_coef, alpha=0.2)
 
-        mask = tf.where(a == 0., -10e9, 0.)
+        mask = tf.where(a == 0.0, -10e9, 0.0)
+        mask = tf.cast(mask, dtype=attn_coef.dtype)
         attn_coef += mask[..., None, :]
         attn_coef = tf.nn.softmax(attn_coef, axis=-1)
         attn_coef_drop = self.dropout(attn_coef)
