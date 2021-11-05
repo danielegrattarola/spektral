@@ -327,12 +327,14 @@ class GlobalAttnSumPool(GlobalPool):
             X = inputs
         attn_coeff = K.dot(X, self.attn_kernel)
         attn_coeff = K.squeeze(attn_coeff, -1)
-        attn_coeff = K.softmax(attn_coeff)
         if self.data_mode == "single":
+            attn_coeff = K.softmax(attn_coeff)
             output = K.dot(attn_coeff[None, ...], X)
         elif self.data_mode == "batch":
+            attn_coeff = K.softmax(attn_coeff)
             output = K.batch_dot(attn_coeff, X)
         else:
+            attn_coeff = ops.unsorted_segment_softmax(attn_coeff, I, K.shape(X)[0])
             output = attn_coeff[:, None] * X
             output = tf.math.segment_sum(output, I)
 
