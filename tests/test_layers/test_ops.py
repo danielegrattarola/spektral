@@ -8,7 +8,7 @@ from spektral.utils.sparse import sp_batch_to_sp_tensor, sp_matrix_to_sp_tensor
 
 batch_size = 10
 N = 3
-tol = 1e-6
+tol = 1e-5
 
 
 def _assert_all_close(output, expected_output):
@@ -87,7 +87,6 @@ def _check_op_sparse(op, numpy_inputs, convert_to_sparse, **kwargs):
 
 
 def test_matmul_ops_rank_2():
-    np.random.seed(0)
     a = np.random.randn(N, N)
     b = np.random.randn(N, N)
     convert_to_sparse = [[True, False], [False, True], [True, True]]
@@ -107,7 +106,6 @@ def test_matmul_ops_rank_2():
 
 
 def test_matmul_ops_rank_2_3():
-    np.random.seed(0)
     a = np.random.randn(N, N)
     b = np.random.randn(batch_size, N, N)
     convert_to_sparse = [[True, False], [False, True], [True, True]]
@@ -140,7 +138,6 @@ def test_matmul_ops_rank_2_3():
 
 
 def test_matmul_ops_rank_3_2():
-    np.random.seed(0)
     a = np.random.randn(batch_size, N, N)
     b = np.random.randn(N, N)
     convert_to_sparse = [[True, False], [False, True], [True, True]]
@@ -173,7 +170,6 @@ def test_matmul_ops_rank_3_2():
 
 
 def test_matmul_ops_rank_3():
-    np.random.seed(0)
     a = np.random.randn(batch_size, N, N)
     b = np.random.randn(batch_size, N, N)
     convert_to_sparse = [[True, False], [False, True], [True, True]]
@@ -220,7 +216,6 @@ def test_graph_ops():
 
 
 def test_base_ops():
-    np.random.seed(0)
     convert_to_sparse = [[True]]
 
     # Transpose
@@ -287,7 +282,6 @@ def test_modes_ops():
 
 
 def test_scatter_ops():
-    np.random.seed(0)
     from spektral.layers.ops.scatter import OP_DICT
 
     indices = np.array([0, 1, 1, 2, 2, 2, 4, 4, 4, 4])
@@ -371,17 +365,16 @@ def test_indices_to_mask_rank2():
     np.testing.assert_equal(mask.numpy(), expected)
 
 
-def random_sparse(shape, nnz, seed):
-    rng = np.random.default_rng(seed)
+def random_sparse(shape, nnz):
     max_index = np.prod(shape)
-    indices = rng.choice(max_index, nnz, replace=False)
+    indices = np.random.choice(max_index, nnz, replace=False)
     indices.sort()
     indices = np.stack(np.unravel_index(indices, shape), axis=-1)
-    return tf.SparseTensor(indices, rng.normal(size=(nnz,)), shape)
+    return tf.SparseTensor(indices, np.random.normal(size=(nnz,)), shape)
 
 
 def test_boolean_mask_sparse():
-    st = random_sparse((5, 5), 15, seed=0)
+    st = random_sparse((5, 5), 15)
     dense = tf.sparse.to_dense(st)
     mask = np.array([0, 1, 0, 1, 1], dtype=np.bool)
     for axis in (0, 1):
@@ -392,7 +385,7 @@ def test_boolean_mask_sparse():
 
 
 def test_boolean_mask_sparse_square():
-    st = random_sparse((5, 5), 15, seed=0)
+    st = random_sparse((5, 5), 15)
     dense = tf.sparse.to_dense(st)
     mask = np.array([0, 1, 0, 1, 1], dtype=np.bool)
     actual, _ = ops.boolean_mask_sparse_square(st, mask)
@@ -403,7 +396,7 @@ def test_boolean_mask_sparse_square():
 
 
 def test_gather_sparse():
-    st = random_sparse((5, 5), 15, seed=0)
+    st = random_sparse((5, 5), 15)
     dense = tf.sparse.to_dense(st)
     indices = np.array([1, 3, 4], dtype=np.int64)
     for axis in (0, 1):
@@ -414,7 +407,7 @@ def test_gather_sparse():
 
 
 def test_gather_sparse_square():
-    st = random_sparse((5, 5), 15, seed=0)
+    st = random_sparse((5, 5), 15)
     dense = tf.sparse.to_dense(st)
     indices = np.array([1, 3, 4], dtype=np.int64)
     actual, _ = ops.gather_sparse_square(st, indices)

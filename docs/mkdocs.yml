@@ -46,6 +46,7 @@ nav:
     - Transforms: transforms.md
 - Utils:
     - Convolution: utils/convolution.md
+    - Sparse: utils/sparse.md
     - Miscellaneous: utils/misc.md
 - Other:
     - External resources: external.md

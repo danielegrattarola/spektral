@@ -168,6 +168,15 @@ PAGES = [
         "classes": [],
     },
     {
+        "page": "utils/sparse.md",
+        "functions": [
+            utils.sparse.reorder,
+            utils.sp_matrix_to_sp_tensor,
+        ],
+        "methods": [],
+        "classes": [],
+    },
+    {
         "page": "utils/misc.md",
         "functions": [
             utils.misc.pad_jagged_array,

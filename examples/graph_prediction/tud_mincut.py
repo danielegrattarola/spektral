@@ -6,7 +6,7 @@ from tensorflow.keras.optimizers import Adam
 
 from spektral.data import BatchLoader
 from spektral.datasets import TUDataset
-from spektral.layers import GCNConv, GlobalSumPool, GraphMasking, MinCutPool
+from spektral.layers import GCSConv, GlobalSumPool, GraphMasking, MinCutPool
 
 ################################################################################
 # Config
@@ -46,9 +46,9 @@ class Net(Model):
     def __init__(self):
         super().__init__()
         self.mask = GraphMasking()
-        self.conv1 = GCNConv(32, activation="relu")
+        self.conv1 = GCSConv(32, activation="relu")
         self.pool = MinCutPool(N // 2)
-        self.conv2 = GCNConv(32, activation="relu")
+        self.conv2 = GCSConv(32, activation="relu")
         self.global_pool = GlobalSumPool()
         self.dense1 = Dense(n_out)
 

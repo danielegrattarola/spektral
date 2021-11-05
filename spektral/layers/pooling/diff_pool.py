@@ -92,7 +92,6 @@ class DiffPool(Pool):
         self.return_mask = return_mask
 
     def build(self, input_shape):
-        assert isinstance(input_shape, list)
         F = input_shape[0][-1]
 
         if self.channels is None:

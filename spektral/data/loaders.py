@@ -275,7 +275,8 @@ class DisjointLoader(Loader):
 
     - `x`: node attributes of shape `[n_nodes, n_node_features]`;
     - `a`: adjacency matrices of shape `[n_nodes, n_nodes]`;
-    - `e`: edge attributes of shape `[n_edges, n_edge_features]`.
+    - `e`: edge attributes of shape `[n_edges, n_edge_features]`;
+    - `i`: batch index of shape `[n_nodes]`.
 
     `labels` have shape `[batch, n_labels]` if `node_level=False` or
     `[n_nodes, n_labels]` otherwise.
