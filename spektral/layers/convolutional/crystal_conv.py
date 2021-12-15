@@ -34,12 +34,10 @@ class CrystalConv(MessagePassing):
 
     **Output**
 
-    - Node features with the same shape of the input, but the last dimension
-    changed to `channels`.
+    - Node features with the same shape of the input.
 
     **Arguments**
 
-    - `channels`: integer, number of output channels;
     - `activation`: activation function;
     - `use_bias`: bool, add a bias vector to the output;
     - `kernel_initializer`: initializer for the weights;
@@ -53,7 +51,6 @@ class CrystalConv(MessagePassing):
 
     def __init__(
         self,
-        channels,
         aggregate="sum",
         activation=None,
         use_bias=True,
@@ -79,7 +76,6 @@ class CrystalConv(MessagePassing):
             bias_constraint=bias_constraint,
             **kwargs
         )
-        self.channels = channels
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
@@ -92,8 +88,9 @@ class CrystalConv(MessagePassing):
             bias_constraint=self.bias_constraint,
             dtype=self.dtype,
         )
-        self.dense_f = Dense(self.channels, activation="sigmoid", **layer_kwargs)
-        self.dense_s = Dense(self.channels, activation=self.activation, **layer_kwargs)
+        channels = input_shape[0][-1]
+        self.dense_f = Dense(channels, activation="sigmoid", **layer_kwargs)
+        self.dense_s = Dense(channels, activation=self.activation, **layer_kwargs)
 
         self.built = True
 
@@ -111,7 +108,3 @@ class CrystalConv(MessagePassing):
 
     def update(self, embeddings, x=None):
         return x + embeddings
-
-    @property
-    def config(self):
-        return {"channels": self.channels}
