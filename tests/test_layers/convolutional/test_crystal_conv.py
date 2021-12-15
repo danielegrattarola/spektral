@@ -1,4 +1,4 @@
-from core import MODES, run_layer, F
+from core import MODES, F, run_layer
 
 from spektral import layers
 
