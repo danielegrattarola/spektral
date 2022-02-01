@@ -14,7 +14,7 @@
 
   <link rel="stylesheet" href="../../css/theme.css" />
   <link rel="stylesheet" href="../../css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
   <link href="../../stylesheets/extra.css" rel="stylesheet" />
   
   <script>
@@ -26,9 +26,8 @@
   
   <script src="../../js/jquery-2.1.1.min.js" defer></script>
   <script src="../../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
-  
   <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -52,7 +51,7 @@
         <a href="../.." class="icon icon-home"> Spektral</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
@@ -168,14 +167,14 @@
   
   <hr/>
 </div>
+
           <div role="main">
             <div class="section">
               
                 <h2 id="convolution">Convolution</h2>
 <h4 id="degree_matrix">degree_matrix</h4>
-<pre><code class="python">spektral.utils.degree_matrix(A)
+<pre><code class="language-python">spektral.utils.degree_matrix(A)
 </code></pre>
-
 <p>Computes the degree matrix of the given adjacency matrix.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
@@ -186,9 +185,8 @@
 matrix in DIA format.</p>
 <hr />
 <h4 id="degree_power">degree_power</h4>
-<pre><code class="python">spektral.utils.degree_power(A, k)
+<pre><code class="language-python">spektral.utils.degree_power(A, k)
 </code></pre>
-
 <p>Computes <script type="math/tex">\D^{k}</script> from the given adjacency matrix. Useful for computing
 normalised Laplacian.</p>
 <p><strong>Arguments</strong>  </p>
@@ -205,9 +203,8 @@ normalised Laplacian.</p>
 matrix in DIA format.</p>
 <hr />
 <h4 id="normalized_adjacency">normalized_adjacency</h4>
-<pre><code class="python">spektral.utils.normalized_adjacency(A, symmetric=True)
+<pre><code class="language-python">spektral.utils.normalized_adjacency(A, symmetric=True)
 </code></pre>
-
 <p>Normalizes the given adjacency matrix using the degree matrix as either
 <script type="math/tex">\D^{-1}\A</script> or <script type="math/tex">\D^{-1/2}\A\D^{-1/2}</script> (symmetric normalization).</p>
 <p><strong>Arguments</strong>  </p>
@@ -223,9 +220,8 @@ matrix in DIA format.</p>
  The normalized adjacency matrix.</p>
 <hr />
 <h4 id="laplacian">laplacian</h4>
-<pre><code class="python">spektral.utils.laplacian(A)
+<pre><code class="language-python">spektral.utils.laplacian(A)
 </code></pre>
-
 <p>Computes the Laplacian of the given adjacency matrix as <script type="math/tex">\D - \A</script>.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
@@ -235,9 +231,8 @@ matrix in DIA format.</p>
  The Laplacian.</p>
 <hr />
 <h4 id="normalized_laplacian">normalized_laplacian</h4>
-<pre><code class="python">spektral.utils.normalized_laplacian(A, symmetric=True)
+<pre><code class="language-python">spektral.utils.normalized_laplacian(A, symmetric=True)
 </code></pre>
-
 <p>Computes a  normalized Laplacian of the given adjacency matrix as
 <script type="math/tex">\I - \D^{-1}\A</script> or <script type="math/tex">\I - \D^{-1/2}\A\D^{-1/2}</script> (symmetric normalization).</p>
 <p><strong>Arguments</strong>  </p>
@@ -253,9 +248,8 @@ matrix in DIA format.</p>
  The normalized Laplacian.</p>
 <hr />
 <h4 id="rescale_laplacian">rescale_laplacian</h4>
-<pre><code class="python">spektral.utils.rescale_laplacian(L, lmax=None)
+<pre><code class="language-python">spektral.utils.rescale_laplacian(L, lmax=None)
 </code></pre>
-
 <p>Rescales the Laplacian eigenvalues in [-1,1], using lmax as largest eigenvalue.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
@@ -271,9 +265,8 @@ If scalar, use this value as largest eigenvalue when rescaling.</p>
 <p><strong>Return</strong>  </p>
 <hr />
 <h4 id="add_self_loops">add_self_loops</h4>
-<pre><code class="python">spektral.utils.add_self_loops(a, value=1)
+<pre><code class="language-python">spektral.utils.add_self_loops(a, value=1)
 </code></pre>
-
 <p>Sets the inner diagonals of <code>a</code> to <code>value</code>.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
@@ -289,9 +282,8 @@ must be equal.</p>
  A np.array or scipy.sparse matrix with the same shape as <code>a</code>.</p>
 <hr />
 <h4 id="gcn_filter">gcn_filter</h4>
-<pre><code class="python">spektral.utils.gcn_filter(A, symmetric=True)
+<pre><code class="language-python">spektral.utils.gcn_filter(A, symmetric=True)
 </code></pre>
-
 <p>Computes the graph filter described in
 <a href="https://arxiv.org/abs/1609.02907">Kipf &amp; Welling (2017)</a>.</p>
 <p><strong>Arguments</strong>  </p>
@@ -308,9 +300,8 @@ must be equal.</p>
  Array or sparse matrix with rank 2 or 3, same as A;</p>
 <hr />
 <h4 id="chebyshev_polynomial">chebyshev_polynomial</h4>
-<pre><code class="python">spektral.utils.chebyshev_polynomial(X, k)
+<pre><code class="language-python">spektral.utils.chebyshev_polynomial(X, k)
 </code></pre>
-
 <p>Calculates Chebyshev polynomials of X, up to order k.</p>
 <p><strong>Arguments</strong>  </p>
 <ul>
@@ -326,9 +317,8 @@ must be equal.</p>
 degree of the polynomial.</p>
 <hr />
 <h4 id="chebyshev_filter">chebyshev_filter</h4>
-<pre><code class="python">spektral.utils.chebyshev_filter(A, k, symmetric=True)
+<pre><code class="language-python">spektral.utils.chebyshev_filter(A, k, symmetric=True)
 </code></pre>
-
 <p>Computes the Chebyshev filter from the given adjacency matrix, as described
 in <a href="https://arxiv.org/abs/1606.09375">Defferrard et at. (2016)</a>.</p>
 <p><strong>Arguments</strong>  </p>
@@ -380,19 +370,22 @@ degree of the polynomial.</p>
   </div>
 
   <div class="rst-versions" role="note" aria-label="versions">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
-      
-      
-        <span><a href="../../transforms/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../sparse/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../../transforms/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../sparse/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
     <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
     <script src="../../js/theme.js" defer></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
       <script src="../../js/macros.js" defer></script>

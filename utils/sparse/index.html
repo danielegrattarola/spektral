@@ -14,7 +14,7 @@
 
   <link rel="stylesheet" href="../../css/theme.css" />
   <link rel="stylesheet" href="../../css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
   <link href="../../stylesheets/extra.css" rel="stylesheet" />
   
   <script>
@@ -26,9 +26,8 @@
   
   <script src="../../js/jquery-2.1.1.min.js" defer></script>
   <script src="../../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
-  
   <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -52,7 +51,7 @@
         <a href="../.." class="icon icon-home"> Spektral</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
@@ -152,14 +151,14 @@
   
   <hr/>
 </div>
+
           <div role="main">
             <div class="section">
               
                 <h2 id="sparse">Sparse</h2>
 <h4 id="reorder">reorder</h4>
-<pre><code class="python">spektral.utils.reorder(edge_index, edge_weight=None, edge_features=None)
+<pre><code class="language-python">spektral.utils.reorder(edge_index, edge_weight=None, edge_features=None)
 </code></pre>
-
 <p>Reorders <code>edge_index</code>, <code>edge_weight</code>, and <code>edge_features</code> according to the row-major
 ordering of <code>edge_index</code>.</p>
 <p><strong>Arguments</strong>  </p>
@@ -187,9 +186,8 @@ the new order of the indices. Otherwise, None.</li>
 </ul>
 <hr />
 <h4 id="sp_matrix_to_sp_tensor">sp_matrix_to_sp_tensor</h4>
-<pre><code class="python">spektral.utils.sp_matrix_to_sp_tensor(x)
+<pre><code class="language-python">spektral.utils.sp_matrix_to_sp_tensor(x)
 </code></pre>
-
 <p>Converts a Scipy sparse matrix to a SparseTensor.
 The indices of the output are reordered in the canonical row-major ordering, and
 duplicate entries are summed together (which is the default behaviour of Scipy).</p>
@@ -232,19 +230,22 @@ duplicate entries are summed together (which is the default behaviour of Scipy).
   </div>
 
   <div class="rst-versions" role="note" aria-label="versions">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
-      
-      
-        <span><a href="../convolution/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../misc/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../convolution/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../misc/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
     <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
     <script src="../../js/theme.js" defer></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
       <script src="../../js/macros.js" defer></script>

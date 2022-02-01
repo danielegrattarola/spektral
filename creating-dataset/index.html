@@ -14,7 +14,7 @@
 
   <link rel="stylesheet" href="../css/theme.css" />
   <link rel="stylesheet" href="../css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
   <link href="../stylesheets/extra.css" rel="stylesheet" />
   
   <script>
@@ -26,9 +26,8 @@
   
   <script src="../js/jquery-2.1.1.min.js" defer></script>
   <script src="../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
-  
   <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -52,7 +51,7 @@
         <a href=".." class="icon icon-home"> Spektral</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
@@ -152,6 +151,7 @@
   
   <hr/>
 </div>
+
           <div role="main">
             <div class="section">
               
@@ -171,7 +171,7 @@ However, each time you instantiate a Dataset it will check whether <code>path</c
 <h3 id="example">Example</h3>
 <p>This is a simple example that shows how to create a custom dataset with five random graphs. We pretend that the data comes from an online source so that we can show how to use <code>download()</code>. </p>
 <p>We start by overriding the <code>__init__()</code> method to store some custom parameters of the dataset: </p>
-<pre><code class="py">class MyDataset(Dataset):
+<pre><code class="language-py">class MyDataset(Dataset):
     &quot;&quot;&quot;
     A dataset of five random graphs.
     &quot;&quot;&quot;
@@ -181,10 +181,9 @@ However, each time you instantiate a Dataset it will check whether <code>path</c
 
         super().__init__(**kwargs)
 </code></pre>
-
 <p>Remember to call <code>super().__init__(**kwargs)</code> as the last line.</p>
 <p>Then, we simulate downloading the data from the web. Since this method gets called if <code>path</code> does not exist on the system, it makes sense to create the corresponding directory now:</p>
-<pre><code class="py">def download(self):
+<pre><code class="language-py">def download(self):
     data = ...  # Download from somewhere
 
     # Create the directory
@@ -199,9 +198,8 @@ However, each time you instantiate a Dataset it will check whether <code>path</c
         filename = os.path.join(self.path, f'graph_{i}')
         np.savez(filename, x=x, a=a, y=y)
 </code></pre>
-
 <p>Finally, we implement the <code>read()</code> method to return a list of <code>Graph</code> objects:</p>
-<pre><code class="py">def read(self):
+<pre><code class="language-py">def read(self):
     # We must return a list of Graph objects
     output = []
 
@@ -213,18 +211,15 @@ However, each time you instantiate a Dataset it will check whether <code>path</c
 
     return output
 </code></pre>
-
 <p>We can now instantiate our dataset, which will "download" our data and read it into memory: </p>
 <pre><code>&gt;&gt;&gt; dataset = MyDataset(3, 2)
 &gt;&gt;&gt; dataset
 MyDataset(n_graphs=5)
 </code></pre>
-
 <p>We can see that our graphs were saved to file: </p>
-<pre><code class="sh">$ ls ~/.spektral/datasets/MyDataset/
+<pre><code class="language-sh">$ ls ~/.spektral/datasets/MyDataset/
 graph_0.npz  graph_1.npz  graph_2.npz  graph_3.npz  graph_4.npz
 </code></pre>
-
 <p>so the next time we create <code>MyDataset</code> it will read from the files we have saved. </p>
 <hr />
 <p>You can now use your custom dataset however you like. <a href="/loaders">Loaders</a> will work, as well as <a href="/transforms">transforms</a> and all other features described in the <a href="/data/#dataset">documentation</a>.</p>
@@ -263,19 +258,22 @@ graph_0.npz  graph_1.npz  graph_2.npz  graph_3.npz  graph_4.npz
   </div>
 
   <div class="rst-versions" role="note" aria-label="versions">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
-      
-      
-        <span><a href="../data-modes/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../creating-layer/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../data-modes/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../creating-layer/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
     <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
     <script src="../js/theme.js" defer></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
       <script src="../js/macros.js" defer></script>

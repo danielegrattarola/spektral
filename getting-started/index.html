@@ -14,7 +14,7 @@
 
   <link rel="stylesheet" href="../css/theme.css" />
   <link rel="stylesheet" href="../css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
   <link href="../stylesheets/extra.css" rel="stylesheet" />
   
   <script>
@@ -26,9 +26,8 @@
   
   <script src="../js/jquery-2.1.1.min.js" defer></script>
   <script src="../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
-  
   <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -52,7 +51,7 @@
         <a href=".." class="icon icon-home"> Spektral</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
@@ -176,6 +175,7 @@
   
   <hr/>
 </div>
+
           <div role="main">
             <div class="section">
               
@@ -206,9 +206,8 @@ This is called the <em>COOrdinate format</em> and it is the format used by Tenso
  [0, 5, 0, 6],
  [7, 0, 8, 0]]
 </code></pre>
-
 <p>can be represented in COOrdinate format as follows: </p>
-<pre><code class="python">R, C, V
+<pre><code class="language-python">R, C, V
 0, 1, 1
 0, 3, 2
 1, 0, 3
@@ -218,7 +217,6 @@ This is called the <em>COOrdinate format</em> and it is the format used by Tenso
 3, 0, 7
 3, 2, 8
 </code></pre>
-
 <p>where <code>R</code> indicates the "row" indices, <code>C</code> the columns, and <code>V</code> the non-zero values <code>a[i, j]</code>. For example, in the second line, we see that there is an edge that goes <strong>from node 3 to node 0</strong> with weight 2.</p>
 <p>We also see that, in this case, all edges have a corresponding edge that goes in the opposite direction. For the sake of this example, all edges have been assigned a different weight. In practice, however, edge <code>i, j</code> will often have the same weight as edge <code>j, i</code> and the adjacency matrix will be symmetric.</p>
 <p>Many convolutional and pooling layers in Spektral use this sparse representation of matrices to do their computation, and sometimes you will see in the documentation a comment saying that <strong>"This layer expects a sparse adjacency matrix."</strong></p>
@@ -232,7 +230,7 @@ This is called the <em>COOrdinate format</em> and it is the format used by Tenso
 <p>If we store them in a dense <code>np.array</code>, then the array will have shape <code>[n_nodes, n_nodes, n_edge_features]</code> and most of its entries will be zeros. Unfortunately, order-3 tensors cannot be represented as Scipy sparse matrices, so we need to be smart about it. </p>
 <p>Similar to how we stored the adjacency matrix as a list of entries <code>r, c, v</code>, here we can use the COOrdinate format to represent our edge features. 
 Assume that, in the example above, each edge has <code>n_edge_features=3</code> features. We could do something like: </p>
-<pre><code class="python">R, C, V
+<pre><code class="language-python">R, C, V
 0, 1, [ef_1, ef_2, ef_3]
 0, 3, [ef_1, ef_2, ef_3]
 1, 0, [ef_1, ef_2, ef_3]
@@ -242,7 +240,6 @@ Assume that, in the example above, each edge has <code>n_edge_features=3</code> 
 3, 0, [ef_1, ef_2, ef_3]
 3, 2, [ef_1, ef_2, ef_3]
 </code></pre>
-
 <p>Since we already have the information of <code>R</code> and <code>C</code> in the adjacency matrix, we only need to store the <code>V</code> column as a matrix <code>e</code> of shape <code>[n_edges, n_edge_features]</code>. In this case, <code>n_edges</code> indicates the number of non-zero entries in the adjacency matrix. </p>
 <p>Note that, since we have separated the edge features from the edge indices of the adjacency matrix, the order in which we store the edge features is very important. We must not break the correspondence between the edges in <code>a</code> and the edges in <code>e</code>.</p>
 <p><strong>In Spektral, we always assume that edges are sorted in the row-major ordering (we first sort by row, then by column, like in the example above). This is not important when building the adjacency matrix, but it is important when building <code>e</code>.</strong></p>
@@ -262,28 +259,24 @@ Node-level labels can be 1-dimensional arrays of shape <code>[n_nodes, ]</code> 
 <h3 id="datasets">Datasets</h3>
 <p>The <code>spektral.data.Dataset</code> container provides some useful functionality to manipulate collections of graphs.</p>
 <p>Let's load a popular benchmark dataset for graph classification: </p>
-<pre><code class="python">&gt;&gt;&gt; from spektral.datasets import TUDataset
+<pre><code class="language-python">&gt;&gt;&gt; from spektral.datasets import TUDataset
 
 &gt;&gt;&gt; dataset = TUDataset('PROTEINS')
 
 &gt;&gt;&gt; dataset
 TUDataset(n_graphs=1113)
 </code></pre>
-
 <p>We can now retrieve individual graphs:</p>
-<pre><code class="python">&gt;&gt;&gt; dataset[0]
+<pre><code class="language-python">&gt;&gt;&gt; dataset[0]
 Graph(n_nodes=42, n_node_features=4, n_edge_features=None, y=[1. 0.])
 </code></pre>
-
 <p>or shuffle the data:</p>
-<pre><code class="python">&gt;&gt;&gt; np.random.shuffle(dataset)
+<pre><code class="language-python">&gt;&gt;&gt; np.random.shuffle(dataset)
 </code></pre>
-
 <p>or slice the dataset into sub-datsets: </p>
-<pre><code class="python">&gt;&gt;&gt; dataset[:100]
+<pre><code class="language-python">&gt;&gt;&gt; dataset[:100]
 TUDataset(n_graphs=100)
 </code></pre>
-
 <p>Datasets also provide methods for applying <strong>transforms</strong> to each datum: </p>
 <ul>
 <li><code>apply(transform)</code> - modifies the dataset in-place, by applying the <code>transform</code> to each graph;</li>
@@ -291,39 +284,34 @@ TUDataset(n_graphs=100)
 <li><code>filter(function)</code> - removes from the dataset any graph for which <code>function(graph)</code> is <code>False</code>. This is also an in-place operation.</li>
 </ul>
 <p>For example, let's modify our dataset so that we only have graphs with less than 500 nodes:</p>
-<pre><code class="python">&gt;&gt;&gt; dataset.filter(lambda g: g.n_nodes &lt; 500)
+<pre><code class="language-python">&gt;&gt;&gt; dataset.filter(lambda g: g.n_nodes &lt; 500)
 
 &gt;&gt;&gt; dataset
 TUDataset(n_graphs=1111)  # removed 2 graphs
 </code></pre>
-
 <p>Now let's apply some transforms to our graphs. For example, we can modify each graph so that the node features also contain the one-hot-encoded degree of the nodes.</p>
 <p>First, we compute the maximum degree of the dataset, so that we know the size of the one-hot vectors: </p>
-<pre><code class="python">&gt;&gt;&gt; max_degree = dataset.map(lambda g: g.a.sum(-1).max(), reduce=max)
+<pre><code class="language-python">&gt;&gt;&gt; max_degree = dataset.map(lambda g: g.a.sum(-1).max(), reduce=max)
 
 &gt;&gt;&gt; max_degree
 12
 </code></pre>
-
 <p>Try to go over the lambda function to see what it does. Also, notice that we passed a reduction function to the method, using the <code>reduce</code> keyword. This will be run on the output list computed by the map.</p>
 <p>Now we are ready to augment our node features with the one-hot-encoded degree. Spektral has a lot of pre-implemented <code>transforms</code> that we can use: </p>
-<pre><code class="python">&gt;&gt;&gt; from spektral.transforms import Degree
+<pre><code class="language-python">&gt;&gt;&gt; from spektral.transforms import Degree
 
 &gt;&gt;&gt; dataset.apply(Degree(max_degree))
 </code></pre>
-
 <p>We can see that it worked because now we have an extra <code>max_degree + 1</code> node features:</p>
-<pre><code class="python">&gt;&gt;&gt; dataset[0]
+<pre><code class="language-python">&gt;&gt;&gt; dataset[0]
 Graph(n_nodes=42, n_node_features=17, n_edge_features=None, y=[1. 0.])
 </code></pre>
-
 <p>Since we will be using a <code>GCNConv</code> layer in our GNN, we also want to follow the <a href="https://arxiv.org/abs/1609.02907">original paper</a> that introduced this layer and do some extra pre-processing of the adjacency matrix. </p>
 <p>Since this is a fairly common operation, Spektral has a transform to do it: </p>
-<pre><code class="python">&gt;&gt;&gt; from spektral.transforms import GCNFilter
+<pre><code class="language-python">&gt;&gt;&gt; from spektral.transforms import GCNFilter
 
 &gt;&gt;&gt; dataset.apply(GCNFilter())
 </code></pre>
-
 <p>Many layers will require you to do some form of preprocessing. If you don't want to go back to the literature every time, every convolutional layer in Spektral has a <code>preprocess(a)</code> method that you can use to transform the adjacency matrix as needed. <br>
 Have a look at the handy <a href="/transforms/#layerpreprocess"><code>LayerPreprocess</code> transform</a>.</p>
 <h3 id="creating-a-gnn">Creating a GNN</h3>
@@ -331,13 +319,12 @@ Have a look at the handy <a href="/transforms/#layerpreprocess"><code>LayerPrepr
 We just need to use the functional API because GNN layers usually need two or more inputs (so no <code>Sequential</code> models for now). </p>
 <p>For our first GNN, we will create a simple network that first does a bit of graph convolution, then sums all the nodes together (known as "global pooling"), and finally classifies the result with a dense softmax layer. We will also use dropout for regularization.</p>
 <p>Let's start by importing the necessary layers:</p>
-<pre><code class="python">from tensorflow.keras.models import Model
+<pre><code class="language-python">from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Dense, Dropout
 from spektral.layers import GCNConv, GlobalSumPool
 </code></pre>
-
 <p>Now we can use model subclassing to define our model:</p>
-<pre><code class="python">class MyFirstGNN(Model):
+<pre><code class="language-python">class MyFirstGNN(Model):
 
     def __init__(self, n_hidden, n_labels):
         super().__init__()
@@ -354,17 +341,15 @@ from spektral.layers import GCNConv, GlobalSumPool
 
         return out
 </code></pre>
-
 <p>And that's it!</p>
 <p>Note how we mixed layers from Spektral and Keras interchangeably: it's all just computation with tensors underneath.</p>
 <p>This also means that if you want to break free from <code>Graph</code> and <code>Dataset</code> and every other feature of Spektral, you can. </p>
 <p><strong>Note:</strong> If you don't want to subclass <code>Model</code> to implement your GNN, you can also use the classical declarative style. You just need to pay attention to the <code>Input</code> and leave "node" dimensions unspecified (so <code>None</code> instead of <code>n_nodes</code>).</p>
 <h3 id="training-the-gnn">Training the GNN</h3>
 <p>Now we're ready to train the GNN. First, we instantiate and compile our model: </p>
-<pre><code class="python">model = MyFirstGNN(32, dataset.n_labels)
+<pre><code class="language-python">model = MyFirstGNN(32, dataset.n_labels)
 model.compile('adam', 'categorical_crossentropy')
 </code></pre>
-
 <p>and we're almost there!</p>
 <p>However, here's where graphs get in our way. Unlike regular data, like images or sequences, graphs cannot be stretched, cut, or reshaped so that we can fit them into tensors of pre-defined shapes. If a graph has 10 nodes and another one has 4, we have to keep them that way. </p>
 <p>This means that iterating over a dataset in mini-batches is not trivial and we cannot simply use the <code>model.fit()</code> method of Keras as-is. </p>
@@ -375,31 +360,27 @@ You only need to go to <a href="/data-modes">this page</a> and read up on <stron
 <p>Each loader has a <code>load()</code> method that returns a data generator that Keras can process. </p>
 <p>Since we're doing graph-level classification, we can use a <code>BatchLoader</code>. It's a bit slow and memory intensive (a <code>DisjointLoader</code> would have been better), but it lets us simplify the definition of <code>MyFirstGNN</code>. Again, go read about <a href="/data-modes">data modes</a> after this tutorial.</p>
 <p>Let's create a data loader:</p>
-<pre><code class="python">from spektral.data import BatchLoader
+<pre><code class="language-python">from spektral.data import BatchLoader
 
 loader = BatchLoader(dataset_train, batch_size=32)
 </code></pre>
-
 <p>and we can finally train our GNN!</p>
 <p>Since loaders are essentially generators, we need to provide the <code>steps_per_epoch</code> keyword to <code>model.fit()</code> and we don't need to specify a batch size:</p>
-<pre><code class="python">model.fit(loader.load(), steps_per_epoch=loader.steps_per_epoch, epochs=10)
+<pre><code class="language-python">model.fit(loader.load(), steps_per_epoch=loader.steps_per_epoch, epochs=10)
 </code></pre>
-
 <p>Done!</p>
 <h3 id="evaluating-the-gnn">Evaluating the GNN</h3>
 <p>Evaluating the performance of our model, be it for testing or validation, follows a similar workflow. </p>
 <p>We create a data loader: </p>
-<pre><code class="python">from spektral.data import BatchLoader
+<pre><code class="language-python">from spektral.data import BatchLoader
 
 loader = BatchLoader(dataset_test, batch_size=32)
 </code></pre>
-
 <p>and feed it to the model by calling <code>load()</code>:</p>
-<pre><code class="python">loss = model.evaluate(loader.load(), steps=loader.steps_per_epoch)
+<pre><code class="language-python">loss = model.evaluate(loader.load(), steps=loader.steps_per_epoch)
 
 print('Test loss: {}'.format(loss))
 </code></pre>
-
 <h3 id="node-level-learning">Node-level learning</h3>
 <p>Besides learning to predict labels for the whole graph, like in this tutorial, GNNs are very effective at learning to predict labels for each node. This is called "node-level learning" and we usually do it for datasets with one big graph (think a social network).</p>
 <p>For example, reproducing the results of the <a href="https://arxiv.org/abs/1609.02907">GCN paper for classifying nodes in a citation network</a> can be done with <code>GCNConv</code> layers, the <code>Citation</code> dataset, and a <code>SingleLoader</code>: check out <a href="https://github.com/danielegrattarola/spektral/blob/master/examples/node_prediction/citation_gcn.py">this example</a>.</p>
@@ -447,19 +428,22 @@ Daniele Grattarola and Cesare Alippi  </p>
   </div>
 
   <div class="rst-versions" role="note" aria-label="versions">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
-      
-      
-        <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../data-modes/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../data-modes/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
     <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
     <script src="../js/theme.js" defer></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
       <script src="../js/macros.js" defer></script>

@@ -14,7 +14,7 @@
 
   <link rel="stylesheet" href="../../css/theme.css" />
   <link rel="stylesheet" href="../../css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
   <link href="../../stylesheets/extra.css" rel="stylesheet" />
   
   <script>
@@ -26,9 +26,8 @@
   
   <script src="../../js/jquery-2.1.1.min.js" defer></script>
   <script src="../../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
-  
   <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -52,7 +51,7 @@
         <a href="../.." class="icon icon-home"> Spektral</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
@@ -83,9 +82,11 @@
                     </li>
                     <li class="toctree-l1 current"><a class="reference internal current" href="./">Base layers</a>
     <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#innerproduct">InnerProduct</a>
-    </li>
     <li class="toctree-l2"><a class="reference internal" href="#disjoint2batch">Disjoint2Batch</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#graphmasking">GraphMasking</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#innerproduct">InnerProduct</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#minkowskiproduct">MinkowskiProduct</a>
     </li>
@@ -154,16 +155,53 @@
   
   <hr/>
 </div>
+
           <div role="main">
             <div class="section">
               
                 <h2 id="base-layers">Base layers</h2>
 <p>This module contains a miscellany of layers that are not specifically for graph neural networks. </p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L12">[source]</a></span></p>
+<h4 id="disjoint2batch">Disjoint2Batch</h4>
+<pre><code class="language-python">spektral.layers.Disjoint2Batch()
+</code></pre>
+<p>Utility layer that converts data from disjoint mode to batch mode by
+zero-padding the node features and adjacency matrices.</p>
+<p><strong>Mode</strong>: disjoint.</p>
+<p><strong>This layer expects a sparse adjacency matrix.</strong></p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>(n_nodes, n_node_features)</code>;</li>
+<li>Binary adjacency matrix of shape <code>(n_nodes, n_nodes)</code>;</li>
+<li>Graph IDs of shape <code>(n_nodes, )</code>;</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Batched node features of shape <code>(batch, N_max, n_node_features)</code>;</li>
+<li>Batched adjacency matrix of shape <code>(batch, N_max, N_max)</code>;</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L52">[source]</a></span></p>
+<h4 id="graphmasking">GraphMasking</h4>
+<pre><code class="language-python">keras.engine.base_layer.GraphMasking()
+</code></pre>
+<p>A layer that starts the propagation of masks in a model.</p>
+<p>This layer assumes that the node features given as input have been extended with a
+binary mask that indicates which nodes are valid in each graph.
+The layer is useful when using a <code>data.BatchLoader</code> with <code>mask=True</code> or in general
+when zero-padding graphs so that all batches have the same size. The binary mask
+indicates with a 1 those nodes that should be taken into account by the model.</p>
+<p>The layer will remove the rightmost feature from the nodes and start a mask
+propagation to all subsequent layers:</p>
+<pre><code class="language-python">print(x.shape)  # shape (batch, n_nodes, n_node_features + 1)
+mask = x[..., -1:]  # shape (batch, n_nodes, 1)
+x_new = x[..., :-1] # shape (batch, n_nodes, n_node_features)
+</code></pre>
+<hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L87">[source]</a></span></p>
 <h4 id="innerproduct">InnerProduct</h4>
-<pre><code class="python">spektral.layers.InnerProduct(trainable_kernel=False, activation=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
+<pre><code class="language-python">spektral.layers.InnerProduct(trainable_kernel=False, activation=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
 </code></pre>
-
 <p>Computes the inner product between elements of a 2d Tensor:
 <script type="math/tex; mode=display">
 \langle \x, \x \rangle = \x\x^\top.
@@ -198,32 +236,10 @@ product (e.g., <code>X @ W @ X.T</code>);</p>
 </li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L12">[source]</a></span></p>
-<h4 id="disjoint2batch">Disjoint2Batch</h4>
-<pre><code class="python">spektral.layers.Disjoint2Batch()
-</code></pre>
-
-<p>Utility layer that converts data from disjoint mode to batch mode by
-zero-padding the node features and adjacency matrices.</p>
-<p><strong>Mode</strong>: disjoint.</p>
-<p><strong>This layer expects a sparse adjacency matrix.</strong></p>
-<p><strong>Input</strong></p>
-<ul>
-<li>Node features of shape <code>(n_nodes, n_node_features)</code>;</li>
-<li>Binary adjacency matrix of shape <code>(n_nodes, n_nodes)</code>;</li>
-<li>Graph IDs of shape <code>(n_nodes, )</code>;</li>
-</ul>
-<p><strong>Output</strong></p>
-<ul>
-<li>Batched node features of shape <code>(batch, N_max, n_node_features)</code>;</li>
-<li>Batched adjacency matrix of shape <code>(batch, N_max, N_max)</code>;</li>
-</ul>
-<hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/base.py#L162">[source]</a></span></p>
 <h4 id="minkowskiproduct">MinkowskiProduct</h4>
-<pre><code class="python">spektral.layers.MinkowskiProduct(activation=None)
+<pre><code class="language-python">spektral.layers.MinkowskiProduct(activation=None)
 </code></pre>
-
 <p>Computes the hyperbolic inner product between elements of a rank 2 Tensor:
 <script type="math/tex; mode=display">
 \langle \x, \x \rangle = \x \,
@@ -279,19 +295,22 @@ zero-padding the node features and adjacency matrices.</p>
   </div>
 
   <div class="rst-versions" role="note" aria-label="versions">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
-      
-      
-        <span><a href="../pooling/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../../models/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../pooling/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../models/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
     <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
     <script src="../../js/theme.js" defer></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
       <script src="../../js/macros.js" defer></script>

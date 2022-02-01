@@ -14,7 +14,7 @@
 
   <link rel="stylesheet" href="../css/theme.css" />
   <link rel="stylesheet" href="../css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
   <link href="../stylesheets/extra.css" rel="stylesheet" />
   
   <script>
@@ -26,9 +26,8 @@
   
   <script src="../js/jquery-2.1.1.min.js" defer></script>
   <script src="../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
-  
   <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -52,7 +51,7 @@
         <a href=".." class="icon icon-home"> Spektral</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
@@ -168,6 +167,7 @@
   
   <hr/>
 </div>
+
           <div role="main">
             <div class="section">
               
@@ -175,16 +175,14 @@
 <p>This module provides benchmark datasets for graph-level and node-level prediction. 
 Datasets are automatically downloaded and saved locally on first usage. 
 You can configure the path where the data are stored by creating a <code>~/.spektral/config.json</code> file with the following content:</p>
-<pre><code class="json">{
+<pre><code class="language-json">{
   &quot;dataset_folder&quot;: &quot;/path/to/dataset/folder&quot;
 }
 </code></pre>
-
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/citation.py#L15">[source]</a></span></p>
 <h4 id="citation">Citation</h4>
-<pre><code class="python">spektral.datasets.citation.Citation(name, random_split=False, normalize_x=False, dtype=&lt;class 'numpy.float32'&gt;)
+<pre><code class="language-python">spektral.datasets.citation.Citation(name, random_split=False, normalize_x=False, dtype=&lt;class 'numpy.float32'&gt;)
 </code></pre>
-
 <p>The citation datasets Cora, Citeseer and Pubmed.</p>
 <p>Node attributes are bag-of-words vectors representing the most common words
 in the text document associated to each node.
@@ -207,9 +205,8 @@ If False (default), return the "Planetoid" public splits defined by
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/graphsage.py#L15">[source]</a></span></p>
 <h4 id="graphsage">GraphSage</h4>
-<pre><code class="python">spektral.datasets.graphsage.GraphSage(name)
+<pre><code class="language-python">spektral.datasets.graphsage.GraphSage(name)
 </code></pre>
-
 <p>The datasets used in the paper</p>
 <blockquote>
 <p><a href="https://arxiv.org/abs/1706.02216">Inductive Representation Learning on Large Graphs</a><br>
@@ -234,23 +231,20 @@ accessible via the <code>mask_tr</code>, <code>mask_va</code>, and <code>mask_te
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/graphsage.py#L119">[source]</a></span></p>
 <h4 id="ppi">PPI</h4>
-<pre><code class="python">spektral.datasets.graphsage.PPI()
+<pre><code class="language-python">spektral.datasets.graphsage.PPI()
 </code></pre>
-
 <p>Alias for <code>GraphSage('ppi')</code>.</p>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/graphsage.py#L128">[source]</a></span></p>
 <h4 id="reddit">Reddit</h4>
-<pre><code class="python">spektral.datasets.graphsage.Reddit()
+<pre><code class="language-python">spektral.datasets.graphsage.Reddit()
 </code></pre>
-
 <p>Alias for <code>GraphSage('reddit')</code>.</p>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/mnist.py#L11">[source]</a></span></p>
 <h4 id="mnist">MNIST</h4>
-<pre><code class="python">spektral.datasets.mnist.MNIST(p_flip=0.0, k=8)
+<pre><code class="language-python">spektral.datasets.mnist.MNIST(p_flip=0.0, k=8)
 </code></pre>
-
 <p>The MNIST images used as node features for a grid graph, as described by
 <a href="https://arxiv.org/abs/1606.09375">Defferrard et al. (2016)</a>.</p>
 <p>This dataset is a graph signal classification task, where graphs are
@@ -274,9 +268,8 @@ with that probability.</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/modelnet.py#L14">[source]</a></span></p>
 <h4 id="modelnet">ModelNet</h4>
-<pre><code class="python">spektral.datasets.modelnet.ModelNet(name, test=False, n_jobs=-1)
+<pre><code class="language-python">spektral.datasets.modelnet.ModelNet(name, test=False, n_jobs=-1)
 </code></pre>
-
 <p>The ModelNet10 and ModelNet40 CAD models datasets from the paper:</p>
 <blockquote>
 <p><a href="https://arxiv.org/abs/1406.5670">3D ShapeNets: A Deep Representation for Volumetric Shapes</a><br>
@@ -298,9 +291,8 @@ available cores)</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/ogb.py#L7">[source]</a></span></p>
 <h4 id="ogb">OGB</h4>
-<pre><code class="python">spektral.datasets.ogb.OGB(dataset)
+<pre><code class="language-python">spektral.datasets.ogb.OGB(dataset)
 </code></pre>
-
 <p>Wrapper for datasets from the <a href="https://ogb.stanford.edu/">Open Graph Benchmark (OGB)</a>.</p>
 <p><strong>Arguments</strong></p>
 <ul>
@@ -309,9 +301,8 @@ available cores)</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/qm7.py#L12">[source]</a></span></p>
 <h4 id="qm7">QM7</h4>
-<pre><code class="python">spektral.datasets.qm7.QM7()
+<pre><code class="language-python">spektral.datasets.qm7.QM7()
 </code></pre>
-
 <p>The QM7b dataset of molecules from the paper:</p>
 <blockquote>
 <p><a href="https://arxiv.org/abs/1703.00564">MoleculeNet: A Benchmark for Molecular Machine Learning</a><br>
@@ -324,9 +315,8 @@ molecules.</p>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/qm9.py#L17">[source]</a></span></p>
 <h4 id="qm9">QM9</h4>
-<pre><code class="python">spektral.datasets.qm9.QM9(amount=None, n_jobs=1)
+<pre><code class="language-python">spektral.datasets.qm9.QM9(amount=None, n_jobs=1)
 </code></pre>
-
 <p>The QM9 chemical data set of small molecules.</p>
 <p>In this dataset, nodes represent atoms and edges represent chemical bonds.
 There are 5 possible atom types (H, C, N, O, F) and 4 bond types (single,
@@ -351,9 +341,8 @@ available cores).</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/tudataset.py#L16">[source]</a></span></p>
 <h4 id="tudataset">TUDataset</h4>
-<pre><code class="python">spektral.datasets.tudataset.TUDataset(name, clean=False)
+<pre><code class="language-python">spektral.datasets.tudataset.TUDataset(name, clean=False)
 </code></pre>
-
 <p>The Benchmark Data Sets for Graph Kernels from TU Dortmund
 (<a href="https://chrsmrrs.github.io/datasets/docs/datasets/">link</a>).</p>
 <p>Node features are computed by concatenating the following features for
@@ -417,19 +406,22 @@ graphs.</li>
   </div>
 
   <div class="rst-versions" role="note" aria-label="versions">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
-      
-      
-        <span><a href="../data/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../loaders/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../data/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../loaders/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
     <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
     <script src="../js/theme.js" defer></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
       <script src="../js/macros.js" defer></script>

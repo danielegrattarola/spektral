@@ -14,7 +14,7 @@
 
   <link rel="stylesheet" href="../css/theme.css" />
   <link rel="stylesheet" href="../css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
   <link href="../stylesheets/extra.css" rel="stylesheet" />
   
   <script>
@@ -26,9 +26,8 @@
   
   <script src="../js/jquery-2.1.1.min.js" defer></script>
   <script src="../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
-  
   <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -52,7 +51,7 @@
         <a href=".." class="icon icon-home"> Spektral</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
@@ -170,30 +169,28 @@
   
   <hr/>
 </div>
+
           <div role="main">
             <div class="section">
               
                 <h2 id="transforms">Transforms</h2>
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/transforms/adj_to_sp_tensor.py#L4">[source]</a></span></p>
 <h4 id="adjtosptensor">AdjToSpTensor</h4>
-<pre><code class="python">spektral.transforms.adj_to_sp_tensor.AdjToSpTensor()
+<pre><code class="language-python">spektral.transforms.adj_to_sp_tensor.AdjToSpTensor()
 </code></pre>
-
 <p>Converts the adjacency matrix to a SparseTensor.</p>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/transforms/clustering_coefficient.py#L5">[source]</a></span></p>
 <h4 id="clusteringcoeff">ClusteringCoeff</h4>
-<pre><code class="python">spektral.transforms.clustering_coefficient.ClusteringCoeff()
+<pre><code class="language-python">spektral.transforms.clustering_coefficient.ClusteringCoeff()
 </code></pre>
-
 <p>Concatenates to each node attribute the clustering coefficient of the
 corresponding node.</p>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/transforms/constant.py#L4">[source]</a></span></p>
 <h4 id="constant">Constant</h4>
-<pre><code class="python">spektral.transforms.constant.Constant(value)
+<pre><code class="language-python">spektral.transforms.constant.Constant(value)
 </code></pre>
-
 <p>Concatenates a constant value to the node attributes.</p>
 <p><strong>Arguments</strong></p>
 <ul>
@@ -202,9 +199,8 @@ corresponding node.</p>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/transforms/delaunay.py#L6">[source]</a></span></p>
 <h4 id="delaunay">Delaunay</h4>
-<pre><code class="python">spektral.transforms.delaunay.Delaunay()
+<pre><code class="language-python">spektral.transforms.delaunay.Delaunay()
 </code></pre>
-
 <p>Computes the Delaunay triangulation of the node features.</p>
 <p>The adjacency matrix is obtained from the edges of the triangulation and
 replaces the previous adjacency matrix.
@@ -213,9 +209,8 @@ Duplicate edges are ignored and the adjacency matrix is binary.</p>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/transforms/degree.py#L6">[source]</a></span></p>
 <h4 id="degree">Degree</h4>
-<pre><code class="python">spektral.transforms.degree.Degree(max_degree)
+<pre><code class="language-python">spektral.transforms.degree.Degree(max_degree)
 </code></pre>
-
 <p>Concatenates to each node attribute the one-hot degree of the corresponding
 node.</p>
 <p>The adjacency matrix is expected to have integer entries and the degree is
@@ -228,9 +223,8 @@ one-hot vectors.</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/transforms/gcn_filter.py#L4">[source]</a></span></p>
 <h4 id="gcnfilter">GCNFilter</h4>
-<pre><code class="python">spektral.transforms.gcn_filter.GCNFilter(symmetric=True)
+<pre><code class="language-python">spektral.transforms.gcn_filter.GCNFilter(symmetric=True)
 </code></pre>
-
 <p>Normalizes the adjacency matrix as described by
 <a href="https://arxiv.org/abs/1609.02907">Kipf &amp; Welling (2017)</a>:
 <script type="math/tex; mode=display">
@@ -245,9 +239,8 @@ one-hot vectors.</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/transforms/layer_preprocess.py#L1">[source]</a></span></p>
 <h4 id="layerpreprocess">LayerPreprocess</h4>
-<pre><code class="python">spektral.transforms.layer_preprocess.LayerPreprocess(layer_class)
+<pre><code class="language-python">spektral.transforms.layer_preprocess.LayerPreprocess(layer_class)
 </code></pre>
-
 <p>Applies the <code>preprocess</code> function of a convolutional Layer to the adjacency
 matrix.</p>
 <p><strong>Arguments</strong></p>
@@ -258,9 +251,8 @@ or any Layer that implements a <code>preprocess(adj)</code> method.</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/transforms/normalize_adj.py#L4">[source]</a></span></p>
 <h4 id="normalizeadj">NormalizeAdj</h4>
-<pre><code class="python">spektral.transforms.normalize_adj.NormalizeAdj(symmetric=True)
+<pre><code class="language-python">spektral.transforms.normalize_adj.NormalizeAdj(symmetric=True)
 </code></pre>
-
 <p>Normalizes the adjacency matrix as:
 <script type="math/tex; mode=display">
 \A \leftarrow \D^{-1/2}\A\D^{-1/2}
@@ -273,9 +265,8 @@ or any Layer that implements a <code>preprocess(adj)</code> method.</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/transforms/normalize_one.py#L4">[source]</a></span></p>
 <h4 id="normalizeone">NormalizeOne</h4>
-<pre><code class="python">spektral.transforms.normalize_one.NormalizeOne()
+<pre><code class="language-python">spektral.transforms.normalize_one.NormalizeOne()
 </code></pre>
-
 <p>Normalizes the node attributes by dividing each row by its sum, so that it
 sums to 1:
 <script type="math/tex; mode=display">
@@ -285,9 +276,8 @@ sums to 1:
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/transforms/normalize_sphere.py#L4">[source]</a></span></p>
 <h4 id="normalizesphere">NormalizeSphere</h4>
-<pre><code class="python">spektral.transforms.normalize_sphere.NormalizeSphere()
+<pre><code class="language-python">spektral.transforms.normalize_sphere.NormalizeSphere()
 </code></pre>
-
 <p>Normalizes the node attributes so that they are centered at the origin and
 contained within a sphere of radius 1:
 <script type="math/tex; mode=display">
@@ -298,9 +288,8 @@ contained within a sphere of radius 1:
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/transforms/one_hot.py#L4">[source]</a></span></p>
 <h4 id="onehotlabels">OneHotLabels</h4>
-<pre><code class="python">spektral.transforms.one_hot.OneHotLabels(depth=None, labels=None)
+<pre><code class="language-python">spektral.transforms.one_hot.OneHotLabels(depth=None, labels=None)
 </code></pre>
-
 <p>One-hot encodes the graph labels along the innermost dimension (also if they
 are simple scalars).</p>
 <p>Either <code>depth</code> or <code>labels</code> must be passed as argument.</p>
@@ -344,19 +333,22 @@ indices for a vector of size <code>depth</code>);</li>
   </div>
 
   <div class="rst-versions" role="note" aria-label="versions">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
-      
-      
-        <span><a href="../loaders/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../utils/convolution/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../loaders/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../utils/convolution/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
     <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
     <script src="../js/theme.js" defer></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
       <script src="../js/macros.js" defer></script>

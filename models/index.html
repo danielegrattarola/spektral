@@ -14,7 +14,7 @@
 
   <link rel="stylesheet" href="../css/theme.css" />
   <link rel="stylesheet" href="../css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
   <link href="../stylesheets/extra.css" rel="stylesheet" />
   
   <script>
@@ -26,9 +26,8 @@
   
   <script src="../js/jquery-2.1.1.min.js" defer></script>
   <script src="../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
-  
   <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -52,7 +51,7 @@
         <a href=".." class="icon icon-home"> Spektral</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
@@ -154,6 +153,7 @@
   
   <hr/>
 </div>
+
           <div role="main">
             <div class="section">
               
@@ -161,9 +161,8 @@
 <p>This module implements ready-to-use models from recent literature.</p>
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/models/gcn.py#L6">[source]</a></span></p>
 <h4 id="gcn">GCN</h4>
-<pre><code class="python">spektral.models.gcn.GCN(n_labels, channels=16, activation='relu', output_activation='softmax', use_bias=False, dropout_rate=0.5, l2_reg=0.00025, n_input_channels=None)
+<pre><code class="language-python">spektral.models.gcn.GCN(n_labels, channels=16, activation='relu', output_activation='softmax', use_bias=False, dropout_rate=0.5, l2_reg=0.00025, n_input_channels=None)
 </code></pre>
-
 <p>This model, with its default hyperparameters, implements the architecture
 from the paper:</p>
 <blockquote>
@@ -195,9 +194,8 @@ Thomas N. Kipf and Max Welling</p>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/models/general_gnn.py#L23">[source]</a></span></p>
 <h4 id="generalgnn">GeneralGNN</h4>
-<pre><code class="python">spektral.models.general_gnn.GeneralGNN(output, activation=None, hidden=256, message_passing=4, pre_process=2, post_process=2, connectivity='cat', batch_norm=True, dropout=0.0, aggregate='sum', hidden_activation='prelu', pool='sum')
+<pre><code class="language-python">spektral.models.general_gnn.GeneralGNN(output, activation=None, hidden=256, message_passing=4, pre_process=2, post_process=2, connectivity='cat', batch_norm=True, dropout=0.0, aggregate='sum', hidden_activation='prelu', pool='sum')
 </code></pre>
-
 <p>This model implements the GNN architecture from the paper</p>
 <blockquote>
 <p><a href="https://arxiv.org/abs/2011.08843">Design Space for Graph Neural Networks</a><br>
@@ -263,9 +261,8 @@ pooling is applied (e.g., for node-level learning). Supported pooling methods:
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/models/gnn_explainer.py#L12">[source]</a></span></p>
 <h4 id="gnnexplainer">GNNExplainer</h4>
-<pre><code class="python">spektral.models.gnn_explainer.GNNExplainer(model, n_hops=None, preprocess=None, graph_level=False, verbose=False, learning_rate=0.01, a_size_coef=0.0005, x_size_coef=0.1, a_entropy_coef=0.1, x_entropy_coef=0.1, laplacian_coef=0.0)
+<pre><code class="language-python">spektral.models.gnn_explainer.GNNExplainer(model, n_hops=None, preprocess=None, graph_level=False, verbose=False, learning_rate=0.01, a_size_coef=0.0005, x_size_coef=0.1, a_entropy_coef=0.1, x_entropy_coef=0.1, laplacian_coef=0.0)
 </code></pre>
-
 <p>The GNNExplainer model from the paper:</p>
 <blockquote>
 <p><a href="https://arxiv.org/abs/1903.03894">GNNExplainer: Generating Explanations for Graph Neural Networks</a><br>
@@ -329,19 +326,22 @@ mask;</li>
   </div>
 
   <div class="rst-versions" role="note" aria-label="versions">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
-      
-      
-        <span><a href="../layers/base/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../data/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../layers/base/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../data/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
     <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
     <script src="../js/theme.js" defer></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
       <script src="../js/macros.js" defer></script>

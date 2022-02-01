@@ -14,7 +14,7 @@
 
   <link rel="stylesheet" href="../css/theme.css" />
   <link rel="stylesheet" href="../css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
   <link href="../stylesheets/extra.css" rel="stylesheet" />
   
   <script>
@@ -26,9 +26,8 @@
   
   <script src="../js/jquery-2.1.1.min.js" defer></script>
   <script src="../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
-  
   <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -52,7 +51,7 @@
         <a href=".." class="icon icon-home"> Spektral</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
@@ -156,6 +155,7 @@
   
   <hr/>
 </div>
+
           <div role="main">
             <div class="section">
               
@@ -226,14 +226,13 @@ In particular, we go over which <a href="/loaders/">data <code>Loader</code></a>
 </ul>
 <p>A very common benchmark dataset in single mode is the Cora citation network. 
 We can load it with:</p>
-<pre><code class="py">&gt;&gt;&gt; from spektral.datasets import Cora
+<pre><code class="language-py">&gt;&gt;&gt; from spektral.datasets import Cora
 &gt;&gt;&gt; dataset = Cora()
 &gt;&gt;&gt; dataset
 Cora(n_graphs=1)
 </code></pre>
-
 <p>As expected, we have only one graph: </p>
-<pre><code class="py">&gt;&gt;&gt; dataset[0]
+<pre><code class="language-py">&gt;&gt;&gt; dataset[0]
 Graph(n_nodes=2708, n_node_features=1433, n_edge_features=None, n_labels=7)
 
 &gt;&gt;&gt; dataset[0].a.shape
@@ -242,14 +241,12 @@ Graph(n_nodes=2708, n_node_features=1433, n_edge_features=None, n_labels=7)
 &gt;&gt;&gt; dataset[0].x.shape
 (2708, 1433)
 </code></pre>
-
 <p>When training a GNN in single mode, we can use a <code>SingleLoader</code> that will extract the characteristic matrices from the graph and return a <code>tf.data.Dataset</code> to feed to our model:</p>
-<pre><code class="py">&gt;&gt;&gt; from spektral.data import SingleLoader
+<pre><code class="language-py">&gt;&gt;&gt; from spektral.data import SingleLoader
 &gt;&gt;&gt; loader = SingleLoader(dataset)
 &gt;&gt;&gt; loader.load()
 &lt;RepeatDataset shapes: (((2708, 1433), (2708, 2708)), (2708, 7)), types: ((tf.float32, tf.int64), tf.int32)&gt;
 </code></pre>
-
 <h3 id="disjoint-mode">Disjoint mode</h3>
 <p><img src="/img/disjoint_mode.svg" style="max-width: 400px; width: 100%;"/></p>
 <p>In disjoint mode we represent a set of graphs as a single graph, their "disjoint union", where:</p>
@@ -266,7 +263,7 @@ In the example above, color blue represents 0, green is 1, and orange is 2.</p>
 <p>In convolutional layers, disjoint mode is indistinguishable from single mode because it is not possible to exchange messages between the disjoint components of the graph, so <code>I</code> is not needed to compute the output.<br />
 Pooling layers, on the other hand, require <code>I</code> to know which nodes can be pooled together.</p>
 <p>Let's load a dataset with many small graphs and have a look at the first three:</p>
-<pre><code class="py">&gt;&gt;&gt; from spektral.datasets import TUDataset
+<pre><code class="language-py">&gt;&gt;&gt; from spektral.datasets import TUDataset
 &gt;&gt;&gt; dataset = TUDataset('PROTEINS')
 Successfully loaded PROTEINS.
 
@@ -280,14 +277,12 @@ Graph(n_nodes=27, n_node_features=4, n_edge_features=None, n_labels=2)
 &gt;&gt;&gt; dataset[2]
 Graph(n_nodes=10, n_node_features=4, n_edge_features=None, n_labels=2)
 </code></pre>
-
 <p>To create batches in disjoint mode, we can use a <code>DisjointLoader</code>:</p>
-<pre><code class="py">&gt;&gt;&gt; from spektral.data import DisjointLoader
+<pre><code class="language-py">&gt;&gt;&gt; from spektral.data import DisjointLoader
 &gt;&gt;&gt; loader = DisjointLoader(dataset, batch_size=3)
 </code></pre>
-
 <p>Since Loaders are effectively generators, we can inspect the first batch by calling <code>__next__()</code>:</p>
-<pre><code class="py">&gt;&gt;&gt; batch = loader.__next__()
+<pre><code class="language-py">&gt;&gt;&gt; batch = loader.__next__()
 &gt;&gt;&gt; inputs, target = batch
 &gt;&gt;&gt; x, a, i = inputs
 &gt;&gt;&gt; x.shape
@@ -299,7 +294,6 @@ Graph(n_nodes=10, n_node_features=4, n_edge_features=None, n_labels=2)
 &gt;&gt;&gt; i.shape
 (79, )
 </code></pre>
-
 <p>Note that, since we don't have edge attributes in our dataset, the loader did not create the <code>E</code> matrix.</p>
 <h3 id="batch-mode">Batch mode</h3>
 <p><img src="/img/batch_mode.svg" style="max-width: 400px; width: 100%;"/></p>
@@ -314,7 +308,7 @@ Due to the general lack of support for sparse higher-order tensors both in Scipy
 <p>If you don't want to zero-pad the graphs or work with dense inputs, it is better to use <a href="#disjoint-mode">disjoint mode</a> instead.
 However, note that some pooling layers like <code>DiffPool</code> and <code>MinCutPool</code> will only work in batch mode. </p>
 <p>Let's re-use the dataset from the example above. We can use a <code>BatchLoader</code> as follows: </p>
-<pre><code class="py">&gt;&gt;&gt; from spektral.data import BatchLoader
+<pre><code class="language-py">&gt;&gt;&gt; from spektral.data import BatchLoader
 &gt;&gt;&gt; loader = BatchLoader(dataset, batch_size=3)
 &gt;&gt;&gt; inputs, target = loader.__next__()
 
@@ -324,7 +318,6 @@ However, note that some pooling layers like <code>DiffPool</code> and <code>MinC
 &gt;&gt;&gt; inputs[1].shape
 (3, 42, 42)
 </code></pre>
-
 <p>In this case, the loader only created two inputs because we don't need the indices <code>I</code>. 
 Also note that the batch was padded so that all graphs have 42 nodes, which is the size of the biggest graph out of the three.</p>
 <p>The <code>BatchLoader</code> zero-pads each batch independently of the others, so that we don't waste memory. If you want to remove the overhead of padding each batch, you can use a <code>PackedBatchLoader</code> which will pre-pad all graphs before yielding the batches. Of course, this means that all graphs will have the same number of nodes as the biggest graph in the dataset (and not just in the batch).</p>
@@ -339,14 +332,13 @@ Also note that the batch was padded so that all graphs have 42 nodes, which is t
 </ul>
 <p>Note that, since <code>nodes</code> and <code>edges</code> are the same for all graphs, we have stacked each <code>x_i</code> and <code>e_i</code> in higher-order tensors, similar to batch mode. </p>
 <p>An example of a mixed mode dataset is the MNIST random grid (<a href="https://arxiv.org/abs/1606.09375">Defferrard et al., 2016</a>):</p>
-<pre><code class="py">&gt;&gt;&gt; from spektral.datasets import MNIST
+<pre><code class="language-py">&gt;&gt;&gt; from spektral.datasets import MNIST
 &gt;&gt;&gt; dataset = MNIST()
 &gt;&gt;&gt; dataset
 MNIST(n_graphs=70000)
 </code></pre>
-
 <p>Mixed-mode datasets have a special <code>a</code> attribute that stores the adjacency matrix, while the proper graphs that make up the dataset only have node/edge features:</p>
-<pre><code class="py">&gt;&gt;&gt;dataset.a
+<pre><code class="language-py">&gt;&gt;&gt;dataset.a
 &lt;784x784 sparse matrix of type '&lt;class 'numpy.float64'&gt;'
     with 6396 stored elements in Compressed Sparse Row format&gt;
 
@@ -356,9 +348,8 @@ Graph(n_nodes=784, n_node_features=1, n_edge_features=None, n_labels=1)
 &gt;&gt;&gt;dataset[0].a
 # None
 </code></pre>
-
 <p>We can use a <code>MixedLoader</code> to deal with sharing the adjacency matrix between the graphs in our dataset: </p>
-<pre><code class="py">&gt;&gt;&gt; from spektral.data import MixedLoader
+<pre><code class="language-py">&gt;&gt;&gt; from spektral.data import MixedLoader
 &gt;&gt;&gt; loader = MixedLoader(dataset, batch_size=3)
 &gt;&gt;&gt; inputs, target = loader.__next__()
 
@@ -368,7 +359,6 @@ Graph(n_nodes=784, n_node_features=1, n_edge_features=None, n_labels=1)
 &gt;&gt;&gt; inputs[1].shape  # Only one adjacency matrix
 (784, 784)
 </code></pre>
-
 <p>Mixed mode requires a bit more work than the other three modes. In particular, it is not possible to use <code>loader.load()</code> to train a model in this mode. </p>
 <p>Have a look at <a href="https://github.com/danielegrattarola/spektral/blob/master/examples/other/graph_signal_classification_mnist.py">this example</a> to see how to train a GNN in mixed mode.</p>
               
@@ -404,19 +394,22 @@ Graph(n_nodes=784, n_node_features=1, n_edge_features=None, n_labels=1)
   </div>
 
   <div class="rst-versions" role="note" aria-label="versions">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
-      
-      
-        <span><a href="../getting-started/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../creating-dataset/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../getting-started/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../creating-dataset/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
     <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
     <script src="../js/theme.js" defer></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
       <script src="../js/macros.js" defer></script>

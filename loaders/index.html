@@ -14,7 +14,7 @@
 
   <link rel="stylesheet" href="../css/theme.css" />
   <link rel="stylesheet" href="../css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
   <link href="../stylesheets/extra.css" rel="stylesheet" />
   
   <script>
@@ -26,9 +26,8 @@
   
   <script src="../js/jquery-2.1.1.min.js" defer></script>
   <script src="../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
-  
   <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -52,7 +51,7 @@
         <a href=".." class="icon icon-home"> Spektral</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
@@ -160,15 +159,15 @@
   
   <hr/>
 </div>
+
           <div role="main">
             <div class="section">
               
                 <h2 id="loaders">Loaders</h2>
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L21">[source]</a></span></p>
 <h4 id="loader">Loader</h4>
-<pre><code class="python">spektral.data.loaders.Loader(dataset, batch_size=1, epochs=None, shuffle=True)
+<pre><code class="language-python">spektral.data.loaders.Loader(dataset, batch_size=1, epochs=None, shuffle=True)
 </code></pre>
-
 <p>Parent class for data loaders. The role of a Loader is to iterate over a
 Dataset and yield batches of graphs to feed your Keras Models.</p>
 <p>This is achieved by having a generator object that produces lists of Graphs,
@@ -178,18 +177,16 @@ This takes as input a list of <code>Graph</code> objects and returns a list of T
 np.arrays, or SparseTensors.</p>
 <p>For instance, if all graphs have the same number of nodes and size of the
 attributes, a simple collation function can be:</p>
-<pre><code class="python">def collate(self, batch):
+<pre><code class="language-python">def collate(self, batch):
     x = np.array([g.x for g in batch])
     a = np.array([g.a for g in batch)]
     return x, a
 </code></pre>
-
 <p>The <code>load()</code> method of a Loader returns an object that can be passed to a Keras
 model when using the <code>fit</code>, <code>predict</code> and <code>evaluate</code> functions.
 You can use it as follows:</p>
-<pre><code class="python">model.fit(loader.load(), steps_per_epoch=loader.steps_per_epoch)
+<pre><code class="language-python">model.fit(loader.load(), steps_per_epoch=loader.steps_per_epoch)
 </code></pre>
-
 <p>The <code>steps_per_epoch</code> property represents the number of batches that are in
 an epoch, and is a required keyword when calling <code>fit</code>, <code>predict</code> or <code>evaluate</code>
 with a Loader.</p>
@@ -197,7 +194,7 @@ with a Loader.</p>
 of your batches with the tf.TypeSpec system to avoid unnecessary re-tracings.
 The signature is computed automatically by calling <code>loader.tf_signature()</code>.</p>
 <p>For example, a simple training step can be written as:</p>
-<pre><code class="python">@tf.function(input_signature=loader.tf_signature())  # Specify signature here
+<pre><code class="language-python">@tf.function(input_signature=loader.tf_signature())  # Specify signature here
 def train_step(inputs, target):
     with tf.GradientTape() as tape:
         predictions = model(inputs, training=True)
@@ -205,12 +202,10 @@ def train_step(inputs, target):
     gradients = tape.gradient(loss, model.trainable_variables)
     optimizer.apply_gradients(zip(gradients, model.trainable_variables))
 </code></pre>
-
 <p>We can then train our model in a loop as follows:</p>
-<pre><code class="python">for batch in loader:
+<pre><code class="language-python">for batch in loader:
     train_step(*batch)
 </code></pre>
-
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>dataset</code>: a <code>spektral.data.Dataset</code> object;</li>
@@ -222,9 +217,8 @@ iterates indefinitely;</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L168">[source]</a></span></p>
 <h4 id="singleloader">SingleLoader</h4>
-<pre><code class="python">spektral.data.loaders.SingleLoader(dataset, epochs=None, sample_weights=None)
+<pre><code class="language-python">spektral.data.loaders.SingleLoader(dataset, epochs=None, sample_weights=None)
 </code></pre>
-
 <p>A Loader for <a href="https://graphneural.network/data-modes/#single-mode">single mode</a>.</p>
 <p>This loader produces Tensors representing a single graph. As such, it can
 only be used with Datasets of length 1 and the <code>batch_size</code> cannot be set.</p>
@@ -254,9 +248,8 @@ SparseTensors);</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L244">[source]</a></span></p>
 <h4 id="disjointloader">DisjointLoader</h4>
-<pre><code class="python">spektral.data.loaders.DisjointLoader(dataset, node_level=False, batch_size=1, epochs=None, shuffle=True)
+<pre><code class="language-python">spektral.data.loaders.DisjointLoader(dataset, node_level=False, batch_size=1, epochs=None, shuffle=True)
 </code></pre>
-
 <p>A Loader for <a href="https://graphneural.network/data-modes/#disjoint-mode">disjoint mode</a>.</p>
 <p>This loader represents a batch of graphs via their disjoint union.</p>
 <p>The loader automatically computes a batch index tensor, containing integer
@@ -289,9 +282,8 @@ iterates indefinitely;</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L340">[source]</a></span></p>
 <h4 id="batchloader">BatchLoader</h4>
-<pre><code class="python">spektral.data.loaders.BatchLoader(dataset, mask=False, batch_size=1, epochs=None, shuffle=True)
+<pre><code class="language-python">spektral.data.loaders.BatchLoader(dataset, mask=False, batch_size=1, epochs=None, shuffle=True)
 </code></pre>
-
 <p>A Loader for <a href="https://graphneural.network/data-modes/#batch-mode">batch mode</a>.</p>
 <p>This loader returns batches of graphs stacked along an extra dimension,
 with all "node" dimensions padded to be equal among all graphs.</p>
@@ -334,9 +326,8 @@ iterates indefinitely;</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L437">[source]</a></span></p>
 <h4 id="packedbatchloader">PackedBatchLoader</h4>
-<pre><code class="python">spektral.data.loaders.PackedBatchLoader(dataset, mask=False, batch_size=1, epochs=None, shuffle=True)
+<pre><code class="language-python">spektral.data.loaders.PackedBatchLoader(dataset, mask=False, batch_size=1, epochs=None, shuffle=True)
 </code></pre>
-
 <p>A <code>BatchLoader</code> that zero-pads the graphs before iterating over the dataset.
 This means that <code>n_max</code> is computed over the whole dataset and not just
 a single batch.</p>
@@ -370,9 +361,8 @@ iterates indefinitely;</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L533">[source]</a></span></p>
 <h4 id="mixedloader">MixedLoader</h4>
-<pre><code class="python">spektral.data.loaders.MixedLoader(dataset, batch_size=1, epochs=None, shuffle=True)
+<pre><code class="language-python">spektral.data.loaders.MixedLoader(dataset, batch_size=1, epochs=None, shuffle=True)
 </code></pre>
-
 <p>A Loader for <a href="https://graphneural.network/data-modes/#mixed-mode">mixed mode</a>.</p>
 <p>This loader returns batches where the node and edge attributes are stacked
 along an extra dimension, but the adjacency matrix is shared by all graphs.</p>
@@ -429,19 +419,22 @@ iterates indefinitely;</li>
   </div>
 
   <div class="rst-versions" role="note" aria-label="versions">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
-      
-      
-        <span><a href="../datasets/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../transforms/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../datasets/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../transforms/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
     <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
     <script src="../js/theme.js" defer></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
       <script src="../js/macros.js" defer></script>

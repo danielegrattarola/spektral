@@ -14,7 +14,7 @@
 
   <link rel="stylesheet" href="../../css/theme.css" />
   <link rel="stylesheet" href="../../css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
   <link href="../../stylesheets/extra.css" rel="stylesheet" />
   
   <script>
@@ -26,9 +26,8 @@
   
   <script src="../../js/jquery-2.1.1.min.js" defer></script>
   <script src="../../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script> 
-  
   <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -52,7 +51,7 @@
         <a href="../.." class="icon icon-home"> Spektral</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
@@ -184,6 +183,7 @@
   
   <hr/>
 </div>
+
           <div role="main">
             <div class="section">
               
@@ -219,9 +219,8 @@
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/message_passing.py#L16">[source]</a></span></p>
 <h4 id="messagepassing">MessagePassing</h4>
-<pre><code class="python">spektral.layers.MessagePassing(aggregate='sum')
+<pre><code class="language-python">spektral.layers.MessagePassing(aggregate='sum')
 </code></pre>
-
 <p>A general class for message passing networks from the paper</p>
 <blockquote>
 <p><a href="https://arxiv.org/abs/1704.01212">Neural Message Passing for Quantum Chemistry</a><br>
@@ -242,33 +241,29 @@ function to aggregate the messages (like the sum or the average), and
 <p>By extending this class, it is possible to create any message-passing layer
 in single/disjoint mode.</p>
 <p><strong>API</strong></p>
-<pre><code class="python">propagate(x, a, e=None, **kwargs)
+<pre><code class="language-python">propagate(x, a, e=None, **kwargs)
 </code></pre>
-
 <p>Propagates the messages and computes embeddings for each node in the graph. <br>
 Any <code>kwargs</code> will be forwarded as keyword arguments to <code>message()</code>,
 <code>aggregate()</code> and <code>update()</code>.</p>
-<pre><code class="python">message(x, **kwargs)
+<pre><code class="language-python">message(x, **kwargs)
 </code></pre>
-
 <p>Computes messages, equivalent to <script type="math/tex">\phi</script> in the definition. <br>
 Any extra keyword argument of this function will be populated by
 <code>propagate()</code> if a matching keyword is found. <br>
 Use <code>self.get_i()</code> and  <code>self.get_j()</code> to gather the elements using the
 indices <code>i</code> or <code>j</code> of the adjacency matrix. Equivalently, you can access
 the indices themselves via the <code>index_i</code> and <code>index_j</code> attributes.</p>
-<pre><code class="python">aggregate(messages, **kwargs)
+<pre><code class="language-python">aggregate(messages, **kwargs)
 </code></pre>
-
 <p>Aggregates the messages, equivalent to <script type="math/tex">\square</script> in the definition. <br>
 The behaviour of this function can also be controlled using the <code>aggregate</code>
 keyword in the constructor of the layer (supported aggregations: sum, mean,
 max, min, prod). <br>
 Any extra keyword argument of this function will be  populated by
 <code>propagate()</code> if a matching keyword is found.</p>
-<pre><code class="python">update(embeddings, **kwargs)
+<pre><code class="language-python">update(embeddings, **kwargs)
 </code></pre>
-
 <p>Updates the aggregated messages to obtain the final node embeddings,
 equivalent to <script type="math/tex">\gamma</script> in the definition. <br>
 Any extra keyword argument of this function will be  populated by
@@ -286,9 +281,8 @@ regularizers, initializers, constraints, etc.</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/agnn_conv.py#L8">[source]</a></span></p>
 <h4 id="agnnconv">AGNNConv</h4>
-<pre><code class="python">spektral.layers.AGNNConv(trainable=True, aggregate='sum', activation=None)
+<pre><code class="language-python">spektral.layers.AGNNConv(trainable=True, aggregate='sum', activation=None)
 </code></pre>
-
 <p>An Attention-based Graph Neural Network (AGNN) from the paper</p>
 <blockquote>
 <p><a href="https://arxiv.org/abs/1803.03735">Attention-based Graph Neural Network for Semi-supervised Learning</a><br>
@@ -328,9 +322,8 @@ Otherwise, beta is fixed to 1;</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/appnp_conv.py#L10">[source]</a></span></p>
 <h4 id="appnpconv">APPNPConv</h4>
-<pre><code class="python">spektral.layers.APPNPConv(channels, alpha=0.2, propagations=1, mlp_hidden=None, mlp_activation='relu', dropout_rate=0.0, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<pre><code class="language-python">spektral.layers.APPNPConv(channels, alpha=0.2, propagations=1, mlp_hidden=None, mlp_activation='relu', dropout_rate=0.0, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
-
 <p>The APPNP operator from the paper</p>
 <blockquote>
 <p><a href="https://arxiv.org/abs/1810.05997">Predict then Propagate: Graph Neural Networks meet Personalized PageRank</a><br>
@@ -378,9 +371,8 @@ layer in the MLP (if None, the MLP has only the output layer);</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/arma_conv.py#L10">[source]</a></span></p>
 <h4 id="armaconv">ARMAConv</h4>
-<pre><code class="python">spektral.layers.ARMAConv(channels, order=1, iterations=1, share_weights=False, gcn_activation='relu', dropout_rate=0.0, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<pre><code class="language-python">spektral.layers.ARMAConv(channels, order=1, iterations=1, share_weights=False, gcn_activation='relu', dropout_rate=0.0, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
-
 <p>An Auto-Regressive Moving Average convolutional layer (ARMA) from the paper</p>
 <blockquote>
 <p><a href="https://arxiv.org/abs/1901.01343">Graph Neural Networks with convolutional ARMA filters</a><br>
@@ -438,9 +430,8 @@ stack;</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/cheb_conv.py#L8">[source]</a></span></p>
 <h4 id="chebconv">ChebConv</h4>
-<pre><code class="python">spektral.layers.ChebConv(channels, K=1, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<pre><code class="language-python">spektral.layers.ChebConv(channels, K=1, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
-
 <p>A Chebyshev convolutional layer from the paper</p>
 <blockquote>
 <p><a href="https://arxiv.org/abs/1606.09375">Convolutional Neural Networks on Graphs with Fast Localized Spectral
@@ -493,9 +484,8 @@ dimension changed to <code>channels</code>.</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/crystal_conv.py#L7">[source]</a></span></p>
 <h4 id="crystalconv">CrystalConv</h4>
-<pre><code class="python">spektral.layers.CrystalConv(channels, aggregate='sum', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<pre><code class="language-python">spektral.layers.CrystalConv(channels, aggregate='sum', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
-
 <p>A crystal graph convolutional layer from the paper</p>
 <blockquote>
 <p><a href="https://arxiv.org/abs/1710.10324">Crystal Graph Convolutional Neural Networks for an Accurate and
@@ -540,9 +530,8 @@ changed to <code>channels</code>.</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/diffusion_conv.py#L79">[source]</a></span></p>
 <h4 id="diffusionconv">DiffusionConv</h4>
-<pre><code class="python">spektral.layers.DiffusionConv(channels, K=6, activation='tanh', kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
+<pre><code class="language-python">spektral.layers.DiffusionConv(channels, K=6, activation='tanh', kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
 </code></pre>
-
 <p>A diffusion convolution operator from the paper</p>
 <blockquote>
 <p><a href="https://arxiv.org/abs/1707.01926">Diffusion Convolutional Recurrent Neural Network: Data-Driven Traffic
@@ -581,9 +570,8 @@ dimension changed to <code>channels</code>.</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/ecc_conv.py#L12">[source]</a></span></p>
 <h4 id="eccconv">ECCConv</h4>
-<pre><code class="python">spektral.layers.ECCConv(channels, kernel_network=None, root=True, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<pre><code class="language-python">spektral.layers.ECCConv(channels, kernel_network=None, root=True, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
-
 <p>An edge-conditioned convolutional layer (ECC) from the paper</p>
 <blockquote>
 <p><a href="https://arxiv.org/abs/1704.02901">Dynamic Edge-Conditioned Filters in Convolutional Neural Networks on
@@ -633,9 +621,8 @@ the message passing (first term in equation above), but only the neighbours.</li
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/edge_conv.py#L9">[source]</a></span></p>
 <h4 id="edgeconv">EdgeConv</h4>
-<pre><code class="python">spektral.layers.EdgeConv(channels, mlp_hidden=None, mlp_activation='relu', aggregate='sum', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<pre><code class="language-python">spektral.layers.EdgeConv(channels, mlp_hidden=None, mlp_activation='relu', aggregate='sum', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
-
 <p>An edge convolutional layer from the paper</p>
 <blockquote>
 <p><a href="https://arxiv.org/abs/1801.07829">Dynamic Graph CNN for Learning on Point Clouds</a><br>
@@ -678,9 +665,8 @@ layer in the MLP (if None, the MLP has only the output layer);</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gat_conv.py#L11">[source]</a></span></p>
 <h4 id="gatconv">GATConv</h4>
-<pre><code class="python">spektral.layers.GATConv(channels, attn_heads=1, concat_heads=True, dropout_rate=0.5, return_attn_coef=False, add_self_loops=True, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', attn_kernel_initializer='glorot_uniform', kernel_regularizer=None, bias_regularizer=None, attn_kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None, attn_kernel_constraint=None)
+<pre><code class="language-python">spektral.layers.GATConv(channels, attn_heads=1, concat_heads=True, dropout_rate=0.5, return_attn_coef=False, add_self_loops=True, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', attn_kernel_initializer='glorot_uniform', kernel_regularizer=None, bias_regularizer=None, attn_kernel_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None, attn_kernel_constraint=None)
 </code></pre>
-
 <p>A Graph Attention layer (GAT) from the paper</p>
 <blockquote>
 <p><a href="https://arxiv.org/abs/1710.10903">Graph Attention Networks</a><br>
@@ -744,9 +730,8 @@ the given input (one n_nodes x n_nodes matrix for each head).</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gated_graph_conv.py#L7">[source]</a></span></p>
 <h4 id="gatedgraphconv">GatedGraphConv</h4>
-<pre><code class="python">spektral.layers.GatedGraphConv(channels, n_layers, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<pre><code class="language-python">spektral.layers.GatedGraphConv(channels, n_layers, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
-
 <p>A gated graph convolutional layer from the paper</p>
 <blockquote>
 <p><a href="https://arxiv.org/abs/1511.05493">Gated Graph Sequence Neural Networks</a><br>
@@ -791,9 +776,8 @@ changed to <code>channels</code>.</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gcn_conv.py#L8">[source]</a></span></p>
 <h4 id="gcnconv">GCNConv</h4>
-<pre><code class="python">spektral.layers.GCNConv(channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<pre><code class="language-python">spektral.layers.GCNConv(channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
-
 <p>A graph convolutional layer (GCN) from the paper</p>
 <blockquote>
 <p><a href="https://arxiv.org/abs/1609.02907">Semi-Supervised Classification with Graph Convolutional Networks</a><br>
@@ -833,9 +817,8 @@ dimension changed to <code>channels</code>.</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/general_conv.py#L8">[source]</a></span></p>
 <h4 id="generalconv">GeneralConv</h4>
-<pre><code class="python">spektral.layers.GeneralConv(channels=256, batch_norm=True, dropout=0.0, aggregate='sum', activation='prelu', use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<pre><code class="language-python">spektral.layers.GeneralConv(channels=256, batch_norm=True, dropout=0.0, aggregate='sum', activation='prelu', use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
-
 <p>A general convolutional layer from the paper</p>
 <blockquote>
 <p><a href="https://arxiv.org/abs/2011.08843">Design Space for Graph Neural Networks</a><br>
@@ -899,9 +882,8 @@ advanced activation PReLU by passing <code>activation='prelu'</code>.</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gcs_conv.py#L8">[source]</a></span></p>
 <h4 id="gcsconv">GCSConv</h4>
-<pre><code class="python">spektral.layers.GCSConv(channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<pre><code class="language-python">spektral.layers.GCSConv(channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
-
 <p>A <code>GraphConv</code> layer with a trainable skip connection.</p>
 <p><strong>Mode</strong>: single, disjoint, mixed, batch.</p>
 <p>This layer computes:
@@ -936,9 +918,8 @@ dimension changed to <code>channels</code>.</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gin_conv.py#L9">[source]</a></span></p>
 <h4 id="ginconv">GINConv</h4>
-<pre><code class="python">spektral.layers.GINConv(channels, epsilon=None, mlp_hidden=None, mlp_activation='relu', mlp_batchnorm=True, aggregate='sum', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<pre><code class="language-python">spektral.layers.GINConv(channels, epsilon=None, mlp_hidden=None, mlp_activation='relu', mlp_batchnorm=True, aggregate='sum', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
-
 <p>A Graph Isomorphism Network (GIN) from the paper</p>
 <blockquote>
 <p><a href="https://arxiv.org/abs/1810.00826">How Powerful are Graph Neural Networks?</a><br>
@@ -986,9 +967,8 @@ layer in the MLP (if None, the MLP has only the output layer);</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/graphsage_conv.py#L7">[source]</a></span></p>
 <h4 id="graphsageconv">GraphSageConv</h4>
-<pre><code class="python">spektral.layers.GraphSageConv(channels, aggregate='mean', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<pre><code class="language-python">spektral.layers.GraphSageConv(channels, aggregate='mean', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
-
 <p>A GraphSAGE layer from the paper</p>
 <blockquote>
 <p><a href="https://arxiv.org/abs/1706.02216">Inductive Representation Learning on Large Graphs</a><br>
@@ -1032,9 +1012,8 @@ dimension changed to <code>channels</code>.</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/tag_conv.py#L8">[source]</a></span></p>
 <h4 id="tagconv">TAGConv</h4>
-<pre><code class="python">spektral.layers.TAGConv(channels, K=3, aggregate='sum', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<pre><code class="language-python">spektral.layers.TAGConv(channels, K=3, aggregate='sum', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
-
 <p>A Topology Adaptive Graph Convolutional layer (TAG) from the paper</p>
 <blockquote>
 <p><a href="https://arxiv.org/abs/1710.10370">Topology Adaptive Graph Convolutional Networks</a><br>
@@ -1075,9 +1054,8 @@ neighbourhood for each node);</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/xenet_conv.py#L11">[source]</a></span></p>
 <h4 id="xenetconv">XENetConv</h4>
-<pre><code class="python">spektral.layers.XENetConv(stack_channels, node_channels, edge_channels, attention=True, node_activation=None, edge_activation=None, aggregate='sum', use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<pre><code class="language-python">spektral.layers.XENetConv(stack_channels, node_channels, edge_channels, attention=True, node_activation=None, edge_activation=None, aggregate='sum', use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
-
 <p>A XENet convolutional layer from the paper</p>
 <blockquote>
 <p><a href="https://www.biorxiv.org/content/10.1101/2021.05.05.442729v1">XENet: Using a new graph convolution to accelerate the timeline for protein design on quantum computers</a><br>
@@ -1159,19 +1137,22 @@ changed to <code>edge_channels</code>.</li>
   </div>
 
   <div class="rst-versions" role="note" aria-label="versions">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
-      
-      
-        <span><a href="../../examples/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../pooling/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/danielegrattarola/spektral/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../../examples/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../pooling/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
     <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
     <script src="../../js/theme.js" defer></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
       <script src="../../js/macros.js" defer></script>
