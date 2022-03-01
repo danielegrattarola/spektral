@@ -5,18 +5,18 @@ with open("README.md", "r") as fh:
 
 setup(
     name="spektral",
-    version="1.0.8",
+    version="1.0.9",
     packages=find_packages(),
     install_requires=[
         "joblib",
         "lxml",
         "networkx",
-        "numpy<1.20",
+        "numpy",
         "pandas",
         "requests",
         "scikit-learn",
         "scipy",
-        "tensorflow>=2.1.0",
+        "tensorflow>=2.2.0",
         "tqdm",
     ],
     url="https://github.com/danielegrattarola/spektral",
@@ -27,8 +27,8 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     classifiers=[
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
     ],
 )
