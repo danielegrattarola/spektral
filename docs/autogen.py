@@ -72,8 +72,9 @@ PAGES = [
         "functions": [],
         "methods": [],
         "classes": [
-            layers.InnerProduct,
             layers.Disjoint2Batch,
+            layers.GraphMasking,
+            layers.InnerProduct,
             layers.MinkowskiProduct,
         ],
     },
