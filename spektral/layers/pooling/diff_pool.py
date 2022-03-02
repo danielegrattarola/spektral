@@ -3,85 +3,83 @@ from tensorflow.keras import activations
 from tensorflow.keras import backend as K
 
 from spektral.layers import ops
-from spektral.layers.ops import modes
-from spektral.layers.pooling.pool import Pool
+from spektral.layers.pooling.src import SRCPool
 
 
-class DiffPool(Pool):
+class DiffPool(SRCPool):
     r"""
-    A DiffPool layer from the paper
+        A DiffPool layer from the paper
 
-    > [Hierarchical Graph Representation Learning with Differentiable Pooling](https://arxiv.org/abs/1806.08804)<br>
-    > Rex Ying et al.
+        > [Hierarchical Graph Representation Learning with Differentiable Pooling](https://arxiv.org/abs/1806.08804)<br>
+        > Rex Ying et al.
 
-    **Mode**: batch.
+        **Mode**: batch.
 
-    This layer computes a soft clustering \(\S\) of the input graphs using a GNN,
-    and reduces graphs as follows:
-    $$
-        \begin{align}
-            \S &= \textrm{GNN}_{embed}(\A, \X); \\
-            \Z &= \textrm{GNN}_{pool}(\A, \X); \\
-            \A' &= \S^\top \A \S; \\
-            \X' &= \S^\top \Z
-        \end{align}
-    $$
-    where:
-    $$
-        \textrm{GNN}_{\square}(\A, \X) = \D^{-1/2} \A \D^{-1/2} \X \W_{\square}.
-    $$
-    The number of output channels of \(\textrm{GNN}_{embed}\) is controlled by 
-    the `channels` parameter.
+        This layer computes a soft clustering \(\S\) of the input graphs using a GNN,
+        and reduces graphs as follows:
+        $$
+            \begin{align}
+                \S &= \textrm{GNN}_{embed}(\A, \X); \\
+                \Z &= \textrm{GNN}_{pool}(\A, \X); \\
+                \A' &= \S^\top \A \S; \\
+                \X' &= \S^\top \Z
+            \end{align}
+        $$
+        where:
+        $$
+            \textrm{GNN}_{\square}(\A, \X) = \D^{-1/2} \A \D^{-1/2} \X \W_{\square}.
+        $$
+        The number of output channels of \(\textrm{GNN}_{embed}\) is controlled by
+        the `channels` parameter.
 
-    Two auxiliary loss terms are also added to the model: the _link prediction
-    loss_
-    $$
-        L_{LP} = \big\| \A - \S\S^\top \big\|_F
-    $$
-    and the _entropy loss_
-    $$
-        L_{E} - \frac{1}{N} \sum\limits_{i = 1}^{N} \S \log (\S).
-    $$
+        Two auxiliary loss terms are also added to the model: the _link prediction
+        loss_
+        $$
+            L_{LP} = \big\| \A - \S\S^\top \big\|_F
+        $$
+        and the _entropy loss_
+        $$
+            L_{E} - \frac{1}{N} \sum\limits_{i = 1}^{N} \S \log (\S).
+        $$
 
-    The layer can be used without a supervised loss, to compute node clustering
-    simply by minimizing the two auxiliary losses.
+        The layer can be used without a supervised loss, to compute node clustering
+        simply by minimizing the two auxiliary losses.
 
-    **Input**
+        **Input**
 
-    - Node features of shape `([batch], n_nodes, n_node_features)`;
-    - Adjacency matrix of shape `([batch], n_nodes, n_nodes)`;
+        - Node features of shape `([batch], n_nodes, n_node_features)`;
+        - Adjacency matrix of shape `([batch], n_nodes, n_nodes)`;
 
-    **Output**
+        **Output**
 
-    - Reduced node features of shape `([batch], K, channels)`;
-    - Reduced adjacency matrix of shape `([batch], K, K)`;
-    - If `return_mask=True`, the soft clustering matrix of shape `([batch], n_nodes, K)`.
+        - Reduced node features of shape `([batch], K, channels)`;
+        - Reduced adjacency matrix of shape `([batch], K, K)`;
+        - If `return_mask=True`, the soft clustering matrix of shape `([batch], n_nodes, K)`.
 
-    **Arguments**
+        **Arguments**
 
-    - `k`: number of output nodes;
-    - `channels`: number of output channels (if None, the number of output
-    channels is assumed to be the same as the input);
-    - `return_mask`: boolean, whether to return the cluster assignment matrix;
-    - `kernel_initializer`: initializer for the weights;
-    - `kernel_regularizer`: regularization applied to the weights;
-    - `kernel_constraint`: constraint applied to the weights;
-    """
+        - `k`: number of output nodes;
+        - `channels`: number of output channels (if None, the number of output
+        channels is assumed to be the same as the input);
+        - `return_selection`: boolean, whether to return the selection matrix;
+        - `kernel_initializer`: initializer for the weights;
+        - `kernel_regularizer`: regularization applied to the weights;
+        - `kernel_constraint`: constraint applied to the weights;
+        """
 
     def __init__(
         self,
         k,
         channels=None,
-        return_mask=False,
+        return_selection=False,
         activation=None,
         kernel_initializer="glorot_uniform",
         kernel_regularizer=None,
         kernel_constraint=None,
         **kwargs
     ):
-
         super().__init__(
-            activation=activation,
+            return_selection=return_selection,
             kernel_initializer=kernel_initializer,
             kernel_regularizer=kernel_regularizer,
             kernel_constraint=kernel_constraint,
@@ -89,16 +87,14 @@ class DiffPool(Pool):
         )
         self.k = k
         self.channels = channels
-        self.return_mask = return_mask
+        self.activation = activations.get(activation)
 
     def build(self, input_shape):
-        F = input_shape[0][-1]
-
+        in_channels = input_shape[0][-1]
         if self.channels is None:
-            self.channels = F
-
+            self.channels = in_channels
         self.kernel_emb = self.add_weight(
-            shape=(F, self.channels),
+            shape=(in_channels, self.channels),
             name="kernel_emb",
             initializer=self.kernel_initializer,
             regularizer=self.kernel_regularizer,
@@ -106,82 +102,80 @@ class DiffPool(Pool):
         )
 
         self.kernel_pool = self.add_weight(
-            shape=(F, self.k),
+            shape=(in_channels, self.k),
             name="kernel_pool",
             initializer=self.kernel_initializer,
             regularizer=self.kernel_regularizer,
             constraint=self.kernel_constraint,
         )
-
         super().build(input_shape)
 
     def call(self, inputs, mask=None):
-        X, A = inputs
+        x, a, i = self.get_inputs(inputs)
 
-        N = K.shape(A)[-1]
-        # Check if the layer is operating in mixed or batch mode
-        mode = ops.autodetect_mode(X, A)
-        self.reduce_loss = mode in (modes.MIXED, modes.BATCH)
-
-        # Get normalized adjacency
-        if K.is_sparse(A):
-            I_ = tf.sparse.eye(N, dtype=A.dtype)
-            A_ = tf.sparse.add(A, I_)
+        # Graph filter for GNNs
+        if K.is_sparse(a):
+            i_n = tf.sparse.eye(self.n_nodes, dtype=a.dtype)
+            a_ = tf.sparse.add(a, i_n)
         else:
-            I_ = tf.eye(N, dtype=A.dtype)
-            A_ = A + I_
-        fltr = ops.normalize_A(A_)
+            i_n = tf.eye(self.n_nodes, dtype=a.dtype)
+            a_ = a + i_n
+        fltr = ops.normalize_A(a_)
 
-        # Node embeddings
-        Z = K.dot(X, self.kernel_emb)
-        Z = ops.modal_dot(fltr, Z)
-        if self.activation is not None:
-            Z = self.activation(Z)
-
-        # Compute cluster assignment matrix
-        S = K.dot(X, self.kernel_pool)
-        S = ops.modal_dot(fltr, S)
-        S = activations.softmax(S, axis=-1)  # softmax applied row-wise
-        if mask is not None:
-            S *= mask[0]
-
-        # Link prediction loss
-        S_gram = ops.modal_dot(S, S, transpose_b=True)
-        if mode == modes.MIXED:
-            A = tf.sparse.to_dense(A)[None, ...]
-        if K.is_sparse(A):
-            LP_loss = tf.sparse.add(A, -S_gram)  # A/tf.norm(A) - S_gram/tf.norm(S_gram)
-        else:
-            LP_loss = A - S_gram
-        LP_loss = tf.norm(LP_loss, axis=(-1, -2))
-        if self.reduce_loss:
-            LP_loss = K.mean(LP_loss)
-        self.add_loss(LP_loss)
-
-        # Entropy loss
-        entr = tf.negative(
-            tf.reduce_sum(tf.multiply(S, K.log(S + K.epsilon())), axis=-1)
-        )
-        entr_loss = K.mean(entr, axis=-1)
-        if self.reduce_loss:
-            entr_loss = K.mean(entr_loss)
-        self.add_loss(entr_loss)
-
-        # Pooling
-        X_pooled = ops.modal_dot(S, Z, transpose_a=True)
-        A_pooled = ops.matmul_at_b_a(S, A)
-
-        output = [X_pooled, A_pooled]
-
-        if self.return_mask:
-            output.append(S)
-
+        output = self.pool(x, a, i, fltr=fltr, mask=mask)
         return output
 
-    @property
-    def config(self):
-        return {
-            "k": self.k,
-            "channels": self.channels,
-            "return_mask": self.return_mask,
-        }
+    def select(self, x, a, i, fltr=None, mask=None):
+        s = ops.modal_dot(fltr, K.dot(x, self.kernel_pool))
+        s = activations.softmax(s, axis=-1)
+        if mask is not None:
+            s *= mask[0]
+
+        # Auxiliary losses
+        lp_loss = self.link_prediction_loss(a, s)
+        entr_loss = self.entropy_loss(s)
+        if K.ndim(x) == 3:
+            lp_loss = K.mean(lp_loss)
+            entr_loss = K.mean(entr_loss)
+        self.add_loss(lp_loss)
+        self.add_loss(entr_loss)
+
+        return s
+
+    def reduce(self, x, s, fltr=None):
+        z = ops.modal_dot(fltr, K.dot(x, self.kernel_emb))
+        z = self.activation(z)
+
+        return ops.modal_dot(s, z, transpose_a=True)
+
+    def connect(self, a, s, **kwargs):
+        return ops.matmul_at_b_a(s, a)
+
+    def reduce_index(self, i, s, **kwargs):
+        i_mean = tf.math.segment_mean(i, i)
+        i_pool = ops.repeat(i_mean, tf.ones_like(i_mean) * self.k)
+
+        return i_pool
+
+    @staticmethod
+    def link_prediction_loss(a, s):
+        s_gram = ops.modal_dot(s, s, transpose_b=True)
+        if K.is_sparse(a):
+            lp_loss = tf.sparse.add(a, -s_gram)
+        else:
+            lp_loss = a - s_gram
+        lp_loss = tf.norm(lp_loss, axis=(-1, -2))
+        return lp_loss
+
+    @staticmethod
+    def entropy_loss(s):
+        entr = tf.negative(
+            tf.reduce_sum(tf.multiply(s, K.log(s + K.epsilon())), axis=-1)
+        )
+        entr_loss = K.mean(entr, axis=-1)
+        return entr_loss
+
+    def get_config(self):
+        config = {"k": self.k, "channels": self.channels}
+        base_config = super().get_config()
+        return {**base_config, **config}

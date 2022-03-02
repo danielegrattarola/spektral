@@ -7,6 +7,8 @@ from .global_pool import (
     GlobalSumPool,
     SortPool,
 )
+from .la_pool import LaPool
 from .mincut_pool import MinCutPool
 from .sag_pool import SAGPool
+from .src import SRCPool
 from .topk_pool import TopKPool

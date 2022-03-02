@@ -4,80 +4,78 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Dense
 
 from spektral.layers import ops
-from spektral.layers.pooling.pool import Pool
+from spektral.layers.pooling.src import SRCPool
 
 
-class MinCutPool(Pool):
+class MinCutPool(SRCPool):
     r"""
-    A MinCut pooling layer from the paper
+        A MinCut pooling layer from the paper
 
-    > [Spectral Clustering with Graph Neural Networks for Graph Pooling](https://arxiv.org/abs/1907.00481)<br>
-    > Filippo Maria Bianchi et al.
+        > [Spectral Clustering with Graph Neural Networks for Graph Pooling](https://arxiv.org/abs/1907.00481)<br>
+        > Filippo Maria Bianchi et al.
 
-    **Mode**: batch.
+        **Mode**: batch.
 
-    This layer computes a soft clustering \(\S\) of the input graphs using a MLP,
-    and reduces graphs as follows:
-    $$
-    \begin{align}
-        \S &= \textrm{MLP}(\X); \\
-        \A' &= \S^\top \A \S; \\ 
-        \X' &= \S^\top \X
-    \end{align}
-    $$
-    where MLP is a multi-layer perceptron with softmax output.
+        This layer computes a soft clustering \(\S\) of the input graphs using a MLP,
+        and reduces graphs as follows:
+        $$
+        \begin{align}
+            \S &= \textrm{MLP}(\X); \\
+            \A' &= \S^\top \A \S; \\
+            \X' &= \S^\top \X
+        \end{align}
+        $$
+        where MLP is a multi-layer perceptron with softmax output.
 
-    Two auxiliary loss terms are also added to the model: the _minCUT loss_
-    $$
-        L_c = - \frac{ \mathrm{Tr}(\S^\top \A \S) }{ \mathrm{Tr}(\S^\top \D \S) }
-    $$
-    and the _orthogonality loss_
-    $$
-        L_o = \left\|
-            \frac{\S^\top \S}{\| \S^\top \S \|_F}
-            - \frac{\I_K}{\sqrt{K}}
-        \right\|_F.
-    $$
+        Two auxiliary loss terms are also added to the model: the _minCUT loss_
+        $$
+            L_c = - \frac{ \mathrm{Tr}(\S^\top \A \S) }{ \mathrm{Tr}(\S^\top \D \S) }
+        $$
+        and the _orthogonality loss_
+        $$
+            L_o = \left\|
+                \frac{\S^\top \S}{\| \S^\top \S \|_F}
+                - \frac{\I_K}{\sqrt{K}}
+            \right\|_F.
+        $$
 
-    The layer can be used without a supervised loss, to compute node clustering
-    simply by minimizing the two auxiliary losses.
+        The layer can be used without a supervised loss, to compute node clustering
+        simply by minimizing the two auxiliary losses.
 
-    **Input**
+        **Input**
 
-    - Node features of shape `([batch], n_nodes, n_node_features)`;
-    - Symmetrically normalized adjacency matrix of shape `([batch], n_nodes, n_nodes)`;
+        - Node features of shape `([batch], n_nodes, n_node_features)`;
+        - Symmetrically normalized adjacency matrix of shape `([batch], n_nodes, n_nodes)`;
 
-    **Output**
+        **Output**
 
-    - Reduced node features of shape `([batch], K, n_node_features)`;
-    - Reduced adjacency matrix of shape `([batch], K, K)`;
-    - If `return_mask=True`, the soft clustering matrix of shape `([batch], n_nodes, K)`.
+        - Reduced node features of shape `([batch], K, n_node_features)`;
+        - Reduced adjacency matrix of shape `([batch], K, K)`;
+        - If `return_mask=True`, the soft clustering matrix of shape `([batch], n_nodes, K)`.
 
-    **Arguments**
+        **Arguments**
 
-    - `k`: number of output nodes;
-    - `mlp_hidden`: list of integers, number of hidden units for each hidden
-    layer in the MLP used to compute cluster assignments (if None, the MLP has
-    only the output layer);
-    - `mlp_activation`: activation for the MLP layers;
-    - `return_mask`: boolean, whether to return the cluster assignment matrix;
-    - `use_bias`: use bias in the MLP;
-    - `kernel_initializer`: initializer for the weights of the MLP;
-    - `bias_initializer`: initializer for the bias of the MLP;
-    - `kernel_regularizer`: regularization applied to the weights of the MLP;
-    - `bias_regularizer`: regularization applied to the bias of the MLP;
-    - `kernel_constraint`: constraint applied to the weights of the MLP;
-    - `bias_constraint`: constraint applied to the bias of the MLP;
-    """
+        - `k`: number of output nodes;
+        - `mlp_hidden`: list of integers, number of hidden units for each hidden
+        layer in the MLP used to compute cluster assignments (if None, the MLP has
+        only the output layer);
+        - `mlp_activation`: activation for the MLP layers;
+        - `return_selection`: boolean, whether to return the selection matrix;
+        - `use_bias`: use bias in the MLP;
+        - `kernel_initializer`: initializer for the weights of the MLP;
+        - `bias_initializer`: initializer for the bias of the MLP;
+        - `kernel_regularizer`: regularization applied to the weights of the MLP;
+        - `bias_regularizer`: regularization applied to the bias of the MLP;
+        - `kernel_constraint`: constraint applied to the weights of the MLP;
+        - `bias_constraint`: constraint applied to the bias of the MLP;
+        """
 
     def __init__(
         self,
         k,
         mlp_hidden=None,
         mlp_activation="relu",
-        return_mask=False,
-        activation=None,
-        use_bias=True,
+        return_selection=False,
         kernel_initializer="glorot_uniform",
         bias_initializer="zeros",
         kernel_regularizer=None,
@@ -86,10 +84,8 @@ class MinCutPool(Pool):
         bias_constraint=None,
         **kwargs
     ):
-
         super().__init__(
-            activation=activation,
-            use_bias=use_bias,
+            return_selection=return_selection,
             kernel_initializer=kernel_initializer,
             bias_initializer=bias_initializer,
             kernel_regularizer=kernel_regularizer,
@@ -98,10 +94,10 @@ class MinCutPool(Pool):
             bias_constraint=bias_constraint,
             **kwargs
         )
+
         self.k = k
-        self.mlp_hidden = mlp_hidden if mlp_hidden else []
+        self.mlp_hidden = mlp_hidden if mlp_hidden is not None else []
         self.mlp_activation = mlp_activation
-        self.return_mask = return_mask
 
     def build(self, input_shape):
         layer_kwargs = dict(
@@ -112,65 +108,81 @@ class MinCutPool(Pool):
             kernel_constraint=self.kernel_constraint,
             bias_constraint=self.bias_constraint,
         )
-        mlp_layers = []
-        for _, channels in enumerate(self.mlp_hidden):
-            mlp_layers.append(Dense(channels, self.mlp_activation, **layer_kwargs))
-        mlp_layers.append(Dense(self.k, "softmax", **layer_kwargs))
-        self.mlp = Sequential(mlp_layers)
+        self.mlp = Sequential(
+            [
+                Dense(channels, self.mlp_activation, **layer_kwargs)
+                for channels in self.mlp_hidden
+            ]
+            + [Dense(self.k, "softmax", **layer_kwargs)]
+        )
 
         super().build(input_shape)
 
     def call(self, inputs, mask=None):
-        X, A = inputs
+        x, a, i = self.get_inputs(inputs)
+        return self.pool(x, a, i, mask=mask)
 
-        # Check if the layer is operating in batch mode (X and A have rank 3)
-        batch_mode = K.ndim(X) == 3
-
-        # Compute cluster assignment matrix
-        S = self.mlp(X)
+    def select(self, x, a, i, mask=None):
+        s = self.mlp(x)
         if mask is not None:
-            S *= mask[0]
+            s *= mask[0]
 
-        # MinCut regularization
-        A_pooled = ops.matmul_at_b_a(S, A)
-        num = tf.linalg.trace(A_pooled)
-        D = ops.degree_matrix(A)
-        den = tf.linalg.trace(ops.matmul_at_b_a(S, D)) + K.epsilon()
-        cut_loss = -(num / den)
-        if batch_mode:
-            cut_loss = K.mean(cut_loss)
-        self.add_loss(cut_loss)
-
-        # Orthogonality regularization
-        SS = ops.modal_dot(S, S, transpose_a=True)
-        I_S = tf.eye(self.k, dtype=SS.dtype)
-        ortho_loss = tf.norm(
-            SS / tf.norm(SS, axis=(-1, -2), keepdims=True) - I_S / tf.norm(I_S),
-            axis=(-1, -2),
-        )
-        if batch_mode:
+        # Orthogonality loss
+        ortho_loss = self.orthogonality_loss(s)
+        if K.ndim(a) == 3:
             ortho_loss = K.mean(ortho_loss)
         self.add_loss(ortho_loss)
 
-        # Pooling
-        X_pooled = ops.modal_dot(S, X, transpose_a=True)
-        A_pooled = tf.linalg.set_diag(
-            A_pooled, tf.zeros(K.shape(A_pooled)[:-1], dtype=A_pooled.dtype)
-        )  # Remove diagonal
-        A_pooled = ops.normalize_A(A_pooled)
+        return s
 
-        output = [X_pooled, A_pooled]
+    def reduce(self, x, s, **kwargs):
+        return ops.modal_dot(s, x, transpose_a=True)
 
-        if self.return_mask:
-            output.append(S)
+    def connect(self, a, s, **kwargs):
+        a_pool = ops.matmul_at_b_a(s, a)
 
-        return output
+        # MinCut loss
+        cut_loss = self.mincut_loss(a, s, a_pool)
+        if K.ndim(a) == 3:
+            cut_loss = K.mean(cut_loss)
+        self.add_loss(cut_loss)
 
-    @property
-    def config(self):
-        return {
+        # Post-processing of A
+        a_pool = tf.linalg.set_diag(
+            a_pool, tf.zeros(K.shape(a_pool)[:-1], dtype=a_pool.dtype)
+        )
+        a_pool = ops.normalize_A(a_pool)
+
+        return a_pool
+
+    def reduce_index(self, i, s, **kwargs):
+        i_mean = tf.math.segment_mean(i, i)
+        i_pool = ops.repeat(i_mean, tf.ones_like(i_mean) * self.k)
+
+        return i_pool
+
+    def orthogonality_loss(self, s):
+        ss = ops.modal_dot(s, s, transpose_a=True)
+        i_s = tf.eye(self.k, dtype=ss.dtype)
+        ortho_loss = tf.norm(
+            ss / tf.norm(ss, axis=(-1, -2), keepdims=True) - i_s / tf.norm(i_s),
+            axis=(-1, -2),
+        )
+        return ortho_loss
+
+    @staticmethod
+    def mincut_loss(a, s, a_pool):
+        num = tf.linalg.trace(a_pool)
+        d = ops.degree_matrix(a)
+        den = tf.linalg.trace(ops.matmul_at_b_a(s, d))
+        cut_loss = -(num / den)
+        return cut_loss
+
+    def get_config(self):
+        config = {
             "k": self.k,
             "mlp_hidden": self.mlp_hidden,
             "mlp_activation": self.mlp_activation,
-            "return_mask": self.return_mask,
         }
+        base_config = super().get_config()
+        return {**base_config, **config}
