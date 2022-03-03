@@ -22,7 +22,7 @@ A graph can have all of these attributes or none of them. Since Graphs are just 
 
 ### Adjacency matrix (`graph.a`)
 
-Each entry `a[i, j]` of the adjacency matrix is non-zero if there exists an edge going from node `j` to node `i`, and zero otherwise. 
+Each entry `a[i, j]` of the adjacency matrix is non-zero if there exists an edge going from node `i` to node `j`, and zero otherwise. 
 
 We can represent `a` as a dense `np.array` or as a Scipy sparse matrix of shape `[n_nodes, n_nodes]`.
 Using an `np.array` to represent the adjacency matrix can be expensive, since we need to store a lot of 0s in memory, so sparse matrices are usually preferable.
@@ -53,7 +53,7 @@ R, C, V
 3, 2, 8
 ```
 
-where `R` indicates the "row" indices, `C` the columns, and `V` the non-zero values `a[i, j]`. For example, in the second line, we see that there is an edge that goes **from node 3 to node 0** with weight 2.
+where `R` indicates the "row" indices, `C` the columns, and `V` the non-zero values `a[i, j]`. For example, in the second line, we see that there is an edge that goes **from node 0 to node 3** with weight 2.
 
 We also see that, in this case, all edges have a corresponding edge that goes in the opposite direction. For the sake of this example, all edges have been assigned a different weight. In practice, however, edge `i, j` will often have the same weight as edge `j, i` and the adjacency matrix will be symmetric.
 
