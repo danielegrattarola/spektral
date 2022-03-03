@@ -195,7 +195,7 @@ A graph can have four main attributes: </p>
 </ul>
 <p>A graph can have all of these attributes or none of them. Since Graphs are just plain Python objects, you can also add extra attributes if you want. For instance, see <code>graph.n_nodes</code>, <code>graph.n_node_features</code>, etc.</p>
 <h4 id="adjacency-matrix-grapha">Adjacency matrix (<code>graph.a</code>)</h4>
-<p>Each entry <code>a[i, j]</code> of the adjacency matrix is non-zero if there exists an edge going from node <code>j</code> to node <code>i</code>, and zero otherwise. </p>
+<p>Each entry <code>a[i, j]</code> of the adjacency matrix is non-zero if there exists an edge going from node <code>i</code> to node <code>j</code>, and zero otherwise. </p>
 <p>We can represent <code>a</code> as a dense <code>np.array</code> or as a Scipy sparse matrix of shape <code>[n_nodes, n_nodes]</code>.
 Using an <code>np.array</code> to represent the adjacency matrix can be expensive, since we need to store a lot of 0s in memory, so sparse matrices are usually preferable.</p>
 <p>With sparse matrices, we only need to store the non-zero entries of <code>a</code>. In practice, we can implement a sparse matrix by only storing the indices and values of the non-zero entries in a list, and assuming that if a pair of indices is missing from the list then its corresponding value will be 0.<br />
@@ -217,7 +217,7 @@ This is called the <em>COOrdinate format</em> and it is the format used by Tenso
 3, 0, 7
 3, 2, 8
 </code></pre>
-<p>where <code>R</code> indicates the "row" indices, <code>C</code> the columns, and <code>V</code> the non-zero values <code>a[i, j]</code>. For example, in the second line, we see that there is an edge that goes <strong>from node 3 to node 0</strong> with weight 2.</p>
+<p>where <code>R</code> indicates the "row" indices, <code>C</code> the columns, and <code>V</code> the non-zero values <code>a[i, j]</code>. For example, in the second line, we see that there is an edge that goes <strong>from node 0 to node 3</strong> with weight 2.</p>
 <p>We also see that, in this case, all edges have a corresponding edge that goes in the opposite direction. For the sake of this example, all edges have been assigned a different weight. In practice, however, edge <code>i, j</code> will often have the same weight as edge <code>j, i</code> and the adjacency matrix will be symmetric.</p>
 <p>Many convolutional and pooling layers in Spektral use this sparse representation of matrices to do their computation, and sometimes you will see in the documentation a comment saying that <strong>"This layer expects a sparse adjacency matrix."</strong></p>
 <h4 id="node-features-graphx">Node features (<code>graph.x</code>)</h4>
