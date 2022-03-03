@@ -2,97 +2,97 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://graphneural.network/</loc>
-         <lastmod>2022-02-01</lastmod>
+         <lastmod>2022-03-03</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://graphneural.network/about/</loc>
-         <lastmod>2022-02-01</lastmod>
+         <lastmod>2022-03-03</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://graphneural.network/creating-dataset/</loc>
-         <lastmod>2022-02-01</lastmod>
+         <lastmod>2022-03-03</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://graphneural.network/creating-layer/</loc>
-         <lastmod>2022-02-01</lastmod>
+         <lastmod>2022-03-03</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://graphneural.network/data-modes/</loc>
-         <lastmod>2022-02-01</lastmod>
+         <lastmod>2022-03-03</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://graphneural.network/data/</loc>
-         <lastmod>2022-02-01</lastmod>
+         <lastmod>2022-03-03</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://graphneural.network/datasets/</loc>
-         <lastmod>2022-02-01</lastmod>
+         <lastmod>2022-03-03</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://graphneural.network/examples/</loc>
-         <lastmod>2022-02-01</lastmod>
+         <lastmod>2022-03-03</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://graphneural.network/external/</loc>
-         <lastmod>2022-02-01</lastmod>
+         <lastmod>2022-03-03</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://graphneural.network/getting-started/</loc>
-         <lastmod>2022-02-01</lastmod>
+         <lastmod>2022-03-03</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://graphneural.network/loaders/</loc>
-         <lastmod>2022-02-01</lastmod>
+         <lastmod>2022-03-03</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://graphneural.network/models/</loc>
-         <lastmod>2022-02-01</lastmod>
+         <lastmod>2022-03-03</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://graphneural.network/transforms/</loc>
-         <lastmod>2022-02-01</lastmod>
+         <lastmod>2022-03-03</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://graphneural.network/layers/base/</loc>
-         <lastmod>2022-02-01</lastmod>
+         <lastmod>2022-03-03</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://graphneural.network/layers/convolution/</loc>
-         <lastmod>2022-02-01</lastmod>
+         <lastmod>2022-03-03</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://graphneural.network/layers/pooling/</loc>
-         <lastmod>2022-02-01</lastmod>
+         <lastmod>2022-03-03</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://graphneural.network/utils/convolution/</loc>
-         <lastmod>2022-02-01</lastmod>
+         <lastmod>2022-03-03</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://graphneural.network/utils/misc/</loc>
-         <lastmod>2022-02-01</lastmod>
+         <lastmod>2022-03-03</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://graphneural.network/utils/sparse/</loc>
-         <lastmod>2022-02-01</lastmod>
+         <lastmod>2022-03-03</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
