@@ -58,7 +58,7 @@ class ModelNet(Dataset):
     def read(self):
         folders = glob(osp.join(self.path, "*", ""))
         dataset = "test" if self.test else "train"
-        classes = [f.split("/")[-2] for f in folders]
+        classes = [f.split(os.path.sep)[-2] for f in folders]
         n_out = len(classes)
 
         print("Loading data")

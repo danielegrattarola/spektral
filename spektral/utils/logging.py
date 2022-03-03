@@ -15,7 +15,7 @@ def init_logging(name=None):
     global LOGFILE
     if name is None:
         name = time.strftime("%Y-%m-%d-%H-%M-%S")
-    log_dir = "./logs/%s/" % name
+    log_dir = os.path.join(".", "logs", f"{name}")
     if not os.path.isdir(log_dir):
         os.makedirs(log_dir)
     LOGFILE = log_dir + "log.txt"

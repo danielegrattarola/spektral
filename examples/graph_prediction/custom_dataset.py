@@ -27,7 +27,6 @@ from tensorflow.keras.optimizers import Adam
 
 from spektral.data import Dataset, DisjointLoader, Graph
 from spektral.layers import GCSConv, GlobalAvgPool
-from spektral.layers.pooling import TopKPool
 from spektral.transforms.normalize_adj import NormalizeAdj
 
 ################################################################################
@@ -107,9 +106,7 @@ class Net(Model):
     def __init__(self):
         super().__init__()
         self.conv1 = GCSConv(32, activation="relu")
-        self.pool1 = TopKPool(ratio=0.5)
         self.conv2 = GCSConv(32, activation="relu")
-        self.pool2 = TopKPool(ratio=0.5)
         self.conv3 = GCSConv(32, activation="relu")
         self.global_pool = GlobalAvgPool()
         self.dense = Dense(data.n_labels, activation="softmax")
@@ -117,11 +114,9 @@ class Net(Model):
     def call(self, inputs):
         x, a, i = inputs
         x = self.conv1([x, a])
-        x1, a1, i1 = self.pool1([x, a, i])
-        x1 = self.conv2([x1, a1])
-        x2, a2, i2 = self.pool1([x1, a1, i1])
-        x2 = self.conv3([x2, a2])
-        output = self.global_pool([x2, i2])
+        x = self.conv2([x, a])
+        x = self.conv3([x, a])
+        output = self.global_pool([x, i])
         output = self.dense(output)
 
         return output

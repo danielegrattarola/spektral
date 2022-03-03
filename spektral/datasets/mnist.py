@@ -50,13 +50,13 @@ class MNIST(Dataset):
         x = np.vstack((x_train, x_test))
         x = x / 255.0
         y = np.concatenate((y_train, y_test), 0)
-        x = x.reshape(-1, MNIST_SIZE ** 2, 1)
+        x = x.reshape(-1, MNIST_SIZE**2, 1)
 
         return [Graph(x=x_, y=y_) for x_, y_ in zip(x, y)]
 
 
 def _grid_coordinates(side):
-    M = side ** 2
+    M = side**2
     x = np.linspace(0, 1, side, dtype=np.float32)
     y = np.linspace(0, 1, side, dtype=np.float32)
     xx, yy = np.meshgrid(x, y)
