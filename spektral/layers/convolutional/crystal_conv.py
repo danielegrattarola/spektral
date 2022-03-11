@@ -95,8 +95,8 @@ class CrystalConv(MessagePassing):
         self.built = True
 
     def message(self, x, e=None):
-        x_i = self.get_i(x)
-        x_j = self.get_j(x)
+        x_i = self.get_targets(x)
+        x_j = self.get_sources(x)
 
         to_concat = [x_i, x_j]
         if e is not None:

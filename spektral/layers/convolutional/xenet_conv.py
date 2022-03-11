@@ -149,8 +149,8 @@ class XENetConv(MessagePassing):
         return x_out, e_out
 
     def message(self, x, e=None):
-        x_i = self.get_i(x)  # Features of self
-        x_j = self.get_j(x)  # Features of neighbours
+        x_i = self.get_targets(x)  # Features of self
+        x_j = self.get_sources(x)  # Features of neighbours
 
         # Features of outgoing edges are simply the edge features
         e_ij = e
@@ -163,7 +163,7 @@ class XENetConv(MessagePassing):
         #     tf.transpose(E, perm=(1, 0, 2))
         # where E has shape (N, N, S).
         reorder_idx = gen_sparse_ops.sparse_reorder(
-            tf.stack([self.index_i, self.index_j], axis=-1),
+            tf.stack([self.index_targets, self.index_sources], axis=-1),
             tf.range(tf.shape(e)[0]),
             (self.n_nodes, self.n_nodes),
         )[1]
@@ -181,20 +181,16 @@ class XENetConv(MessagePassing):
         return stack_ij
 
     def aggregate(self, messages, x=None):
-        # Note: messages == stack_ij
         if self.attention:
             incoming_att = self.incoming_att_sigmoid(messages)
             incoming = self.incoming_att_multiply([incoming_att, messages])
-            incoming = self.agg(incoming, self.index_i, self.n_nodes)
+            incoming = self.agg(incoming, self.index_targets, self.n_nodes)
             outgoing_att = self.outgoing_att_sigmoid(messages)
             outgoing = self.outgoing_att_multiply([outgoing_att, messages])
-            outgoing = self.agg(outgoing, self.index_j, self.n_nodes)
+            outgoing = self.agg(outgoing, self.index_sources, self.n_nodes)
         else:
-            # The equivalent numpy notation for these operations is:
-            #     incoming[i] = np.sum(stack_ij[self.index_i == i])
-            #     outgoing[j] = np.sum(stack_ij[self.index_j == j])
-            incoming = self.agg(messages, self.index_i, self.n_nodes)
-            outgoing = self.agg(messages, self.index_j, self.n_nodes)
+            incoming = self.agg(messages, self.index_targets, self.n_nodes)
+            outgoing = self.agg(messages, self.index_sources, self.n_nodes)
 
         return tf.concat([x, incoming, outgoing], axis=-1), messages
 

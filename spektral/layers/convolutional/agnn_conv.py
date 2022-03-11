@@ -68,14 +68,14 @@ class AGNNConv(MessagePassing):
         return output
 
     def message(self, x, x_norm=None):
-        x_j = self.get_j(x)
-        x_norm_i = self.get_i(x_norm)
-        x_norm_j = self.get_j(x_norm)
+        x_j = self.get_sources(x)
+        x_norm_i = self.get_targets(x_norm)
+        x_norm_j = self.get_sources(x_norm)
         alpha = self.beta * tf.reduce_sum(x_norm_i * x_norm_j, axis=-1)
 
         if len(alpha.shape) == 2:
             alpha = tf.transpose(alpha)  # For mixed mode
-        alpha = ops.unsorted_segment_softmax(alpha, self.index_i, self.n_nodes)
+        alpha = ops.unsorted_segment_softmax(alpha, self.index_targets, self.n_nodes)
         if len(alpha.shape) == 2:
             alpha = tf.transpose(alpha)  # For mixed mode
         alpha = alpha[..., None]

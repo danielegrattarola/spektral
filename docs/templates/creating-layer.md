@@ -53,16 +53,17 @@ def call(self, inputs):
 ```
 
 Then, we implement the `message` function.
-The `get_i` and `get_j` built-in methods can be used to automatically access either side of the edges \(i \leftarrow j\). For instance, we can use `get_j` to access the node features `x[j]` of all neighbors `j`.
+The `get_sources` and `get_targets` built-in methods can be used to automatically retrieve the node attributes of nodes that are sending (sources) or receiving (targets) a message. 
+For instance, we can use `get_targets` to access the node features `x[j]` of all neighbors `j`.
 
-If you need direct access to the edge indices, you can use the `index_i` and `index_j` attributes.
+If you need direct access to the edge indices, you can use the `index_sources` and `index_targets` attributes.
 
-In this case, we only need to get the neighbors' features and return them: 
+In this case, we only need to get the neighbors' features and return them:
 
 ```py
 def message(self, x):
     # Get the node features of all neighbors
-    return self.get_j(x)
+    return self.get_sources(x)
 ```
 
 Then, we define an aggregation function for the messages. We can use a simple average of the nodes:
@@ -70,11 +71,12 @@ Then, we define an aggregation function for the messages. We can use a simple av
 ```py
 from spektral.layers.ops import scatter_mean
 
+
 def aggregate(self, messages):
-    return scatter_mean(messages, self.index_i, self.n_nodes)
+    return scatter_mean(messages, self.index_targets, self.n_nodes)
 ```
 
-**Note**: `n_nodes` is computed dynamically at the start of propagation, exactly like `index_i`.
+**Note**: `n_nodes` is computed dynamically at the start of propagation, exactly like `index_targets`.
 
 Since there are a few common aggregation functions that are often used in the literature, you can also skip the implementation of this method and simply pass a special keyword to the `__init__()` method of the superclass:
 

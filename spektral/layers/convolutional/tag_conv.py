@@ -107,7 +107,7 @@ class TAGConv(MessagePassing):
         return self.linear(output)
 
     def message(self, x, edge_weight=None):
-        x_j = self.get_j(x)
+        x_j = self.get_sources(x)
         return edge_weight[:, None] * x_j
 
     @property
