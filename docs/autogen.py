@@ -48,7 +48,9 @@ PAGES = [
         "functions": [],
         "methods": [],
         "classes": [
+            layers.SRCPool,
             layers.DiffPool,
+            layers.LaPool,
             layers.MinCutPool,
             layers.SAGPool,
             layers.TopKPool,
