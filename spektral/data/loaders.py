@@ -3,6 +3,7 @@ import tensorflow as tf
 
 from spektral.data.utils import (
     batch_generator,
+    collate_labels_batch,
     collate_labels_disjoint,
     get_spec,
     prepend_none,
@@ -78,10 +79,10 @@ class Loader:
     **Arguments**
 
     - `dataset`: a `spektral.data.Dataset` object;
-    - `batch_size`: size of the mini-batches;
-    - `epochs`: number of epochs to iterate over the dataset. By default (`None`)
+    - `batch_size`: int, size of the mini-batches;
+    - `epochs`: int, number of epochs to iterate over the dataset. By default (`None`)
     iterates indefinitely;
-    - `shuffle`: whether to shuffle the dataset at the start of each epoch.
+    - `shuffle`: bool, whether to shuffle the dataset at the start of each epoch.
     """
 
     def __init__(self, dataset, batch_size=1, epochs=None, shuffle=True):
@@ -178,11 +179,10 @@ class SingleLoader(Loader):
     **Arguments**
 
     - `dataset`: a `spektral.data.Dataset` object with only one graph;
-    - `epochs`: number of epochs to iterate over the dataset. By default (`None`)
+    - `epochs`: int, number of epochs to iterate over the dataset. By default (`None`)
     iterates indefinitely;
-    - `shuffle`: whether to shuffle the data at the start of each epoch;
-    - `sample_weights`: if given, these will be appended to the output
-    automatically.
+    - `shuffle`: bool, whether to shuffle the data at the start of each epoch;
+    - `sample_weights`: Numpy array, will be appended to the output automatically.
 
     **Output**
 
@@ -197,9 +197,8 @@ class SingleLoader(Loader):
     - `e`: same as `dataset[0].e`;
 
     `labels` is the same as `dataset[0].y`.
-    `sample_weights` is the same object passed to the constructor.
 
-
+    `sample_weights` is the same array passed when creating the loader.
     """
 
     def __init__(self, dataset, epochs=None, sample_weights=None):
@@ -262,6 +261,8 @@ class DisjointLoader(Loader):
     **Arguments**
 
     - `dataset`: a graph Dataset;
+    - `node_level`: bool, if `True` stack the labels vertically for node-level
+    prediction;
     - `batch_size`: size of the mini-batches;
     - `epochs`: number of epochs to iterate over the dataset. By default (`None`)
     iterates indefinitely;
@@ -321,7 +322,7 @@ class DisjointLoader(Loader):
         Adjacency matrix has shape [n_nodes, n_nodes]
         Node features have shape [n_nodes, n_node_features]
         Edge features have shape [n_edges, n_edge_features]
-        Targets have shape [..., n_labels]
+        Targets have shape [*, n_labels]
         """
         signature = self.dataset.signature
         if "y" in signature:
@@ -347,33 +348,40 @@ class BatchLoader(Loader):
     If `n_max` is the number of nodes of the biggest graph in the batch, then
     the padding consist of adding zeros to the node features, adjacency matrix,
     and edge attributes of each graph so that they have shapes
-    `(n_max, n_node_features)`, `(n_max, n_max)`, and
-    `(n_max, n_max, n_edge_features)` respectively.
+    `[n_max, n_node_features]`, `[n_max, n_max]`, and
+    `[n_max, n_max, n_edge_features]` respectively.
 
     The zero-padding is done batch-wise, which saves up memory at the cost of
     more computation. If latency is an issue but memory isn't, or if the
     dataset has graphs with a similar number of nodes, you can use
-    the `PackedBatchLoader` that first zero-pads all the dataset and then
+    the `PackedBatchLoader` that zero-pads all the dataset once and then
     iterates over it.
 
     Note that the adjacency matrix and edge attributes are returned as dense
-    arrays (mostly due to the lack of support for sparse tensor operations for
-    rank >2).
+    arrays.
 
-    Only graph-level labels are supported with this loader (i.e., labels are not
-    zero-padded because they are assumed to have no "node" dimensions).
+    if `mask=True`, node attributes will be extended with a binary mask that indicates
+    valid nodes (the last feature of each node will be 1 if the node was originally in
+    the graph and 0 if it is a fake node added by zero-padding).
+
+    Use this flag in conjunction with layers.base.GraphMasking to start the propagation
+    of masks in a model (necessary for node-level prediction and models that use a
+    dense pooling layer like DiffPool or MinCutPool).
+
+    If `node_level=False`, the labels are interpreted as graph-level labels and
+    are returned as an array of shape `[batch, n_labels]`.
+    If `node_level=True`, then the labels are padded along the node dimension and are
+    returned as an array of shape `[batch, n_max, n_labels]`.
 
     **Arguments**
 
     - `dataset`: a graph Dataset;
-    - `mask`: if True, node attributes will be extended with a binary mask that
-    indicates valid nodes (the last feature of each node will be 1 if the node is valid
-    and 0 otherwise). Use this flag in conjunction with layers.base.GraphMasking to
-    start the propagation of masks in a model.
-    - `batch_size`: size of the mini-batches;
-    - `epochs`: number of epochs to iterate over the dataset. By default (`None`)
+    - `mask`: bool, whether to add a mask to the node features;
+    - `batch_size`: int, size of the mini-batches;
+    - `epochs`: int, number of epochs to iterate over the dataset. By default (`None`)
     iterates indefinitely;
-    - `shuffle`: whether to shuffle the data at the start of each epoch.
+    - `shuffle`: bool, whether to shuffle the data at the start of each epoch;
+    - `node_level`: bool, if `True` pad the labels along the node dimension;
 
     **Output**
 
@@ -385,11 +393,22 @@ class BatchLoader(Loader):
     - `a`: adjacency matrices of shape `[batch, n_max, n_max]`;
     - `e`: edge attributes of shape `[batch, n_max, n_max, n_edge_features]`.
 
-    `labels` have shape `[batch, n_labels]`.
+    `labels` have shape `[batch, n_labels]` if `node_level=False` or
+    `[batch, n_max, n_labels]` otherwise.
     """
 
-    def __init__(self, dataset, mask=False, batch_size=1, epochs=None, shuffle=True):
+    def __init__(
+        self,
+        dataset,
+        mask=False,
+        batch_size=1,
+        epochs=None,
+        shuffle=True,
+        node_level=False,
+    ):
         self.mask = mask
+        self.node_level = node_level
+        self.signature = dataset.signature
         super().__init__(dataset, batch_size=batch_size, epochs=epochs, shuffle=shuffle)
 
     def collate(self, batch):
@@ -397,7 +416,7 @@ class BatchLoader(Loader):
 
         y = packed.pop("y_list", None)
         if y is not None:
-            y = np.array(y)
+            y = collate_labels_batch(y, node_level=self.node_level)
 
         output = to_batch(**packed, mask=self.mask)
         output = sp_matrices_to_sp_tensors(output)
@@ -415,12 +434,13 @@ class BatchLoader(Loader):
         Adjacency matrix has shape [batch, n_nodes, n_nodes]
         Node features have shape [batch, n_nodes, n_node_features]
         Edge features have shape [batch, n_nodes, n_nodes, n_edge_features]
-        Targets have shape [batch, ..., n_labels]
+        Labels have shape [batch, n_labels]
         """
-        signature = self.dataset.signature
+        signature = self.signature
         for k in signature:
             signature[k]["shape"] = prepend_none(signature[k]["shape"])
-        if "x" in signature:
+        if "x" in signature and self.mask:
+            # In case we have a mask, the mask is concatenated to the features
             signature["x"]["shape"] = signature["x"]["shape"][:-1] + (
                 signature["x"]["shape"][-1] + 1,
             )
@@ -430,6 +450,9 @@ class BatchLoader(Loader):
         if "e" in signature:
             # Edge attributes have an extra None dimension in batch mode
             signature["e"]["shape"] = prepend_none(signature["e"]["shape"])
+        if "y" in signature and self.node_level:
+            # Node labels have an extra None dimension
+            signature["y"]["shape"] = prepend_none(signature["y"]["shape"])
 
         return to_tf_signature(signature)
 
@@ -454,10 +477,12 @@ class PackedBatchLoader(BatchLoader):
     **Arguments**
 
     - `dataset`: a graph Dataset;
-    - `batch_size`: size of the mini-batches;
-    - `epochs`: number of epochs to iterate over the dataset. By default (`None`)
+    - `mask`: bool, whether to add a mask to the node features;
+    - `batch_size`: int, size of the mini-batches;
+    - `epochs`: int, number of epochs to iterate over the dataset. By default (`None`)
     iterates indefinitely;
-    - `shuffle`: whether to shuffle the data at the start of each epoch.
+    - `shuffle`: bool, whether to shuffle the data at the start of each epoch;
+    - `node_level`: bool, if `True` pad the labels along the node dimension;
 
     **Output**
 
@@ -469,12 +494,26 @@ class PackedBatchLoader(BatchLoader):
     - `a`: adjacency matrices of shape `[batch, n_max, n_max]`;
     - `e`: edge attributes of shape `[batch, n_max, n_max, n_edge_features]`.
 
-    `labels` have shape `[batch, ..., n_labels]`.
+    `labels` have shape `[batch, n_labels]` if `node_level=False` or
+    `[batch, n_max, n_labels]` otherwise.
     """
 
-    def __init__(self, dataset, mask=False, batch_size=1, epochs=None, shuffle=True):
+    def __init__(
+        self,
+        dataset,
+        mask=False,
+        batch_size=1,
+        epochs=None,
+        shuffle=True,
+        node_level=False,
+    ):
         super().__init__(
-            dataset, mask=mask, batch_size=batch_size, epochs=epochs, shuffle=shuffle
+            dataset,
+            mask=mask,
+            batch_size=batch_size,
+            epochs=epochs,
+            shuffle=shuffle,
+            node_level=node_level,
         )
 
         # Drop the Dataset container and work on packed tensors directly
@@ -482,9 +521,8 @@ class PackedBatchLoader(BatchLoader):
 
         y = packed.pop("y_list", None)
         if y is not None:
-            y = np.array(y)
+            y = collate_labels_batch(y, node_level=self.node_level)
 
-        self.signature = dataset.signature
         self.dataset = to_batch(**packed, mask=mask)
         if y is not None:
             self.dataset += (y,)
@@ -500,29 +538,6 @@ class PackedBatchLoader(BatchLoader):
             return batch[0], batch[1]
         else:
             return batch[:-1], batch[-1]
-
-    def tf_signature(self):
-        """
-        Adjacency matrix has shape [batch, n_nodes, n_nodes]
-        Node features have shape [batch, n_nodes, n_node_features]
-        Edge features have shape [batch, n_nodes, n_nodes, n_edge_features]
-        Targets have shape [batch, ..., n_labels]
-        """
-        signature = self.signature
-        for k in signature:
-            signature[k]["shape"] = prepend_none(signature[k]["shape"])
-        if "x" in signature:
-            signature["x"]["shape"] = signature["x"]["shape"][:-1] + (
-                signature["x"]["shape"][-1] + 1,
-            )
-        if "a" in signature:
-            # Adjacency matrix in batch mode is dense
-            signature["a"]["spec"] = tf.TensorSpec
-        if "e" in signature:
-            # Edge attributes have an extra None dimension in batch mode
-            signature["e"]["shape"] = prepend_none(signature["e"]["shape"])
-
-        return to_tf_signature(signature)
 
     @property
     def steps_per_epoch(self):
@@ -544,10 +559,10 @@ class MixedLoader(Loader):
     **Arguments**
 
     - `dataset`: a graph Dataset;
-    - `batch_size`: size of the mini-batches;
-    - `epochs`: number of epochs to iterate over the dataset. By default (`None`)
+    - `batch_size`: int, size of the mini-batches;
+    - `epochs`: int, number of epochs to iterate over the dataset. By default (`None`)
     iterates indefinitely;
-    - `shuffle`: whether to shuffle the data at the start of each epoch.
+    - `shuffle`: bool, whether to shuffle the data at the start of each epoch.
 
     **Output**
 
