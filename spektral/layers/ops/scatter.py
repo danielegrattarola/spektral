@@ -214,15 +214,9 @@ def serialize_scatter(identifier):
 
 
 def deserialize_scatter(scatter):
-    if isinstance(scatter, str):
-        if scatter in OP_DICT:
-            return OP_DICT[scatter]
-        else:
-            if callable(scatter):
-                return scatter
-            else:
-                raise ValueError(
-                    "scatter must be callable or string in: {}.".format(
-                        list(OP_DICT.keys())
-                    )
-                )
+    if isinstance(scatter, str) and scatter in OP_DICT:
+        return OP_DICT[scatter]
+    elif callable(scatter):
+        return scatter
+    else:
+        raise ValueError(f"scatter must be callable or string: {list(OP_DICT.keys())}")
