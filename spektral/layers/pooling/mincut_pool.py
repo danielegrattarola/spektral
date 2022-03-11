@@ -9,66 +9,67 @@ from spektral.layers.pooling.src import SRCPool
 
 class MinCutPool(SRCPool):
     r"""
-        A MinCut pooling layer from the paper
+    A MinCut pooling layer from the paper
 
-        > [Spectral Clustering with Graph Neural Networks for Graph Pooling](https://arxiv.org/abs/1907.00481)<br>
-        > Filippo Maria Bianchi et al.
+    > [Spectral Clustering with Graph Neural Networks for Graph Pooling](https://arxiv.org/abs/1907.00481)<br>
+    > Filippo Maria Bianchi et al.
 
-        **Mode**: batch.
+    **Mode**: batch.
 
-        This layer computes a soft clustering \(\S\) of the input graphs using a MLP,
-        and reduces graphs as follows:
-        $$
-        \begin{align}
-            \S &= \textrm{MLP}(\X); \\
-            \A' &= \S^\top \A \S; \\
-            \X' &= \S^\top \X
-        \end{align}
-        $$
-        where MLP is a multi-layer perceptron with softmax output.
+    This layer learns a soft clustering of the input graph as follows:
+    $$
+    \begin{align}
+        \S &= \textrm{MLP}(\X); \\
+        \X' &= \S^\top \X \\
+        \A' &= \S^\top \A \S; \\
+    \end{align}
+    $$
+    where \(\textrm{MLP}\) is a multi-layer perceptron with softmax output.
 
-        Two auxiliary loss terms are also added to the model: the _minCUT loss_
-        $$
-            L_c = - \frac{ \mathrm{Tr}(\S^\top \A \S) }{ \mathrm{Tr}(\S^\top \D \S) }
-        $$
-        and the _orthogonality loss_
-        $$
-            L_o = \left\|
-                \frac{\S^\top \S}{\| \S^\top \S \|_F}
-                - \frac{\I_K}{\sqrt{K}}
-            \right\|_F.
-        $$
+    Two auxiliary loss terms are also added to the model: the minimum cut loss
+    $$
+        L_c = - \frac{ \mathrm{Tr}(\S^\top \A \S) }{ \mathrm{Tr}(\S^\top \D \S) }
+    $$
+    and the orthogonality loss
+    $$
+        L_o = \left\|
+            \frac{\S^\top \S}{\| \S^\top \S \|_F}
+            - \frac{\I_K}{\sqrt{K}}
+        \right\|_F.
+    $$
 
-        The layer can be used without a supervised loss, to compute node clustering
-        simply by minimizing the two auxiliary losses.
+    The layer can be used without a supervised loss to compute node clustering by
+    minimizing the two auxiliary losses.
 
-        **Input**
+    **Input**
 
-        - Node features of shape `([batch], n_nodes, n_node_features)`;
-        - Symmetrically normalized adjacency matrix of shape `([batch], n_nodes, n_nodes)`;
+    - Node features of shape `(batch, n_nodes_in, n_node_features)`;
+    - Symmetrically normalized adjacency matrix of shape
+    `(batch, n_nodes_in, n_nodes_in)`;
 
-        **Output**
+    **Output**
 
-        - Reduced node features of shape `([batch], K, n_node_features)`;
-        - Reduced adjacency matrix of shape `([batch], K, K)`;
-        - If `return_mask=True`, the soft clustering matrix of shape `([batch], n_nodes, K)`.
+    - Reduced node features of shape `(batch, n_nodes_out, n_node_features)`;
+    - Reduced adjacency matrix of shape `(batch, n_nodes_out, n_nodes_out)`;
+    - If `return_selection=True`, the selection matrix of shape
+    `(batch, n_nodes_in, n_nodes_out)`.
 
-        **Arguments**
+    **Arguments**
 
-        - `k`: number of output nodes;
-        - `mlp_hidden`: list of integers, number of hidden units for each hidden
-        layer in the MLP used to compute cluster assignments (if None, the MLP has
-        only the output layer);
-        - `mlp_activation`: activation for the MLP layers;
-        - `return_selection`: boolean, whether to return the selection matrix;
-        - `use_bias`: use bias in the MLP;
-        - `kernel_initializer`: initializer for the weights of the MLP;
-        - `bias_initializer`: initializer for the bias of the MLP;
-        - `kernel_regularizer`: regularization applied to the weights of the MLP;
-        - `bias_regularizer`: regularization applied to the bias of the MLP;
-        - `kernel_constraint`: constraint applied to the weights of the MLP;
-        - `bias_constraint`: constraint applied to the bias of the MLP;
-        """
+    - `k`: number of output nodes;
+    - `mlp_hidden`: list of integers, number of hidden units for each hidden layer in
+    the MLP used to compute cluster assignments (if `None`, the MLP has only one output
+    layer);
+    - `mlp_activation`: activation for the MLP layers;
+    - `return_selection`: boolean, whether to return the selection matrix;
+    - `use_bias`: use bias in the MLP;
+    - `kernel_initializer`: initializer for the weights of the MLP;
+    - `bias_initializer`: initializer for the bias of the MLP;
+    - `kernel_regularizer`: regularization applied to the weights of the MLP;
+    - `bias_regularizer`: regularization applied to the bias of the MLP;
+    - `kernel_constraint`: constraint applied to the weights of the MLP;
+    - `bias_constraint`: constraint applied to the bias of the MLP;
+    """
 
     def __init__(
         self,

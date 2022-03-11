@@ -7,58 +7,59 @@ from spektral.layers.pooling.src import SRCPool
 
 class TopKPool(SRCPool):
     r"""
-        A gPool/Top-K layer from the papers
+    A gPool/Top-K layer from the papers
 
-        > [Graph U-Nets](https://arxiv.org/abs/1905.05178)<br>
-        > Hongyang Gao and Shuiwang Ji
+    > [Graph U-Nets](https://arxiv.org/abs/1905.05178)<br>
+    > Hongyang Gao and Shuiwang Ji
 
-        and
+    and
 
-        > [Towards Sparse Hierarchical Graph Classifiers](https://arxiv.org/abs/1811.01287)<br>
-        > Cătălina Cangea et al.
+    > [Towards Sparse Hierarchical Graph Classifiers](https://arxiv.org/abs/1811.01287)<br>
+    > Cătălina Cangea et al.
 
-        **Mode**: single, disjoint.
+    **Mode**: single, disjoint.
 
-        This layer computes the following operations:
-        $$
-            \y = \frac{\X\p}{\|\p\|}; \;\;\;\;
-            \i = \textrm{rank}(\y, K); \;\;\;\;
-            \X' = (\X \odot \textrm{tanh}(\y))_\i; \;\;\;\;
-            \A' = \A_{\i, \i}
-        $$
-        where \(\textrm{rank}(\y, K)\) returns the indices of the top K values of
-        \(\y\), and \(\p\) is a learnable parameter vector of size \(F\).
+    This layer computes:
+    $$
+        \y = \frac{\X\p}{\|\p\|}; \;\;\;\;
+        \i = \textrm{rank}(\y, K); \;\;\;\;
+        \X' = (\X \odot \textrm{tanh}(\y))_\i; \;\;\;\;
+        \A' = \A_{\i, \i}
+    $$
+    where \(\textrm{rank}(\y, K)\) returns the indices of the top K values of
+    \(\y\), and \(\p\) is a learnable parameter vector of size \(F\).
 
-        \(K\) is defined for each graph as a fraction of the number of nodes,
-        controlled by the `ratio` argument.
+    \(K\) is defined for each graph as a fraction of the number of nodes,
+    controlled by the `ratio` argument.
 
-        Note that the the gating operation \(\textrm{tanh}(\y)\) (Cangea et al.)
-        can be replaced with a sigmoid (Gao & Ji).
+    The gating operation \(\textrm{tanh}(\y)\) (Cangea et al.) can be replaced with a
+    sigmoid (Gao & Ji).
 
-        **Input**
+    **Input**
 
-        - Node features of shape `(n_nodes, n_node_features)`;
-        - Binary adjacency matrix of shape `(n_nodes, n_nodes)`;
-        - Graph IDs of shape `(n_nodes, )` (only in disjoint mode);
+    - Node features of shape `(n_nodes_in, n_node_features)`;
+    - Adjacency matrix of shape `(n_nodes_in, n_nodes_in)`;
+    - Graph IDs of shape `(n_nodes, )` (only in disjoint mode);
 
-        **Output**
+    **Output**
 
-        - Reduced node features of shape `(ratio * n_nodes, n_node_features)`;
-        - Reduced adjacency matrix of shape `(ratio * n_nodes, ratio * n_nodes)`;
-        - Reduced graph IDs of shape `(ratio * n_nodes, )` (only in disjoint mode);
-        - If `return_mask=True`, the binary pooling mask of shape `(ratio * n_nodes, )`.
+    - Reduced node features of shape `(ratio * n_nodes_in, n_node_features)`;
+    - Reduced adjacency matrix of shape `(ratio * n_nodes_in, ratio * n_nodes_in)`;
+    - Reduced graph IDs of shape `(ratio * n_nodes_in, )` (only in disjoint mode);
+    - If `return_selection=True`, the selection mask of shape `(ratio * n_nodes_in, )`.
+    - If `return_score=True`, the scoring vector of shape `(n_nodes_in, )`
 
-        **Arguments**
+    **Arguments**
 
-        - `ratio`: float between 0 and 1, ratio of nodes to keep in each graph;
-        - `return_selection`: boolean, whether to return the binary selection mask;
-        - `return_score`: boolean, whether to return the node scoring vector;
-        - `sigmoid_gating`: boolean, use a sigmoid gating activation instead of a
-            tanh;
-        - `kernel_initializer`: initializer for the weights;
-        - `kernel_regularizer`: regularization applied to the weights;
-        - `kernel_constraint`: constraint applied to the weights;
-        """
+    - `ratio`: float between 0 and 1, ratio of nodes to keep in each graph;
+    - `return_selection`: boolean, whether to return the selection mask;
+    - `return_score`: boolean, whether to return the node scoring vector;
+    - `sigmoid_gating`: boolean, use a sigmoid activation for gating instead of a
+        tanh;
+    - `kernel_initializer`: initializer for the weights;
+    - `kernel_regularizer`: regularization applied to the weights;
+    - `kernel_constraint`: constraint applied to the weights;
+    """
 
     def __init__(
         self,

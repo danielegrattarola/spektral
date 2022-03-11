@@ -7,6 +7,51 @@ from spektral.layers.pooling.src import SRCPool
 
 
 class LaPool(SRCPool):
+    r"""
+    A Laplacian pooling (LaPool) layer from the paper
+
+    > [Towards Interpretable Sparse Graph Representation Learning with Laplacian Pooling](https://arxiv.org/abs/1905.11577)<br>
+    > Emmanuel Noutahi et al.
+
+    **Mode**: disjoint.
+
+    This layer computes a soft clustering of the graph by first identifying a set of
+    leaders, and then assigning every remaining node to the cluster of the closest
+    leader:
+    $$
+        \V = \norm{\L\X}_d; \\
+        \i = \{ i \mid \V_i > \V_j, \forall j \in \cN(i) \} \\
+        \S^\top = \textrm{SparseMax}\left( \beta \frac{\X\X_{\i}^\top}{\norm{\X}\norm{\X_{\i}}} \right)
+    $$
+    \(\beta\) is a regularization vecotr that is applied element-wise to the selection
+    matrix.
+    If `shortest_path_reg=True`, it is equal to the inverse of the shortest path between
+    each node and its corresponding leader (this can be expensive since it runs on CPU).
+    Otherwise it is equal to 1.
+
+    The reduction and connection are computed as \(\X' = \S\X\) and
+    \(\A' = \S^\top\A\S\), respectively.
+
+    Note that the number of nodes in the output graph depends on the input node features.
+
+    **Input**
+
+    - Node features of shape `(n_nodes_in, n_node_features)`;
+    - Adjacency matrix of shape `(n_nodes_in, n_nodes_in)`;
+
+    **Output**
+
+    - Reduced node features of shape `(n_nodes_out, channels)`;
+    - Reduced adjacency matrix of shape `(n_nodes_out, n_nodes_out)`;
+    - If `return_selection=True`, the selection matrix of shape
+    `(n_nodes_in, n_nodes_out)`.
+
+    **Arguments**
+
+    - `shortest_path_reg`: boolean, apply the shortest path regularization described in
+    the papaer (can be expensive);
+    - `return_selection`: boolean, whether to return the selection matrix;
+    """
     def __init__(self, shortest_path_reg=True, return_selection=False, **kwargs):
         super().__init__(return_selection=return_selection, **kwargs)
 

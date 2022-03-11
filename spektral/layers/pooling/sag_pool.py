@@ -7,53 +7,56 @@ from tensorflow.keras import backend as K
 
 class SAGPool(TopKPool):
     r"""
-        A self-attention graph pooling layer from the paper
+    A self-attention graph pooling layer from the paper
 
-        > [Self-Attention Graph Pooling](https://arxiv.org/abs/1904.08082)<br>
-        > Junhyun Lee et al.
+    > [Self-Attention Graph Pooling](https://arxiv.org/abs/1904.08082)<br>
+    > Junhyun Lee et al.
 
-        **Mode**: single, disjoint.
+    **Mode**: single, disjoint.
 
-        This layer computes the following operations:
-        $$
-            \y = \textrm{GNN}(\A, \X); \;\;\;\;
-            \i = \textrm{rank}(\y, K); \;\;\;\;
-            \X' = (\X \odot \textrm{tanh}(\y))_\i; \;\;\;\;
-            \A' = \A_{\i, \i}
-        $$
-        where \(\textrm{rank}(\y, K)\) returns the indices of the top K values of
-        \(\y\) and
-        $$
-            \textrm{GNN}(\A, \X) = \A \X \W.
-        $$
+    This layer computes:
+    $$
+        \y = \textrm{GNN}(\A, \X); \;\;\;\;
+        \i = \textrm{rank}(\y, K); \;\;\;\;
+        \X' = (\X \odot \textrm{tanh}(\y))_\i; \;\;\;\;
+        \A' = \A_{\i, \i}
+    $$
+    where \(\textrm{rank}(\y, K)\) returns the indices of the top K values of \(\y\) and
+    $$
+        \textrm{GNN}(\A, \X) = \A \X \W.
+    $$
 
-        \(K\) is defined for each graph as a fraction of the number of nodes,
-        controlled by the `ratio` argument.
+    \(K\) is defined for each graph as a fraction of the number of nodes, controlled by
+    the `ratio` argument.
 
-        **Input**
+    The gating operation \(\textrm{tanh}(\y)\) (Cangea et al.) can be replaced with a
+    sigmoid (Gao & Ji).
 
-        - Node features of shape `(n_nodes, n_node_features)`;
-        - Binary adjacency matrix of shape `(n_nodes, n_nodes)`;
-        - Graph IDs of shape `(n_nodes, )` (only in disjoint mode);
+    **Input**
 
-        **Output**
+    - Node features of shape `(n_nodes_in, n_node_features)`;
+    - Adjacency matrix of shape `(n_nodes_in, n_nodes_in)`;
+    - Graph IDs of shape `(n_nodes, )` (only in disjoint mode);
 
-        - Reduced node features of shape `(ratio * n_nodes, n_node_features)`;
-        - Reduced adjacency matrix of shape `(ratio * n_nodes, ratio * n_nodes)`;
-        - Reduced graph IDs of shape `(ratio * n_nodes, )` (only in disjoint mode);
-        - If `return_mask=True`, the binary pooling mask of shape `(ratio * n_nodes, )`.
+    **Output**
 
-        **Arguments**
+    - Reduced node features of shape `(ratio * n_nodes_in, n_node_features)`;
+    - Reduced adjacency matrix of shape `(ratio * n_nodes_in, ratio * n_nodes_in)`;
+    - Reduced graph IDs of shape `(ratio * n_nodes_in, )` (only in disjoint mode);
+    - If `return_selection=True`, the selection mask of shape `(ratio * n_nodes_in, )`.
+    - If `return_score=True`, the scoring vector of shape `(n_nodes_in, )`
 
-        - `ratio`: float between 0 and 1, ratio of nodes to keep in each graph;
-        - `return_selection`: boolean, whether to return the binary selection mask;
-        - `return_score`: boolean, whether to return the node scoring vector;
-        - `sigmoid_gating`: boolean, use a sigmoid gating activation instead of a
-            tanh;
-        - `kernel_initializer`: initializer for the weights;
-        - `kernel_regularizer`: regularization applied to the weights;
-        - `kernel_constraint`: constraint applied to the weights;
-        """
+    **Arguments**
+
+    - `ratio`: float between 0 and 1, ratio of nodes to keep in each graph;
+    - `return_selection`: boolean, whether to return the selection mask;
+    - `return_score`: boolean, whether to return the node scoring vector;
+    - `sigmoid_gating`: boolean, use a sigmoid activation for gating instead of a
+        tanh;
+    - `kernel_initializer`: initializer for the weights;
+    - `kernel_regularizer`: regularization applied to the weights;
+    - `kernel_constraint`: constraint applied to the weights;
+    """
 
     def __init__(
         self,

@@ -8,64 +8,64 @@ from spektral.layers.pooling.src import SRCPool
 
 class DiffPool(SRCPool):
     r"""
-        A DiffPool layer from the paper
+    A DiffPool layer from the paper
 
-        > [Hierarchical Graph Representation Learning with Differentiable Pooling](https://arxiv.org/abs/1806.08804)<br>
-        > Rex Ying et al.
+    > [Hierarchical Graph Representation Learning with Differentiable Pooling](https://arxiv.org/abs/1806.08804)<br>
+    > Rex Ying et al.
 
-        **Mode**: batch.
+    **Mode**: batch.
 
-        This layer computes a soft clustering \(\S\) of the input graphs using a GNN,
-        and reduces graphs as follows:
-        $$
-            \begin{align}
-                \S &= \textrm{GNN}_{embed}(\A, \X); \\
-                \Z &= \textrm{GNN}_{pool}(\A, \X); \\
-                \A' &= \S^\top \A \S; \\
-                \X' &= \S^\top \Z
-            \end{align}
-        $$
-        where:
-        $$
-            \textrm{GNN}_{\square}(\A, \X) = \D^{-1/2} \A \D^{-1/2} \X \W_{\square}.
-        $$
-        The number of output channels of \(\textrm{GNN}_{embed}\) is controlled by
-        the `channels` parameter.
+    This layer learns a soft clustering of the input graph as follows:
+    $$
+        \begin{align}
+            \S &= \textrm{GNN}_{embed}(\A, \X); \\
+            \Z &= \textrm{GNN}_{pool}(\A, \X); \\
+            \X' &= \S^\top \Z; \\
+            \A' &= \S^\top \A \S; \\
+        \end{align}
+    $$
+    where:
+    $$
+        \textrm{GNN}_{\square}(\A, \X) = \D^{-1/2} \A \D^{-1/2} \X \W_{\square}.
+    $$
+    The number of output channels of \(\textrm{GNN}_{embed}\) is controlled by the
+    `channels` parameter.
 
-        Two auxiliary loss terms are also added to the model: the _link prediction
-        loss_
-        $$
-            L_{LP} = \big\| \A - \S\S^\top \big\|_F
-        $$
-        and the _entropy loss_
-        $$
-            L_{E} - \frac{1}{N} \sum\limits_{i = 1}^{N} \S \log (\S).
-        $$
+    Two auxiliary loss terms are also added to the model: the link prediction loss
+    $$
+        L_{LP} = \big\| \A - \S\S^\top \big\|_F
+    $$
+    and the entropy loss
+    $$
+        L_{E} - \frac{1}{N} \sum\limits_{i = 1}^{N} \S \log (\S).
+    $$
 
-        The layer can be used without a supervised loss, to compute node clustering
-        simply by minimizing the two auxiliary losses.
+    The layer can be used without a supervised loss to compute node clustering by
+    minimizing the two auxiliary losses.
 
-        **Input**
+    **Input**
 
-        - Node features of shape `([batch], n_nodes, n_node_features)`;
-        - Adjacency matrix of shape `([batch], n_nodes, n_nodes)`;
+    - Node features of shape `(batch, n_nodes_in, n_node_features)`;
+    - Adjacency matrix of shape `(batch, n_nodes_in, n_nodes_in)`;
 
-        **Output**
+    **Output**
 
-        - Reduced node features of shape `([batch], K, channels)`;
-        - Reduced adjacency matrix of shape `([batch], K, K)`;
-        - If `return_mask=True`, the soft clustering matrix of shape `([batch], n_nodes, K)`.
+    - Reduced node features of shape `(batch, n_nodes_out, channels)`;
+    - Reduced adjacency matrix of shape `(batch, n_nodes_out, n_nodes_out)`;
+    - If `return_selection=True`, the selection matrix of shape
+    `(batch, n_nodes_in, n_nodes_out)`.
 
-        **Arguments**
+    **Arguments**
 
-        - `k`: number of output nodes;
-        - `channels`: number of output channels (if None, the number of output
-        channels is assumed to be the same as the input);
-        - `return_selection`: boolean, whether to return the selection matrix;
-        - `kernel_initializer`: initializer for the weights;
-        - `kernel_regularizer`: regularization applied to the weights;
-        - `kernel_constraint`: constraint applied to the weights;
-        """
+    - `k`: number of output nodes;
+    - `channels`: number of output channels (if `None`, the number of output channels is
+    the same as the input);
+    - `return_selection`: boolean, whether to return the selection matrix;
+    - `activation`: activation to apply after reduction;
+    - `kernel_initializer`: initializer for the weights;
+    - `kernel_regularizer`: regularization applied to the weights;
+    - `kernel_constraint`: constraint applied to the weights;
+    """
 
     def __init__(
         self,
