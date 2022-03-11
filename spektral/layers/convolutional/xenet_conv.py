@@ -1,7 +1,7 @@
 from collections.abc import Iterable
 
 import tensorflow as tf
-from tensorflow.keras.layers import Concatenate, Dense, Multiply, PReLU, ReLU, Reshape
+from tensorflow.keras.layers import Concatenate, Dense, Multiply, PReLU, ReLU
 from tensorflow.python.ops import gen_sparse_ops
 
 from spektral.layers.convolutional.conv import Conv

@@ -52,6 +52,7 @@ class LaPool(SRCPool):
     the papaer (can be expensive);
     - `return_selection`: boolean, whether to return the selection matrix;
     """
+
     def __init__(self, shortest_path_reg=True, return_selection=False, **kwargs):
         super().__init__(return_selection=return_selection, **kwargs)
 
@@ -99,7 +100,9 @@ class LaPool(SRCPool):
         s = beta * tf.sparse.to_dense(s)
 
         # Leaders end up entirely in their own cluster
-        kronecker_delta = tf.boolean_mask(tf.eye(self.n_nodes, dtype=s.dtype), leader_mask, axis=1)
+        kronecker_delta = tf.boolean_mask(
+            tf.eye(self.n_nodes, dtype=s.dtype), leader_mask, axis=1
+        )
 
         # Create clustering
         s = tf.where(leader_mask[:, None], kronecker_delta, s)

@@ -135,9 +135,9 @@ def _test_disjoint_mode(layer, sparse=False, **kwargs):
 
     if "ratio" in kwargs.keys():
         N_pool_expected = int(
-                np.ceil(kwargs["ratio"] * N1)
-                + np.ceil(kwargs["ratio"] * N2)
-                + np.ceil(kwargs["ratio"] * N3)
+            np.ceil(kwargs["ratio"] * N1)
+            + np.ceil(kwargs["ratio"] * N2)
+            + np.ceil(kwargs["ratio"] * N3)
         )
     elif "k" in kwargs.keys():
         N_pool_expected = int(kwargs["k"])
