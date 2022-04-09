@@ -1,97 +1,91 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <meta name="author" content="Daniele Grattarola">
-  <link rel="canonical" href="https://graphneural.network/loaders/">
-  <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Loaders - Spektral</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Daniele Grattarola" /><link rel="canonical" href="https://graphneural.network/loaders/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Loaders - Spektral</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+        <link href="../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Loaders";
+        var mkdocs_page_input_path = "loaders.md";
+        var mkdocs_page_url = "/loaders/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+      <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-  <link rel="stylesheet" href="../css/theme.css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
-  <link href="../stylesheets/extra.css" rel="stylesheet" />
-  
-  <script>
-    // Current page data
-    var mkdocs_page_name = "Loaders";
-    var mkdocs_page_input_path = "loaders.md";
-    var mkdocs_page_url = "/loaders/";
-  </script>
-  
-  <script src="../js/jquery-2.1.1.min.js" defer></script>
-  <script src="../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script> 
-  <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-      ga('create', 'UA-125823175-1', 'auto');
-      ga('send', 'pageview');
-  </script>
-  
+        ga('create', 'UA-125823175-1', 'auto');
+        ga('send', 'pageview');
+      </script>
+    
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
     <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Spektral</a>
-        <div role="search">
+          <a href=".." class="icon icon-home"> Spektral
+        </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
       <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
-                    </li>
-                </ul>
-                <p class="caption"><span class="caption-text">Tutorials</span></p>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../getting-started/">Getting started</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../data-modes/">Data modes</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../creating-dataset/">Creating a dataset</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../creating-layer/">Creating a layer</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a>
-                    </li>
-                </ul>
-                <p class="caption"><span class="caption-text">Layers</span></p>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../layers/convolution/">Convolutional layers</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../layers/pooling/">Pooling layers</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../layers/base/">Base layers</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../models/">Models</a>
-                    </li>
-                </ul>
-                <p class="caption"><span class="caption-text">Data</span></p>
-                <ul class="current">
-                    <li class="toctree-l1"><a class="reference internal" href="../data/">Containers</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../datasets/">Datasets</a>
-                    </li>
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Loaders</a>
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/">Getting started</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../data-modes/">Data modes</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../creating-dataset/">Creating a dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../creating-layer/">Creating a layer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Layers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../layers/convolution/">Convolutional layers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../layers/pooling/">Pooling layers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../layers/base/">Base layers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../models/">Models</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Data</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../data/">Containers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../datasets/">Datasets</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Loaders</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#loader">Loader</a>
     </li>
@@ -106,65 +100,52 @@
     <li class="toctree-l2"><a class="reference internal" href="#mixedloader">MixedLoader</a>
     </li>
     </ul>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../transforms/">Transforms</a>
-                    </li>
-                </ul>
-                <p class="caption"><span class="caption-text">Utils</span></p>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../utils/convolution/">Convolution</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../utils/sparse/">Sparse</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../utils/misc/">Miscellaneous</a>
-                    </li>
-                </ul>
-                <p class="caption"><span class="caption-text">Other</span></p>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../external/">External resources</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../about/">About</a>
-                    </li>
-                </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transforms/">Transforms</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Utils</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../utils/convolution/">Convolution</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../utils/sparse/">Sparse</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../utils/misc/">Miscellaneous</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Other</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../external/">External resources</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../about/">About</a>
+                  </li>
+              </ul>
       </div>
     </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="..">Spektral</a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Spektral</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    
-      
-        
-          <li>Data &raquo;</li>
-        
-      
-    
-    <li>Loaders</li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Data &raquo;</li><li>Loaders</li>
     <li class="wy-breadcrumbs-aside">
-      
     </li>
   </ul>
-  
   <hr/>
 </div>
 
-          <div role="main">
-            <div class="section">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
               
                 <h2 id="loaders">Loaders</h2>
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L21">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L22">[source]</a></span></p>
 <h4 id="loader">Loader</h4>
 <pre><code class="language-python">spektral.data.loaders.Loader(dataset, batch_size=1, epochs=None, shuffle=True)
 </code></pre>
@@ -209,13 +190,13 @@ def train_step(inputs, target):
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>dataset</code>: a <code>spektral.data.Dataset</code> object;</li>
-<li><code>batch_size</code>: size of the mini-batches;</li>
-<li><code>epochs</code>: number of epochs to iterate over the dataset. By default (<code>None</code>)
+<li><code>batch_size</code>: int, size of the mini-batches;</li>
+<li><code>epochs</code>: int, number of epochs to iterate over the dataset. By default (<code>None</code>)
 iterates indefinitely;</li>
-<li><code>shuffle</code>: whether to shuffle the dataset at the start of each epoch.</li>
+<li><code>shuffle</code>: bool, whether to shuffle the dataset at the start of each epoch.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L168">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L169">[source]</a></span></p>
 <h4 id="singleloader">SingleLoader</h4>
 <pre><code class="language-python">spektral.data.loaders.SingleLoader(dataset, epochs=None, sample_weights=None)
 </code></pre>
@@ -227,11 +208,10 @@ If given, then each batch will be a tuple <code>(inputs, labels, sample_weights)
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>dataset</code>: a <code>spektral.data.Dataset</code> object with only one graph;</li>
-<li><code>epochs</code>: number of epochs to iterate over the dataset. By default (<code>None</code>)
+<li><code>epochs</code>: int, number of epochs to iterate over the dataset. By default (<code>None</code>)
 iterates indefinitely;</li>
-<li><code>shuffle</code>: whether to shuffle the data at the start of each epoch;</li>
-<li><code>sample_weights</code>: if given, these will be appended to the output
-automatically.</li>
+<li><code>shuffle</code>: bool, whether to shuffle the data at the start of each epoch;</li>
+<li><code>sample_weights</code>: Numpy array, will be appended to the output automatically.</li>
 </ul>
 <p><strong>Output</strong></p>
 <p>Returns a tuple <code>(inputs, labels)</code> or <code>(inputs, labels, sample_weights)</code>.</p>
@@ -243,10 +223,10 @@ are not <code>None</code>:</p>
 SparseTensors);</li>
 <li><code>e</code>: same as <code>dataset[0].e</code>;</li>
 </ul>
-<p><code>labels</code> is the same as <code>dataset[0].y</code>.
-<code>sample_weights</code> is the same object passed to the constructor.</p>
+<p><code>labels</code> is the same as <code>dataset[0].y</code>.</p>
+<p><code>sample_weights</code> is the same array passed when creating the loader.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L244">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L243">[source]</a></span></p>
 <h4 id="disjointloader">DisjointLoader</h4>
 <pre><code class="language-python">spektral.data.loaders.DisjointLoader(dataset, node_level=False, batch_size=1, epochs=None, shuffle=True)
 </code></pre>
@@ -263,6 +243,8 @@ method in a Keras training loop.</p>
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>dataset</code>: a graph Dataset;</li>
+<li><code>node_level</code>: bool, if <code>True</code> stack the labels vertically for node-level
+prediction;</li>
 <li><code>batch_size</code>: size of the mini-batches;</li>
 <li><code>epochs</code>: number of epochs to iterate over the dataset. By default (<code>None</code>)
 iterates indefinitely;</li>
@@ -280,9 +262,9 @@ iterates indefinitely;</li>
 <p><code>labels</code> have shape <code>[batch, n_labels]</code> if <code>node_level=False</code> or
 <code>[n_nodes, n_labels]</code> otherwise.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L340">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L341">[source]</a></span></p>
 <h4 id="batchloader">BatchLoader</h4>
-<pre><code class="language-python">spektral.data.loaders.BatchLoader(dataset, mask=False, batch_size=1, epochs=None, shuffle=True)
+<pre><code class="language-python">spektral.data.loaders.BatchLoader(dataset, mask=False, batch_size=1, epochs=None, shuffle=True, node_level=False)
 </code></pre>
 <p>A Loader for <a href="https://graphneural.network/data-modes/#batch-mode">batch mode</a>.</p>
 <p>This loader returns batches of graphs stacked along an extra dimension,
@@ -290,29 +272,34 @@ with all "node" dimensions padded to be equal among all graphs.</p>
 <p>If <code>n_max</code> is the number of nodes of the biggest graph in the batch, then
 the padding consist of adding zeros to the node features, adjacency matrix,
 and edge attributes of each graph so that they have shapes
-<code>(n_max, n_node_features)</code>, <code>(n_max, n_max)</code>, and
-<code>(n_max, n_max, n_edge_features)</code> respectively.</p>
+<code>[n_max, n_node_features]</code>, <code>[n_max, n_max]</code>, and
+<code>[n_max, n_max, n_edge_features]</code> respectively.</p>
 <p>The zero-padding is done batch-wise, which saves up memory at the cost of
 more computation. If latency is an issue but memory isn't, or if the
 dataset has graphs with a similar number of nodes, you can use
-the <code>PackedBatchLoader</code> that first zero-pads all the dataset and then
+the <code>PackedBatchLoader</code> that zero-pads all the dataset once and then
 iterates over it.</p>
 <p>Note that the adjacency matrix and edge attributes are returned as dense
-arrays (mostly due to the lack of support for sparse tensor operations for
-rank &gt;2).</p>
-<p>Only graph-level labels are supported with this loader (i.e., labels are not
-zero-padded because they are assumed to have no "node" dimensions).</p>
+arrays.</p>
+<p>if <code>mask=True</code>, node attributes will be extended with a binary mask that indicates
+valid nodes (the last feature of each node will be 1 if the node was originally in
+the graph and 0 if it is a fake node added by zero-padding).</p>
+<p>Use this flag in conjunction with layers.base.GraphMasking to start the propagation
+of masks in a model (necessary for node-level prediction and models that use a
+dense pooling layer like DiffPool or MinCutPool).</p>
+<p>If <code>node_level=False</code>, the labels are interpreted as graph-level labels and
+are returned as an array of shape <code>[batch, n_labels]</code>.
+If <code>node_level=True</code>, then the labels are padded along the node dimension and are
+returned as an array of shape <code>[batch, n_max, n_labels]</code>.</p>
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>dataset</code>: a graph Dataset;</li>
-<li><code>mask</code>: if True, node attributes will be extended with a binary mask that
-indicates valid nodes (the last feature of each node will be 1 if the node is valid
-and 0 otherwise). Use this flag in conjunction with layers.base.GraphMasking to
-start the propagation of masks in a model.</li>
-<li><code>batch_size</code>: size of the mini-batches;</li>
-<li><code>epochs</code>: number of epochs to iterate over the dataset. By default (<code>None</code>)
+<li><code>mask</code>: bool, whether to add a mask to the node features;</li>
+<li><code>batch_size</code>: int, size of the mini-batches;</li>
+<li><code>epochs</code>: int, number of epochs to iterate over the dataset. By default (<code>None</code>)
 iterates indefinitely;</li>
-<li><code>shuffle</code>: whether to shuffle the data at the start of each epoch.</li>
+<li><code>shuffle</code>: bool, whether to shuffle the data at the start of each epoch;</li>
+<li><code>node_level</code>: bool, if <code>True</code> pad the labels along the node dimension;</li>
 </ul>
 <p><strong>Output</strong></p>
 <p>For each batch, returns a tuple <code>(inputs, labels)</code>.</p>
@@ -322,11 +309,12 @@ iterates indefinitely;</li>
 <li><code>a</code>: adjacency matrices of shape <code>[batch, n_max, n_max]</code>;</li>
 <li><code>e</code>: edge attributes of shape <code>[batch, n_max, n_max, n_edge_features]</code>.</li>
 </ul>
-<p><code>labels</code> have shape <code>[batch, n_labels]</code>.</p>
+<p><code>labels</code> have shape <code>[batch, n_labels]</code> if <code>node_level=False</code> or
+<code>[batch, n_max, n_labels]</code> otherwise.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L437">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L460">[source]</a></span></p>
 <h4 id="packedbatchloader">PackedBatchLoader</h4>
-<pre><code class="language-python">spektral.data.loaders.PackedBatchLoader(dataset, mask=False, batch_size=1, epochs=None, shuffle=True)
+<pre><code class="language-python">spektral.data.loaders.PackedBatchLoader(dataset, mask=False, batch_size=1, epochs=None, shuffle=True, node_level=False)
 </code></pre>
 <p>A <code>BatchLoader</code> that zero-pads the graphs before iterating over the dataset.
 This means that <code>n_max</code> is computed over the whole dataset and not just
@@ -344,10 +332,12 @@ average).</li>
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>dataset</code>: a graph Dataset;</li>
-<li><code>batch_size</code>: size of the mini-batches;</li>
-<li><code>epochs</code>: number of epochs to iterate over the dataset. By default (<code>None</code>)
+<li><code>mask</code>: bool, whether to add a mask to the node features;</li>
+<li><code>batch_size</code>: int, size of the mini-batches;</li>
+<li><code>epochs</code>: int, number of epochs to iterate over the dataset. By default (<code>None</code>)
 iterates indefinitely;</li>
-<li><code>shuffle</code>: whether to shuffle the data at the start of each epoch.</li>
+<li><code>shuffle</code>: bool, whether to shuffle the data at the start of each epoch;</li>
+<li><code>node_level</code>: bool, if <code>True</code> pad the labels along the node dimension;</li>
 </ul>
 <p><strong>Output</strong></p>
 <p>For each batch, returns a tuple <code>(inputs, labels)</code>.</p>
@@ -357,9 +347,10 @@ iterates indefinitely;</li>
 <li><code>a</code>: adjacency matrices of shape <code>[batch, n_max, n_max]</code>;</li>
 <li><code>e</code>: edge attributes of shape <code>[batch, n_max, n_max, n_edge_features]</code>.</li>
 </ul>
-<p><code>labels</code> have shape <code>[batch, ..., n_labels]</code>.</p>
+<p><code>labels</code> have shape <code>[batch, n_labels]</code> if <code>node_level=False</code> or
+<code>[batch, n_max, n_labels]</code> otherwise.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L533">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/data/loaders.py#L548">[source]</a></span></p>
 <h4 id="mixedloader">MixedLoader</h4>
 <pre><code class="language-python">spektral.data.loaders.MixedLoader(dataset, batch_size=1, epochs=None, shuffle=True)
 </code></pre>
@@ -372,10 +363,10 @@ The dataset is pre-packed like in a PackedBatchLoader.</p>
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>dataset</code>: a graph Dataset;</li>
-<li><code>batch_size</code>: size of the mini-batches;</li>
-<li><code>epochs</code>: number of epochs to iterate over the dataset. By default (<code>None</code>)
+<li><code>batch_size</code>: int, size of the mini-batches;</li>
+<li><code>epochs</code>: int, number of epochs to iterate over the dataset. By default (<code>None</code>)
 iterates indefinitely;</li>
-<li><code>shuffle</code>: whether to shuffle the data at the start of each epoch.</li>
+<li><code>shuffle</code>: bool, whether to shuffle the data at the start of each epoch.</li>
 </ul>
 <p><strong>Output</strong></p>
 <p>For each batch, returns a tuple <code>(inputs, labels)</code>.</p>
@@ -388,29 +379,21 @@ iterates indefinitely;</li>
 <p><code>labels</code> have shape <code>[batch, ..., n_labels]</code>.</p>
               
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../datasets/" class="btn btn-neutral float-left" title="Datasets"><span class="icon icon-circle-arrow-left"></span> Previous</a>
         <a href="../transforms/" class="btn btn-neutral float-right" title="Transforms">Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../datasets/" class="btn btn-neutral" title="Datasets"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <!-- Copyright etc -->
-    
   </div>
 
-  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-      
+          
         </div>
       </div>
 
@@ -418,7 +401,7 @@ iterates indefinitely;</li>
 
   </div>
 
-  <div class="rst-versions" role="note" aria-label="versions">
+  <div class="rst-versions" role="note" aria-label="Versions">
   <span class="rst-current-version" data-toggle="rst-current-version">
     
         <span>

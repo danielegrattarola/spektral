@@ -1,75 +1,69 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <meta name="author" content="Daniele Grattarola">
-  <link rel="canonical" href="https://graphneural.network/creating-layer/">
-  <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Creating a layer - Spektral</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Daniele Grattarola" /><link rel="canonical" href="https://graphneural.network/creating-layer/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Creating a layer - Spektral</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+        <link href="../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Creating a layer";
+        var mkdocs_page_input_path = "creating-layer.md";
+        var mkdocs_page_url = "/creating-layer/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+      <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-  <link rel="stylesheet" href="../css/theme.css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
-  <link href="../stylesheets/extra.css" rel="stylesheet" />
-  
-  <script>
-    // Current page data
-    var mkdocs_page_name = "Creating a layer";
-    var mkdocs_page_input_path = "creating-layer.md";
-    var mkdocs_page_url = "/creating-layer/";
-  </script>
-  
-  <script src="../js/jquery-2.1.1.min.js" defer></script>
-  <script src="../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script> 
-  <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-      ga('create', 'UA-125823175-1', 'auto');
-      ga('send', 'pageview');
-  </script>
-  
+        ga('create', 'UA-125823175-1', 'auto');
+        ga('send', 'pageview');
+      </script>
+    
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
     <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Spektral</a>
-        <div role="search">
+          <a href=".." class="icon icon-home"> Spektral
+        </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
       <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
-                    </li>
-                </ul>
-                <p class="caption"><span class="caption-text">Tutorials</span></p>
-                <ul class="current">
-                    <li class="toctree-l1"><a class="reference internal" href="../getting-started/">Getting started</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../data-modes/">Data modes</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../creating-dataset/">Creating a dataset</a>
-                    </li>
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Creating a layer</a>
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/">Getting started</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../data-modes/">Data modes</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../creating-dataset/">Creating a dataset</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Creating a layer</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#essential-information">Essential information</a>
     </li>
@@ -78,84 +72,71 @@
     <li class="toctree-l2"><a class="reference internal" href="#notes">Notes</a>
     </li>
     </ul>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a>
-                    </li>
-                </ul>
-                <p class="caption"><span class="caption-text">Layers</span></p>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../layers/convolution/">Convolutional layers</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../layers/pooling/">Pooling layers</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../layers/base/">Base layers</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../models/">Models</a>
-                    </li>
-                </ul>
-                <p class="caption"><span class="caption-text">Data</span></p>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../data/">Containers</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../datasets/">Datasets</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../loaders/">Loaders</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../transforms/">Transforms</a>
-                    </li>
-                </ul>
-                <p class="caption"><span class="caption-text">Utils</span></p>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../utils/convolution/">Convolution</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../utils/sparse/">Sparse</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../utils/misc/">Miscellaneous</a>
-                    </li>
-                </ul>
-                <p class="caption"><span class="caption-text">Other</span></p>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../external/">External resources</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../about/">About</a>
-                    </li>
-                </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Layers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../layers/convolution/">Convolutional layers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../layers/pooling/">Pooling layers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../layers/base/">Base layers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../models/">Models</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Data</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../data/">Containers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../datasets/">Datasets</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../loaders/">Loaders</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transforms/">Transforms</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Utils</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../utils/convolution/">Convolution</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../utils/sparse/">Sparse</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../utils/misc/">Miscellaneous</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Other</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../external/">External resources</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../about/">About</a>
+                  </li>
+              </ul>
       </div>
     </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="..">Spektral</a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Spektral</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    
-      
-        
-          <li>Tutorials &raquo;</li>
-        
-      
-    
-    <li>Creating a layer</li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Tutorials &raquo;</li><li>Creating a layer</li>
     <li class="wy-breadcrumbs-aside">
-      
     </li>
   </ul>
-  
   <hr/>
 </div>
 
-          <div role="main">
-            <div class="section">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
               
                 <h2 id="creating-a-message-passing-layer">Creating a Message-Passing Layer</h2>
 <p>In this tutorial we go over the <code>MessagePassing</code> interface for creating GNN layers. </p>
@@ -193,20 +174,22 @@ x_out[i] = update(x[i], aggregate([message(x[j]) for j in neighbours(i)]))
     return self.propagate(x=x, a=a)
 </code></pre>
 <p>Then, we implement the <code>message</code> function.
-The <code>get_i</code> and <code>get_j</code> built-in methods can be used to automatically access either side of the edges <script type="math/tex">i \leftarrow j</script>. For instance, we can use <code>get_j</code> to access the node features <code>x[j]</code> of all neighbors <code>j</code>.</p>
-<p>If you need direct access to the edge indices, you can use the <code>index_i</code> and <code>index_j</code> attributes.</p>
-<p>In this case, we only need to get the neighbors' features and return them: </p>
+The <code>get_sources</code> and <code>get_targets</code> built-in methods can be used to automatically retrieve the node attributes of nodes that are sending (sources) or receiving (targets) a message. 
+For instance, we can use <code>get_targets</code> to access the node features <code>x[j]</code> of all neighbors <code>j</code>.</p>
+<p>If you need direct access to the edge indices, you can use the <code>index_sources</code> and <code>index_targets</code> attributes.</p>
+<p>In this case, we only need to get the neighbors' features and return them:</p>
 <pre><code class="language-py">def message(self, x):
     # Get the node features of all neighbors
-    return self.get_j(x)
+    return self.get_sources(x)
 </code></pre>
 <p>Then, we define an aggregation function for the messages. We can use a simple average of the nodes:</p>
 <pre><code class="language-py">from spektral.layers.ops import scatter_mean
 
+
 def aggregate(self, messages):
-    return scatter_mean(messages, self.index_i, self.n_nodes)
+    return scatter_mean(messages, self.index_targets, self.n_nodes)
 </code></pre>
-<p><strong>Note</strong>: <code>n_nodes</code> is computed dynamically at the start of propagation, exactly like <code>index_i</code>.</p>
+<p><strong>Note</strong>: <code>n_nodes</code> is computed dynamically at the start of propagation, exactly like <code>index_targets</code>.</p>
 <p>Since there are a few common aggregation functions that are often used in the literature, you can also skip the implementation of this method and simply pass a special keyword to the <code>__init__()</code> method of the superclass:</p>
 <pre><code class="language-py">def __init__(self):
     # Equivalent to the above implementation of aggregate
@@ -231,29 +214,21 @@ def aggregate(self, messages):
 <p>For example, <code>spektral.layers.GCNConv</code> implements the same GCN layer that we just saw, using the <code>Conv</code> class so that it can provide support for batch and mixed mode, as well as dense adjacency matrices. </p>
               
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../creating-dataset/" class="btn btn-neutral float-left" title="Creating a dataset"><span class="icon icon-circle-arrow-left"></span> Previous</a>
         <a href="../examples/" class="btn btn-neutral float-right" title="Examples">Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../creating-dataset/" class="btn btn-neutral" title="Creating a dataset"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <!-- Copyright etc -->
-    
   </div>
 
-  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-      
+          
         </div>
       </div>
 
@@ -261,7 +236,7 @@ def aggregate(self, messages):
 
   </div>
 
-  <div class="rst-versions" role="note" aria-label="versions">
+  <div class="rst-versions" role="note" aria-label="Versions">
   <span class="rst-current-version" data-toggle="rst-current-version">
     
         <span>

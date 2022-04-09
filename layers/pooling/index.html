@@ -1,86 +1,84 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <meta name="author" content="Daniele Grattarola">
-  <link rel="canonical" href="https://graphneural.network/layers/pooling/">
-  <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>Pooling layers - Spektral</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Daniele Grattarola" /><link rel="canonical" href="https://graphneural.network/layers/pooling/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Pooling layers - Spektral</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Pooling layers";
+        var mkdocs_page_input_path = "layers/pooling.md";
+        var mkdocs_page_url = "/layers/pooling/";
+      </script>
+    
+    <script src="../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+      <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-  <link rel="stylesheet" href="../../css/theme.css" />
-  <link rel="stylesheet" href="../../css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
-  <link href="../../stylesheets/extra.css" rel="stylesheet" />
-  
-  <script>
-    // Current page data
-    var mkdocs_page_name = "Pooling layers";
-    var mkdocs_page_input_path = "layers/pooling.md";
-    var mkdocs_page_url = "/layers/pooling/";
-  </script>
-  
-  <script src="../../js/jquery-2.1.1.min.js" defer></script>
-  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script> 
-  <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-      ga('create', 'UA-125823175-1', 'auto');
-      ga('send', 'pageview');
-  </script>
-  
+        ga('create', 'UA-125823175-1', 'auto');
+        ga('send', 'pageview');
+      </script>
+    
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
     <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href="../.." class="icon icon-home"> Spektral</a>
-        <div role="search">
+          <a href="../.." class="icon icon-home"> Spektral
+        </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
       <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
-                    </li>
-                </ul>
-                <p class="caption"><span class="caption-text">Tutorials</span></p>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting started</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../data-modes/">Data modes</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../creating-dataset/">Creating a dataset</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../creating-layer/">Creating a layer</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../examples/">Examples</a>
-                    </li>
-                </ul>
-                <p class="caption"><span class="caption-text">Layers</span></p>
-                <ul class="current">
-                    <li class="toctree-l1"><a class="reference internal" href="../convolution/">Convolutional layers</a>
-                    </li>
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Pooling layers</a>
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting started</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../data-modes/">Data modes</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../creating-dataset/">Creating a dataset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../creating-layer/">Creating a layer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../examples/">Examples</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Layers</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../convolution/">Convolutional layers</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Pooling layers</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#srcpool">SRCPool</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#diffpool">DiffPool</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#lapool">LaPool</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#mincutpool">MinCutPool</a>
     </li>
@@ -105,83 +103,142 @@
         </ul>
     </li>
     </ul>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../base/">Base layers</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../models/">Models</a>
-                    </li>
-                </ul>
-                <p class="caption"><span class="caption-text">Data</span></p>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../../data/">Containers</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../datasets/">Datasets</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../loaders/">Loaders</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../transforms/">Transforms</a>
-                    </li>
-                </ul>
-                <p class="caption"><span class="caption-text">Utils</span></p>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../../utils/convolution/">Convolution</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../utils/sparse/">Sparse</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../utils/misc/">Miscellaneous</a>
-                    </li>
-                </ul>
-                <p class="caption"><span class="caption-text">Other</span></p>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../../external/">External resources</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../../about/">About</a>
-                    </li>
-                </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../base/">Base layers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../models/">Models</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Data</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../data/">Containers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../datasets/">Datasets</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../loaders/">Loaders</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../transforms/">Transforms</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Utils</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../utils/convolution/">Convolution</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../utils/sparse/">Sparse</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../utils/misc/">Miscellaneous</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Other</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../external/">External resources</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../about/">About</a>
+                  </li>
+              </ul>
       </div>
     </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../..">Spektral</a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Spektral</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../..">Docs</a> &raquo;</li>
-    
-      
-        
-          <li>Layers &raquo;</li>
-        
-      
-    
-    <li>Pooling layers</li>
+    <li><a href="../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Layers &raquo;</li><li>Pooling layers</li>
     <li class="wy-breadcrumbs-aside">
-      
     </li>
   </ul>
-  
   <hr/>
 </div>
 
-          <div role="main">
-            <div class="section">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
               
                 <h2 id="pooling-layers">Pooling layers</h2>
 <p>The following pooling layers are available in Spektral.</p>
 <p>See <a href="/layers/convolution">the convolutional layers page</a> for the notation. </p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/diff_pool.py#L10">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/src.py#L15">[source]</a></span></p>
+<h4 id="srcpool">SRCPool</h4>
+<pre><code class="language-python">spektral.layers.SRCPool(return_selection=False)
+</code></pre>
+<p>A general class for graph pooling layers based on the "Select, Reduce,
+Connect" framework presented in:</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/2110.05292">Understanding Pooling in Graph Neural Networks.</a><br>
+Daniele Grattarola et al.</p>
+</blockquote>
+<p>This layer computes:
+<script type="math/tex; mode=display">
+\begin{align}
+& \mathcal{S} = \left\{\mathcal{S}_k\right\}_{k=1:K} = \textsc{Sel}(\mathcal{G}) \\
+& \mathcal{X}'=\left\{\textsc{Red}( \mathcal{G}, \mathcal{S}_k )\right\}_{k=1:K} \\
+& \mathcal{E}'=\left\{\textsc{Con}( \mathcal{G}, \mathcal{S}_k, \mathcal{S}_l )\right\}_{k,L=1:K} \\
+\end{align}
+</script>
+Where <script type="math/tex">\textsc{Sel}</script> is a node equivariant selection function that computes
+the supernode assignments <script type="math/tex">\mathcal{S}_k</script>, <script type="math/tex">\textsc{Red}</script> is a
+permutation-invariant function to reduce the supernodes into the new node
+attributes, and <script type="math/tex">\textsc{Con}</script> is a permutation-invariant connection
+function that computes the link between the pooled nodes.</p>
+<p>By extending this class, it is possible to create any pooling layer in the
+SRC formalism.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li><code>x</code>: Tensor of shape <code>([batch], N, F)</code> representing node features;</li>
+<li><code>a</code>: Tensor or SparseTensor of shape <code>([batch], N, N)</code> representing the
+adjacency matrix;</li>
+<li><code>i</code>: (optional) Tensor of integers with shape <code>(N, )</code> representing the
+batch index;</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li><code>x_pool</code>: Tensor of shape <code>([batch], K, F)</code>, representing the node
+features of the output. <code>K</code> is the number of output nodes and depends on the
+specific pooling strategy;</li>
+<li><code>a_pool</code>: Tensor or SparseTensor of shape <code>([batch], K, K)</code> representing
+the adjacency matrix of the output;</li>
+<li><code>i_pool</code>: (only if i was given as input) Tensor of integers with shape
+<code>(K, )</code> representing the batch index of the output;</li>
+<li><code>s</code>: (if <code>return_selection=True</code>) Tensor or SparseTensor representing the
+supernode assignments;</li>
+</ul>
+<p><strong>API</strong></p>
+<ul>
+<li><code>pool(x, a, i, **kwargs)</code>: pools the graph and returns the reduced node
+features and adjacency matrix. If the batch index <code>i</code> is not <code>None</code>, a
+reduced version of <code>i</code> will be returned as well.
+Any given <code>kwargs</code> will be passed as keyword arguments to <code>select()</code>,
+<code>reduce()</code> and <code>connect()</code> if any matching key is found.
+The mandatory arguments of <code>pool()</code> <strong>must</strong> be computed in <code>call()</code> by
+calling <code>self.get_inputs(inputs)</code>.</li>
+<li><code>select(x, a, i, **kwargs)</code>: computes supernode assignments mapping the
+nodes of the input graph to the nodes of the output.</li>
+<li><code>reduce(x, s, **kwargs)</code>: reduces the supernodes to form the nodes of the
+pooled graph.</li>
+<li><code>connect(a, s, **kwargs)</code>: connects the reduced supernodes.</li>
+<li><code>reduce_index(i, s, **kwargs)</code>: helper function to reduce the batch index
+(only called if <code>i</code> is given as input).</li>
+</ul>
+<p>When overriding any function of the API, it is possible to access the
+true number of nodes of the input (<code>n_nodes</code>) as a Tensor in the instance variable
+<code>self.n_nodes</code> (this is populated by <code>self.get_inputs()</code> at the beginning of
+<code>call()</code>).</p>
+<p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>return_selection</code>: if <code>True</code>, the Tensor used to represent supernode assignments
+will be returned with <code>x_pool</code>, <code>a_pool</code>, and <code>i_pool</code>;</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/diff_pool.py#L9">[source]</a></span></p>
 <h4 id="diffpool">DiffPool</h4>
-<pre><code class="language-python">spektral.layers.DiffPool(k, channels=None, return_mask=False, activation=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
+<pre><code class="language-python">spektral.layers.DiffPool(k, channels=None, return_selection=False, activation=None, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
 </code></pre>
 <p>A DiffPool layer from the paper</p>
 <blockquote>
@@ -189,59 +246,104 @@
 Rex Ying et al.</p>
 </blockquote>
 <p><strong>Mode</strong>: batch.</p>
-<p>This layer computes a soft clustering <script type="math/tex">\S</script> of the input graphs using a GNN,
-and reduces graphs as follows:
+<p>This layer learns a soft clustering of the input graph as follows:
 <script type="math/tex; mode=display">
 \begin{align}
 \S &= \textrm{GNN}_{embed}(\A, \X); \\
 \Z &= \textrm{GNN}_{pool}(\A, \X); \\
+\X' &= \S^\top \Z; \\
 \A' &= \S^\top \A \S; \\
-\X' &= \S^\top \Z
 \end{align}
 </script>
 where:
 <script type="math/tex; mode=display">
 \textrm{GNN}_{\square}(\A, \X) = \D^{-1/2} \A \D^{-1/2} \X \W_{\square}.
 </script>
-The number of output channels of <script type="math/tex">\textrm{GNN}_{embed}</script> is controlled by 
-the <code>channels</code> parameter.</p>
-<p>Two auxiliary loss terms are also added to the model: the <em>link prediction
-loss</em>
+The number of output channels of <script type="math/tex">\textrm{GNN}_{embed}</script> is controlled by the
+<code>channels</code> parameter.</p>
+<p>Two auxiliary loss terms are also added to the model: the link prediction loss
 <script type="math/tex; mode=display">
 L_{LP} = \big\| \A - \S\S^\top \big\|_F
 </script>
-and the <em>entropy loss</em>
+and the entropy loss
 <script type="math/tex; mode=display">
 L_{E} - \frac{1}{N} \sum\limits_{i = 1}^{N} \S \log (\S).
 </script>
 </p>
-<p>The layer can be used without a supervised loss, to compute node clustering
-simply by minimizing the two auxiliary losses.</p>
+<p>The layer can be used without a supervised loss to compute node clustering by
+minimizing the two auxiliary losses.</p>
 <p><strong>Input</strong></p>
 <ul>
-<li>Node features of shape <code>([batch], n_nodes, n_node_features)</code>;</li>
-<li>Adjacency matrix of shape <code>([batch], n_nodes, n_nodes)</code>;</li>
+<li>Node features of shape <code>(batch, n_nodes_in, n_node_features)</code>;</li>
+<li>Adjacency matrix of shape <code>(batch, n_nodes_in, n_nodes_in)</code>;</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li>Reduced node features of shape <code>([batch], K, channels)</code>;</li>
-<li>Reduced adjacency matrix of shape <code>([batch], K, K)</code>;</li>
-<li>If <code>return_mask=True</code>, the soft clustering matrix of shape <code>([batch], n_nodes, K)</code>.</li>
+<li>Reduced node features of shape <code>(batch, n_nodes_out, channels)</code>;</li>
+<li>Reduced adjacency matrix of shape <code>(batch, n_nodes_out, n_nodes_out)</code>;</li>
+<li>If <code>return_selection=True</code>, the selection matrix of shape
+<code>(batch, n_nodes_in, n_nodes_out)</code>.</li>
 </ul>
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>k</code>: number of output nodes;</li>
-<li><code>channels</code>: number of output channels (if None, the number of output
-channels is assumed to be the same as the input);</li>
-<li><code>return_mask</code>: boolean, whether to return the cluster assignment matrix;</li>
+<li><code>channels</code>: number of output channels (if <code>None</code>, the number of output channels is
+the same as the input);</li>
+<li><code>return_selection</code>: boolean, whether to return the selection matrix;</li>
+<li><code>activation</code>: activation to apply after reduction;</li>
 <li><code>kernel_initializer</code>: initializer for the weights;</li>
 <li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
 <li><code>kernel_constraint</code>: constraint applied to the weights;</li>
 </ul>
 <hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/la_pool.py#L9">[source]</a></span></p>
+<h4 id="lapool">LaPool</h4>
+<pre><code class="language-python">spektral.layers.LaPool(shortest_path_reg=True, return_selection=False)
+</code></pre>
+<p>A Laplacian pooling (LaPool) layer from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/1905.11577">Towards Interpretable Sparse Graph Representation Learning with Laplacian Pooling</a><br>
+Emmanuel Noutahi et al.</p>
+</blockquote>
+<p><strong>Mode</strong>: disjoint.</p>
+<p>This layer computes a soft clustering of the graph by first identifying a set of
+leaders, and then assigning every remaining node to the cluster of the closest
+leader:
+<script type="math/tex; mode=display">
+\V = \norm{\L\X}_d; \\
+\i = \{ i \mid \V_i > \V_j, \forall j \in \cN(i) \} \\
+\S^\top = \textrm{SparseMax}\left( \beta \frac{\X\X_{\i}^\top}{\norm{\X}\norm{\X_{\i}}} \right)
+</script>
+<script type="math/tex">\beta</script> is a regularization vecotr that is applied element-wise to the selection
+matrix.
+If <code>shortest_path_reg=True</code>, it is equal to the inverse of the shortest path between
+each node and its corresponding leader (this can be expensive since it runs on CPU).
+Otherwise it is equal to 1.</p>
+<p>The reduction and connection are computed as <script type="math/tex">\X' = \S\X</script> and
+<script type="math/tex">\A' = \S^\top\A\S</script>, respectively.</p>
+<p>Note that the number of nodes in the output graph depends on the input node features.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>(n_nodes_in, n_node_features)</code>;</li>
+<li>Adjacency matrix of shape <code>(n_nodes_in, n_nodes_in)</code>;</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Reduced node features of shape <code>(n_nodes_out, channels)</code>;</li>
+<li>Reduced adjacency matrix of shape <code>(n_nodes_out, n_nodes_out)</code>;</li>
+<li>If <code>return_selection=True</code>, the selection matrix of shape
+<code>(n_nodes_in, n_nodes_out)</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>shortest_path_reg</code>: boolean, apply the shortest path regularization described in
+the papaer (can be expensive);</li>
+<li><code>return_selection</code>: boolean, whether to return the selection matrix;</li>
+</ul>
+<hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/mincut_pool.py#L10">[source]</a></span></p>
 <h4 id="mincutpool">MinCutPool</h4>
-<pre><code class="language-python">spektral.layers.MinCutPool(k, mlp_hidden=None, mlp_activation='relu', return_mask=False, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, kernel_constraint=None, bias_constraint=None)
+<pre><code class="language-python">spektral.layers.MinCutPool(k, mlp_hidden=None, mlp_activation='relu', return_selection=False, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
 <p>A MinCut pooling layer from the paper</p>
 <blockquote>
@@ -249,21 +351,20 @@ channels is assumed to be the same as the input);</li>
 Filippo Maria Bianchi et al.</p>
 </blockquote>
 <p><strong>Mode</strong>: batch.</p>
-<p>This layer computes a soft clustering <script type="math/tex">\S</script> of the input graphs using a MLP,
-and reduces graphs as follows:
+<p>This layer learns a soft clustering of the input graph as follows:
 <script type="math/tex; mode=display">
 \begin{align}
 \S &= \textrm{MLP}(\X); \\
-\A' &= \S^\top \A \S; \\ 
-\X' &= \S^\top \X
+\X' &= \S^\top \X \\
+\A' &= \S^\top \A \S; \\
 \end{align}
 </script>
-where MLP is a multi-layer perceptron with softmax output.</p>
-<p>Two auxiliary loss terms are also added to the model: the <em>minCUT loss</em>
+where <script type="math/tex">\textrm{MLP}</script> is a multi-layer perceptron with softmax output.</p>
+<p>Two auxiliary loss terms are also added to the model: the minimum cut loss
 <script type="math/tex; mode=display">
 L_c = - \frac{ \mathrm{Tr}(\S^\top \A \S) }{ \mathrm{Tr}(\S^\top \D \S) }
 </script>
-and the <em>orthogonality loss</em>
+and the orthogonality loss
 <script type="math/tex; mode=display">
 L_o = \left\|
 \frac{\S^\top \S}{\| \S^\top \S \|_F}
@@ -271,27 +372,29 @@ L_o = \left\|
 \right\|_F.
 </script>
 </p>
-<p>The layer can be used without a supervised loss, to compute node clustering
-simply by minimizing the two auxiliary losses.</p>
+<p>The layer can be used without a supervised loss to compute node clustering by
+minimizing the two auxiliary losses.</p>
 <p><strong>Input</strong></p>
 <ul>
-<li>Node features of shape <code>([batch], n_nodes, n_node_features)</code>;</li>
-<li>Symmetrically normalized adjacency matrix of shape <code>([batch], n_nodes, n_nodes)</code>;</li>
+<li>Node features of shape <code>(batch, n_nodes_in, n_node_features)</code>;</li>
+<li>Symmetrically normalized adjacency matrix of shape
+<code>(batch, n_nodes_in, n_nodes_in)</code>;</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li>Reduced node features of shape <code>([batch], K, n_node_features)</code>;</li>
-<li>Reduced adjacency matrix of shape <code>([batch], K, K)</code>;</li>
-<li>If <code>return_mask=True</code>, the soft clustering matrix of shape <code>([batch], n_nodes, K)</code>.</li>
+<li>Reduced node features of shape <code>(batch, n_nodes_out, n_node_features)</code>;</li>
+<li>Reduced adjacency matrix of shape <code>(batch, n_nodes_out, n_nodes_out)</code>;</li>
+<li>If <code>return_selection=True</code>, the selection matrix of shape
+<code>(batch, n_nodes_in, n_nodes_out)</code>.</li>
 </ul>
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>k</code>: number of output nodes;</li>
-<li><code>mlp_hidden</code>: list of integers, number of hidden units for each hidden
-layer in the MLP used to compute cluster assignments (if None, the MLP has
-only the output layer);</li>
+<li><code>mlp_hidden</code>: list of integers, number of hidden units for each hidden layer in
+the MLP used to compute cluster assignments (if <code>None</code>, the MLP has only one output
+layer);</li>
 <li><code>mlp_activation</code>: activation for the MLP layers;</li>
-<li><code>return_mask</code>: boolean, whether to return the cluster assignment matrix;</li>
+<li><code>return_selection</code>: boolean, whether to return the selection matrix;</li>
 <li><code>use_bias</code>: use bias in the MLP;</li>
 <li><code>kernel_initializer</code>: initializer for the weights of the MLP;</li>
 <li><code>bias_initializer</code>: initializer for the bias of the MLP;</li>
@@ -301,9 +404,9 @@ only the output layer);</li>
 <li><code>bias_constraint</code>: constraint applied to the bias of the MLP;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/sag_pool.py#L6">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/sag_pool.py#L8">[source]</a></span></p>
 <h4 id="sagpool">SAGPool</h4>
-<pre><code class="language-python">spektral.layers.SAGPool(ratio, return_mask=False, sigmoid_gating=False, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
+<pre><code class="language-python">spektral.layers.SAGPool(ratio, return_selection=False, return_score=False, sigmoid_gating=False, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
 </code></pre>
 <p>A self-attention graph pooling layer from the paper</p>
 <blockquote>
@@ -311,40 +414,43 @@ only the output layer);</li>
 Junhyun Lee et al.</p>
 </blockquote>
 <p><strong>Mode</strong>: single, disjoint.</p>
-<p>This layer computes the following operations:
+<p>This layer computes:
 <script type="math/tex; mode=display">
 \y = \textrm{GNN}(\A, \X); \;\;\;\;
 \i = \textrm{rank}(\y, K); \;\;\;\;
 \X' = (\X \odot \textrm{tanh}(\y))_\i; \;\;\;\;
 \A' = \A_{\i, \i}
 </script>
-where <script type="math/tex">\textrm{rank}(\y, K)</script> returns the indices of the top K values of
-<script type="math/tex">\y</script> and
+where <script type="math/tex">\textrm{rank}(\y, K)</script> returns the indices of the top K values of <script type="math/tex">\y</script> and
 <script type="math/tex; mode=display">
 \textrm{GNN}(\A, \X) = \A \X \W.
 </script>
 </p>
 <p>
-<script type="math/tex">K</script> is defined for each graph as a fraction of the number of nodes,
-controlled by the <code>ratio</code> argument.</p>
+<script type="math/tex">K</script> is defined for each graph as a fraction of the number of nodes, controlled by
+the <code>ratio</code> argument.</p>
+<p>The gating operation <script type="math/tex">\textrm{tanh}(\y)</script> (Cangea et al.) can be replaced with a
+sigmoid (Gao &amp; Ji).</p>
 <p><strong>Input</strong></p>
 <ul>
-<li>Node features of shape <code>(n_nodes, n_node_features)</code>;</li>
-<li>Binary adjacency matrix of shape <code>(n_nodes, n_nodes)</code>;</li>
+<li>Node features of shape <code>(n_nodes_in, n_node_features)</code>;</li>
+<li>Adjacency matrix of shape <code>(n_nodes_in, n_nodes_in)</code>;</li>
 <li>Graph IDs of shape <code>(n_nodes, )</code> (only in disjoint mode);</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li>Reduced node features of shape <code>(ratio * n_nodes, n_node_features)</code>;</li>
-<li>Reduced adjacency matrix of shape <code>(ratio * n_nodes, ratio * n_nodes)</code>;</li>
-<li>Reduced graph IDs of shape <code>(ratio * n_nodes, )</code> (only in disjoint mode);</li>
-<li>If <code>return_mask=True</code>, the binary pooling mask of shape <code>(ratio * n_nodes, )</code>.</li>
+<li>Reduced node features of shape <code>(ratio * n_nodes_in, n_node_features)</code>;</li>
+<li>Reduced adjacency matrix of shape <code>(ratio * n_nodes_in, ratio * n_nodes_in)</code>;</li>
+<li>Reduced graph IDs of shape <code>(ratio * n_nodes_in, )</code> (only in disjoint mode);</li>
+<li>If <code>return_selection=True</code>, the selection mask of shape <code>(ratio * n_nodes_in, )</code>.</li>
+<li>If <code>return_score=True</code>, the scoring vector of shape <code>(n_nodes_in, )</code></li>
 </ul>
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>ratio</code>: float between 0 and 1, ratio of nodes to keep in each graph;</li>
-<li><code>return_mask</code>: boolean, whether to return the binary mask used for pooling;</li>
-<li><code>sigmoid_gating</code>: boolean, use a sigmoid gating activation instead of a
+<li><code>return_selection</code>: boolean, whether to return the selection mask;</li>
+<li><code>return_score</code>: boolean, whether to return the node scoring vector;</li>
+<li><code>sigmoid_gating</code>: boolean, use a sigmoid activation for gating instead of a
 tanh;</li>
 <li><code>kernel_initializer</code>: initializer for the weights;</li>
 <li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
@@ -353,7 +459,7 @@ tanh;</li>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/topk_pool.py#L8">[source]</a></span></p>
 <h4 id="topkpool">TopKPool</h4>
-<pre><code class="language-python">spektral.layers.TopKPool(ratio, return_mask=False, sigmoid_gating=False, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
+<pre><code class="language-python">spektral.layers.TopKPool(ratio, return_selection=False, return_score=False, sigmoid_gating=False, kernel_initializer='glorot_uniform', kernel_regularizer=None, kernel_constraint=None)
 </code></pre>
 <p>A gPool/Top-K layer from the papers</p>
 <blockquote>
@@ -366,7 +472,7 @@ Hongyang Gao and Shuiwang Ji</p>
 Cătălina Cangea et al.</p>
 </blockquote>
 <p><strong>Mode</strong>: single, disjoint.</p>
-<p>This layer computes the following operations:
+<p>This layer computes:
 <script type="math/tex; mode=display">
 \y = \frac{\X\p}{\|\p\|}; \;\;\;\;
 \i = \textrm{rank}(\y, K); \;\;\;\;
@@ -378,26 +484,28 @@ where <script type="math/tex">\textrm{rank}(\y, K)</script> returns the indices 
 <p>
 <script type="math/tex">K</script> is defined for each graph as a fraction of the number of nodes,
 controlled by the <code>ratio</code> argument.</p>
-<p>Note that the the gating operation <script type="math/tex">\textrm{tanh}(\y)</script> (Cangea et al.)
-can be replaced with a sigmoid (Gao &amp; Ji).</p>
+<p>The gating operation <script type="math/tex">\textrm{tanh}(\y)</script> (Cangea et al.) can be replaced with a
+sigmoid (Gao &amp; Ji).</p>
 <p><strong>Input</strong></p>
 <ul>
-<li>Node features of shape <code>(n_nodes, n_node_features)</code>;</li>
-<li>Binary adjacency matrix of shape <code>(n_nodes, n_nodes)</code>;</li>
+<li>Node features of shape <code>(n_nodes_in, n_node_features)</code>;</li>
+<li>Adjacency matrix of shape <code>(n_nodes_in, n_nodes_in)</code>;</li>
 <li>Graph IDs of shape <code>(n_nodes, )</code> (only in disjoint mode);</li>
 </ul>
 <p><strong>Output</strong></p>
 <ul>
-<li>Reduced node features of shape <code>(ratio * n_nodes, n_node_features)</code>;</li>
-<li>Reduced adjacency matrix of shape <code>(ratio * n_nodes, ratio * n_nodes)</code>;</li>
-<li>Reduced graph IDs of shape <code>(ratio * n_nodes, )</code> (only in disjoint mode);</li>
-<li>If <code>return_mask=True</code>, the binary pooling mask of shape <code>(ratio * n_nodes, )</code>.</li>
+<li>Reduced node features of shape <code>(ratio * n_nodes_in, n_node_features)</code>;</li>
+<li>Reduced adjacency matrix of shape <code>(ratio * n_nodes_in, ratio * n_nodes_in)</code>;</li>
+<li>Reduced graph IDs of shape <code>(ratio * n_nodes_in, )</code> (only in disjoint mode);</li>
+<li>If <code>return_selection=True</code>, the selection mask of shape <code>(ratio * n_nodes_in, )</code>.</li>
+<li>If <code>return_score=True</code>, the scoring vector of shape <code>(n_nodes_in, )</code></li>
 </ul>
 <p><strong>Arguments</strong></p>
 <ul>
 <li><code>ratio</code>: float between 0 and 1, ratio of nodes to keep in each graph;</li>
-<li><code>return_mask</code>: boolean, whether to return the binary mask used for pooling;</li>
-<li><code>sigmoid_gating</code>: boolean, use a sigmoid gating activation instead of a
+<li><code>return_selection</code>: boolean, whether to return the selection mask;</li>
+<li><code>return_score</code>: boolean, whether to return the node scoring vector;</li>
+<li><code>sigmoid_gating</code>: boolean, use a sigmoid activation for gating instead of a
 tanh;</li>
 <li><code>kernel_initializer</code>: initializer for the weights;</li>
 <li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
@@ -533,7 +641,7 @@ matrix;</li>
 matrix;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L351">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L353">[source]</a></span></p>
 <h4 id="sortpool">SortPool</h4>
 <pre><code class="language-python">spektral.layers.SortPool(k)
 </code></pre>
@@ -559,29 +667,21 @@ be <code>(1, k, n_node_features)</code>).</li>
 </ul>
               
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../convolution/" class="btn btn-neutral float-left" title="Convolutional layers"><span class="icon icon-circle-arrow-left"></span> Previous</a>
         <a href="../base/" class="btn btn-neutral float-right" title="Base layers">Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../convolution/" class="btn btn-neutral" title="Convolutional layers"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <!-- Copyright etc -->
-    
   </div>
 
-  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-      
+          
         </div>
       </div>
 
@@ -589,7 +689,7 @@ be <code>(1, k, n_node_features)</code>).</li>
 
   </div>
 
-  <div class="rst-versions" role="note" aria-label="versions">
+  <div class="rst-versions" role="note" aria-label="Versions">
   <span class="rst-current-version" data-toggle="rst-current-version">
     
         <span>
