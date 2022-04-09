@@ -33,7 +33,7 @@ class MessagePassing(Layer):
     where \( \gamma \) is a differentiable update function, \( \phi \) is a
     differentiable message function, \( \square \) is a permutation-invariant
     function to aggregate the messages (like the sum or the average), and
-    \(\E_{ij}\) is the edge attribute of edge i-j.
+    \(\E_{ij}\) is the edge attribute of edge j-i.
 
     By extending this class, it is possible to create any message-passing layer
     in single/disjoint mode.
