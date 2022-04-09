@@ -115,8 +115,8 @@ class EdgeConv(MessagePassing):
         self.built = True
 
     def message(self, x, **kwargs):
-        x_i = self.get_i(x)
-        x_j = self.get_j(x)
+        x_i = self.get_targets(x)
+        x_j = self.get_sources(x)
         return self.mlp(K.concatenate((x_i, x_j - x_i)))
 
     @property

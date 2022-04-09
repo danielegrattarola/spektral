@@ -22,7 +22,7 @@ graph = dataset[0]
 x, a, y = graph.x, graph.a, graph.y
 mask_tr, mask_va, mask_te = dataset.mask_tr, dataset.mask_va, dataset.mask_te
 
-model = GCN(n_labels=dataset.n_labels, n_input_channels=dataset.n_node_features)
+model = GCN(n_labels=dataset.n_labels)
 optimizer = Adam(lr=1e-2)
 loss_fn = CategoricalCrossentropy()
 

@@ -31,7 +31,6 @@ class GCN(tf.keras.Model):
     - `use_bias`: whether to add a learnable bias to the two GCNConv layers;
     - `dropout_rate`: `rate` used in `Dropout` layers;
     - `l2_reg`: l2 regularization strength;
-    - `n_input_channels`: number of input channels, required for tf 2.1;
     - `**kwargs`: passed to `Model.__init__`.
     """
 
@@ -44,7 +43,6 @@ class GCN(tf.keras.Model):
         use_bias=False,
         dropout_rate=0.5,
         l2_reg=2.5e-4,
-        n_input_channels=None,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -56,7 +54,6 @@ class GCN(tf.keras.Model):
         self.use_bias = use_bias
         self.dropout_rate = dropout_rate
         self.l2_reg = l2_reg
-        self.n_input_channels = n_input_channels
         reg = tf.keras.regularizers.l2(l2_reg)
         self._d0 = tf.keras.layers.Dropout(dropout_rate)
         self._gcn0 = gcn_conv.GCNConv(
@@ -67,13 +64,6 @@ class GCN(tf.keras.Model):
             n_labels, activation=output_activation, use_bias=use_bias
         )
 
-        if tf.version.VERSION < "2.2":
-            if n_input_channels is None:
-                raise ValueError("n_input_channels required for tf < 2.2")
-            x = tf.keras.Input((n_input_channels,), dtype=tf.float32)
-            a = tf.keras.Input((None,), dtype=tf.float32, sparse=True)
-            self._set_inputs((x, a))
-
     def get_config(self):
         return dict(
             n_labels=self.n_labels,
@@ -83,7 +73,6 @@ class GCN(tf.keras.Model):
             use_bias=self.use_bias,
             dropout_rate=self.dropout_rate,
             l2_reg=self.l2_reg,
-            n_input_channels=self.n_input_channels,
         )
 
     def call(self, inputs):
@@ -91,10 +80,7 @@ class GCN(tf.keras.Model):
             x, a = inputs
         else:
             x, a, _ = inputs  # So that the model can be used with DisjointLoader
-        if self.n_input_channels is None:
-            self.n_input_channels = x.shape[-1]
-        else:
-            assert self.n_input_channels == x.shape[-1]
+
         x = self._d0(x)
         x = self._gcn0([x, a])
         x = self._d1(x)

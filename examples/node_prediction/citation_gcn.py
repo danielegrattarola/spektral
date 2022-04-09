@@ -40,7 +40,7 @@ weights_tr, weights_va, weights_te = (
     for mask in (dataset.mask_tr, dataset.mask_va, dataset.mask_te)
 )
 
-model = GCN(n_labels=dataset.n_labels, n_input_channels=dataset.n_node_features)
+model = GCN(n_labels=dataset.n_labels)
 model.compile(
     optimizer=Adam(learning_rate),
     loss=CategoricalCrossentropy(reduction="sum"),

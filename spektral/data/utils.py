@@ -287,3 +287,11 @@ def collate_labels_disjoint(y_list, node_level=False):
         if len(np.shape(y_list[0])) == 0:
             y_list = [np.array([y_]) for y_ in y_list]
         return np.array(y_list)
+
+
+def collate_labels_batch(y_list, node_level=False):
+    if node_level:
+        n_max = max([x.shape[0] for x in y_list])
+        return pad_jagged_array(y_list, (n_max, -1))
+    else:
+        return np.array(y_list)

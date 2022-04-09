@@ -29,8 +29,7 @@ def _check_output_and_model_output_shapes(true_shape, model_shape):
 
 
 def _check_number_of_nodes(N_pool_expected, N_pool_true):
-    if N_pool_expected is not None:
-        assert N_pool_expected == N_pool_true or N_pool_true is None
+    assert N_pool_expected == N_pool_true or N_pool_true is None
 
 
 def _test_single_mode(layer, sparse=False, **kwargs):
@@ -55,17 +54,20 @@ def _test_single_mode(layer, sparse=False, **kwargs):
     X_pool, A_pool, mask = output
     if "ratio" in kwargs.keys():
         N_exp = kwargs["ratio"] * N
+        N_pool_expected = int(np.ceil(N_exp))
     elif "k" in kwargs.keys():
-        N_exp = kwargs["k"]
+        N_pool_expected = int(kwargs["k"])
     else:
-        raise ValueError("Need k or ratio.")
-    N_pool_expected = int(np.ceil(N_exp))
+        N_pool_expected = None
+
     N_pool_true = A_pool.shape[-1]
+    assert N_pool_true > 0
 
-    _check_number_of_nodes(N_pool_expected, N_pool_true)
+    if N_pool_expected is not None:
+        _check_number_of_nodes(N_pool_expected, N_pool_true)
 
-    assert X_pool.shape == (N_pool_expected, F)
-    assert A_pool.shape == (N_pool_expected, N_pool_expected)
+        assert X_pool.shape == (N_pool_expected, F)
+        assert A_pool.shape == (N_pool_expected, N_pool_expected)
 
     output_shape = [o.shape for o in output]
     _check_output_and_model_output_shapes(output_shape, model.output_shape)
@@ -89,17 +91,18 @@ def _test_batch_mode(layer, **kwargs):
     X_pool, A_pool, mask = output
     if "ratio" in kwargs.keys():
         N_exp = kwargs["ratio"] * N
+        N_pool_expected = int(np.ceil(N_exp))
     elif "k" in kwargs.keys():
-        N_exp = kwargs["k"]
+        N_pool_expected = int(kwargs["k"])
     else:
-        raise ValueError("Need k or ratio.")
-    N_pool_expected = int(np.ceil(N_exp))
+        N_pool_expected = None
     N_pool_true = A_pool.shape[-1]
 
-    _check_number_of_nodes(N_pool_expected, N_pool_true)
+    if N_pool_expected is not None:
+        _check_number_of_nodes(N_pool_expected, N_pool_true)
 
-    assert X_pool.shape == (batch_size, N_pool_expected, F)
-    assert A_pool.shape == (batch_size, N_pool_expected, N_pool_expected)
+        assert X_pool.shape == (batch_size, N_pool_expected, F)
+        assert A_pool.shape == (batch_size, N_pool_expected, N_pool_expected)
 
     output_shape = [o.shape for o in output]
     _check_output_and_model_output_shapes(output_shape, model.output_shape)
@@ -128,20 +131,26 @@ def _test_disjoint_mode(layer, sparse=False, **kwargs):
 
     output = model(input_data)
 
-    X_pool, A_pool, I_pool, mask = output
-    N_pool_expected = (
-        np.ceil(kwargs["ratio"] * N1)
-        + np.ceil(kwargs["ratio"] * N2)
-        + np.ceil(kwargs["ratio"] * N3)
-    )
-    N_pool_expected = int(N_pool_expected)
+    X_pool, A_pool, I_pool, s = output
+
+    if "ratio" in kwargs.keys():
+        N_pool_expected = int(
+            np.ceil(kwargs["ratio"] * N1)
+            + np.ceil(kwargs["ratio"] * N2)
+            + np.ceil(kwargs["ratio"] * N3)
+        )
+    elif "k" in kwargs.keys():
+        N_pool_expected = int(kwargs["k"])
+    else:
+        N_pool_expected = None
     N_pool_true = A_pool.shape[0]
 
-    _check_number_of_nodes(N_pool_expected, N_pool_true)
+    if N_pool_expected is not None:
+        _check_number_of_nodes(N_pool_expected, N_pool_true)
 
-    assert X_pool.shape == (N_pool_expected, F)
-    assert A_pool.shape == (N_pool_expected, N_pool_expected)
-    assert I_pool.shape == (N_pool_expected,)
+        assert X_pool.shape == (N_pool_expected, F)
+        assert A_pool.shape == (N_pool_expected, N_pool_expected)
+        assert I_pool.shape == (N_pool_expected,)
 
     output_shape = [o.shape for o in output]
     _check_output_and_model_output_shapes(output_shape, model.output_shape)

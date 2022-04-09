@@ -53,9 +53,11 @@ class MessagePassing(Layer):
     Computes messages, equivalent to \(\phi\) in the definition. <br>
     Any extra keyword argument of this function will be populated by
     `propagate()` if a matching keyword is found. <br>
-    Use `self.get_i()` and  `self.get_j()` to gather the elements using the
-    indices `i` or `j` of the adjacency matrix. Equivalently, you can access
-    the indices themselves via the `index_i` and `index_j` attributes.
+    The `get_sources` and `get_targets` built-in methods can be used to automatically
+    retrieve the node attributes of nodes that are sending (sources) or receiving
+    (targets) a message.
+    If you need direct access to the edge indices, you can use the `index_sources` and
+    `index_targets` attributes.
 
     ```python
     aggregate(messages, **kwargs)
@@ -110,8 +112,8 @@ class MessagePassing(Layer):
 
     def propagate(self, x, a, e=None, **kwargs):
         self.n_nodes = tf.shape(x)[-2]
-        self.index_i = a.indices[:, 1]
-        self.index_j = a.indices[:, 0]
+        self.index_targets = a.indices[:, 1]  # Nodes receiving the message
+        self.index_sources = a.indices[:, 0]  # Nodes sending the message (ie neighbors)
 
         # Message
         msg_kwargs = self.get_kwargs(x, a, e, self.msg_signature, kwargs)
@@ -128,19 +130,19 @@ class MessagePassing(Layer):
         return output
 
     def message(self, x, **kwargs):
-        return self.get_j(x)
+        return self.get_sources(x)
 
     def aggregate(self, messages, **kwargs):
-        return self.agg(messages, self.index_i, self.n_nodes)
+        return self.agg(messages, self.index_targets, self.n_nodes)
 
     def update(self, embeddings, **kwargs):
         return embeddings
 
-    def get_i(self, x):
-        return tf.gather(x, self.index_i, axis=-2)
+    def get_targets(self, x):
+        return tf.gather(x, self.index_targets, axis=-2)
 
-    def get_j(self, x):
-        return tf.gather(x, self.index_j, axis=-2)
+    def get_sources(self, x):
+        return tf.gather(x, self.index_sources, axis=-2)
 
     def get_kwargs(self, x, a, e, signature, kwargs):
         output = {}

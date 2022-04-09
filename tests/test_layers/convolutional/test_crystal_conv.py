@@ -1,11 +1,11 @@
-from core import MODES, run_layer
+from core import MODES, F, run_layer
 
 from spektral import layers
 
 config = {
     "layer": layers.CrystalConv,
     "modes": [MODES["SINGLE"], MODES["MIXED"]],
-    "kwargs": {"channels": 7},
+    "kwargs": {"channels": F},  # Set channels same as node features
     "dense": False,
     "sparse": True,
     "edges": True,

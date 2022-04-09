@@ -57,7 +57,7 @@ x_in = Input(shape=(F,), name="X_in")
 a_in = Input(shape=(None,), name="A_in", sparse=True)
 
 x_1 = GCSConv(16, activation="elu")([x_in, a_in])
-x_1, a_1, s_1 = MinCutPool(n_clusters, return_mask=True)([x_1, a_in])
+x_1, a_1, s_1 = MinCutPool(n_clusters, return_selection=True)([x_1, a_in])
 
 model = Model([x_in, a_in], [x_1, s_1])
 
