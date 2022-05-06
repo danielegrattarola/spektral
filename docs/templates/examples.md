@@ -27,3 +27,4 @@ This is a collection of examples that you can use as template for your projects.
 
 - [Graph signal classification on MNIST (mixed mode)](https://github.com/danielegrattarola/spektral/blob/master/examples/other/graph_signal_classification_mnist.py)
 - [Node clustering on citation networks with MinCut pooling (unsupervised)](https://github.com/danielegrattarola/spektral/blob/master/examples/other/node_clustering_mincut.py)
+- [Link prediction with Variational Graph Autoencoders (by Filippo Bianchi)](https://github.com/FilippoMB/Variational-Graph-Auto-encoders-Tensorflow-2-Spektral-)
