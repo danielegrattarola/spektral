@@ -1,78 +1,84 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Daniele Grattarola" /><link rel="canonical" href="https://graphneural.network/layers/pooling/" />
-      <link rel="shortcut icon" href="../../img/favicon.ico" />
-    <title>Pooling layers - Spektral</title>
-    <link rel="stylesheet" href="../../css/theme.css" />
-    <link rel="stylesheet" href="../../css/theme_extra.css" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
-        <link href="../../stylesheets/extra.css" rel="stylesheet" />
-    
-      <script>
-        // Current page data
-        var mkdocs_page_name = "Pooling layers";
-        var mkdocs_page_input_path = "layers/pooling.md";
-        var mkdocs_page_url = "/layers/pooling/";
-      </script>
-    
-    <script src="../../js/jquery-3.6.0.min.js" defer></script>
-    <!--[if lt IE 9]>
-      <script src="../../js/html5shiv.min.js"></script>
-    <![endif]-->
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
-      <script>hljs.initHighlightingOnLoad();</script> 
-      <script>
-        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="Daniele Grattarola">
+  <link rel="canonical" href="https://graphneural.network/layers/pooling/">
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Pooling layers - Spektral</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
-        ga('create', 'UA-125823175-1', 'auto');
-        ga('send', 'pageview');
-      </script>
-    
+  <link rel="stylesheet" href="../../css/theme.css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  <link href="../../stylesheets/extra.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Pooling layers";
+    var mkdocs_page_input_path = "layers/pooling.md";
+    var mkdocs_page_url = "/layers/pooling/";
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-125823175-1', 'auto');
+      ga('send', 'pageview');
+  </script>
+  
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
+
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
     <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-          <a href="../.." class="icon icon-home"> Spektral
-        </a><div role="search">
+        <a href="../.." class="icon icon-home"> Spektral</a>
+        <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
       <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
-                </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Tutorials</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting started</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../data-modes/">Data modes</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../creating-dataset/">Creating a dataset</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../creating-layer/">Creating a layer</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../examples/">Examples</a>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Layers</span></p>
-              <ul class="current">
-                  <li class="toctree-l1"><a class="reference internal" href="../convolution/">Convolutional layers</a>
-                  </li>
-                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Pooling layers</a>
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Tutorials</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting started</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../data-modes/">Data modes</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../creating-dataset/">Creating a dataset</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../creating-layer/">Creating a layer</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../examples/">Examples</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Layers</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../convolution/">Convolutional layers</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Pooling layers</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#srcpool">SRCPool</a>
     </li>
@@ -103,62 +109,75 @@
         </ul>
     </li>
     </ul>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../base/">Base layers</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../models/">Models</a>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Data</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../../data/">Containers</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../datasets/">Datasets</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../loaders/">Loaders</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../transforms/">Transforms</a>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Utils</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../../utils/convolution/">Convolution</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../utils/sparse/">Sparse</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../utils/misc/">Miscellaneous</a>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Other</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../../external/">External resources</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../about/">About</a>
-                  </li>
-              </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../base/">Base layers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../models/">Models</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Data</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../data/">Containers</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../datasets/">Datasets</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../loaders/">Loaders</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../transforms/">Transforms</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Utils</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../utils/convolution/">Convolution</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../utils/sparse/">Sparse</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../utils/misc/">Miscellaneous</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Other</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../external/">External resources</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../about/">About</a>
+                    </li>
+                </ul>
       </div>
     </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../..">Spektral</a>
-        
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Spektral</a>
       </nav>
+
+      
       <div class="wy-nav-content">
-        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
-          <li>Layers &raquo;</li><li>Pooling layers</li>
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Layers &raquo;</li>
+        
+      
+    
+    <li>Pooling layers</li>
     <li class="wy-breadcrumbs-aside">
+      
     </li>
   </ul>
+  
   <hr/>
 </div>
 
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-            <div class="section" itemprop="articleBody">
+          <div role="main">
+            <div class="section">
               
                 <h2 id="pooling-layers">Pooling layers</h2>
 <p>The following pooling layers are available in Spektral.</p>
@@ -177,15 +196,15 @@ Daniele Grattarola et al.</p>
 <p>This layer computes:
 <script type="math/tex; mode=display">
 \begin{align}
-& \mathcal{S} = \left\{\mathcal{S}_k\right\}_{k=1:K} = \textrm{Sel}(\mathcal{G}) \\
-& \mathcal{X}'=\left\{\textrm{Red}( \mathcal{G}, \mathcal{S}_k )\right\}_{k=1:K} \\
-& \mathcal{E}'=\left\{\textrm{Con}( \mathcal{G}, \mathcal{S}_k, \mathcal{S}_l )\right\}_{k,L=1:K} \\
+& \mathcal{S} = \left\{\mathcal{S}_k\right\}_{k=1:K} = \textsc{Sel}(\mathcal{G}) \\
+& \mathcal{X}'=\left\{\textsc{Red}( \mathcal{G}, \mathcal{S}_k )\right\}_{k=1:K} \\
+& \mathcal{E}'=\left\{\textsc{Con}( \mathcal{G}, \mathcal{S}_k, \mathcal{S}_l )\right\}_{k,L=1:K} \\
 \end{align}
 </script>
-Where <script type="math/tex">\textrm{Sel}</script> is a node equivariant selection function that computes
-the supernode assignments <script type="math/tex">\mathcal{S}_k</script>, <script type="math/tex">\textrm{Red}</script> is a
+Where <script type="math/tex">\textsc{Sel}</script> is a node equivariant selection function that computes
+the supernode assignments <script type="math/tex">\mathcal{S}_k</script>, <script type="math/tex">\textsc{Red}</script> is a
 permutation-invariant function to reduce the supernodes into the new node
-attributes, and <script type="math/tex">\textrm{Con}</script> is a permutation-invariant connection
+attributes, and <script type="math/tex">\textsc{Con}</script> is a permutation-invariant connection
 function that computes the link between the pooled nodes.</p>
 <p>By extending this class, it is possible to create any pooling layer in the
 SRC formalism.</p>
@@ -310,9 +329,9 @@ Emmanuel Noutahi et al.</p>
 leaders, and then assigning every remaining node to the cluster of the closest
 leader:
 <script type="math/tex; mode=display">
-\V = \|\L\X\|_d; \\
-\i = \{ i \mid \V_i > \V_j, \forall j \in \mathcal{N}(i) \} \\
-\S^\top = \textrm{SparseMax}\left( \beta \frac{\X\X_{\i}^\top}{\|\X\|\|\X_{\i}\|} \right)
+\V = \norm{\L\X}_d; \\
+\i = \{ i \mid \V_i > \V_j, \forall j \in \cN(i) \} \\
+\S^\top = \textrm{SparseMax}\left( \beta \frac{\X\X_{\i}^\top}{\norm{\X}\norm{\X_{\i}}} \right)
 </script>
 <script type="math/tex">\beta</script> is a regularization vecotr that is applied element-wise to the selection
 matrix.
@@ -667,21 +686,29 @@ be <code>(1, k, n_node_features)</code>).</li>
 </ul>
               
             </div>
-          </div><footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../convolution/" class="btn btn-neutral float-left" title="Convolutional layers"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
         <a href="../base/" class="btn btn-neutral float-right" title="Base layers">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../convolution/" class="btn btn-neutral" title="Convolutional layers"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
     </div>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <!-- Copyright etc -->
+    
   </div>
 
-  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-          
+      
         </div>
       </div>
 
@@ -689,7 +716,7 @@ be <code>(1, k, n_node_features)</code>).</li>
 
   </div>
 
-  <div class="rst-versions" role="note" aria-label="Versions">
+  <div class="rst-versions" role="note" aria-label="versions">
   <span class="rst-current-version" data-toggle="rst-current-version">
     
         <span>
