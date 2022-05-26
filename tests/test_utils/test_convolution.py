@@ -1,6 +1,7 @@
 import networkx as nx
 import numpy as np
 import scipy.sparse as sp
+import pytest
 
 from spektral.utils import convolution
 
@@ -91,6 +92,58 @@ def test_gcn_filter():
 
     # Test batch mode
     _run_dense_op(convolution.gcn_filter, np.array([adj] * 3), symmetric=False)
+
+
+@pytest.mark.parametrize(("edges", "expected_t"), [
+    ([(0, 1), (1, 2), (2, 3)], [[1, 0, 0], [1, 1, 0], [0, 1, 1], [0, 0, 1]]),
+    ([(0, 1), (1, 2), (1, 3), (3, 0)], [[1, 1, 0, 0], [1, 0, 1, 1],
+                                        [0, 0, 1, 0], [0, 1, 0, 1]]),
+    ([(0, 0), (1, 1)], [[1, 0], [0, 1]])
+],
+                         ids=["simple", "cycle", "self_loop"])
+def test_cens_net_binary_transformation_matrix(edges, expected_t):
+    """
+    Tests that `cens_net_binary_transformation_matrix` produces correct results.
+    :param edges: The graph to use for testing, as a list of edges.
+    :param expected_t: The expected transformation matrix.
+    """
+    # Arrange.
+    # Create the adjacency matrix.
+    graph = nx.Graph(edges)
+    adjacency = nx.to_numpy_array(graph)
+
+    # Act.
+    got_t = convolution.cens_net_binary_transformation_matrix(adjacency)
+
+    # Assert.
+    got_t = got_t.numpy()
+    expected_t = np.array(expected_t)
+    np.testing.assert_array_equal(expected_t, got_t)
+
+
+def test_cens_net_binary_transformation_matrix_batch():
+    """
+    Tests that `cens_net_binary_transformation_matrix` works with multiple
+    graphs in a batch.
+    """
+    # Arrange.
+    # Create test graphs.
+    graph1 = nx.to_numpy_array(nx.house_graph())
+    graph2 = nx.to_numpy_array(nx.house_graph())
+
+    # Act.
+    # Get the transformation for both graphs individually, and both together
+    # as a batch.
+    graph1_t = convolution.cens_net_binary_transformation_matrix(graph1)
+    graph2_t = convolution.cens_net_binary_transformation_matrix(graph2)
+
+    batch = np.stack([graph1, graph2], axis=0)
+    batch_t = convolution.cens_net_binary_transformation_matrix(batch)
+
+    # Assert.
+    # Both ways of doing it should produce the same results.
+    np.testing.assert_array_equal(graph1_t, batch_t[0])
+    np.testing.assert_array_equal(graph2_t, batch_t[1])
 
 
 def test_chebyshev_polynomial():

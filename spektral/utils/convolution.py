@@ -1,6 +1,8 @@
 import copy
 import warnings
+from functools import partial
 
+import tensorflow as tf
 import numpy as np
 from scipy import linalg
 from scipy import sparse as sp
@@ -135,6 +137,102 @@ def gcn_filter(A, symmetric=True):
     if sp.issparse(out):
         out.sort_indices()
     return out
+
+
+def _triangular_adjacency(adjacency):
+    """
+    Gets the triangular version of the adjacency matrix, removing redundant
+    values.
+
+    :param adjacency: The full adjacency matrix, with shape
+        ([batch], n_nodes, n_nodes).
+    :return: The upper triangle of the adjacency matrix, with the lower
+        triangle set to zero.
+    """
+    return tf.linalg.band_part(adjacency, 0, -1)
+
+
+def _cens_net_binary_transformation_matrix_single(triangular_adjacency, *, num_edges):
+    """
+    Creates the binary transformation matrix (T) for `CensNet`.
+
+    :param triangular_adjacency: The binary adjacency matrix. Should have shape
+        (n_nodes, n_nodes), and be triangular.
+    :param num_edges: The number of edges to use in the output. Should be large
+        enough to accommodate all the edges in the adjacency matrix.
+
+    :return: The computed transformation matrix. It will have a shape of
+        (n_nodes, n_edges).
+    """
+    # The adjacency matrix should be sparse, so get the indices of the edges.
+    connected_node_indices = tf.where(triangular_adjacency)
+
+    # Match each edge with one of the nodes connected by that edge. We refer
+    # to the two nodes connected by each edge as "right" and "left",
+    # for convenience.
+    edge_indices = tf.range(num_edges, dtype=tf.int64)
+    edges_with_left_nodes = tf.stack(
+        [connected_node_indices[:, 0], edge_indices], axis=1
+    )
+    edges_with_right_nodes = tf.stack(
+        [connected_node_indices[:, 1], edge_indices], axis=1
+    )
+
+    # We now have all the points that should go in the sparse binary
+    # transformation matrix.
+    edge_indicators = tf.ones_like(edge_indices, dtype=tf.float32)
+    num_nodes = tf.cast(tf.shape(triangular_adjacency)[0], tf.int64)
+    output_shape = tf.stack([num_nodes, num_edges])
+    left_sparse = tf.SparseTensor(
+        indices=edges_with_left_nodes, values=edge_indicators, dense_shape=output_shape
+    )
+    left_sparse = tf.sparse.reorder(left_sparse)
+    right_sparse = tf.SparseTensor(
+        indices=edges_with_right_nodes, values=edge_indicators, dense_shape=output_shape
+    )
+    right_sparse = tf.sparse.reorder(right_sparse)
+    # Combine the matrices for the left and right nodes.
+    combined_sparse = tf.sparse.maximum(left_sparse, right_sparse)
+
+    return tf.sparse.to_dense(combined_sparse)
+
+
+def cens_net_binary_transformation_matrix(adjacency):
+    """
+    Creates the binary transformation matrices (T) for `CensNet`.
+
+    :param adjacency: The binary adjacency matrices. Should have shape
+        ([batch], n_nodes, n_nodes).
+    :return: The computed transformation matrices. It will have a shape of
+        ([batch], n_nodes, n_edges).
+    """
+    adjacency = tf.convert_to_tensor(adjacency)
+    added_batch = False
+    if tf.size(tf.shape(adjacency)) == 2:
+        # Add the extra batch dimension if needed.
+        adjacency = tf.expand_dims(adjacency, axis=0)
+        added_batch = True
+
+    # Compute the maximum number of edges. We will pad everything in the
+    # batch to this dimension.
+    adjacency_upper = _triangular_adjacency(adjacency)
+    num_edges = tf.math.count_nonzero(adjacency_upper, axis=(1, 2))
+    max_num_edges = tf.reduce_max(num_edges)
+
+    # Compute all the transformation matrices.
+    make_single_matrix = partial(
+        _cens_net_binary_transformation_matrix_single, num_edges=max_num_edges
+    )
+    transformation_matrices = tf.map_fn(
+        make_single_matrix,
+        adjacency_upper,
+        fn_output_signature=tf.TensorSpec(shape=[None, None], dtype=tf.float32),
+    )
+
+    if added_batch:
+        # Remove the extra batch dimension before returning.
+        transformation_matrices = transformation_matrices[0]
+    return transformation_matrices
 
 
 def chebyshev_polynomial(X, k):
