@@ -101,9 +101,9 @@ def test_gcn_filter():
     ([(0, 0), (1, 1)], [[1, 0], [0, 1]])
 ],
                          ids=["simple", "cycle", "self_loop"])
-def test_cens_net_binary_transformation_matrix(edges, expected_t):
+def test_incidence_matrix(edges, expected_t):
     """
-    Tests that `cens_net_binary_transformation_matrix` produces correct results.
+    Tests that `incidence_matrix` produces correct results.
     :param edges: The graph to use for testing, as a list of edges.
     :param expected_t: The expected transformation matrix.
     """
@@ -113,7 +113,7 @@ def test_cens_net_binary_transformation_matrix(edges, expected_t):
     adjacency = nx.to_numpy_array(graph)
 
     # Act.
-    got_t = convolution.cens_net_binary_transformation_matrix(adjacency)
+    got_t = convolution.incidence_matrix(adjacency)
 
     # Assert.
     got_t = got_t.numpy()
@@ -121,29 +121,87 @@ def test_cens_net_binary_transformation_matrix(edges, expected_t):
     np.testing.assert_array_equal(expected_t, got_t)
 
 
-def test_cens_net_binary_transformation_matrix_batch():
+def test_incidence_matrix_batch():
     """
-    Tests that `cens_net_binary_transformation_matrix` works with multiple
+    Tests that `incidence_matrix` works with multiple
     graphs in a batch.
     """
     # Arrange.
     # Create test graphs.
     graph1 = nx.to_numpy_array(nx.house_graph())
-    graph2 = nx.to_numpy_array(nx.house_graph())
+    graph2 = nx.to_numpy_array(nx.house_x_graph())
 
     # Act.
-    # Get the transformation for both graphs individually, and both together
+    # Get the incidence matrix for both graphs individually, and both together
     # as a batch.
-    graph1_t = convolution.cens_net_binary_transformation_matrix(graph1)
-    graph2_t = convolution.cens_net_binary_transformation_matrix(graph2)
+    graph1_incidence = convolution.incidence_matrix(graph1)
+    # The first graph will be padded with two extra rows columns so that it
+    # can be batched with the other one, which has two more edges.
+    graph1_incidence = np.pad(graph1_incidence, ((0, 0), (0, 2)))
+    graph2_incidence = convolution.incidence_matrix(graph2)
 
     batch = np.stack([graph1, graph2], axis=0)
-    batch_t = convolution.cens_net_binary_transformation_matrix(batch)
+    batch_incidence = convolution.incidence_matrix(batch)
 
     # Assert.
     # Both ways of doing it should produce the same results.
-    np.testing.assert_array_equal(graph1_t, batch_t[0])
-    np.testing.assert_array_equal(graph2_t, batch_t[1])
+    np.testing.assert_array_equal(graph1_incidence, batch_incidence[0])
+    np.testing.assert_array_equal(graph2_incidence, batch_incidence[1])
+
+
+def test_line_graph():
+    """
+    Tests that `line_graph` produces correct results.
+    """
+    # Arrange.
+    # Compute the line graph using NX.
+    graph = nx.house_graph()
+
+    unordered_line_graph = nx.line_graph(graph)
+    # NX puts the nodes in a weird order when making the line graph,
+    # so we sort them to maintain consistency with the original graph and the
+    # incidence matrix.
+    line_graph = nx.Graph()
+    line_graph.add_nodes_from(sorted(unordered_line_graph.nodes(data=True)))
+    line_graph.add_edges_from(unordered_line_graph.edges(data=True))
+
+    graph_incidence = nx.incidence_matrix(graph).todense()
+    true_line_graph_adj = nx.to_numpy_array(line_graph)
+
+    # Act.
+    got_line_graph_adj = convolution.line_graph(graph_incidence).numpy()
+
+    # Assert
+    np.testing.assert_array_equal(true_line_graph_adj, got_line_graph_adj)
+
+
+def test_line_graph_batch():
+    """
+    Tests that `line_graph` works with multiple graphs in a batch.
+    """
+    # Arrange.
+    # Create test graphs.
+    graph1 = nx.house_graph()
+    incidence1 = nx.incidence_matrix(graph1).todense()
+    # We will have to pad the first incidence matrix with two columns,
+    # because the second graph has two extra edges.
+    incidence1 = np.pad(incidence1, ((0, 0), (0, 2)))
+    graph2 = nx.house_x_graph()
+    incidence2 = nx.incidence_matrix(graph2).todense()
+
+    # Act.
+    # Get the line graph for both graphs individually, and both together
+    # as a batch.
+    graph1_line = convolution.line_graph(incidence1)
+    graph2_line = convolution.line_graph(incidence2)
+
+    batch = np.stack([incidence1, incidence2], axis=0)
+    line_graph_batch = convolution.line_graph(batch)
+
+    # Assert.
+    # Both ways of doing it should produce the same results.
+    np.testing.assert_array_equal(graph1_line, line_graph_batch[0])
+    np.testing.assert_array_equal(graph2_line, line_graph_batch[1])
 
 
 def test_chebyshev_polynomial():
