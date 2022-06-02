@@ -1,6 +1,7 @@
 from .agnn_conv import AGNNConv
 from .appnp_conv import APPNPConv
 from .arma_conv import ARMAConv
+from .censnet_conv import CensNetConv
 from .cheb_conv import ChebConv
 from .crystal_conv import CrystalConv
 from .diffusion_conv import DiffusionConv

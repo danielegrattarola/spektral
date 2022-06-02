@@ -94,13 +94,18 @@ def test_gcn_filter():
     _run_dense_op(convolution.gcn_filter, np.array([adj] * 3), symmetric=False)
 
 
-@pytest.mark.parametrize(("edges", "expected_t"), [
-    ([(0, 1), (1, 2), (2, 3)], [[1, 0, 0], [1, 1, 0], [0, 1, 1], [0, 0, 1]]),
-    ([(0, 1), (1, 2), (1, 3), (3, 0)], [[1, 1, 0, 0], [1, 0, 1, 1],
-                                        [0, 0, 1, 0], [0, 1, 0, 1]]),
-    ([(0, 0), (1, 1)], [[1, 0], [0, 1]])
-],
-                         ids=["simple", "cycle", "self_loop"])
+@pytest.mark.parametrize(
+    ("edges", "expected_t"),
+    [
+        ([(0, 1), (1, 2), (2, 3)], [[1, 0, 0], [1, 1, 0], [0, 1, 1], [0, 0, 1]]),
+        (
+            [(0, 1), (1, 2), (1, 3), (3, 0)],
+            [[1, 1, 0, 0], [1, 0, 1, 1], [0, 0, 1, 0], [0, 1, 0, 1]],
+        ),
+        ([(0, 0), (1, 1)], [[1, 0], [0, 1]]),
+    ],
+    ids=["simple", "cycle", "self_loop"],
+)
 def test_incidence_matrix(edges, expected_t):
     """
     Tests that `incidence_matrix` produces correct results.
