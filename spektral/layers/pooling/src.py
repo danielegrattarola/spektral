@@ -116,7 +116,7 @@ class SRCPool(Layer):
         # Always start the call() method with get_inputs(inputs) to set self.n_nodes
         x, a, i = self.get_inputs(inputs)
 
-        return self.pool(x, a, i)
+        return self.pool(x, a, i, **kwargs)
 
     def pool(self, x, a, i, **kwargs):
         """

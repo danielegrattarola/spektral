@@ -18,8 +18,8 @@ class DiffPool(SRCPool):
     This layer learns a soft clustering of the input graph as follows:
     $$
         \begin{align}
-            \S &= \textrm{GNN}_{embed}(\A, \X); \\
-            \Z &= \textrm{GNN}_{pool}(\A, \X); \\
+            \Z &= \textrm{GNN}_{embed}(\A, \X); \\
+            \S &= \textrm{GNN}_{pool}(\A, \X); \\
             \X' &= \S^\top \Z; \\
             \A' &= \S^\top \A \S; \\
         \end{align}
