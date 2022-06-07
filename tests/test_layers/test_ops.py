@@ -8,6 +8,7 @@ from spektral.utils.sparse import sp_batch_to_sp_tensor, sp_matrix_to_sp_tensor
 
 batch_size = 10
 N = 3
+M = 5
 tol = 1e-5
 
 
@@ -135,6 +136,11 @@ def test_matmul_ops_rank_2_3():
 
     expected_output = np.array([a.T.dot(b[i]).dot(a) for i in range(batch_size)])
     _check_op(ops.matmul_at_b_a, [a, b], expected_output, convert_to_sparse)
+
+    # Check with outer dimensions that don't match.
+    c = np.random.randn(M, N)
+    expected_output = np.array([c.dot(b[i]) for i in range(batch_size)])
+    _check_op(ops.modal_dot, [c, b], expected_output, convert_to_sparse)
 
 
 def test_matmul_ops_rank_3_2():

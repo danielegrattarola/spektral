@@ -67,11 +67,13 @@ def mixed_mode_dot(a, b):
     :param b: Tensor or SparseTensor with rank 3.
     :return: Tensor or SparseTensor with rank 3.
     """
-    shp = K.int_shape(b)
+    a_shp = tf.shape(a)
+    b_shp = tf.shape(b)
+
     b_t = ops.transpose(b, (1, 2, 0))
-    b_t = ops.reshape(b_t, (shp[1], -1))
+    b_t = ops.reshape(b_t, tf.stack((b_shp[1], -1)))
     output = dot(a, b_t)
-    output = ops.reshape(output, (shp[1], shp[2], -1))
+    output = ops.reshape(output, tf.stack((a_shp[0], b_shp[2], -1)))
     output = ops.transpose(output, (2, 0, 1))
 
     return output

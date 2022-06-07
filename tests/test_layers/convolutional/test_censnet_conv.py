@@ -82,7 +82,9 @@ def test_smoke(random_graph_descriptors, mode):
     incidence_input = Input(shape=incidence.shape[1:])
     edge_input = Input(shape=edge_features.shape[1:])
 
-    next_nodes, next_edges = CensNetConv(NODE_CHANNELS, EDGE_CHANNELS, activation="relu")(
+    next_nodes, next_edges = CensNetConv(
+        NODE_CHANNELS, EDGE_CHANNELS, activation="relu"
+    )(
         (
             node_input,
             (laplacian_input, edge_laplacian_input, incidence_input),
@@ -113,3 +115,71 @@ def test_smoke(random_graph_descriptors, mode):
     got_edge_shape = got_next_edges.numpy().shape
     assert got_node_shape == node_features.shape[:-1] + (NODE_CHANNELS,)
     assert got_edge_shape == edge_features.shape[:-1] + (EDGE_CHANNELS,)
+
+
+@pytest.mark.parametrize("mode", [Modes.SINGLE, Modes.BATCH, Modes.MIXED])
+@pytest.mark.parametrize(("num_nodes", "num_edges"), [(5, 5), (4, 10), (1, 1)])
+def test_output_shape(mode, num_nodes, num_edges):
+    """
+    Tests that we can compute the output shape correctly.
+
+    :param mode: The data mode to use for this test.
+    :param num_nodes: The number of nodes to use for the input.
+    :param num_edges: The number of edges to use for the input.
+    """
+    # Arrange.
+    # Create valid-looking input shapes.
+    node_features_shape = (num_nodes, F)
+    edge_features_shape = (num_edges, S)
+    node_laplacian_shape = (num_nodes, num_nodes)
+    edge_laplacian_shape = (num_edges, num_edges)
+    incidence_shape = (num_nodes, num_edges)
+
+    if mode != Modes.SINGLE:
+        node_features_shape = (batch_size,) + node_features_shape
+        edge_features_shape = (batch_size,) + edge_features_shape
+    if mode == Modes.BATCH:
+        node_laplacian_shape = (batch_size,) + node_laplacian_shape
+        edge_laplacian_shape = (batch_size,) + edge_laplacian_shape
+        incidence_shape = (batch_size,) + incidence_shape
+
+    input_shape = (
+        node_features_shape,
+        (node_laplacian_shape, edge_laplacian_shape, incidence_shape),
+        edge_features_shape,
+    )
+
+    # Create the layer.
+    layer = CensNetConv(NODE_CHANNELS, EDGE_CHANNELS)
+
+    # Act.
+    got_output_shape = layer.compute_output_shape(input_shape)
+
+    # Assert.
+    # The output shape should be the same as the input, but with the correct
+    # channel numbers.
+    expected_node_feature_shape = node_features_shape[:-1] + (NODE_CHANNELS,)
+    expected_edge_feature_shape = edge_features_shape[:-1] + (EDGE_CHANNELS,)
+    assert got_output_shape == (
+        expected_node_feature_shape,
+        expected_edge_feature_shape,
+    )
+
+
+def test_get_config_round_trip():
+    """
+    Tests that it is possible to serialize a layer using `get_config()`,
+    and then re-instantiate an identical one.
+    """
+    # Arrange.
+    # Create the layer to test with.
+    layer = CensNetConv(NODE_CHANNELS, EDGE_CHANNELS)
+
+    # Act.
+    config = layer.get_config()
+    new_layer = CensNetConv(**config)
+
+    # Assert.
+    # The new layer should be the same.
+    assert new_layer.node_channels == layer.node_channels
+    assert new_layer.edge_channels == layer.edge_channels
