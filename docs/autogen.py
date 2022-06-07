@@ -27,6 +27,7 @@ PAGES = [
             layers.AGNNConv,
             layers.APPNPConv,
             layers.ARMAConv,
+            layers.CensNetConv,
             layers.ChebConv,
             layers.CrystalConv,
             layers.DiffusionConv,
