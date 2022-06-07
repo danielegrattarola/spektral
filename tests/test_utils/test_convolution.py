@@ -1,7 +1,7 @@
 import networkx as nx
 import numpy as np
-import scipy.sparse as sp
 import pytest
+import scipy.sparse as sp
 
 from spektral.utils import convolution
 

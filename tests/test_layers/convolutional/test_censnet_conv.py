@@ -1,12 +1,12 @@
 import enum
-import numpy as np
-from tensorflow.keras import Input, Model, layers
+
 import networkx as nx
+import numpy as np
 import pytest
+from core import A, F, S, batch_size
+from tensorflow.keras import Input, Model, layers
 
 from spektral.layers import CensNetConv
-from core import batch_size, F, S, A
-
 
 NODE_CHANNELS = 8
 """
