@@ -170,7 +170,7 @@ def test_line_graph():
     line_graph.add_nodes_from(sorted(unordered_line_graph.nodes(data=True)))
     line_graph.add_edges_from(unordered_line_graph.edges(data=True))
 
-    graph_incidence = nx.incidence_matrix(graph).todense()
+    graph_incidence = nx.incidence_matrix(graph).toarray()
     true_line_graph_adj = nx.to_numpy_array(line_graph)
 
     # Act.
@@ -187,12 +187,12 @@ def test_line_graph_batch():
     # Arrange.
     # Create test graphs.
     graph1 = nx.house_graph()
-    incidence1 = nx.incidence_matrix(graph1).todense()
+    incidence1 = nx.incidence_matrix(graph1).toarray()
     # We will have to pad the first incidence matrix with two columns,
     # because the second graph has two extra edges.
     incidence1 = np.pad(incidence1, ((0, 0), (0, 2)))
     graph2 = nx.house_x_graph()
-    incidence2 = nx.incidence_matrix(graph2).todense()
+    incidence2 = nx.incidence_matrix(graph2).toarray()
 
     # Act.
     # Get the line graph for both graphs individually, and both together
