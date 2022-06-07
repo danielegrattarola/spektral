@@ -77,6 +77,11 @@ def check_dtypes_decorator(call):
 
 
 def check_dtypes(inputs):
+    for value in inputs:
+        if not hasattr(value, "dtype"):
+            # It's not a valid tensor.
+            return inputs
+
     if len(inputs) == 2:
         x, a = inputs
         e = None
