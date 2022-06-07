@@ -4,7 +4,7 @@ import networkx as nx
 import numpy as np
 import pytest
 from core import A, F, S, batch_size
-from tensorflow.keras import Input, Model, layers
+from tensorflow.keras import Input, Model
 
 from spektral.layers import CensNetConv
 

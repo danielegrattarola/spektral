@@ -7,10 +7,14 @@ from spektral.utils.convolution import gcn_filter, incidence_matrix, line_graph
 
 class CensNetConv(Conv):
     r"""
-    Convolution layer from [CensNet](
-    https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9224195)
+    A CensNet convolutional layer from the paper
+
+    > [Co-embedding of Nodes and Edges with Graph Neural Networks](https://arxiv.org/abs/2010.13242)<br>
+    > Xiaodong Jiang et al.
 
     This implements both the node and edge propagation rules as a single layer.
+
+    **Mode**: single, disjoint, batch.
 
     **Input**
 
