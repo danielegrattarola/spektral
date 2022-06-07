@@ -2,8 +2,8 @@ import copy
 import warnings
 from functools import partial
 
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
 from scipy import linalg
 from scipy import sparse as sp
 from scipy.sparse.linalg import ArpackNoConvergence
