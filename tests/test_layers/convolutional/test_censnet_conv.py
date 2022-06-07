@@ -5,7 +5,7 @@ import networkx as nx
 import pytest
 
 from spektral.layers import CensNetConv
-from core import batch_size, F, S
+from core import batch_size, F, S, A
 
 
 NODE_CHANNELS = 8
@@ -183,3 +183,11 @@ def test_get_config_round_trip():
     # The new layer should be the same.
     assert new_layer.node_channels == layer.node_channels
     assert new_layer.edge_channels == layer.edge_channels
+
+
+def test_preprocess_smoke():
+    """
+    Tests that the preprocessing functionality does not crash.
+    """
+    # Act.
+    node_laplacian, edge_laplacian, incidence = CensNetConv.preprocess(A)
