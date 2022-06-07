@@ -23,15 +23,15 @@ class SRCPool(Layer):
     This layer computes:
     $$
         \begin{align}
-            & \mathcal{S} = \left\{\mathcal{S}_k\right\}_{k=1:K} = \textsc{Sel}(\mathcal{G}) \\
-            & \mathcal{X}'=\left\{\textsc{Red}( \mathcal{G}, \mathcal{S}_k )\right\}_{k=1:K} \\
-            & \mathcal{E}'=\left\{\textsc{Con}( \mathcal{G}, \mathcal{S}_k, \mathcal{S}_l )\right\}_{k,L=1:K} \\
+            & \mathcal{S} = \left\{\mathcal{S}_k\right\}_{k=1:K} = \textrm{Sel}(\mathcal{G}) \\
+            & \mathcal{X}'=\left\{\textrm{Red}( \mathcal{G}, \mathcal{S}_k )\right\}_{k=1:K} \\
+            & \mathcal{E}'=\left\{\textrm{Con}( \mathcal{G}, \mathcal{S}_k, \mathcal{S}_l )\right\}_{k,L=1:K} \\
         \end{align}
     $$
-    Where \(\textsc{Sel}\) is a node equivariant selection function that computes
-    the supernode assignments \(\mathcal{S}_k\), \(\textsc{Red}\) is a
+    Where \(\textrm{Sel}\) is a node equivariant selection function that computes
+    the supernode assignments \(\mathcal{S}_k\), \(\textrm{Red}\) is a
     permutation-invariant function to reduce the supernodes into the new node
-    attributes, and \(\textsc{Con}\) is a permutation-invariant connection
+    attributes, and \(\textrm{Con}\) is a permutation-invariant connection
     function that computes the link between the pooled nodes.
 
     By extending this class, it is possible to create any pooling layer in the

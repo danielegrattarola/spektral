@@ -19,9 +19,9 @@ class LaPool(SRCPool):
     leaders, and then assigning every remaining node to the cluster of the closest
     leader:
     $$
-        \V = \norm{\L\X}_d; \\
-        \i = \{ i \mid \V_i > \V_j, \forall j \in \cN(i) \} \\
-        \S^\top = \textrm{SparseMax}\left( \beta \frac{\X\X_{\i}^\top}{\norm{\X}\norm{\X_{\i}}} \right)
+        \V = \|\L\X\|_d; \\
+        \i = \{ i \mid \V_i > \V_j, \forall j \in \mathcal{N}(i) \} \\
+        \S^\top = \textrm{SparseMax}\left( \beta \frac{\X\X_{\i}^\top}{\|\X\|\|\X_{\i}\|} \right)
     $$
     \(\beta\) is a regularization vecotr that is applied element-wise to the selection
     matrix.
