@@ -199,7 +199,7 @@ class GATConv(Conv):
 
         # Prepare message-passing
         indices = a.indices
-        N = tf.shape(x, out_type=indices.dtype)[-2]
+        N = tf.reduce_max(indices) + 1
         if self.add_self_loops:
             indices = ops.add_self_loops_indices(indices, N)
         targets, sources = indices[:, 1], indices[:, 0]
