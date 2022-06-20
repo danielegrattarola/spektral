@@ -1,5 +1,7 @@
 import copy
 import os.path as osp
+import time
+import multiprocessing as mp
 import warnings
 
 import numpy as np
@@ -102,10 +104,16 @@ class Dataset:
 
     - `transforms`: a callable or list of callables that are automatically
     applied to the graphs after loading the dataset.
+    - `workers`: maximum number of processes to use when performing transformation.
+    Defaults to 1.
     """
 
-    def __init__(self, transforms=None, **kwargs):
+    def __init__(self, transforms=None, workers=1, **kwargs):
         self.a = None  # Used for mixed-mode datasets
+        self.workers = workers # Used for multi-parallelisation
+        
+        assert type(workers) == int
+        
         # Read extra kwargs
         for k, v in kwargs.items():
             setattr(self, k, v)
@@ -142,11 +150,53 @@ class Dataset:
         pass
 
     def apply(self, transform):
+        
         if not callable(transform):
             raise ValueError("`transform` must be callable")
+            
+        if self.workers > 1:
+            
+            manager = mp.Manager()
+            graphs = manager.list([None] * len(self.graphs))
+            processes = list()
+            
+            def transform_graph (set, graph, i):
+                
+                set[i] = transform(graph)
+            
+            for i in range(len(self.graphs)):
+                
+                process = mp.Process(target=transform_graph, args=[set, graph, i])
+                processes.append(process)
+                
+                if len(processes) >= self.workers:
+                
+                    while True:
+                        
+                        removed_indices = False
+                        
+                        for j in reversed(range(len(processes))):
+                            
+                            if not processes[j].is_alive():
+                                
+                                del processes[j]
+                                removed_indices = True
+                                
+                        if removed_indices:
+                            
+                            break
+                            
+                        time.sleep(0.01)
+                            
+             for process in processes:
+                process.join()
+                
+             self.graphs = graphs
+            
+        else:
 
-        for i in range(len(self.graphs)):
-            self.graphs[i] = transform(self.graphs[i])
+            for i in range(len(self.graphs)):
+                self.graphs[i] = transform(self.graphs[i])
 
     def map(self, transform, reduce=None):
         if not callable(transform):
