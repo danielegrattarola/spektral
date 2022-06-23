@@ -155,7 +155,7 @@ class CensNetConv(Conv):
             )
         self.built = True
 
-    def __bias_and_activation(self, pre_activation, *, bias_weights, mask=None):
+    def _bias_and_activation(self, pre_activation, *, bias_weights, mask=None):
         """
         Applies the bias, activation, and mask, if necessary.
 
@@ -172,7 +172,7 @@ class CensNetConv(Conv):
             pre_activation *= mask[0]
         return self.activation(pre_activation)
 
-    def __propagate_nodes(self, inputs, mask=None):
+    def _propagate_nodes(self, inputs, mask=None):
         """
         Performs the node feature propagation step.
 
@@ -195,11 +195,9 @@ class CensNetConv(Conv):
         output = ops.modal_dot(node_adjacency, node_features)
         output = ops.modal_dot(output, self.node_kernel)
 
-        return self.__bias_and_activation(
-            output, bias_weights=self.node_bias, mask=mask
-        )
+        return self._bias_and_activation(output, bias_weights=self.node_bias, mask=mask)
 
-    def __propagate_edges(self, inputs, mask=None):
+    def _propagate_edges(self, inputs, mask=None):
         """
         Performs the edge feature propagation step.
 
@@ -222,13 +220,11 @@ class CensNetConv(Conv):
         output = ops.modal_dot(edge_adjacency, edge_features)
         output = ops.modal_dot(output, self.edge_kernel)
 
-        return self.__bias_and_activation(
-            output, bias_weights=self.edge_bias, mask=mask
-        )
+        return self._bias_and_activation(output, bias_weights=self.edge_bias, mask=mask)
 
     def call(self, inputs, mask=None):
-        node_features = self.__propagate_nodes(inputs, mask=mask)
-        edge_features = self.__propagate_edges(inputs, mask=mask)
+        node_features = self._propagate_nodes(inputs, mask=mask)
+        edge_features = self._propagate_edges(inputs, mask=mask)
 
         return node_features, edge_features
 
