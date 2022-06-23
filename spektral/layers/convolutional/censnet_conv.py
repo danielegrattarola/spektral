@@ -149,7 +149,7 @@ class CensNetConv(Conv):
             self.edge_bias = self.add_weight(
                 shape=(self.edge_channels,),
                 initializer=self.bias_initializer,
-                name="node_bias",
+                name="edge_bias",
                 regularizer=self.bias_regularizer,
                 constraint=self.bias_constraint,
             )
