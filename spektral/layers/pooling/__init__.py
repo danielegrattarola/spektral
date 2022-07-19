@@ -12,3 +12,4 @@ from .mincut_pool import MinCutPool
 from .sag_pool import SAGPool
 from .src import SRCPool
 from .topk_pool import TopKPool
+from .just_balance_pool import JustBalancePool
