@@ -10,6 +10,18 @@ def test_citation():
     dataset = datasets.Pubmed(normalize_x=True)
     sl = SingleLoader(dataset)
     sl.load()
+    
+    
+def test_dblp():
+    dataset = datasets.DBLP(normalize_x=True)
+    sl = SingleLoader(dataset)
+    sl.load()
+    
+    
+def test_flickr():
+    dataset = datasets.Flickr(normalize_x=True)
+    sl = SingleLoader(dataset)
+    sl.load()
 
 
 def test_graphsage():

@@ -1,4 +1,4 @@
-from .citation import Citation, Citeseer, Cora, Pubmed
+from .citation import Citation, Citeseer, Cora, Pubmed, DBLP, Flickr
 from .graphsage import PPI, GraphSage, Reddit
 from .mnist import MNIST
 from .modelnet import ModelNet
