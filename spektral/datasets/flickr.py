@@ -98,7 +98,7 @@ def _preprocess_features(features):
     return features
 
 
-def _download_url(url: str, folder: str, log: bool = True):
+def _download_url(url, folder, log=False):
     r"""Downloads the content of an URL to a specific folder.
     Args:
         url (string): The url.
@@ -113,11 +113,11 @@ def _download_url(url: str, folder: str, log: bool = True):
 
     if osp.exists(path):  # pragma: no cover
         if log:
-            print(f'Using existing file {filename}', file=sys.stderr)
+            print(f"Using existing file {filename}", file=sys.stderr)
         return path
 
     if log:
-        print(f'Downloading {url}', file=sys.stderr)
+        print(f"Downloading {url}", file=sys.stderr)
 
     try:
         os.makedirs(osp.expanduser(osp.normpath(folder)), exist_ok=True)

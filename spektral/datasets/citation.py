@@ -256,7 +256,7 @@ def _preprocess_features(features):
     return features
 
 
-def _download_url(url, folder, log=True):
+def _download_url(url, folder, log=False):
     r"""Downloads the content of an URL to a specific folder.
     Args:
         url (string): The url.
