@@ -255,10 +255,6 @@ class Flickr(Dataset):
                 y=y.astype(self.dtype),
             )
         ]
-    
-    @staticmethod
-    def available_datasets():
-        return ["flickr"]
 
 
 class DBLP(Dataset):
@@ -308,10 +304,6 @@ class DBLP(Dataset):
                 y=y.astype(self.dtype),
             )
         ]
-    
-    @staticmethod
-    def available_datasets():
-        return ["dblp"]
 
 
 def _read_file(path, name, suffix):
