@@ -4,7 +4,6 @@ import sys
 import ssl
 import errno
 import urllib
-import json
 
 import networkx as nx
 import numpy as np
@@ -257,7 +256,7 @@ def _preprocess_features(features):
     return features
 
 
-def _download_url(url: str, folder: str, log: bool = True):
+def _download_url(url, folder, log=True):
     r"""Downloads the content of an URL to a specific folder.
     Args:
         url (string): The url.
