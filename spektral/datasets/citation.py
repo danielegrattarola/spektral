@@ -199,6 +199,10 @@ class DBLP(Dataset):
         super().__init__(**kwargs)
 
     url = 'https://github.com/abojchevski/graph2gauss/raw/master/data/dblp.npz'
+    
+    @property
+    def path(self):
+        return osp.join(DATASET_FOLDER, "Citation", "dblp")
 
     def download(self):
         print("Downloading DBLP dataset.")
