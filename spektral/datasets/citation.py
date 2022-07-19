@@ -271,11 +271,11 @@ def _download_url(url, folder, log=True):
 
     if osp.exists(path):  # pragma: no cover
         if log:
-            print(f'Using existing file {filename}', file=sys.stderr)
+            print(f"Using existing file {filename}", file=sys.stderr)
         return path
 
     if log:
-        print(f'Downloading {url}', file=sys.stderr)
+        print(f"Downloading {url}", file=sys.stderr)
 
     try:
         os.makedirs(osp.expanduser(osp.normpath(folder)), exist_ok=True)
