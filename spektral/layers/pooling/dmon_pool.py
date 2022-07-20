@@ -7,45 +7,43 @@ from spektral.layers import ops
 from spektral.layers.pooling.src import SRCPool
 
 
-class JustBalancePool(SRCPool):
+class DMoNPool(SRCPool):
     r"""
-    The Just Balance pooling layer from the paper
+    The DMoN pooling layer from the paper
 
-    > [Simplifying Clustering with Graph Neural Networks](https://arxiv.org/abs/2207.08779)<br>
-    > Filippo Maria Bianchi
+    > [Graph Clustering with Graph Neural Networks](https://arxiv.org/abs/2006.16904)<br>
+    > Anton Tsitsulin et al.
 
-    **Mode**: batch.
+    **Mode**: single, batch.
 
     This layer learns a soft clustering of the input graph as follows:
     $$
     \begin{align}
-        \S &= \textrm{MLP}(\X); \\
-        \X' &= \S^\top \X \\
-        \A' &= \S^\top \A \S; \\
+        \C &= \textrm{MLP}(\X); \\
+        \X' &= \C^\top \X \\
+        \A' &= \C^\top \A \C; \\
     \end{align}
     $$
     where \(\textrm{MLP}\) is a multi-layer perceptron with softmax output.
 
-    The layer adds the following auxiliary loss to the model
+    Two auxiliary loss terms are also added to the model: the modularity loss
     $$
-        L = - \mathrm{Tr}(\sqrt{ \S^\top \S })
+        L_m = - \frac{1}{2m} \mathrm{Tr}(\C^\top \A \C - \C^\top \d^\top \d \C)
+    $$
+    and the collapse regularization loss
+    $$
+        L_c = \frac{\sqrt{k}}{n} \left\|
+            \sum_i \C_i^\top
+        \right\|_F -1.
     $$
 
-    The layer can be used without a supervised loss to compute node clustering by
-    minimizing the two auxiliary losses.
-
-    The layer is originally designed to be used in conjuction with a
-    [GCNConv](https://graphneural.network/layers/convolution/#gcnconv)
-    layer operating on the following connectivity matrix
-
-    $$
-        \tilde{\A} = \I - \delta (\I - \D^{-1/2} \A \D^{-1/2})
-    $$
+    This layer is based on the original implementation found
+    [here](https://github.com/google-research/google-research/blob/master/graph_embedding/dmon/dmon.py).
 
     **Input**
 
     - Node features of shape `(batch, n_nodes_in, n_node_features)`;
-    - Connectivity matrix of shape
+    - Symmetrically normalized adjacency matrix of shape
     `(batch, n_nodes_in, n_nodes_in)`;
 
     **Output**
@@ -62,8 +60,9 @@ class JustBalancePool(SRCPool):
     the MLP used to compute cluster assignments (if `None`, the MLP has only one output
     layer);
     - `mlp_activation`: activation for the MLP layers;
-    - `normalized_loss`: booelan, whether to normalize the auxiliary loss in [0,1];
+    - `collapse_regularization`: strength of the collapse regularization;
     - `return_selection`: boolean, whether to return the selection matrix;
+    - `use_bias`: use bias in the MLP;
     - `kernel_initializer`: initializer for the weights of the MLP;
     - `bias_initializer`: initializer for the bias of the MLP;
     - `kernel_regularizer`: regularization applied to the weights of the MLP;
@@ -72,21 +71,25 @@ class JustBalancePool(SRCPool):
     - `bias_constraint`: constraint applied to the bias of the MLP;
     """
 
-    def __init__(self,
-                 k,
-                 mlp_hidden=None,
-                 mlp_activation="relu",
-                 normalized_loss=False,
-                 return_selection=False,
-                 kernel_initializer="glorot_uniform",
-                 bias_initializer="zeros",
-                 kernel_regularizer=None,
-                 bias_regularizer=None,
-                 kernel_constraint=None,
-                 bias_constraint=None,
-                 **kwargs
-                 ):
+    def __init__(
+        self,
+        k,
+        mlp_hidden=None,
+        mlp_activation="relu",
+        return_selection=False,
+        collapse_regularization=0.1,
+        kernel_initializer="glorot_uniform",
+        bias_initializer="zeros",
+        kernel_regularizer=None,
+        bias_regularizer=None,
+        kernel_constraint=None,
+        bias_constraint=None,
+        **kwargs
+    ):
         super().__init__(
+            k=k,
+            mlp_hidden=mlp_hidden,
+            mlp_activation=mlp_activation,
             return_selection=return_selection,
             kernel_initializer=kernel_initializer,
             bias_initializer=bias_initializer,
@@ -96,10 +99,11 @@ class JustBalancePool(SRCPool):
             bias_constraint=bias_constraint,
             **kwargs
         )
+
         self.k = k
-        self.mlp_hidden = mlp_hidden if mlp_hidden else []
+        self.mlp_hidden = mlp_hidden if mlp_hidden is not None else []
         self.mlp_activation = mlp_activation
-        self.normalized_loss = normalized_loss
+        self.collapse_regularization = collapse_regularization
 
     def build(self, input_shape):
         layer_kwargs = dict(
@@ -129,7 +133,11 @@ class JustBalancePool(SRCPool):
         if mask is not None:
             s *= mask[0]
 
-        self.add_loss(self.balance_loss(s))
+        # Collapse loss
+        col_loss = self.collapse_loss(a, s)
+        if K.ndim(a) == 3:
+            col_loss = K.mean(col_loss)
+        self.add_loss(self.collapse_regularization * col_loss)
 
         return s
 
@@ -139,11 +147,11 @@ class JustBalancePool(SRCPool):
     def connect(self, a, s, **kwargs):
         a_pool = ops.matmul_at_b_a(s, a)
 
-        # Post-processing of A
-        a_pool = tf.linalg.set_diag(
-            a_pool, tf.zeros(K.shape(a_pool)[:-1], dtype=a_pool.dtype)
-        )
-        a_pool = ops.normalize_A(a_pool)
+        # Modularity loss
+        mod_loss = self.modularity_loss(a, s, a_pool)
+        if K.ndim(a) == 3:
+            mod_loss = K.mean(mod_loss)
+        self.add_loss(mod_loss)
 
         return a_pool
 
@@ -153,22 +161,46 @@ class JustBalancePool(SRCPool):
 
         return i_pool
 
-    def balance_loss(self, s):
-        ss = ops.modal_dot(s, s, transpose_a=True)
-        loss = -tf.linalg.trace(tf.math.sqrt(ss))
+    def modularity_loss(self, a, s, a_pool):
 
-        if self.normalized_loss:
-            n = float(tf.shape(s, out_type=tf.int32)[-2])
-            c = float(tf.shape(s, out_type=tf.int32)[-1])
-            loss = loss / tf.math.sqrt(n * c)
+        if K.is_sparse(a):
+            n_edges = tf.cast(len(a.values), dtype=s.dtype)
+
+            degrees = tf.sparse.reduce_sum(a, axis=-1)
+            degrees = tf.reshape(degrees, (-1, 1))
+        else:
+            n_edges = tf.cast(tf.math.count_nonzero(
+                a, axis=(-2, -1)), dtype=s.dtype)
+            degrees = tf.reduce_sum(a, axis=-1, keepdims=True)
+
+        normalizer_left = tf.matmul(s, degrees, transpose_a=True)
+        normalizer_right = tf.matmul(degrees, s, transpose_a=True)
+
+        if K.ndim(s) == 3:
+            normalizer = ops.modal_dot(normalizer_left, normalizer_right) / \
+                2 / tf.reshape(n_edges, [tf.shape(n_edges)[0]] + [1] * 2)
+        else:
+            normalizer = ops.modal_dot(normalizer_left, normalizer_right) / \
+                2 / n_edges
+
+        loss = -tf.linalg.trace(a_pool - normalizer) / 2 / n_edges
+
+        return loss
+
+    def collapse_loss(self, a, s):
+        cluster_sizes = tf.math.reduce_sum(s, axis=-2)
+        n_nodes = tf.cast(tf.shape(a)[-1], s.dtype)
+        loss = tf.norm(cluster_sizes, axis=-1) / \
+            n_nodes * tf.sqrt(float(self.k)) - 1
+
         return loss
 
     def get_config(self):
         config = {
+            "collapse_regularization": self.collapse_regularization,
             "k": self.k,
             "mlp_hidden": self.mlp_hidden,
             "mlp_activation": self.mlp_activation,
-            "normalized_loss": self.normalized_loss,
         }
         base_config = super().get_config()
         return {**base_config, **config}

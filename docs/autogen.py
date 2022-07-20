@@ -56,6 +56,7 @@ PAGES = [
             layers.SAGPool,
             layers.TopKPool,
             layers.JustBalancePool,
+            layers.DMoNPool,
         ],
     },
     {
