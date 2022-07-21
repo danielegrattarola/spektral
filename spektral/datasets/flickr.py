@@ -1,15 +1,13 @@
+import json
 import os
 import os.path as osp
-import sys
-import ssl
-import errno
-import urllib
-import json
 
 import numpy as np
 import scipy.sparse as sp
 
 from spektral.data import Dataset, Graph
+from spektral.datasets.citation import _preprocess_features
+from spektral.datasets.dblp import _download_url
 from spektral.utils import label_to_one_hot
 
 
@@ -87,48 +85,3 @@ class Flickr(Dataset):
                 y=y.astype(self.dtype),
             )
         ]
-
-
-def _preprocess_features(features):
-    rowsum = np.array(features.sum(1))
-    r_inv = np.power(rowsum, -1).flatten()
-    r_inv[np.isinf(r_inv)] = 0.0
-    r_mat_inv = sp.diags(r_inv)
-    features = r_mat_inv.dot(features)
-    return features
-
-
-def _download_url(url, folder, log=False):
-    r"""Downloads the content of an URL to a specific folder.
-    Args:
-        url (string): The url.
-        folder (string): The folder.
-        log (bool, optional): If :obj:`False`, will not print anything to the
-            console. (default: :obj:`True`)
-    """
-
-    filename = url.rpartition('/')[2]
-    filename = filename if filename[0] == '?' else filename.split('?')[0]
-    path = osp.join(folder, filename)
-
-    if osp.exists(path):  # pragma: no cover
-        if log:
-            print(f"Using existing file {filename}", file=sys.stderr)
-        return path
-
-    if log:
-        print(f"Downloading {url}", file=sys.stderr)
-
-    try:
-        os.makedirs(osp.expanduser(osp.normpath(folder)), exist_ok=True)
-    except OSError as e:
-        if e.errno != errno.EEXIST and osp.isdir(path):
-            raise e
-
-    context = ssl._create_unverified_context()
-    data = urllib.request.urlopen(url, context=context)
-
-    with open(path, 'wb') as f:
-        f.write(data.read())
-
-    return path
