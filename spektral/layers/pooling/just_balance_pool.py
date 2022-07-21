@@ -14,7 +14,7 @@ class JustBalancePool(SRCPool):
     > [Simplifying Clustering with Graph Neural Networks](https://arxiv.org/abs/2207.08779)<br>
     > Filippo Maria Bianchi
 
-    **Mode**: batch.
+    **Mode**: single, batch.
 
     This layer learns a soft clustering of the input graph as follows:
     $$

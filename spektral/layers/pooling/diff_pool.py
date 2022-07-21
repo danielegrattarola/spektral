@@ -13,7 +13,7 @@ class DiffPool(SRCPool):
     > [Hierarchical Graph Representation Learning with Differentiable Pooling](https://arxiv.org/abs/1806.08804)<br>
     > Rex Ying et al.
 
-    **Mode**: batch.
+    **Mode**: single, batch.
 
     This layer learns a soft clustering of the input graph as follows:
     $$

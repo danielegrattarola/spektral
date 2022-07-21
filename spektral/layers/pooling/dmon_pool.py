@@ -191,7 +191,12 @@ class DMoNPool(SRCPool):
     def collapse_loss(self, a, s):
         cluster_sizes = tf.math.reduce_sum(s, axis=-2)
         n_nodes = tf.cast(tf.shape(a)[-1], s.dtype)
-        loss = tf.norm(cluster_sizes, axis=-1) / n_nodes * tf.sqrt(float(self.k)) - 1
+        loss = (
+            tf.norm(cluster_sizes, axis=-1)
+            / n_nodes
+            * tf.sqrt(tf.cast(self.k, s.dtype))
+            - 1
+        )
 
         return loss
 
