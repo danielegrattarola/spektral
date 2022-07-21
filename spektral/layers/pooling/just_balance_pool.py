@@ -72,20 +72,21 @@ class JustBalancePool(SRCPool):
     - `bias_constraint`: constraint applied to the bias of the MLP;
     """
 
-    def __init__(self,
-                 k,
-                 mlp_hidden=None,
-                 mlp_activation="relu",
-                 normalized_loss=False,
-                 return_selection=False,
-                 kernel_initializer="glorot_uniform",
-                 bias_initializer="zeros",
-                 kernel_regularizer=None,
-                 bias_regularizer=None,
-                 kernel_constraint=None,
-                 bias_constraint=None,
-                 **kwargs
-                 ):
+    def __init__(
+        self,
+        k,
+        mlp_hidden=None,
+        mlp_activation="relu",
+        normalized_loss=False,
+        return_selection=False,
+        kernel_initializer="glorot_uniform",
+        bias_initializer="zeros",
+        kernel_regularizer=None,
+        bias_regularizer=None,
+        kernel_constraint=None,
+        bias_constraint=None,
+        **kwargs
+    ):
         super().__init__(
             return_selection=return_selection,
             kernel_initializer=kernel_initializer,

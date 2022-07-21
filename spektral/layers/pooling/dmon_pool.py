@@ -169,19 +169,20 @@ class DMoNPool(SRCPool):
             degrees = tf.sparse.reduce_sum(a, axis=-1)
             degrees = tf.reshape(degrees, (-1, 1))
         else:
-            n_edges = tf.cast(tf.math.count_nonzero(
-                a, axis=(-2, -1)), dtype=s.dtype)
+            n_edges = tf.cast(tf.math.count_nonzero(a, axis=(-2, -1)), dtype=s.dtype)
             degrees = tf.reduce_sum(a, axis=-1, keepdims=True)
 
         normalizer_left = tf.matmul(s, degrees, transpose_a=True)
         normalizer_right = tf.matmul(degrees, s, transpose_a=True)
 
         if K.ndim(s) == 3:
-            normalizer = ops.modal_dot(normalizer_left, normalizer_right) / \
-                2 / tf.reshape(n_edges, [tf.shape(n_edges)[0]] + [1] * 2)
+            normalizer = (
+                ops.modal_dot(normalizer_left, normalizer_right)
+                / 2
+                / tf.reshape(n_edges, [tf.shape(n_edges)[0]] + [1] * 2)
+            )
         else:
-            normalizer = ops.modal_dot(normalizer_left, normalizer_right) / \
-                2 / n_edges
+            normalizer = ops.modal_dot(normalizer_left, normalizer_right) / 2 / n_edges
 
         loss = -tf.linalg.trace(a_pool - normalizer) / 2 / n_edges
 
@@ -190,8 +191,7 @@ class DMoNPool(SRCPool):
     def collapse_loss(self, a, s):
         cluster_sizes = tf.math.reduce_sum(s, axis=-2)
         n_nodes = tf.cast(tf.shape(a)[-1], s.dtype)
-        loss = tf.norm(cluster_sizes, axis=-1) / \
-            n_nodes * tf.sqrt(float(self.k)) - 1
+        loss = tf.norm(cluster_sizes, axis=-1) / n_nodes * tf.sqrt(float(self.k)) - 1
 
         return loss
 

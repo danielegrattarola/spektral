@@ -16,12 +16,12 @@ from spektral.utils import label_to_one_hot
 
 class DBLP(Dataset):
     """
-    A subset of the DBLP computer science bibliography website, 
-    as collected in the 
+    A subset of the DBLP computer science bibliography website,
+    as collected in the
     [Fu et al. (2020)](https://arxiv.org/abs/2002.01680) paper.
-    
+
     **Arguments**
-    
+
     - `normalize_x`: if True, normalize the features.
     - `dtype`: numpy dtype of graph data.
     """
@@ -31,8 +31,8 @@ class DBLP(Dataset):
         self.normalize_x = normalize_x
         super().__init__(**kwargs)
 
-    url = 'https://github.com/abojchevski/graph2gauss/raw/master/data/dblp.npz'
-    
+    url = "https://github.com/abojchevski/graph2gauss/raw/master/data/dblp.npz"
+
     @property
     def path(self):
         return osp.join(DATASET_FOLDER, "Citation", "dblp")
@@ -42,20 +42,22 @@ class DBLP(Dataset):
         _download_url(self.url, self.path)
 
     def read(self):
-        f = np.load(osp.join(self.path, 'dblp.npz'))
+        f = np.load(osp.join(self.path, "dblp.npz"))
 
-        x = sp.csr_matrix((f['attr_data'], f['attr_indices'], f['attr_indptr']),
-                          f['attr_shape']).toarray()
+        x = sp.csr_matrix(
+            (f["attr_data"], f["attr_indices"], f["attr_indptr"]), f["attr_shape"]
+        ).toarray()
         x[x > 0] = 1
 
         if self.normalize_x:
             print("Pre-processing node features")
             x = _preprocess_features(x)
 
-        a = sp.csr_matrix((f['adj_data'], f['adj_indices'], f['adj_indptr']),
-                          f['adj_shape'])  # .tocoo()
+        a = sp.csr_matrix(
+            (f["adj_data"], f["adj_indices"], f["adj_indptr"]), f["adj_shape"]
+        )  # .tocoo()
 
-        y = f['labels']
+        y = f["labels"]
         y = label_to_one_hot(y, np.unique(y))
 
         return [
@@ -76,8 +78,8 @@ def _download_url(url, folder, log=False):
             console. (default: :obj:`True`)
     """
 
-    filename = url.rpartition('/')[2]
-    filename = filename if filename[0] == '?' else filename.split('?')[0]
+    filename = url.rpartition("/")[2]
+    filename = filename if filename[0] == "?" else filename.split("?")[0]
     path = osp.join(folder, filename)
 
     if osp.exists(path):  # pragma: no cover
@@ -97,7 +99,7 @@ def _download_url(url, folder, log=False):
     context = ssl._create_unverified_context()
     data = urllib.request.urlopen(url, context=context)
 
-    with open(path, 'wb') as f:
+    with open(path, "wb") as f:
         f.write(data.read())
 
     return path
