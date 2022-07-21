@@ -55,6 +55,8 @@ PAGES = [
             layers.MinCutPool,
             layers.SAGPool,
             layers.TopKPool,
+            layers.JustBalancePool,
+            layers.DMoNPool,
         ],
     },
     {
@@ -123,6 +125,8 @@ PAGES = [
         "methods": [],
         "classes": [
             datasets.Citation,
+            datasets.DBLP,
+            datasets.Flickr,
             datasets.GraphSage,
             datasets.PPI,
             datasets.Reddit,

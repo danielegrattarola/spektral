@@ -14,7 +14,7 @@ class MinCutPool(SRCPool):
     > [Spectral Clustering with Graph Neural Networks for Graph Pooling](https://arxiv.org/abs/1907.00481)<br>
     > Filippo Maria Bianchi et al.
 
-    **Mode**: batch.
+    **Mode**: single, batch.
 
     This layer learns a soft clustering of the input graph as follows:
     $$

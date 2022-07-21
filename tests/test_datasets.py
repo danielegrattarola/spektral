@@ -12,6 +12,18 @@ def test_citation():
     sl.load()
 
 
+def test_dblp():
+    dataset = datasets.DBLP(normalize_x=True)
+    sl = SingleLoader(dataset)
+    sl.load()
+
+
+def test_flickr():
+    dataset = datasets.Flickr(normalize_x=True)
+    sl = SingleLoader(dataset)
+    sl.load()
+
+
 def test_graphsage():
     # Test only PPI because Travis otherwise runs into memory errors
     dataset = datasets.PPI()
