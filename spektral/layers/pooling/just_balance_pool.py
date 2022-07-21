@@ -32,7 +32,7 @@ class JustBalancePool(SRCPool):
     $$
 
     The layer can be used without a supervised loss to compute node clustering by
-    minimizing the two auxiliary losses.
+    minimizing the auxiliary loss.
 
     The layer is originally designed to be used in conjuction with a
     [GCNConv](https://graphneural.network/layers/convolution/#gcnconv)
