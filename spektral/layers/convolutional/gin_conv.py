@@ -3,6 +3,7 @@ from tensorflow.keras import activations
 from tensorflow.keras.layers import BatchNormalization, Dense
 from tensorflow.keras.models import Sequential
 
+from spektral.layers import ops
 from spektral.layers.convolutional.message_passing import MessagePassing
 
 
@@ -140,3 +141,11 @@ class GINConv(MessagePassing):
             "mlp_activation": self.mlp_activation,
             "mlp_batchnorm": self.mlp_batchnorm,
         }
+
+
+class GinConvBatch(GINConv):
+    def call(self, inputs, **kwargs):
+        x, a = inputs
+        output = self.mlp((self.one + self.eps) * x + ops.modal_dot(a, x))
+
+        return output

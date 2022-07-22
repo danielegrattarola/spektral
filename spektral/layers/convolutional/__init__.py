@@ -12,7 +12,7 @@ from .gated_graph_conv import GatedGraphConv
 from .gcn_conv import GCNConv
 from .gcs_conv import GCSConv
 from .general_conv import GeneralConv
-from .gin_conv import GINConv
+from .gin_conv import GINConv, GinConvBatch
 from .graphsage_conv import GraphSageConv
 from .message_passing import MessagePassing
 from .tag_conv import TAGConv
