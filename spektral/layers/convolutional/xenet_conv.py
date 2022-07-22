@@ -211,7 +211,7 @@ class XENetConv(MessagePassing):
         }
 
 
-class XENetDenseConv(Conv):
+class XENetConvBatch(Conv):
     r"""
     A XENet convolutional layer from the paper
 

@@ -2,7 +2,7 @@ import numpy as np
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 
-from spektral.layers import XENetConv, XENetDenseConv
+from spektral.layers import XENetConv, XENetConvBatch
 from spektral.utils.sparse import sp_matrix_to_sp_tensor
 
 # Not using these tests because they assume certain behaviors that we
@@ -105,10 +105,10 @@ def test_dense_model_sizes():
         # for test coverage:
         model.predict([x, a, e])
 
-    X, E = XENetDenseConv([5], 10, 20, False)([X_in, A_in, E_in])
+    X, E = XENetConvBatch([5], 10, 20, False)([X_in, A_in, E_in])
     assert_n_params([X_in, A_in, E_in], [X, E], 350)
     # int vs list: 5 vs [5]
-    X, E = XENetDenseConv(5, 10, 20, False)([X_in, A_in, E_in])
+    X, E = XENetConvBatch(5, 10, 20, False)([X_in, A_in, E_in])
     assert_n_params([X_in, A_in, E_in], [X, E], 350)
     # t = (4+4+3+3+1)*5 =  75    # Stack Conv
     # x = (4+5+5+1)*10  = 150    # Node reduce
@@ -116,7 +116,7 @@ def test_dense_model_sizes():
     # p                 =   5    # Prelu
     # total = t+x+e+p   = 350
 
-    X, E = XENetDenseConv(5, 10, 20, True)([X_in, A_in, E_in])
+    X, E = XENetConvBatch(5, 10, 20, True)([X_in, A_in, E_in])
     assert_n_params([X_in, A_in, E_in], [X, E], 362)
     # t = (4+4+3+3+1)*5 =  75
     # a = (5+1)*1   *2  =  12    # Attention
@@ -125,7 +125,7 @@ def test_dense_model_sizes():
     # p                 =   5    # Prelu
     # total = t+x+e+p   = 362
 
-    X, E = XENetDenseConv([50, 5], 10, 20, True)([X_in, A_in, E_in])
+    X, E = XENetConvBatch([50, 5], 10, 20, True)([X_in, A_in, E_in])
     assert_n_params([X_in, A_in, E_in], [X, E], 1292)
     # t1 = (4+4+3+3+1)*50   =  750
     # t2 = (50+1)*5         =  255
@@ -159,10 +159,10 @@ def test_dense_model_unknown_size():
         # for test coverage:
         model.predict([x, a, e])
 
-    X, E = XENetDenseConv([5], 10, 20, False)([X_in, A_in, E_in])
+    X, E = XENetConvBatch([5], 10, 20, False)([X_in, A_in, E_in])
     assert_n_params([X_in, A_in, E_in], [X, E], 350)
     # int vs list: 5 vs [5]
-    X, E = XENetDenseConv(5, 10, 20, False)([X_in, A_in, E_in])
+    X, E = XENetConvBatch(5, 10, 20, False)([X_in, A_in, E_in])
     assert_n_params([X_in, A_in, E_in], [X, E], 350)
     # t = (4+4+3+3+1)*5 =  75    # Stack Conv
     # x = (4+5+5+1)*10  = 150    # Node reduce
@@ -170,7 +170,7 @@ def test_dense_model_unknown_size():
     # p                 =   5    # Prelu
     # total = t+x+e+p   = 350
 
-    X, E = XENetDenseConv(5, 10, 20, True)([X_in, A_in, E_in])
+    X, E = XENetConvBatch(5, 10, 20, True)([X_in, A_in, E_in])
     assert_n_params([X_in, A_in, E_in], [X, E], 362)
     # t = (4+4+3+3+1)*5 =  75
     # a = (5+1)*1   *2  =  12    # Attention
@@ -179,7 +179,7 @@ def test_dense_model_unknown_size():
     # p                 =   5    # Prelu
     # total = t+x+e+p   = 362
 
-    X, E = XENetDenseConv([50, 5], 10, 20, True)([X_in, A_in, E_in])
+    X, E = XENetConvBatch([50, 5], 10, 20, True)([X_in, A_in, E_in])
     assert_n_params([X_in, A_in, E_in], [X, E], 1292)
     # t1 = (4+4+3+3+1)*50   =  750
     # t2 = (50+1)*5         =  255
