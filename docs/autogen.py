@@ -27,6 +27,7 @@ PAGES = [
             layers.AGNNConv,
             layers.APPNPConv,
             layers.ARMAConv,
+            layers.CensNetConv,
             layers.ChebConv,
             layers.CrystalConv,
             layers.DiffusionConv,
@@ -54,6 +55,8 @@ PAGES = [
             layers.MinCutPool,
             layers.SAGPool,
             layers.TopKPool,
+            layers.JustBalancePool,
+            layers.DMoNPool,
         ],
     },
     {
@@ -122,6 +125,8 @@ PAGES = [
         "methods": [],
         "classes": [
             datasets.Citation,
+            datasets.DBLP,
+            datasets.Flickr,
             datasets.GraphSage,
             datasets.PPI,
             datasets.Reddit,
