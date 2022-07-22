@@ -1,8 +1,8 @@
 import numpy as np
 import scipy.sparse as sp
 import tensorflow as tf
-from spektral.data.utils import to_disjoint
 
+from spektral.data.utils import to_disjoint
 from spektral.layers import ops
 from spektral.utils import convolution
 from spektral.utils.sparse import sp_batch_to_sp_tensor, sp_matrix_to_sp_tensor
