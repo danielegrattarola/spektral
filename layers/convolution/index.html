@@ -86,6 +86,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#armaconv">ARMAConv</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#censnetconv">CensNetConv</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#chebconv">ChebConv</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#crystalconv">CrystalConv</a>
@@ -113,6 +115,10 @@
     <li class="toctree-l2"><a class="reference internal" href="#tagconv">TAGConv</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#xenetconv">XENetConv</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#ginconvbatch">GINConvBatch</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#xenetconvbatch">XENetConvBatch</a>
     </li>
     </ul>
                     </li>
@@ -427,6 +433,56 @@ stack;</li>
 <li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
 <li><code>activity_regularizer</code>: regularization applied to the output;</li>
 <li><code>kernel_constraint</code>: constraint applied to the weights;</li>
+<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/censnet_conv.py#L8">[source]</a></span></p>
+<h4 id="censnetconv">CensNetConv</h4>
+<pre><code class="language-python">spektral.layers.CensNetConv(node_channels, edge_channels, activation=None, use_bias=True, kernel_initializer='glorot_uniform', node_initializer='glorot_uniform', edge_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, node_regularizer=None, edge_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, node_constraint=None, edge_constraint=None, bias_constraint=None)
+</code></pre>
+<p>A CensNet convolutional layer from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/2010.13242">Co-embedding of Nodes and Edges with Graph Neural Networks</a><br>
+Xiaodong Jiang et al.</p>
+</blockquote>
+<p>This implements both the node and edge propagation rules as a single layer.</p>
+<p><strong>Mode</strong>: single, disjoint, batch.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>([batch], n_nodes, n_node_features)</code>;</li>
+<li>A tuple containing:</li>
+<li>Modified Laplacian of shape <code>([batch], n_nodes, n_nodes)</code>; can be
+computed with <code>spektral.utils.convolution.gcn_filter</code>.</li>
+<li>Modified line graph Laplacian of shape <code>([batch], n_edges, n_edges)</code>;
+can be computed with <code>spektral.utils.convolution.line_graph</code> and
+<code>spektral.utils.convolution.gcn_filter</code>.</li>
+<li>Incidence matrix of shape <code>([batch], n_nodes, n_edges)</code>; can be
+computed with <code>spektral.utils.convolution.incidence_matrix</code>.</li>
+<li>Edge features of shape <code>([batch], n_edges, n_edge_features)</code>;</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Node features with the same shape as the input, but with the last
+dimension changed to <code>node_channels</code>.</li>
+<li>Edge features with the same shape as the input, but with the last
+dimension changed to <code>edge_channels</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>node_channels</code>: number of output channels for the node features;</li>
+<li><code>edge_channels</code>: number of output channels for the edge features;</li>
+<li><code>activation</code>: activation function;</li>
+<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
+<li><code>node_initializer</code>: initializer for the node feature weights (P_n);</li>
+<li><code>edge_initializer</code>: initializer for the edge feature weights (P_e);</li>
+<li><code>bias_initializer</code>: initializer for the bias vector;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
+<li><code>edge_regularizer</code>: regularization applied to the edge feature weights;</li>
+<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
+<li><code>activity_regularizer</code>: regularization applied to the output;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
+<li><code>edge_constraint</code>: constraint applied to the edge feature weights;</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
@@ -916,7 +972,7 @@ dimension changed to <code>channels</code>.</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gin_conv.py#L9">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gin_conv.py#L10">[source]</a></span></p>
 <h4 id="ginconv">GINConv</h4>
 <pre><code class="language-python">spektral.layers.GINConv(channels, epsilon=None, mlp_hidden=None, mlp_activation='relu', mlp_batchnorm=True, aggregate='sum', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -1104,6 +1160,22 @@ changed to <code>edge_channels</code>.</li>
 <li><code>kernel_constraint</code>: constraint applied to the weights;</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
 </ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gin_conv.py#L146">[source]</a></span></p>
+<h4 id="ginconvbatch">GINConvBatch</h4>
+<pre><code class="language-python">spektral.layers.GINConvBatch(channels, epsilon=None, mlp_hidden=None, mlp_activation='relu', mlp_batchnorm=True, aggregate='sum', activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+</code></pre>
+<p>A batch-mode version of GINConv.</p>
+<p><strong>Mode</strong>: batch.</p>
+<p><strong>This layer expects a dense adjacency matrix.</strong></p>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/xenet_conv.py#L214">[source]</a></span></p>
+<h4 id="xenetconvbatch">XENetConvBatch</h4>
+<pre><code class="language-python">spektral.layers.XENetConvBatch(stack_channels, node_channels, edge_channels, attention=True, node_activation=None, edge_activation=None, aggregate='sum', use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+</code></pre>
+<p>A batch-mode version of XENetConv.</p>
+<p><strong>Mode</strong>: batch.</p>
+<p><strong>This layer expects a dense adjacency matrix.</strong></p>
               
             </div>
           </div>

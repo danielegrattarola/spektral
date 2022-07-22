@@ -92,6 +92,10 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#topkpool">TopKPool</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#justbalancepool">JustBalancePool</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dmonpool">DMoNPool</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#global-pooling-layers">Global pooling layers</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#globalavgpool">GlobalAvgPool</a>
@@ -264,7 +268,7 @@ will be returned with <code>x_pool</code>, <code>a_pool</code>, and <code>i_pool
 <p><a href="https://arxiv.org/abs/1806.08804">Hierarchical Graph Representation Learning with Differentiable Pooling</a><br>
 Rex Ying et al.</p>
 </blockquote>
-<p><strong>Mode</strong>: batch.</p>
+<p><strong>Mode</strong>: single, batch.</p>
 <p>This layer learns a soft clustering of the input graph as follows:
 <script type="math/tex; mode=display">
 \begin{align}
@@ -369,7 +373,7 @@ the papaer (can be expensive);</li>
 <p><a href="https://arxiv.org/abs/1907.00481">Spectral Clustering with Graph Neural Networks for Graph Pooling</a><br>
 Filippo Maria Bianchi et al.</p>
 </blockquote>
-<p><strong>Mode</strong>: batch.</p>
+<p><strong>Mode</strong>: single, batch.</p>
 <p>This layer learns a soft clustering of the input graph as follows:
 <script type="math/tex; mode=display">
 \begin{align}
@@ -529,6 +533,133 @@ tanh;</li>
 <li><code>kernel_initializer</code>: initializer for the weights;</li>
 <li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
 <li><code>kernel_constraint</code>: constraint applied to the weights;</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/just_balance_pool.py#L10">[source]</a></span></p>
+<h4 id="justbalancepool">JustBalancePool</h4>
+<pre><code class="language-python">spektral.layers.JustBalancePool(k, mlp_hidden=None, mlp_activation='relu', normalized_loss=False, return_selection=False, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, kernel_constraint=None, bias_constraint=None)
+</code></pre>
+<p>The Just Balance pooling layer from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/2207.08779">Simplifying Clustering with Graph Neural Networks</a><br>
+Filippo Maria Bianchi</p>
+</blockquote>
+<p><strong>Mode</strong>: single, batch.</p>
+<p>This layer learns a soft clustering of the input graph as follows:
+<script type="math/tex; mode=display">
+\begin{align}
+\S &= \textrm{MLP}(\X); \\
+\X' &= \S^\top \X \\
+\A' &= \S^\top \A \S; \\
+\end{align}
+</script>
+where <script type="math/tex">\textrm{MLP}</script> is a multi-layer perceptron with softmax output.</p>
+<p>The layer adds the following auxiliary loss to the model
+<script type="math/tex; mode=display">
+L = - \mathrm{Tr}(\sqrt{ \S^\top \S })
+</script>
+</p>
+<p>The layer can be used without a supervised loss to compute node clustering by
+minimizing the auxiliary loss.</p>
+<p>The layer is originally designed to be used in conjuction with a
+<a href="https://graphneural.network/layers/convolution/#gcnconv">GCNConv</a>
+layer operating on the following connectivity matrix</p>
+<p>
+<script type="math/tex; mode=display">
+\tilde{\A} = \I - \delta (\I - \D^{-1/2} \A \D^{-1/2})
+</script>
+</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>(batch, n_nodes_in, n_node_features)</code>;</li>
+<li>Connectivity matrix of shape
+<code>(batch, n_nodes_in, n_nodes_in)</code>;</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Reduced node features of shape <code>(batch, n_nodes_out, n_node_features)</code>;</li>
+<li>Reduced adjacency matrix of shape <code>(batch, n_nodes_out, n_nodes_out)</code>;</li>
+<li>If <code>return_selection=True</code>, the selection matrix of shape
+<code>(batch, n_nodes_in, n_nodes_out)</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>k</code>: number of output nodes;</li>
+<li><code>mlp_hidden</code>: list of integers, number of hidden units for each hidden layer in
+the MLP used to compute cluster assignments (if <code>None</code>, the MLP has only one output
+layer);</li>
+<li><code>mlp_activation</code>: activation for the MLP layers;</li>
+<li><code>normalized_loss</code>: booelan, whether to normalize the auxiliary loss in [0,1];</li>
+<li><code>return_selection</code>: boolean, whether to return the selection matrix;</li>
+<li><code>kernel_initializer</code>: initializer for the weights of the MLP;</li>
+<li><code>bias_initializer</code>: initializer for the bias of the MLP;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights of the MLP;</li>
+<li><code>bias_regularizer</code>: regularization applied to the bias of the MLP;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights of the MLP;</li>
+<li><code>bias_constraint</code>: constraint applied to the bias of the MLP;</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/dmon_pool.py#L10">[source]</a></span></p>
+<h4 id="dmonpool">DMoNPool</h4>
+<pre><code class="language-python">spektral.layers.DMoNPool(k, mlp_hidden=None, mlp_activation='relu', return_selection=False, collapse_regularization=0.1, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, kernel_constraint=None, bias_constraint=None)
+</code></pre>
+<p>The DMoN pooling layer from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/2006.16904">Graph Clustering with Graph Neural Networks</a><br>
+Anton Tsitsulin et al.</p>
+</blockquote>
+<p><strong>Mode</strong>: single, batch.</p>
+<p>This layer learns a soft clustering of the input graph as follows:
+<script type="math/tex; mode=display">
+\begin{align}
+\C &= \textrm{MLP}(\X); \\
+\X' &= \C^\top \X \\
+\A' &= \C^\top \A \C; \\
+\end{align}
+</script>
+where <script type="math/tex">\textrm{MLP}</script> is a multi-layer perceptron with softmax output.</p>
+<p>Two auxiliary loss terms are also added to the model: the modularity loss
+<script type="math/tex; mode=display">
+L_m = - \frac{1}{2m} \mathrm{Tr}(\C^\top \A \C - \C^\top \d^\top \d \C)
+</script>
+and the collapse regularization loss
+<script type="math/tex; mode=display">
+L_c = \frac{\sqrt{k}}{n} \left\|
+\sum_i \C_i^\top
+\right\|_F -1.
+</script>
+</p>
+<p>This layer is based on the original implementation found
+<a href="https://github.com/google-research/google-research/blob/master/graph_embedding/dmon/dmon.py">here</a>.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>(batch, n_nodes_in, n_node_features)</code>;</li>
+<li>Symmetrically normalized adjacency matrix of shape
+<code>(batch, n_nodes_in, n_nodes_in)</code>;</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Reduced node features of shape <code>(batch, n_nodes_out, n_node_features)</code>;</li>
+<li>Reduced adjacency matrix of shape <code>(batch, n_nodes_out, n_nodes_out)</code>;</li>
+<li>If <code>return_selection=True</code>, the selection matrix of shape
+<code>(batch, n_nodes_in, n_nodes_out)</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>k</code>: number of output nodes;</li>
+<li><code>mlp_hidden</code>: list of integers, number of hidden units for each hidden layer in
+the MLP used to compute cluster assignments (if <code>None</code>, the MLP has only one output
+layer);</li>
+<li><code>mlp_activation</code>: activation for the MLP layers;</li>
+<li><code>collapse_regularization</code>: strength of the collapse regularization;</li>
+<li><code>return_selection</code>: boolean, whether to return the selection matrix;</li>
+<li><code>use_bias</code>: use bias in the MLP;</li>
+<li><code>kernel_initializer</code>: initializer for the weights of the MLP;</li>
+<li><code>bias_initializer</code>: initializer for the bias of the MLP;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights of the MLP;</li>
+<li><code>bias_regularizer</code>: regularization applied to the bias of the MLP;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights of the MLP;</li>
+<li><code>bias_constraint</code>: constraint applied to the bias of the MLP;</li>
 </ul>
 <hr />
 <h3 id="global-pooling-layers">Global pooling layers</h3>

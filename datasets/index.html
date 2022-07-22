@@ -93,6 +93,10 @@
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#citation">Citation</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dblp">DBLP</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#flickr">Flickr</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#graphsage">GraphSage</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#ppi">PPI</a>
@@ -199,6 +203,31 @@ for training, 30 nodes per class for validation and the remaining nodes for
 testing, as recommended by <a href="https://arxiv.org/abs/1811.05868">Shchur et al. (2018)</a>).
 If False (default), return the "Planetoid" public splits defined by
 <a href="https://arxiv.org/abs/1603.08861">Yang et al. (2016)</a>.</li>
+<li><code>normalize_x</code>: if True, normalize the features.</li>
+<li><code>dtype</code>: numpy dtype of graph data.</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/dblp.py#L17">[source]</a></span></p>
+<h4 id="dblp">DBLP</h4>
+<pre><code class="language-python">spektral.datasets.dblp.DBLP(normalize_x=False, dtype=&lt;class 'numpy.float32'&gt;)
+</code></pre>
+<p>A subset of the DBLP computer science bibliography website,
+as collected in the
+<a href="https://arxiv.org/abs/2002.01680">Fu et al. (2020)</a> paper.</p>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>normalize_x</code>: if True, normalize the features.</li>
+<li><code>dtype</code>: numpy dtype of graph data.</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/datasets/flickr.py#L14">[source]</a></span></p>
+<h4 id="flickr">Flickr</h4>
+<pre><code class="language-python">spektral.datasets.flickr.Flickr(normalize_x=False, dtype=&lt;class 'numpy.float32'&gt;)
+</code></pre>
+<p>The Flickr dataset from the <a href="https://arxiv.org/abs/1907.04931">Zeng at al. (2019)</a> paper,
+containing descriptions and common properties of images.</p>
+<p><strong>Arguments</strong></p>
+<ul>
 <li><code>normalize_x</code>: if True, normalize the features.</li>
 <li><code>dtype</code>: numpy dtype of graph data.</li>
 </ul>
