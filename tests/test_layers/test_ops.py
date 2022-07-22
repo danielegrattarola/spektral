@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.sparse as sp
 import tensorflow as tf
+from spektral.data.utils import to_disjoint
 
 from spektral.layers import ops
 from spektral.utils import convolution
@@ -255,36 +256,32 @@ def test_base_ops():
 
 
 def test_modes_ops():
-    X = np.array([[1, 0], [0, 1], [1, 1], [0, 0], [1, 2]])
-    I = np.array([0, 0, 0, 1, 1])
+    ns = [10, 5, 8]
+    x_list = [np.random.randn(n, 3) for n in ns]
+    a_list = [sp.csr_matrix(np.ones((n, n))) for n in ns]
 
-    A_data = [1, 1, 1, 1, 1]
-    A_row = [0, 1, 2, 3, 4]
-    A_col = [1, 0, 1, 4, 3]
-    A_sparse = sp.csr_matrix((A_data, (A_row, A_col)), shape=(5, 5))
-    A_sparse_tensor = sp_matrix_to_sp_tensor(A_sparse)
+    x, a, i = to_disjoint(x_list, a_list)
+    a = sp_matrix_to_sp_tensor(a)
+
+    expected_x = np.zeros((len(ns), max(ns), 3))
+    for i_, n in enumerate(ns):
+        expected_x[i_, :n] = x_list[i_]
+
+    expected_a = np.zeros((len(ns), max(ns), max(ns)))
+    for i_, n in enumerate(ns):
+        expected_a[i_, :n, :n] = a_list[i_].A
 
     # Disjoint signal to batch
-    expected_result = np.array(
-        [[[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]], [[0.0, 0.0], [1.0, 2.0], [0.0, 0.0]]]
-    )
-    result = ops.disjoint_signal_to_batch(X, I).numpy()
+    result = ops.disjoint_signal_to_batch(x, i).numpy()
 
-    assert expected_result.shape == result.shape
-    assert np.allclose(expected_result, result, atol=tol)
+    assert expected_x.shape == result.shape
+    assert np.allclose(expected_x, result, atol=tol)
 
     # Disjoint adjacency to batch
-    expected_result = np.array(
-        [
-            [[0.0, 1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0]],
-            [[0.0, 1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, 0.0]],
-        ]
-    )
+    result = ops.disjoint_adjacency_to_batch(a, i).numpy()
 
-    result = ops.disjoint_adjacency_to_batch(A_sparse_tensor, I).numpy()
-
-    assert expected_result.shape == result.shape
-    assert np.allclose(expected_result, result, atol=tol)
+    assert expected_a.shape == result.shape
+    assert np.allclose(expected_a, result, atol=tol)
 
 
 def test_scatter_ops():

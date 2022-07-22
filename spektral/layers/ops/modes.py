@@ -33,27 +33,6 @@ def disjoint_signal_to_batch(X, I):
     return batch
 
 
-def _vectorised_get_cum_graph_size(nodes, graph_sizes):
-    """
-    Takes a list of node ids and graph sizes ordered by segment ID and returns the
-    number of nodes contained in graphs with smaller segment ID.
-
-    :param nodes: List of node ids of shape (nodes)
-    :param graph_sizes: List of graph sizes (i.e. tf.math.segment_sum(tf.ones_like(I), I) where I are the
-    segment IDs).
-    :return: A list of shape (nodes) where each entry corresponds to the number of nodes contained in graphs
-    with smaller segment ID for each node.
-    """
-
-    def get_cum_graph_size(node):
-        cum_graph_sizes = tf.cumsum(graph_sizes, exclusive=True)
-        indicator_if_smaller = tf.cast(node - cum_graph_sizes >= 0, tf.int32)
-        graph_id = tf.reduce_sum(indicator_if_smaller) - 1
-        return tf.cumsum(graph_sizes, exclusive=True)[graph_id]
-
-    return tf.map_fn(get_cum_graph_size, nodes)
-
-
 def disjoint_adjacency_to_batch(A, I):
     """
     Converts a disjoint adjacency matrix to batch node by zero-padding.
@@ -63,28 +42,31 @@ def disjoint_adjacency_to_batch(A, I):
     :return: Tensor, batched adjacency matrix of shape `(batch, N_max, N_max)`;
     """
     I = tf.cast(I, tf.int64)
-    A = tf.cast(A, tf.float32)
     indices = A.indices
-    values = tf.cast(A.values, tf.int64)
+    values = A.values
     i_nodes, j_nodes = indices[:, 0], indices[:, 1]
 
     graph_sizes = tf.math.segment_sum(tf.ones_like(I), I)
     max_n_nodes = tf.reduce_max(graph_sizes)
     n_graphs = tf.shape(graph_sizes)[0]
-    relative_j_nodes = j_nodes - _vectorised_get_cum_graph_size(j_nodes, graph_sizes)
-    relative_i_nodes = i_nodes - _vectorised_get_cum_graph_size(i_nodes, graph_sizes)
-    spaced_i_nodes = I * max_n_nodes + relative_i_nodes
+
+    offset = tf.gather(I, i_nodes)
+    offset = tf.gather(tf.cumsum(graph_sizes, exclusive=True), offset)
+
+    relative_j_nodes = j_nodes - offset
+    relative_i_nodes = i_nodes - offset
+
+    spaced_i_nodes = tf.gather(I, i_nodes) * max_n_nodes + relative_i_nodes
     new_indices = tf.transpose(tf.stack([spaced_i_nodes, relative_j_nodes]))
 
-    new_indices = tf.cast(new_indices, tf.int32)
-    n_graphs = tf.cast(n_graphs, tf.int32)
-    max_n_nodes = tf.cast(max_n_nodes, tf.int32)
+    n_graphs = tf.cast(n_graphs, new_indices.dtype)
+    max_n_nodes = tf.cast(max_n_nodes, new_indices.dtype)
 
     dense_adjacency = tf.scatter_nd(
         new_indices, values, (n_graphs * max_n_nodes, max_n_nodes)
     )
     batch = tf.reshape(dense_adjacency, (n_graphs, max_n_nodes, max_n_nodes))
-    batch = tf.cast(batch, tf.float32)
+
     return batch
 
 
