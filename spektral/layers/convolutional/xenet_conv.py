@@ -213,53 +213,11 @@ class XENetConv(MessagePassing):
 
 class XENetConvBatch(Conv):
     r"""
-    A XENet convolutional layer from the paper
-
-      > [XENet: Using a new graph convolution to accelerate the timeline for protein design on quantum computers](https://www.biorxiv.org/content/10.1101/2021.05.05.442729v1)<br>
-      > Jack B. Maguire, Daniele Grattarola, Eugene Klyshko, Vikram Khipple Mulligan, Hans Melo
+    A batch-mode version of XENetConv.
 
     **Mode**: batch.
 
     **This layer expects a dense adjacency matrix.**
-
-    This layer computes for each node \(i\):
-    $$
-        \s_{ij} = \text{PReLU} \left( (\x_{i} \| \x_{j} \| \e_{ij} \| \e_{ji}) \W^{(s)} + \b^{(s)} \right) \\
-        \s^{(\text{out})}_{i} = \sum\limits_{j \in \mathcal{N}(i)} \s_{ij} \\
-        \s^{(\text{in})}_{i} = \sum\limits_{j \in \mathcal{N}(i)} \s_{ji} \\
-        \x_{i}' = \sigma\left( (\x_{i} \| \s^{(\text{out})}_{i} \| \s^{(\text{in})}_{i}) \W^{(n)} + \b^{(n)} \right) \\
-        \e_{ij}' = \sigma\left( \s_{ij} \W^{(e)} + \b^{(e)} \right)
-    $$
-
-    **Input**
-
-    - Node features of shape `([batch], n_nodes, n_node_features)`;
-    - Binary adjacency matrices of shape `([batch], n_nodes, n_nodes)`;
-    - Edge features of shape `(batch, n_nodes, n_nodes, n_edge_features)`.
-
-    **Output**
-
-    - Node features with the same shape of the input, but the last dimension
-    changed to `node_channels`.
-    - Edge features with the same shape of the input, but the last dimension
-    changed to `edge_channels`.
-
-    **Arguments**
-
-    - `stack_channels`: integer or list of integers, number of channels for the hidden layers;
-    - `node_channels`: integer, number of output channels for the nodes;
-    - `edge_channels`: integer, number of output channels for the edges;
-    - `attention`: whether to use attention when aggregating the stacks;
-    - `node_activation`: activation function for nodes;
-    - `edge_activation`: activation function for edges;
-    - `use_bias`: bool, add a bias vector to the output;
-    - `kernel_initializer`: initializer for the weights;
-    - `bias_initializer`: initializer for the bias vector;
-    - `kernel_regularizer`: regularization applied to the weights;
-    - `bias_regularizer`: regularization applied to the bias vector;
-    - `activity_regularizer`: regularization applied to the output;
-    - `kernel_constraint`: constraint applied to the weights;
-    - `bias_constraint`: constraint applied to the bias vector.
     """
 
     def __init__(

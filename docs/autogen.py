@@ -42,6 +42,8 @@ PAGES = [
             layers.GraphSageConv,
             layers.TAGConv,
             layers.XENetConv,
+            layers.GINConvBatch,
+            layers.XENetConvBatch,
         ],
     },
     {

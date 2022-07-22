@@ -143,7 +143,15 @@ class GINConv(MessagePassing):
         }
 
 
-class GinConvBatch(GINConv):
+class GINConvBatch(GINConv):
+    r"""
+    A batch-mode version of GINConv.
+
+    **Mode**: batch.
+
+    **This layer expects a dense adjacency matrix.**
+    """
+
     def call(self, inputs, **kwargs):
         x, a = inputs
         output = self.mlp((self.one + self.eps) * x + ops.modal_dot(a, x))
