@@ -231,7 +231,7 @@ must return a list of <code>spektral.data.Graph</code> objects:</p>
         return [Graph(x=x, adj=adj, y=y) for x, adj, y in some_magic_list]
 </code></pre>
 <p>The <code>download()</code> method is automatically called if the path returned by
-<code>Dataset.path</code> does not exists (default <code>~/.spektral/datasets/ClassName/</code>).</p>
+<code>Dataset.path</code> does not exists (default <code>~/spektral/datasets/ClassName/</code>).</p>
 <p>In this case, <code>download()</code> will be called before <code>read()</code>.</p>
 <p>Datasets should generally behave like Numpy arrays for any operation that
 uses simple 1D indexing:</p>
