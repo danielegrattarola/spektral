@@ -25,7 +25,7 @@ class Dataset:
     ```
 
     The `download()` method is automatically called if the path returned by
-    `Dataset.path` does not exists (default `~/.spektral/datasets/ClassName/`).
+    `Dataset.path` does not exists (default `~/spektral/datasets/ClassName/`).
 
     In this case, `download()` will be called before `read()`.
 

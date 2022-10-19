@@ -93,8 +93,8 @@ print("Homogeneity: {:.3f}; Completeness: {:.3f}; NMI: {:.3f}".format(hom, com, 
 plt.figure(figsize=(10, 5))
 
 plt.subplot(121)
-plt.plot(loss_history[:, 0], label="MinCUT loss")
-plt.plot(loss_history[:, 1], label="Ortho. loss")
+plt.plot(loss_history[:, 0], label="Ortho. loss")
+plt.plot(loss_history[:, 1], label="MinCUT loss")
 plt.plot(loss_history[:, 2], label="Total loss")
 plt.legend()
 plt.ylabel("Loss")

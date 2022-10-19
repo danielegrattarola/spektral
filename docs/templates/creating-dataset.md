@@ -13,7 +13,7 @@ You create a dataset by subclassing the `spektral.data.Dataset` class.
 The core of datasets is the `read()` method. This is called at every instantiation of the dataset and must return a list of `spektral.data.Graph`.
 It doesn't matter if you read the data from a file or create it on the fly, this is where the dataset is loaded in memory. 
 
-All datasets have a `path` property that represents the directory in which the data is stored. This defaults to `~/.spektral/datasets/[ClassName]`.
+All datasets have a `path` property that represents the directory in which the data is stored. This defaults to `~/spektral/datasets/[ClassName]`.
 You can ignore it if you want.<br>
 However, each time you instantiate a Dataset it will check whether `path` exists. If it doesn't, the `download()` method will be called.
 
