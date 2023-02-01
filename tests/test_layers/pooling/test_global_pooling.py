@@ -65,7 +65,7 @@ def _test_batch_mode(layer, **kwargs):
 
 def _test_disjoint_mode(layer, **kwargs):
     X = np.random.normal(size=(batch_size * N, F))
-    I = np.repeat(np.arange(batch_size), N).astype(np.int)
+    I = np.repeat(np.arange(batch_size), N).astype(int)
     if "target_shape" in kwargs:
         target_output_shape = kwargs.pop("target_shape")
     else:

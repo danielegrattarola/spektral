@@ -203,9 +203,9 @@ def preprocess_data(path, name):
         [id_map[k] for k in id_map if k in G.nodes and G.nodes[k]["test"]],
         dtype=np.int32,
     )
-    mask_tr = np.ones(n, dtype=np.bool)
-    mask_va = np.zeros(n, dtype=np.bool)
-    mask_te = np.zeros(n, dtype=np.bool)
+    mask_tr = np.ones(n, dtype=bool)
+    mask_va = np.zeros(n, dtype=bool)
+    mask_te = np.zeros(n, dtype=bool)
     mask_tr[idx_va] = False
     mask_tr[idx_te] = False
     mask_va[idx_va] = True
