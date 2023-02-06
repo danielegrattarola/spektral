@@ -65,7 +65,7 @@ class Net(Model):
 
 
 model = Net()
-opt = Adam(lr=learning_rate)
+opt = Adam(learning_rate=learning_rate)
 model.compile(optimizer=opt, loss="categorical_crossentropy", metrics=["acc"])
 
 ################################################################################

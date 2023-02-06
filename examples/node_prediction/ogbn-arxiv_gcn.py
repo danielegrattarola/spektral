@@ -57,7 +57,7 @@ x_3 = GCNConv(n_out, activation="softmax")([x_2, a_in])
 
 # Build model
 model = Model(inputs=[x_in, a_in], outputs=x_3)
-optimizer = Adam(lr=learning_rate)
+optimizer = Adam(learning_rate=learning_rate)
 loss_fn = SparseCategoricalCrossentropy()
 model.summary()
 

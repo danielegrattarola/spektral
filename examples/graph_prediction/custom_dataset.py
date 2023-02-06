@@ -123,7 +123,7 @@ class Net(Model):
 
 
 model = Net()
-optimizer = Adam(lr=learning_rate)
+optimizer = Adam(learning_rate=learning_rate)
 loss_fn = CategoricalCrossentropy()
 
 

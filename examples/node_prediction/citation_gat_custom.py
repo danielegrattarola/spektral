@@ -54,7 +54,7 @@ x_2 = GATConv(
 
 # Build model
 model = Model(inputs=[x_in, a_in], outputs=x_2)
-optimizer = Adam(lr=5e-3)
+optimizer = Adam(learning_rate=5e-3)
 loss_fn = CategoricalCrossentropy()
 
 
