@@ -379,7 +379,7 @@ def random_sparse(shape, nnz):
 def test_boolean_mask_sparse():
     st = random_sparse((5, 5), 15)
     dense = tf.sparse.to_dense(st)
-    mask = np.array([0, 1, 0, 1, 1], dtype=np.bool)
+    mask = np.array([0, 1, 0, 1, 1], dtype=bool)
     for axis in (0, 1):
         actual, _ = ops.boolean_mask_sparse(st, mask, axis=axis)
         actual = tf.sparse.to_dense(actual).numpy()
@@ -390,7 +390,7 @@ def test_boolean_mask_sparse():
 def test_boolean_mask_sparse_square():
     st = random_sparse((5, 5), 15)
     dense = tf.sparse.to_dense(st)
-    mask = np.array([0, 1, 0, 1, 1], dtype=np.bool)
+    mask = np.array([0, 1, 0, 1, 1], dtype=bool)
     actual, _ = ops.boolean_mask_sparse_square(st, mask)
     for axis in (0, 1):
         dense = tf.boolean_mask(dense, mask, axis=axis)

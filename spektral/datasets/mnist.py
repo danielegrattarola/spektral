@@ -86,7 +86,7 @@ def _flip_random_edges(A, p_swap):
     if not A.shape[0] == A.shape[1]:
         raise ValueError("A must be a square matrix.")
     dtype = A.dtype
-    A = sp.lil_matrix(A).astype(np.bool)
+    A = sp.lil_matrix(A).astype(bool)
     n_elem = A.shape[0] ** 2
     n_elem_to_flip = round(p_swap * n_elem)
     unique_idx = np.random.choice(n_elem, replace=False, size=n_elem_to_flip)

@@ -83,7 +83,7 @@ def load_dot(filename, force_graph=True):
                 # Probably a numpy array
                 elem[k] = np.array(
                     " ".join(v.lstrip("[").rstrip("]").split()).split(" ")
-                ).astype(np.float)
+                ).astype(float)
 
     for elem in output.edges().values():
         for k, v in elem.items():

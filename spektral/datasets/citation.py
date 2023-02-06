@@ -186,7 +186,7 @@ def _read_file(path, name, suffix):
 def _idx_to_mask(idx, l):
     mask = np.zeros(l)
     mask[idx] = 1
-    return np.array(mask, dtype=np.bool)
+    return np.array(mask, dtype=bool)
 
 
 def _preprocess_features(features):
