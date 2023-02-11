@@ -70,14 +70,14 @@ class TopKPool(SRCPool):
         kernel_initializer="glorot_uniform",
         kernel_regularizer=None,
         kernel_constraint=None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(
             return_selection=return_selection,
             kernel_initializer=kernel_initializer,
             kernel_regularizer=kernel_regularizer,
             kernel_constraint=kernel_constraint,
-            **kwargs
+            **kwargs,
         )
         self.ratio = ratio
         self.return_score = return_score

@@ -179,14 +179,14 @@ def run_model(config):
                     config["model"],
                     sparse=False,
                     edges=config.get("edges", False),
-                    **config["kwargs"]
+                    **config["kwargs"],
                 )
             if config["sparse"]:
                 _test_single_mode(
                     config["model"],
                     sparse=True,
                     edges=config.get("edges", False),
-                    **config["kwargs"]
+                    **config["kwargs"],
                 )
         elif mode == MODES["BATCH"]:
             _test_batch_mode(
@@ -198,14 +198,14 @@ def run_model(config):
                     config["model"],
                     sparse=False,
                     edges=config.get("edges", False),
-                    **config["kwargs"]
+                    **config["kwargs"],
                 )
             if config["sparse"]:
                 _test_mixed_mode(
                     config["model"],
                     sparse=True,
                     edges=config.get("edges", False),
-                    **config["kwargs"]
+                    **config["kwargs"],
                 )
         elif mode == MODES["DISJOINT"]:
             if config["dense"]:
@@ -213,13 +213,13 @@ def run_model(config):
                     config["model"],
                     sparse=False,
                     edges=config.get("edges", False),
-                    **config["kwargs"]
+                    **config["kwargs"],
                 )
             if config["sparse"]:
                 _test_disjoint_mode(
                     config["model"],
                     sparse=True,
                     edges=config.get("edges", False),
-                    **config["kwargs"]
+                    **config["kwargs"],
                 )
     _test_get_config(config["model"], **config["kwargs"])

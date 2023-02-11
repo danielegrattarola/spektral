@@ -116,7 +116,7 @@ class InnerProduct(Layer):
         kernel_initializer="glorot_uniform",
         kernel_regularizer=None,
         kernel_constraint=None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(**kwargs)
         self.trainable_kernel = trainable_kernel
