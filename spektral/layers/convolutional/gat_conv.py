@@ -95,7 +95,7 @@ class GATConv(Conv):
         kernel_constraint=None,
         bias_constraint=None,
         attn_kernel_constraint=None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(
             activation=activation,
@@ -107,7 +107,7 @@ class GATConv(Conv):
             activity_regularizer=activity_regularizer,
             kernel_constraint=kernel_constraint,
             bias_constraint=bias_constraint,
-            **kwargs
+            **kwargs,
         )
         self.channels = channels
         self.attn_heads = attn_heads

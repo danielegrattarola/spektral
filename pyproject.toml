@@ -1,3 +1,36 @@
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "spektral"
+version = "1.2.0"
+authors = [
+    { name="Daniele Grattarola", email="daniele.grattarola@gmail.com" },
+]
+description = "Graph Neural Networks with Keras and TensorFlow."
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers=[
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "joblib",
+    "lxml",
+    "networkx",
+    "numpy",
+    "pandas",
+    "requests",
+    "scikit-learn",
+    "scipy",
+    "tensorflow>=2.2.0;platform_machine != 'arm64' or platform_system != 'Darwin'",
+    "tensorflow-macos>=2.5.0;platform_machine == 'arm64' and platform_system == 'Darwin'",
+    "tqdm",
+]
+
+
+[project.urls]
+homepage = "https://github.com/danielegrattarola/spektral"
+documentation = "https://graphneural.network"

@@ -180,7 +180,7 @@ class GlobalAttentionPool(GlobalPool):
         bias_regularizer=None,
         kernel_constraint=None,
         bias_constraint=None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(**kwargs)
         self.channels = channels
@@ -289,7 +289,7 @@ class GlobalAttnSumPool(GlobalPool):
         attn_kernel_initializer="glorot_uniform",
         attn_kernel_regularizer=None,
         attn_kernel_constraint=None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(**kwargs)
         self.attn_kernel_initializer = initializers.get(attn_kernel_initializer)

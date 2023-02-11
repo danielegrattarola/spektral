@@ -74,7 +74,7 @@ class GINConv(MessagePassing):
         activity_regularizer=None,
         kernel_constraint=None,
         bias_constraint=None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(
             aggregate=aggregate,
@@ -87,7 +87,7 @@ class GINConv(MessagePassing):
             activity_regularizer=activity_regularizer,
             kernel_constraint=kernel_constraint,
             bias_constraint=bias_constraint,
-            **kwargs
+            **kwargs,
         )
         self.channels = channels
         self.epsilon = epsilon

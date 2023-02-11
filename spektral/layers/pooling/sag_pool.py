@@ -67,7 +67,7 @@ class SAGPool(TopKPool):
         kernel_initializer="glorot_uniform",
         kernel_regularizer=None,
         kernel_constraint=None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(
             ratio,
@@ -77,7 +77,7 @@ class SAGPool(TopKPool):
             kernel_initializer=kernel_initializer,
             kernel_regularizer=kernel_regularizer,
             kernel_constraint=kernel_constraint,
-            **kwargs
+            **kwargs,
         )
 
     def call(self, inputs):
