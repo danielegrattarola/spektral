@@ -60,7 +60,7 @@ output = GCNConv(
 
 # Build model
 model = Model(inputs=[x_in, a_in], outputs=output)
-optimizer = Adam(lr=learning_rate)
+optimizer = Adam(learning_rate=learning_rate)
 model.compile(
     optimizer=optimizer, loss="categorical_crossentropy", weighted_metrics=["acc"]
 )

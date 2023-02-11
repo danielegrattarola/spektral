@@ -6,7 +6,7 @@ import scipy.sparse as sp
 from spektral.utils import convolution
 
 g = nx.generators.erdos_renyi_graph(10, 0.2)
-adj_sp = nx.adj_matrix(g).astype("f")
+adj_sp = nx.adjacency_matrix(g).astype("f")
 adj = adj_sp.A.astype("f")
 degree = np.diag([d[1] for d in nx.degree(g)])
 tol = 1e-6

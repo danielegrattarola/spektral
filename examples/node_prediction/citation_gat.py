@@ -75,7 +75,7 @@ gc_2 = GATConv(
 
 # Build model
 model = Model(inputs=[x_in, a_in], outputs=gc_2)
-optimizer = Adam(lr=learning_rate)
+optimizer = Adam(learning_rate=learning_rate)
 model.compile(
     optimizer=optimizer,
     loss=CategoricalCrossentropy(reduction="sum"),

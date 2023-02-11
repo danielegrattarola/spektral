@@ -65,7 +65,7 @@ gc_2 = ChebConv(n_out, K=K, activation="softmax", use_bias=False)([do_2, a_in])
 
 # Build model
 model = Model(inputs=[x_in, a_in], outputs=gc_2)
-optimizer = Adam(lr=learning_rate)
+optimizer = Adam(learning_rate=learning_rate)
 model.compile(
     optimizer=optimizer,
     loss=CategoricalCrossentropy(reduction="sum"),  # To compute mean
