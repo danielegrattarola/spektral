@@ -40,6 +40,7 @@ PAGES = [
             layers.GCSConv,
             layers.GINConv,
             layers.GraphSageConv,
+            layers.GTVConv,
             layers.TAGConv,
             layers.XENetConv,
         ],
