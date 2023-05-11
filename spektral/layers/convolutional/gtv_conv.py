@@ -7,10 +7,10 @@ class GTVConv(Conv):
     r"""
     A graph total variation convolutional layer (GTVConv) from the paper
 
-    > [Clustering with Total Variation Graph Neural Networks](https://arxiv.org/abs/2211.06218)<br>
+    > [Total Variation Graph Neural Networks](https://arxiv.org/abs/2211.06218)<br>
     > Jonas Berg Hansen and Filippo Maria Bianchi
 
-    **Mode**: single, disjoint, batch
+    **Mode**: single, disjoint, batch.
 
     This layer computes
     $$

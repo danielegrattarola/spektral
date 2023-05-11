@@ -51,6 +51,7 @@ PAGES = [
         "methods": [],
         "classes": [
             layers.SRCPool,
+            layers.AsymCheegerCutPool,
             layers.DiffPool,
             layers.LaPool,
             layers.MinCutPool,
