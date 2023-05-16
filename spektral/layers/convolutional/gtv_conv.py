@@ -59,7 +59,7 @@ class GTVConv(Conv):
         epsilon=0.001,
         activation=None,
         use_bias=True,
-        kernel_initializer="he_normal",
+        kernel_initializer="glorot_uniform",
         bias_initializer="zeros",
         kernel_regularizer=None,
         bias_regularizer=None,
