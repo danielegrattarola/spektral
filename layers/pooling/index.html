@@ -82,6 +82,8 @@
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#srcpool">SRCPool</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#asymcheegercutpool">AsymCheegerCutPool</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#diffpool">DiffPool</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#lapool">LaPool</a>
@@ -257,6 +259,66 @@ true number of nodes of the input (<code>n_nodes</code>) as a Tensor in the inst
 <ul>
 <li><code>return_selection</code>: if <code>True</code>, the Tensor used to represent supernode assignments
 will be returned with <code>x_pool</code>, <code>a_pool</code>, and <code>i_pool</code>;</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/asym_cheeger_cut_pool.py#L10">[source]</a></span></p>
+<h4 id="asymcheegercutpool">AsymCheegerCutPool</h4>
+<pre><code class="language-python">spektral.layers.AsymCheegerCutPool(k, mlp_hidden=None, mlp_activation='relu', totvar_coeff=1.0, balance_coeff=1.0, return_selection=False, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, kernel_constraint=None, bias_constraint=None)
+</code></pre>
+<p>An Asymmetric Cheeger Cut Pooling layer from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/2211.06218">Total Variation Graph Neural Networks</a><br>
+Jonas Berg Hansen and Filippo Maria Bianchi</p>
+</blockquote>
+<p><strong>Mode</strong>: single, batch.</p>
+<p>This layer learns a soft clustering of the input graph as follows:
+<script type="math/tex; mode=display">
+\begin{align}
+\S &= \textrm{MLP}(\X); \\
+\X' &= \S^\top \X \\
+\A' &= \S^\top \A \S; \\
+\end{align}
+</script>
+where <script type="math/tex">\textrm{MLP}</script> is a multi-layer perceptron with softmax output.</p>
+<p>The layer includes two auxiliary loss terms/components:
+A graph total variation component given by
+<script type="math/tex; mode=display">
+L_\text{GTV} = \frac{1}{2E} \sum_{k=1}^K \sum_{i=1}^N \sum_{j=i}^N a_{i,j} |s_{i,k} - s_{j,k}|,
+</script>
+where <script type="math/tex">E</script> is the number of edges/links, <script type="math/tex">K</script> is the number of clusters or output nodes, and <script type="math/tex">N</script> is the number of nodes.</p>
+<p>An asymmetrical norm component given by
+<script type="math/tex; mode=display">
+L_\text{AN} = \frac{N(K - 1) - \sum_{k=1}^K ||\s_{:,k} - \textrm{quant}_{K-1} (\s_{:,k})||_{1, K-1}}{N(K-1)},
+</script>
+</p>
+<p>The layer can be used without a supervised loss to compute node clustering by
+minimizing the two auxiliary losses.</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>(batch, n_nodes_in, n_node_features)</code>;</li>
+<li>Adjacency matrix of shape <code>(batch, n_nodes_in, n_nodes_in)</code>;</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Reduced node features of shape <code>(batch, n_nodes_out, n_node_features)</code>;</li>
+<li>If <code>return_selection=True</code>, the selection matrix of shape 
+<code>(batch, n_nodes_in, n_nodes_out)</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>k</code>: number of output nodes;</li>
+<li><code>mlp_hidden</code>: list of integers, number of hidden units for each hidden layer in
+the MLP used to compute cluster assignments (if <code>None</code>, the MLP has only one output
+layer);</li>
+<li><code>mlp_activation</code>: activation for the MLP layers;</li>
+<li><code>totvar_coeff</code>: coefficient for graph total variation loss component;</li>
+<li><code>balance_coeff</code>: coefficient for asymmetric norm loss component;  </li>
+<li><code>return_selection</code>: boolean, whether to return the selection matrix;</li>
+<li><code>use_bias</code>: use bias in the MLP;</li>
+<li><code>kernel_initializer</code>: initializer for the weights of the MLP;</li>
+<li><code>bias_regularizer</code>: regularization applied to the bias of the MLP;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights of the MLP;</li>
+<li><code>bias_constraint</code>: constraint applied to the bias of the MLP;</li>
 </ul>
 <hr />
 <p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/diff_pool.py#L9">[source]</a></span></p>
@@ -663,7 +725,7 @@ layer);</li>
 </ul>
 <hr />
 <h3 id="global-pooling-layers">Global pooling layers</h3>
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L82">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L81">[source]</a></span></p>
 <h4 id="globalavgpool">GlobalAvgPool</h4>
 <pre><code class="language-python">spektral.layers.GlobalAvgPool()
 </code></pre>
@@ -683,7 +745,7 @@ be <code>(1, n_node_features)</code>).</li>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L111">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L110">[source]</a></span></p>
 <h4 id="globalmaxpool">GlobalMaxPool</h4>
 <pre><code class="language-python">spektral.layers.GlobalMaxPool()
 </code></pre>
@@ -703,7 +765,7 @@ be <code>(1, n_node_features)</code>).</li>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L53">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L52">[source]</a></span></p>
 <h4 id="globalsumpool">GlobalSumPool</h4>
 <pre><code class="language-python">spektral.layers.GlobalSumPool()
 </code></pre>
@@ -723,7 +785,7 @@ be <code>(1, n_node_features)</code>).</li>
 <p><strong>Arguments</strong></p>
 <p>None.</p>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L140">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L139">[source]</a></span></p>
 <h4 id="globalattentionpool">GlobalAttentionPool</h4>
 <pre><code class="language-python">spektral.layers.GlobalAttentionPool(channels, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, kernel_constraint=None, bias_constraint=None)
 </code></pre>
@@ -758,7 +820,7 @@ shape will be <code>(1, channels)</code>).</li>
 <li><code>bias_constraint</code>: constraint applied to the bias vectors.</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L254">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L253">[source]</a></span></p>
 <h4 id="globalattnsumpool">GlobalAttnSumPool</h4>
 <pre><code class="language-python">spektral.layers.GlobalAttnSumPool(attn_kernel_initializer='glorot_uniform', attn_kernel_regularizer=None, attn_kernel_constraint=None)
 </code></pre>
@@ -791,7 +853,7 @@ matrix;</li>
 matrix;</li>
 </ul>
 <hr />
-<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L353">[source]</a></span></p>
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/pooling/global_pool.py#L352">[source]</a></span></p>
 <h4 id="sortpool">SortPool</h4>
 <pre><code class="language-python">spektral.layers.SortPool(k)
 </code></pre>

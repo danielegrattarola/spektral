@@ -112,6 +112,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#graphsageconv">GraphSageConv</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#gtvconv">GTVConv</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#tagconv">TAGConv</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#xenetconv">XENetConv</a>
@@ -1055,6 +1057,55 @@ dimension changed to <code>channels</code>.</li>
 <li><code>channels</code>: number of output channels;</li>
 <li><code>aggregate_op</code>: str, aggregation method to use (<code>'sum'</code>, <code>'mean'</code>,
 <code>'max'</code>, <code>'min'</code>, <code>'prod'</code>);</li>
+<li><code>activation</code>: activation function;</li>
+<li><code>use_bias</code>: bool, add a bias vector to the output;</li>
+<li><code>kernel_initializer</code>: initializer for the weights;</li>
+<li><code>bias_initializer</code>: initializer for the bias vector;</li>
+<li><code>kernel_regularizer</code>: regularization applied to the weights;</li>
+<li><code>bias_regularizer</code>: regularization applied to the bias vector;</li>
+<li><code>activity_regularizer</code>: regularization applied to the output;</li>
+<li><code>kernel_constraint</code>: constraint applied to the weights;</li>
+<li><code>bias_constraint</code>: constraint applied to the bias vector.</li>
+</ul>
+<hr />
+<p><span style="float:right;"><a href="https://github.com/danielegrattarola/spektral/blob/master/spektral/layers/convolutional/gtv_conv.py#L8">[source]</a></span></p>
+<h4 id="gtvconv">GTVConv</h4>
+<pre><code class="language-python">spektral.layers.GTVConv(channels, delta_coeff=1.0, epsilon=0.001, activation=None, use_bias=True, kernel_initializer='glorot_uniform', bias_initializer='zeros', kernel_regularizer=None, bias_regularizer=None, activity_regularizer=None, kernel_constraint=None, bias_constraint=None)
+</code></pre>
+<p>A graph total variation convolutional layer (GTVConv) from the paper</p>
+<blockquote>
+<p><a href="https://arxiv.org/abs/2211.06218">Total Variation Graph Neural Networks</a><br>
+Jonas Berg Hansen and Filippo Maria Bianchi</p>
+</blockquote>
+<p><strong>Mode</strong>: single, disjoint, batch.</p>
+<p>This layer computes
+<script type="math/tex; mode=display">
+\X' = \sigma\left[\left(\I - \delta\L_\hat{\mathbf{\Gamma}}\right) \tilde{\X} \right]
+</script>
+where
+<script type="math/tex; mode=display">
+\begin{align}
+\tilde{\X} &= \X \W\\[5pt]
+\L_\hat{\mathbf{\Gamma}} &= \D_\mathbf{\hat{\Gamma}} - \hat{\mathbf{\Gamma}}\\[5pt]
+[\hat{\mathbf{\Gamma}}]_{ij} &= \frac{[\mathbf{A}]_{ij}}{\max\{||\tilde{\x}_i-\tilde{\x}_j||_1, \epsilon\}}\\
+\end{align}
+</script>
+</p>
+<p><strong>Input</strong></p>
+<ul>
+<li>Node features of shape <code>(batch, n_nodes, n_node_features)</code>;</li>
+<li>Adjacency matrix of shape <code>(batch, n_nodes, n_nodes)</code>;</li>
+</ul>
+<p><strong>Output</strong></p>
+<ul>
+<li>Node features with the same shape as the input, but with the last
+dimension changed to <code>channels</code>.</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li><code>channels</code>: number of output channels;</li>
+<li><code>delta_coeff</code>: step size for gradient descent of GTV</li>
+<li><code>epsilon</code>: small number used to numerically stabilize the computation of new adjacency weights</li>
 <li><code>activation</code>: activation function;</li>
 <li><code>use_bias</code>: bool, add a bias vector to the output;</li>
 <li><code>kernel_initializer</code>: initializer for the weights;</li>
