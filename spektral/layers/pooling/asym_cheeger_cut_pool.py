@@ -83,7 +83,7 @@ class AsymCheegerCutPool(SRCPool):
         bias_regularizer=None,
         kernel_constraint=None,
         bias_constraint=None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(
             k=k,
@@ -97,7 +97,7 @@ class AsymCheegerCutPool(SRCPool):
             bias_regularizer=bias_regularizer,
             kernel_constraint=kernel_constraint,
             bias_constraint=bias_constraint,
-            **kwargs
+            **kwargs,
         )
 
         self.k = k
