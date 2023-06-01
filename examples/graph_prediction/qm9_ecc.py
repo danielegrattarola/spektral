@@ -40,6 +40,7 @@ dataset_tr, dataset_te = dataset[idx_tr], dataset[idx_te]
 loader_tr = DisjointLoader(dataset_tr, batch_size=batch_size, epochs=epochs)
 loader_te = DisjointLoader(dataset_te, batch_size=batch_size, epochs=1)
 
+
 ################################################################################
 # Build model
 ################################################################################

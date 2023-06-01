@@ -8,7 +8,6 @@ from spektral.layers import ops
 
 class GlobalPool(Layer):
     def __init__(self, **kwargs):
-
         super().__init__(**kwargs)
         self.supports_masking = True
         self.pooling_op = None

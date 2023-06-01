@@ -53,6 +53,7 @@ Y = dataset.graphs[0].y
 y = np.argmax(Y, axis=-1)
 n_clust = Y.shape[-1]
 
+
 ################################
 # MODEL
 ################################
@@ -100,6 +101,7 @@ pool_layer = AsymCheegerCutPool(
 # Instantiate model and optimizer
 model = ClusteringModel(aggr=MP_layers, pool=pool_layer)
 opt = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+
 
 ################################
 # TRAINING
