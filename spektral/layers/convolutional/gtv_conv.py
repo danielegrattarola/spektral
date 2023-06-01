@@ -1,7 +1,9 @@
 import tensorflow as tf
 from tensorflow.keras import backend as K
+
 from spektral.layers import ops
 from spektral.layers.convolutional.conv import Conv
+
 
 class GTVConv(Conv):
     r"""
@@ -132,43 +134,48 @@ class GTVConv(Conv):
         if K.is_sparse(a):
             index_i = a.indices[:, 0]
             index_j = a.indices[:, 1]
-    
+
             n_nodes = tf.shape(a, out_type=index_i.dtype)[0]
-    
+
             # Compute absolute differences between neighbouring nodes
-            abs_diff = tf.math.abs(tf.transpose(tf.gather(x, index_i)) -
-                                   tf.transpose(tf.gather(x, index_j)))
+            abs_diff = tf.math.abs(
+                tf.transpose(tf.gather(x, index_i))
+                - tf.transpose(tf.gather(x, index_j))
+            )
             abs_diff = tf.math.reduce_sum(abs_diff, axis=0)
-    
+
             # Compute new adjacency matrix
-            gamma = tf.sparse.map_values(tf.multiply,
-                                         a,
-                                         1 / tf.math.maximum(abs_diff, self.epsilon))
-            
+            gamma = tf.sparse.map_values(
+                tf.multiply, a, 1 / tf.math.maximum(abs_diff, self.epsilon)
+            )
+
             # Compute degree matrix from gamma matrix
-            d_gamma = tf.sparse.SparseTensor(tf.stack([tf.range(n_nodes)] * 2, axis=1),
-                                             tf.sparse.reduce_sum(gamma, axis=-1),
-                                             [n_nodes, n_nodes])
-            
+            d_gamma = tf.sparse.SparseTensor(
+                tf.stack([tf.range(n_nodes)] * 2, axis=1),
+                tf.sparse.reduce_sum(gamma, axis=-1),
+                [n_nodes, n_nodes],
+            )
+
             # Compute laplcian: L = D_gamma - Gamma
-            l = tf.sparse.add(d_gamma, tf.sparse.map_values(
-                tf.multiply, gamma, -1.))
-            
+            l = tf.sparse.add(d_gamma, tf.sparse.map_values(tf.multiply, gamma, -1.0))
+
             # Compute adjusted laplacian: L_adjusted = I - delta*L
-            l = tf.sparse.add(tf.sparse.eye(n_nodes, dtype=x.dtype), tf.sparse.map_values(
-                tf.multiply, l, -self.delta_coeff))
-    
+            l = tf.sparse.add(
+                tf.sparse.eye(n_nodes, dtype=x.dtype),
+                tf.sparse.map_values(tf.multiply, l, -self.delta_coeff),
+            )
+
             # Aggregate features with adjusted laplacian
             output = ops.modal_dot(l, x)
-        
+
         else:
             n_nodes = tf.shape(a)[-1]
-            
+
             abs_diff = tf.math.abs(x[:, tf.newaxis, :] - x)
             abs_diff = tf.reduce_sum(abs_diff, axis=-1)
-            
+
             gamma = a / tf.math.maximum(abs_diff, self.epsilon)
-            
+
             degrees = tf.math.reduce_sum(gamma, axis=-1)
             l = -gamma
             l = tf.linalg.set_diag(l, degrees - tf.linalg.diag_part(gamma))
@@ -180,9 +187,10 @@ class GTVConv(Conv):
 
     def _call_batch(self, x, a):
         n_nodes = tf.shape(a)[-1]
-          
-        abs_diff = tf.reduce_sum(tf.math.abs(tf.expand_dims(x, 2) - 
-                                             tf.expand_dims(x, 1)), axis = -1)
+
+        abs_diff = tf.reduce_sum(
+            tf.math.abs(tf.expand_dims(x, 2) - tf.expand_dims(x, 1)), axis=-1
+        )
 
         gamma = a / tf.math.maximum(abs_diff, self.epsilon)
 
@@ -192,11 +200,13 @@ class GTVConv(Conv):
         l = tf.eye(n_nodes, dtype=x.dtype) - self.delta_coeff * l
 
         output = tf.matmul(l, x)
-        
+
         return output
-    
+
     @property
     def config(self):
-        return {"channels": self.channels,
-                "delta_coeff": self.delta_coeff,
-                "epsilon": self.epsilon}
+        return {
+            "channels": self.channels,
+            "delta_coeff": self.delta_coeff,
+            "epsilon": self.epsilon,
+        }

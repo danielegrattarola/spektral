@@ -7,18 +7,19 @@ Jonas Berg Hansen and Filippo Maria Bianchi
 """
 
 import numpy as np
-from tqdm import tqdm
+import tensorflow as tf
 from sklearn.metrics.cluster import (
     completeness_score,
     homogeneity_score,
     normalized_mutual_info_score,
 )
-import tensorflow as tf
 from tensorflow.keras import Model
-from spektral.utils.sparse import sp_matrix_to_sp_tensor
-from spektral.datasets.citation import Citation
+from tqdm import tqdm
+
 from spektral.datasets import DBLP
-from spektral.layers import GTVConv, AsymCheegerCutPool
+from spektral.datasets.citation import Citation
+from spektral.layers import AsymCheegerCutPool, GTVConv
+from spektral.utils.sparse import sp_matrix_to_sp_tensor
 
 tf.random.set_seed(1)
 
@@ -30,12 +31,12 @@ mp_channels = 512
 mp_layers = 2
 mp_activation = "elu"
 delta_coeff = 0.311
-epsilon=1e-3
+epsilon = 1e-3
 mlp_hidden_channels = 256
 mlp_hidden_layers = 1
 mlp_activation = "relu"
-totvar_coeff=0.785
-balance_coeff=0.514
+totvar_coeff = 0.785
+balance_coeff = 0.514
 learning_rate = 1e-3
 epochs = 500
 
@@ -77,13 +78,14 @@ class ClusteringModel(Model):
 
         return s_pool
 
+
 # Define the message-passing layers
-MP_layers = [GTVConv(
-    mp_channels,
-    delta_coeff=delta_coeff,
-    epsilon=1e-3,
-    activation=mp_activation)
-for _ in range(mp_layers)]
+MP_layers = [
+    GTVConv(
+        mp_channels, delta_coeff=delta_coeff, epsilon=1e-3, activation=mp_activation
+    )
+    for _ in range(mp_layers)
+]
 
 # Define the pooling layer
 pool_layer = AsymCheegerCutPool(
@@ -92,7 +94,8 @@ pool_layer = AsymCheegerCutPool(
     mlp_activation=mlp_activation,
     totvar_coeff=totvar_coeff,
     balance_coeff=balance_coeff,
-    return_selection=True)
+    return_selection=True,
+)
 
 # Instantiate model and optimizer
 model = ClusteringModel(aggr=MP_layers, pool=pool_layer)
@@ -109,6 +112,7 @@ def train_step(model, inputs):
     gradients = tape.gradient(loss, model.trainable_variables)
     opt.apply_gradients(zip(gradients, model.trainable_variables))
     return model.losses
+
 
 A = sp_matrix_to_sp_tensor(A)
 inputs = [X, A]

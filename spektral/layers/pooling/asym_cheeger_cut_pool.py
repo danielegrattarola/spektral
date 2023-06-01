@@ -1,9 +1,11 @@
 import tensorflow as tf
+import tensorflow.keras.backend as K
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense
-import tensorflow.keras.backend as K
+
 from spektral.layers import ops
 from spektral.layers.pooling.src import SRCPool
+
 
 class AsymCheegerCutPool(SRCPool):
     r"""
@@ -151,7 +153,7 @@ class AsymCheegerCutPool(SRCPool):
 
     def connect(self, a, s, **kwargs):
         a_pool = ops.matmul_at_b_a(s, a)
-        
+
         return a_pool
 
     def reduce_index(self, i, s, **kwargs):
@@ -159,7 +161,7 @@ class AsymCheegerCutPool(SRCPool):
         i_pool = ops.repeat(i_mean, tf.ones_like(i_mean) * self.k)
 
         return i_pool
-    
+
     def totvar_loss(self, a, s):
         if K.is_sparse(a):
             index_i = a.indices[:, 0]
@@ -167,25 +169,38 @@ class AsymCheegerCutPool(SRCPool):
 
             n_edges = tf.cast(len(a.values), dtype=s.dtype)
 
-            loss = tf.math.reduce_sum(a.values[:, tf.newaxis] * 
-                                      tf.math.abs(tf.gather(s, index_i) -
-                                                  tf.gather(s, index_j)),
-                                      axis=(-2, -1))
+            loss = tf.math.reduce_sum(
+                a.values[:, tf.newaxis]
+                * tf.math.abs(tf.gather(s, index_i) - tf.gather(s, index_j)),
+                axis=(-2, -1),
+            )
 
         else:
-            n_edges = tf.cast(tf.math.count_nonzero(
-                a, axis=(-2, -1)), dtype=s.dtype)
+            n_edges = tf.cast(tf.math.count_nonzero(a, axis=(-2, -1)), dtype=s.dtype)
             n_nodes = tf.shape(a)[-1]
             if K.ndim(a) == 3:
-                loss = tf.math.reduce_sum(a * tf.math.reduce_sum(tf.math.abs(s[:, tf.newaxis, ...] -
-                                                                             tf.repeat(s[..., tf.newaxis, :],
-                                                                                       n_nodes, axis=-2)), axis=-1),
-                                          axis=(-2, -1))
+                loss = tf.math.reduce_sum(
+                    a
+                    * tf.math.reduce_sum(
+                        tf.math.abs(
+                            s[:, tf.newaxis, ...]
+                            - tf.repeat(s[..., tf.newaxis, :], n_nodes, axis=-2)
+                        ),
+                        axis=-1,
+                    ),
+                    axis=(-2, -1),
+                )
             else:
-                loss = tf.math.reduce_sum(a * tf.math.reduce_sum(tf.math.abs(s -
-                                                                             tf.repeat(s[..., tf.newaxis, :],
-                                                                                       n_nodes, axis=-2)), axis=-1),
-                                          axis=(-2, -1))
+                loss = tf.math.reduce_sum(
+                    a
+                    * tf.math.reduce_sum(
+                        tf.math.abs(
+                            s - tf.repeat(s[..., tf.newaxis, :], n_nodes, axis=-2)
+                        ),
+                        axis=-1,
+                    ),
+                    axis=(-2, -1),
+                )
 
         loss *= 1 / (2 * n_edges)
 
@@ -196,15 +211,15 @@ class AsymCheegerCutPool(SRCPool):
 
         # k-quantile
         idx = tf.cast(tf.math.floor(n_nodes / self.k) + 1, dtype=tf.int32)
-        med = tf.math.top_k(tf.linalg.matrix_transpose(s), 
-                            k=idx).values[..., -1]
+        med = tf.math.top_k(tf.linalg.matrix_transpose(s), k=idx).values[..., -1]
         # Asymmetric l1-norm
         if K.ndim(s) == 2:
             loss = s - med
         else:
             loss = s - med[:, tf.newaxis, ...]
-        loss = ((tf.cast(loss >= 0, loss.dtype) * (self.k - 1) * loss) +
-                (tf.cast(loss < 0, loss.dtype) * loss * -1.))
+        loss = (tf.cast(loss >= 0, loss.dtype) * (self.k - 1) * loss) + (
+            tf.cast(loss < 0, loss.dtype) * loss * -1.0
+        )
         loss = tf.math.reduce_sum(loss, axis=(-2, -1))
         loss = 1 / (n_nodes * (self.k - 1)) * (n_nodes * (self.k - 1) - loss)
 
@@ -216,7 +231,7 @@ class AsymCheegerCutPool(SRCPool):
             "mlp_hidden": self.mlp_hidden,
             "mlp_activation": self.mlp_activation,
             "totvar_coeff": self.totvar_coeff,
-            "balance_coeff": self.balance_coeff
+            "balance_coeff": self.balance_coeff,
         }
         base_config = super().get_config()
         return {**base_config, **config}
