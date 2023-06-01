@@ -40,6 +40,7 @@ PAGES = [
             layers.GCSConv,
             layers.GINConv,
             layers.GraphSageConv,
+            layers.GTVConv,
             layers.TAGConv,
             layers.XENetConv,
             layers.GINConvBatch,
@@ -52,6 +53,7 @@ PAGES = [
         "methods": [],
         "classes": [
             layers.SRCPool,
+            layers.AsymCheegerCutPool,
             layers.DiffPool,
             layers.LaPool,
             layers.MinCutPool,

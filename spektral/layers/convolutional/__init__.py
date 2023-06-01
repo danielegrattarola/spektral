@@ -14,6 +14,7 @@ from .gcs_conv import GCSConv
 from .general_conv import GeneralConv
 from .gin_conv import GINConv, GINConvBatch
 from .graphsage_conv import GraphSageConv
+from .gtv_conv import GTVConv
 from .message_passing import MessagePassing
 from .tag_conv import TAGConv
 from .xenet_conv import XENetConv, XENetConvBatch
