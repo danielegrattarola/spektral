@@ -162,7 +162,6 @@ class DMoNPool(SRCPool):
         return i_pool
 
     def modularity_loss(self, a, s, a_pool):
-
         if K.is_sparse(a):
             n_edges = tf.cast(len(a.values), dtype=s.dtype)
 
