@@ -52,7 +52,7 @@ class Flickr(Dataset):
         f = np.load(osp.join(self.path, "adj_full.npz"))
         a = sp.csr_matrix((f["data"], f["indices"], f["indptr"]), f["shape"])
 
-        x = np.load(osp.join(self.path, "feats.npy"))
+        x = np.load(osp.join(self.path, "feats.npy"), allow_pickle=True)
 
         if self.normalize_x:
             print("Pre-processing node features")
