@@ -71,7 +71,7 @@ class Graph:
                     f"rank {len(x.shape)}"
                 )
         if a is not None:
-            if not (isinstance(a, np.ndarray) or sp.isspmatrix(a)):
+            if not (isinstance(a, np.ndarray) or sp.issparse(a)):
                 raise ValueError(f"Unsupported type {type(a)} for a")
             if len(a.shape) != 2:
                 raise ValueError(
