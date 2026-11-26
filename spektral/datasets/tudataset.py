@@ -56,13 +56,14 @@ class TUDataset(Dataset):
     )
 
     def __init__(self, name, clean=False, **kwargs):
-        if name not in self.available_datasets():
+        self.name = name
+        self.clean = clean
+        # The online list is only needed to validate a dataset that must be downloaded.
+        if not osp.exists(self.path) and name not in self.available_datasets():
             raise ValueError(
                 "Unknown dataset {}. See {}.available_datasets() for a complete list of"
                 "available datasets.".format(name, self.__class__.__name__)
             )
-        self.name = name
-        self.clean = clean
         super().__init__(**kwargs)
 
     @property
