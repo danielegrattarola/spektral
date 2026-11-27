@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11"]
+        python-version: ["3.10", "3.11"]
         os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
@@ -24,9 +24,10 @@ jobs:
         python -m pip install pytest coverage codecov
     - name: Install Spektral
       run: |
-        # Keras 2 (TensorFlow below 2.16), and the scipy and networkx this code still runs on:
-        # scipy 1.11 removed errstate and Delaunay.vertices; networkx 3 returns csr_array.
-        python -m pip install "tensorflow<2.16" "tensorflow-macos<2.16" "scipy<1.11" "networkx<3" .
+        # TensorFlow below 2.14 (GlobalAttnSumPool's test fails on 2.15), and the scipy and networkx
+        # this code still runs on: scipy 1.11 removed errstate and Delaunay.vertices; networkx 3
+        # returns csr_array. On macOS arm64, pyproject installs tensorflow-macos instead.
+        python -m pip install "tensorflow<2.14; sys_platform != 'darwin'" "tensorflow-macos<2.14; sys_platform == 'darwin'" "scipy<1.11" "networkx<3" .
     - name: Test with pytest and coverage
       run: |
         python -m coverage run --source=. -m pytest

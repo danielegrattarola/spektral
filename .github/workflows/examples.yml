@@ -15,7 +15,7 @@ jobs:
         python-version: 3.11
     - name: Install dependencies
       run: |
-        pip install ogb matplotlib "scipy<1.14" "networkx<3" "tensorflow<2.16"
+        pip install ogb matplotlib "scipy<1.14" "networkx<3" "tensorflow<2.14"
     - name: Install Spektral
       run: |
         pip install .
