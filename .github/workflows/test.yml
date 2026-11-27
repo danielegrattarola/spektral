@@ -24,10 +24,10 @@ jobs:
         python -m pip install pytest coverage codecov
     - name: Install Spektral
       run: |
-        # TensorFlow below 2.15 (test_global_node_attention_pool fails on 2.15), and the scipy and networkx
+        # TensorFlow below 2.14 (test_global_node_attention_pool fails on 2.14 and 2.15), and the scipy and networkx
         # this code still runs on: scipy 1.11 removed errstate and Delaunay.vertices; networkx 3
         # returns csr_array. On macOS arm64, pyproject installs tensorflow-macos instead.
-        python -m pip install "tensorflow<2.15; sys_platform != 'darwin'" "tensorflow-macos<2.15; sys_platform == 'darwin'" "scipy<1.11" "networkx<3" .
+        python -m pip install "tensorflow<2.14; sys_platform != 'darwin'" "tensorflow-macos<2.14; sys_platform == 'darwin'" "scipy<1.11" "networkx<3" .
     - name: Test with pytest and coverage
       run: |
         python -m coverage run --source=. -m pytest
