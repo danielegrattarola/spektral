@@ -62,7 +62,7 @@ def test_delaunay():
     x = np.random.rand(N, 2)
     g = Graph(x=x, a=a, e=e, y=y_nl)
     t(g)
-    g = Graph(x=x, a=a.A, e=e, y=y_nl)
+    g = Graph(x=x, a=a.toarray(), e=e, y=y_nl)
     t(g)
 
 
@@ -71,7 +71,7 @@ def test_gcn_filter():
     assert callable(t)
     g = Graph(x=x, a=a, e=e, y=y_nl)
     t(g)
-    g = Graph(x=x, a=a.A, e=e, y=y_nl)
+    g = Graph(x=x, a=a.toarray(), e=e, y=y_nl)
     t(g)
 
 
@@ -100,7 +100,7 @@ def test_normalize_adj():
     assert callable(t)
     g = Graph(x=x, a=a, e=e, y=y_nl)
     t(g)
-    g = Graph(x=x, a=a.A, e=e, y=y_nl)
+    g = Graph(x=x, a=a.toarray(), e=e, y=y_nl)
     t(g)
 
 

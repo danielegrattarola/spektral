@@ -64,7 +64,7 @@ class Citation(Dataset):
 
     def read(self):
         objects = [_read_file(self.path, self.name, s) for s in self.suffixes]
-        objects = [o.A if sp.issparse(o) else o for o in objects]
+        objects = [o.toarray() if sp.issparse(o) else o for o in objects]
         x, y, tx, ty, allx, ally, graph, idx_te = objects
 
         # Public Planetoid splits. This is the default
