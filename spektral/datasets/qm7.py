@@ -23,7 +23,7 @@ class QM7(Dataset):
     Each graph has a 14-dimensional label for regression.
     """
 
-    url = "http://deepchem.io.s3-website-us-west-1.amazonaws.com/datasets/qm7b.mat"
+    url = "https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/qm7b.mat"
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

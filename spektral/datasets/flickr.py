@@ -22,7 +22,7 @@ class Flickr(Dataset):
     - `dtype`: numpy dtype of graph data.
     """
 
-    url = "https://docs.google.com/uc?export=download&id={}&confirm=t"
+    url = "https://drive.usercontent.google.com/download?id={}&export=download&confirm=t"
 
     adj_full_id = "1crmsTbd1-2sEXsGwa2IKnIB7Zd3TmUsy"
     feats_id = "1join-XdvX3anJU_MLVtick7MgeAQiWIZ"
