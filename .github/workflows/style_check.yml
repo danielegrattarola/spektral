@@ -8,20 +8,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Set up Python 3.11
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: 3.11
     - name: Lint Python code
       run: |
-        pip install flake8
+        pip install "flake8<7.2"
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
     - name: Black formatting
       run: |
-        pip install black
+        pip install "black<24"
         black --diff --check .
     - name: Ensure import sorted
       run: |
-        pip install isort
+        pip install "isort<6"
         isort -rc --diff --check-only .
