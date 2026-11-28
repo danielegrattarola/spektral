@@ -269,7 +269,7 @@ def test_modes_ops():
 
     expected_a = np.zeros((len(ns), max(ns), max(ns)))
     for i_, n in enumerate(ns):
-        expected_a[i_, :n, :n] = a_list[i_].A
+        expected_a[i_, :n, :n] = a_list[i_].toarray()
 
     # Disjoint signal to batch
     result = ops.disjoint_signal_to_batch(x, i).numpy()

@@ -7,7 +7,7 @@ from spektral.utils import convolution
 
 g = nx.generators.erdos_renyi_graph(10, 0.2)
 adj_sp = nx.adjacency_matrix(g).astype("f")
-adj = adj_sp.A.astype("f")
+adj = adj_sp.toarray().astype("f")
 degree = np.diag([d[1] for d in nx.degree(g)])
 tol = 1e-6
 
@@ -40,9 +40,9 @@ def _check_results_equal(results_1, results_2):
     assert len(results_1) == len(results_2)
     for r_1, r_2 in zip(results_1, results_2):
         if sp.issparse(r_1):
-            r_1 = r_1.A
+            r_1 = r_1.toarray()
         if sp.issparse(r_2):
-            r_2 = r_2.A
+            r_2 = r_2.toarray()
         assert np.allclose(r_1, r_2, atol=tol)
 
 
